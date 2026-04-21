@@ -1,0 +1,7 @@
+{
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"C:\\\\_cursor_project\\\\2026전문인재강의안\\\\final\\\\session-01-complete.html\",\"offset\":2349,\"limit\":900}",
+  "error": "File content (27125 tokens) exceeds maximum allowed tokens (25000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
+  "timestamp": "2026-04-21T17:40:02.111Z",
+  "retry_count": 1
+}
