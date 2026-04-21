@@ -1,0 +1,3231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Session 01 · AI 에이전트 시대의 개막과 공공 구현 지형도</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5efe4;--bg2:#ede4d3;--ink:#2b2015;--ink2:#5a4a38;--ink3:#8a7659;--acc:#b8532a;--acc3:#d49575;--ln:#d8c8ae;--ln2:#e6d9bf;--dk:#1a1612;--dk2:#241e17;--on:#ede4d3;--on2:#a89172;--serif:'Fraunces','Noto Serif KR',Georgia,serif;--sans:'Pretendard Variable',Pretendard,sans-serif;--mono:'JetBrains Mono',ui-monospace,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background:#0e0a06;font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;background:#0e0a06}
+.deck::-webkit-scrollbar{display:none}
+.stage{width:100vw;min-height:100vh;display:flex;align-items:center;justify-content:center;scroll-snap-align:start;padding:0;background:#0e0a06}
+.slide{width:1600px;height:900px;background:var(--bg);position:relative;overflow:hidden;transform-origin:center;box-shadow:0 40px 90px -30px rgba(0,0,0,0.7);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.08  0 0 0 0.025 0'/%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.hbar{position:absolute;top:0;left:0;right:0;height:52px;background:var(--dk);display:flex;align-items:center;justify-content:space-between;padding:0 80px}
+.hbar-l{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:10.5px;color:#fff;letter-spacing:2.5px;font-weight:600}
+.hbar-l::before{content:"";width:22px;height:8px;background:var(--acc)}
+.hbar-r{font-family:var(--mono);font-size:10.5px;color:#bbb;letter-spacing:1.5px}
+.hl{position:absolute;left:80px;right:80px;top:86px}
+.hl-kicker{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:14px}
+.hl-title{font-family:var(--serif);font-weight:700;font-size:36px;line-height:1.22;letter-spacing:-0.5px;color:var(--ink)}
+.hl-sub{font-size:15.5px;color:var(--ink2);margin-top:12px;line-height:1.6}
+.hl-bar{width:60px;height:3px;background:var(--ink);margin-top:16px}
+.hl-rule{position:absolute;left:80px;right:80px;top:248px;height:1px;background:var(--ln2)}
+.fbar{position:absolute;bottom:0;left:0;right:0;height:52px;background:#f0e8d8;border-top:3px solid var(--ln);display:flex;align-items:center;justify-content:space-between;padding:0 80px}
+.fbar-l,.fbar-r{display:flex;flex-direction:column;gap:2px}.fbar-r{align-items:flex-end}
+.fbar-label{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2.5px;font-weight:700}
+.fbar-title{font-size:13px;color:var(--ink)}
+
+.bd{position:absolute;left:80px;right:80px;top:264px;bottom:72px;display:grid;gap:1px;background:var(--ln2)}
+.bd.col3{grid-template-columns:1fr 1fr 1fr}
+.bd.col2{grid-template-columns:1fr 1fr}
+.bd.col2w{grid-template-columns:1.25fr 1fr}
+.bd.col2n{grid-template-columns:1fr 1.3fr}
+.col{background:var(--bg);padding:30px 34px;display:flex;flex-direction:column;overflow:hidden;min-width:0;gap:14px}
+.col > .grow{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}
+
+.card{background:var(--bg);padding:34px 36px;display:flex;flex-direction:column;gap:16px;overflow:hidden;min-width:0}
+.card.dk{background:var(--dk);color:var(--on)}
+.card-k{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:2.5px;font-weight:700}
+.card.dk .card-k{color:var(--acc3)}
+.card-anchor{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1.22;color:var(--ink);letter-spacing:-0.4px}
+.card.dk .card-anchor{color:var(--on)}
+.card-anchor em{color:var(--acc);font-style:normal}
+.card.dk .card-anchor em{color:var(--acc3)}
+.card-body{font-size:14px;line-height:1.75;color:var(--ink2)}
+.card.dk .card-body{color:var(--on2)}
+.card-body strong{color:var(--ink);font-weight:700}
+.card.dk .card-body strong{color:var(--on)}
+.card-spacer{flex:1;min-height:8px}
+.card-note{font-size:12.5px;color:var(--ink3);font-style:italic;line-height:1.6}
+.card.dk .card-note{color:var(--on2)}
+
+.sh{display:flex;align-items:baseline;gap:12px;margin-bottom:3px}
+.sh-n{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;white-space:nowrap}
+.sh-t{font-size:12.5px;color:var(--ink2)}
+.sh-line{height:1px;background:var(--ln2);margin-bottom:10px}
+
+.mtbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.mtbl thead th{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;text-align:left;padding:9px 9px;border-bottom:1.5px solid var(--ink);background:var(--bg2)}
+.mtbl tbody td{padding:10px 9px;border-bottom:1px solid var(--ln2);color:var(--ink2);vertical-align:top;line-height:1.6}
+.mtbl tbody tr:last-child td{border-bottom:0}
+.mtbl tbody td:first-child{color:var(--ink);font-weight:700;font-family:var(--mono);font-size:10.5px;letter-spacing:1px;white-space:nowrap}
+.mtbl tbody td.q{color:var(--ink);font-weight:600;font-family:var(--sans);font-size:12.5px;letter-spacing:0}
+
+.co{background:var(--bg2);border-left:3px solid var(--acc);padding:14px 18px}
+.co-lb{font-family:var(--mono);font-size:10.5px;color:var(--acc);letter-spacing:2px;font-weight:700;margin-bottom:5px}
+.co-main{font-size:14.5px;color:var(--ink);font-weight:700;line-height:1.5}
+.co p{font-size:12.5px;color:var(--ink2);line-height:1.7;margin-top:5px}
+
+.next{background:var(--dk);padding:16px 20px;color:var(--on)}
+.next-k{font-family:var(--mono);font-size:10.5px;color:var(--acc3);letter-spacing:2px;font-weight:700;margin-bottom:5px}
+.next-t{font-size:13.5px;line-height:1.65;color:var(--on2)}
+.next-t strong{color:var(--on);font-weight:700}
+
+.pit{border-left:3px solid var(--ink);padding:11px 15px;background:var(--bg2)}
+.pit-lb{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:5px}
+.pit-h{font-size:13px;color:var(--ink);font-weight:700;line-height:1.45}
+.pit-d{font-size:12px;color:var(--ink2);line-height:1.65;margin-top:4px}
+
+.smap{display:flex;flex-direction:column;gap:7px}
+.smap-i{display:grid;grid-template-columns:50px 1fr;gap:12px;align-items:start;padding:9px 13px;background:var(--bg2);border-left:2px solid var(--ln)}
+.smap-i.on{border-left-color:var(--acc);background:#f0e7d6}
+.smap-n{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:1.5px;font-weight:700;padding-top:2px}
+.smap-t{font-size:13px;color:var(--ink);font-weight:600;line-height:1.5}
+
+.qex{background:var(--bg2);border-left:3px solid var(--ink);padding:20px 26px;font-family:var(--serif);font-size:19px;line-height:1.75;color:var(--ink)}
+.qex .hot{background:var(--ink);color:var(--on);padding:2px 7px;border-radius:2px;font-weight:700;font-family:var(--sans);font-size:16px;letter-spacing:-0.2px}
+.qex .dim{color:var(--ink3);font-style:italic;font-size:16px}
+
+.draft{padding:14px 18px}
+.draft.weak{background:var(--bg2);border-left:3px solid var(--ln)}
+.draft.strong{background:var(--dk);color:var(--on);border-left:3px solid var(--acc3)}
+.draft-k{font-family:var(--mono);font-size:10px;letter-spacing:1.8px;font-weight:700;color:var(--ink3);margin-bottom:5px}
+.draft.strong .draft-k{color:var(--acc3)}
+.draft-t{font-size:13.5px;line-height:1.7;color:var(--ink)}
+.draft.strong .draft-t{color:var(--on)}
+.draft-note{font-size:11px;color:var(--ink3);margin-top:7px;line-height:1.55;font-style:italic}
+.draft.strong .draft-note{color:var(--on2)}
+
+.cmp2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--ln2)}
+.cmp2c{padding:18px 22px;display:flex;flex-direction:column;gap:9px;background:var(--bg2)}
+.cmp2c.dk{background:var(--dk);color:var(--on)}
+.cmp2c-k{font-family:var(--mono);font-size:10.5px;color:var(--acc);letter-spacing:2px;font-weight:700}
+.cmp2c.dk .cmp2c-k{color:var(--acc3)}
+.cmp2c-h{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-0.3px}
+.cmp2c.dk .cmp2c-h{color:var(--on)}
+.cmp2c-d{font-size:12.5px;color:var(--ink2);line-height:1.7}
+.cmp2c.dk .cmp2c-d{color:var(--on2)}
+.cmp2c-list{display:flex;flex-direction:column;gap:4px;font-size:12px;line-height:1.65;color:var(--ink2)}
+.cmp2c.dk .cmp2c-list{color:var(--on2)}
+.cmp2c-list li{list-style:none;padding-left:14px;position:relative}
+.cmp2c-list li::before{content:"—";position:absolute;left:0;color:var(--ink3);font-family:var(--mono)}
+.cmp2c.dk .cmp2c-list li::before{color:var(--on2)}
+.cmp2c-fig{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;padding-top:7px;border-top:1px solid var(--ln);margin-top:auto}
+.cmp2c.dk .cmp2c-fig{color:var(--acc3);border-top-color:#3a2f24}
+
+.hybrid{background:#f0e7d6;border-left:4px solid var(--acc);padding:18px 24px;display:flex;flex-direction:column;gap:8px}
+.hybrid-k{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:2.5px;font-weight:700}
+.hybrid-h{font-family:var(--serif);font-size:21px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-0.3px}
+.hybrid-d{font-size:13px;color:var(--ink2);line-height:1.7}
+.hybrid-d strong{color:var(--ink);font-weight:700}
+
+.tline{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--ln2);width:100%}
+.tblock{background:var(--bg2);padding:18px 20px;display:flex;flex-direction:column;gap:8px;position:relative}
+.tblock.dk{background:var(--dk);color:var(--on)}
+.tblock-w{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:2px;font-weight:700}
+.tblock.dk .tblock-w{color:var(--acc3)}
+.tblock-h{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1.25;color:var(--ink);letter-spacing:-0.3px}
+.tblock.dk .tblock-h{color:var(--on)}
+.tblock-sess{font-size:11.5px;color:var(--ink2);line-height:1.6;font-family:var(--mono);letter-spacing:0.3px}
+.tblock.dk .tblock-sess{color:var(--on2)}
+.tblock-d{font-size:12px;color:var(--ink2);line-height:1.7}
+.tblock.dk .tblock-d{color:var(--on2)}
+
+/* 추가 컴포넌트 */
+.flow{display:grid;gap:10px;align-items:center}
+.flow.h4{grid-template-columns:1fr auto 1fr auto 1fr auto 1fr}
+.flow.h3{grid-template-columns:1fr auto 1fr auto 1fr}
+.flow-box{background:var(--bg2);border:1px solid var(--ln);padding:12px 14px;text-align:center;display:flex;flex-direction:column;gap:4px}
+.flow-box.dk{background:var(--dk);color:var(--on);border-color:var(--dk)}
+.flow-box.on{background:#f0e7d6;border-color:var(--acc);border-width:2px}
+.flow-box-k{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700}
+.flow-box.dk .flow-box-k{color:var(--acc3)}
+.flow-box.on .flow-box-k{color:var(--acc)}
+.flow-box-t{font-size:12.5px;color:var(--ink);font-weight:700;line-height:1.4}
+.flow-box.dk .flow-box-t{color:var(--on)}
+.flow-arrow{font-family:var(--mono);font-size:22px;color:var(--acc);font-weight:700;text-align:center}
+
+.grid2x2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;background:var(--ln2)}
+.qd{background:var(--bg2);padding:16px 20px;display:flex;flex-direction:column;gap:6px}
+.qd.dk{background:var(--dk);color:var(--on)}
+.qd-k{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2px;font-weight:700}
+.qd.dk .qd-k{color:var(--acc3)}
+.qd-h{font-size:14px;color:var(--ink);font-weight:700;line-height:1.35;font-family:var(--serif)}
+.qd.dk .qd-h{color:var(--on)}
+.qd-d{font-size:12px;color:var(--ink2);line-height:1.65}
+.qd.dk .qd-d{color:var(--on2)}
+.qd-d strong{color:var(--ink);font-weight:700}
+.qd.dk .qd-d strong{color:var(--on)}
+
+.ladder{display:flex;flex-direction:column;gap:1px;background:var(--ln2)}
+.ladder-step{background:var(--bg);padding:14px 18px;display:grid;grid-template-columns:56px 1fr auto;gap:16px;align-items:center}
+.ladder-step.dk{background:var(--dk);color:var(--on)}
+.ladder-step.on{background:#f0e7d6}
+.ladder-n{font-family:var(--serif);font-size:28px;color:var(--acc);font-weight:700;letter-spacing:-0.03em}
+.ladder-step.dk .ladder-n{color:var(--acc3)}
+.ladder-b{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ladder-h{font-size:14px;color:var(--ink);font-weight:700;line-height:1.4}
+.ladder-step.dk .ladder-h{color:var(--on)}
+.ladder-d{font-size:12px;color:var(--ink2);line-height:1.6}
+.ladder-step.dk .ladder-d{color:var(--on2)}
+.ladder-tag{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;text-align:right;white-space:nowrap}
+.ladder-step.dk .ladder-tag{color:var(--acc3)}
+
+.code{background:var(--dk2);padding:14px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:var(--on);white-space:pre-wrap;border-left:3px solid var(--acc3)}
+.code .cm{color:var(--on2)}
+.code .kw{color:var(--acc3);font-weight:600}
+
+.typelist{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ln2);flex:1}
+.type{background:var(--bg2);padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.type.dk{background:var(--dk);color:var(--on)}
+.type-n{font-family:var(--serif);font-size:32px;color:var(--acc);font-weight:700;line-height:1;letter-spacing:-0.03em}
+.type.dk .type-n{color:var(--acc3)}
+.type-h{font-size:13px;color:var(--ink);font-weight:700;line-height:1.35}
+.type.dk .type-h{color:var(--on)}
+.type-d{font-size:11.5px;color:var(--ink2);line-height:1.6}
+.type.dk .type-d{color:var(--on2)}
+.type-tag{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;margin-top:auto;padding-top:6px;border-top:1px solid var(--ln)}
+.type.dk .type-tag{color:var(--acc3);border-top-color:#3a2f24}
+
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 20px;background:rgba(14,10,6,0.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08)}
+.toolbar button{background:rgba(255,255,255,0.08);color:#ccc;border:1px solid rgba(255,255,255,0.12);padding:5px 14px;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;cursor:pointer;border-radius:3px;text-transform:uppercase;font-weight:600}
+.toolbar button:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
+.toolbar .pg{color:rgba(255,255,255,0.55);font-size:11px;padding:5px 10px;min-width:80px;text-align:center;font-family:var(--mono);letter-spacing:1px}
+@media print{@page{size:423.33mm 237.5mm;margin:0}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{overflow:visible!important;height:auto!important;background:#fff!important}.deck{overflow:visible!important;height:auto!important;scroll-snap-type:none!important;background:#fff!important}.stage{min-height:0!important;height:auto!important;page-break-after:always;page-break-inside:avoid;padding:0!important;margin:0!important;background:#fff!important;display:block!important}.stage:last-child{page-break-after:avoid}.slide{transform:none!important;box-shadow:none!important;width:1600px!important;height:900px!important}.toolbar{display:none!important}}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ============================================================ -->
+<!-- SLIDE 001 · COVER                                             -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Cover">
+  <div class="hbar"><div class="hbar-l">SESSION 01 · LECTURE COVER</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01 of 08</div></div>
+
+  <div style="position:absolute;top:140px;right:72px;font-family:var(--serif);font-size:280px;line-height:1;color:var(--acc);font-weight:300;opacity:0.08;letter-spacing:-0.06em;pointer-events:none;font-style:italic">01</div>
+
+  <div style="position:absolute;top:92px;left:80px;display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:3px;font-weight:700">
+    <div style="width:26px;height:2px;background:var(--acc)"></div>
+    PUBLIC AI EXPERT PROGRAM · 2026
+  </div>
+
+  <div style="position:absolute;top:150px;left:80px;max-width:1200px">
+    <div style="font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:16px">SESSION 01 · 오리엔테이션 및 지형도</div>
+    <h1 style="font-family:var(--serif);font-weight:700;font-size:62px;line-height:1.06;letter-spacing:-0.04em;color:var(--ink);margin-bottom:18px">AI 에이전트 시대의 개막과<br>공공 구현 지형도</h1>
+    <div style="width:72px;height:3px;background:var(--ink);margin-bottom:20px"></div>
+    <div style="font-family:var(--serif);font-size:22px;color:var(--ink);font-weight:600;line-height:1.5;letter-spacing:-0.01em">거점리더의 정체, 공공 AI 시스템 구조, 구현 유형과 거버넌스를 한 번에 잡는 입구 강의</div>
+    <p style="margin-top:22px;font-size:14.5px;color:var(--ink2);line-height:1.85;max-width:1050px">1차시의 목적은 기술을 많이 익히는 것이 아니라 <strong style="color:var(--ink)">지도를 얻는 것</strong>이다. 이후 2~8차시에서 다룰 모든 내용 — 모델, 프롬프트, 도구, RAG, API, MCP, 에이전트 — 이 어디에 놓이는지 먼저 보고, 자기 부서의 문제를 어떤 좌표로 읽을지 기준을 세운다.</p>
+  </div>
+
+  <div style="position:absolute;top:340px;right:80px;width:380px;border-top:2px solid var(--ink);padding-top:18px">
+    <div style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:18px">COURSE METADATA</div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">PROGRAM</span><span style="color:var(--ink);font-weight:600">공공 AI 전문인재 양성과정</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">SESSION</span><span style="color:var(--ink);font-weight:600">01 / 08</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">TARGET</span><span style="color:var(--ink);font-weight:600">부서 거점리더 후보</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">FOCUS</span><span style="color:var(--ink);font-weight:600">지형 이해 + 구조 설계</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">OUTPUT</span><span style="color:var(--ink);font-weight:600">거점 미션 카드 초안</span></div>
+  </div>
+
+  <div style="position:absolute;bottom:80px;left:80px;right:80px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART 0</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">오리엔테이션</div><div style="font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5">거점리더 · 시스템 6단계 · 8주 지도</div></div>
+    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART A</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">AI 기술 지형</div><div style="font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5">트랜스포머 · LLM · RAG · MCP · 프롬프트</div></div>
+    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART B</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">9가지 구현 유형</div><div style="font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5">HTML · Python · Node · RAG · MCP</div></div>
+    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART C</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">거버넌스</div><div style="font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5">오케스트레이션 · 승인 구조</div></div>
+    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART D</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">미션 카드</div><div style="font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5">거점 액션 초안 작성</div></div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">001 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 002 · HUB LEADER                                        -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Hub Leader">
+  <div class="hbar"><div class="hbar-l">PART 0 · HUB LEADER</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 0 · 오리엔테이션 ① · 거점리더의 정체 · 6MIN</div>
+    <div class="hl-title">거점리더는 AI 사용자가 아니라 구조 번역자다</div>
+    <div class="hl-sub">이 과정의 출발점은 "AI를 잘 쓰는 담당자"가 아니라 "현장 문제를 AI가 처리 가능한 구조로 번역하는 설계자"라는 관점이다. 코드 작성은 목표가 아니며, 부서 문제를 해결 가능한 단위로 나누고 다시 연결하는 일이 핵심이다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">역할 01 · TRANSLATE</div>
+      <div class="card-anchor">현장 문제를 AI가 다룰 수 있는 <em>입력</em>으로 바꾼다</div>
+      <div class="card-body">민원, 문서 검토, 통계 작성, 회의록 정리 같은 업무는 원래 사람의 언어로 존재한다. 이를 그대로 AI에 주면 답변도 사람의 언어로 돌아오고, 실제 자동화는 일어나지 않는다. 거점리더가 하는 번역은 <strong>트리거 · 재료 · 출력</strong>이라는 세 축으로 업무를 다시 쓰는 일이다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">"민원이 들어오면 답변을 쓴다"가 아니라 "접수번호가 발급되면, 본문과 관련 조례를 재료로, 초안을 생성한다"로 쓴다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">역할 02 · DESIGN</div>
+      <div class="card-anchor">모델 · 도구 · 데이터의 <em>연결 순서</em>를 정한다</div>
+      <div class="card-body">도구를 많이 아는 것보다 중요한 것은 <strong>어느 단계에 무엇을 쓸지</strong>를 명확히 결정하는 설계 감각이다. 같은 LLM과 같은 문서라도 연결 순서에 따라 품질이 달라지고, 감사와 재현 가능성이 달라지며, 운영 비용까지 달라진다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">도구 리스트는 검색으로 얻을 수 있지만, 연결 순서는 현장 업무를 아는 사람만 만들 수 있다.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">역할 03 · VERIFY &amp; SPREAD</div>
+      <div class="card-anchor">검증하고 <em>퍼뜨려서</em> 부서 전체의 역량을 키운다</div>
+      <div class="card-body">거점리더의 성과는 개인 생산성이 아니라 <strong>동료도 같은 문제를 같은 방식으로 풀 수 있게 만드는 것</strong>이다. 자기 혼자 AI를 잘 써서 업무를 끝내면 그 사람은 거점이 아니라 병목이 된다. 설계한 구조를 문서화하고, 검증 절차를 공유하고, 부서 자산으로 남기는 일까지가 역할에 포함된다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">개인 생산성 상승과 부서 전체의 역량 확산은 다른 지표다. 거점리더는 후자를 지향한다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">002 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 003 · 6-STAGE ARCHITECTURE                              -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="6 Stages">
+  <div class="hbar"><div class="hbar-l">PART 0 · 6-STAGE ARCHITECTURE</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 0 · 오리엔테이션 ② · 공공 AI 시스템 6단계 · 7MIN</div>
+    <div class="hl-title">공공 AI 시스템은 6단계로 나눠 읽는다</div>
+    <div class="hl-sub">민원 답변 초안, 월간 통계 자동화, 법령 Q&amp;A 챗봇은 겉보기는 달라도 대부분 같은 구조를 거친다. 기술 이름을 외우기 전에 이 순서를 먼저 익혀두면, 어느 단계가 자동화 가능하고 어디에 사람이 들어가야 하는지를 즉시 구분할 수 있다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">6 STAGES</span><span class="sh-t">단계 · 핵심 질문 · 공공 업무 예</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:110px">단계</th><th style="width:170px">핵심 질문</th><th>공공 업무에서의 예</th></tr></thead>
+        <tbody>
+          <tr><td>01 TRIGGER</td><td class="q">언제 시작되는가</td><td>민원 접수, 메일 수신, 결재 완료, 일일 집계 시각</td></tr>
+          <tr><td>02 INPUT</td><td class="q">무엇을 넣는가</td><td>민원 본문, 관련 법령, 내부 보고서, DB 조회 결과</td></tr>
+          <tr><td>03 REASON</td><td class="q">어떻게 판단하는가</td><td>분류 · 요약 · 초안 작성 · 비교 평가</td></tr>
+          <tr><td>04 TOOLS</td><td class="q">무엇을 연결하는가</td><td>검색, 계산, 외부 조회, 일정 등록</td></tr>
+          <tr><td>05 REVIEW</td><td class="q">누가 확인하는가</td><td>담당자 검토 → 팀장 결재</td></tr>
+          <tr><td>06 OUTPUT</td><td class="q">어떻게 내보내는가</td><td>민원 회신, 보고서, 공문 초안, 대시보드</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="co">
+          <div class="co-lb">READING ORDER</div>
+          <div class="co-main">LLM은 이 표의 03에만 들어간다</div>
+          <p>"LLM 도입"을 03 선택의 문제로만 보면 대부분 실패한다. 실제 품질은 02(근거 선별)와 05(승인 설계)에서 갈린다. 뒤 차시가 다루는 RAG · 프롬프트 · MCP는 모두 이 두 단계에 서비스한다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">FIELD CASE</span><span class="sh-t">교통민원 답변 초안 자동 생성 — 6단계 매핑</span></div>
+      <div class="sh-line"></div>
+      <div class="smap">
+        <div class="smap-i"><div class="smap-n">01</div><div class="smap-t">민원 포털 등록 + 담당 부서 자동 배정</div></div>
+        <div class="smap-i"><div class="smap-n">02</div><div class="smap-t">민원 본문 + 관련 조례 + 과거 유사 민원</div></div>
+        <div class="smap-i on"><div class="smap-n">03</div><div class="smap-t">LLM이 유형 분류 + 답변 초안 생성</div></div>
+        <div class="smap-i"><div class="smap-n">04</div><div class="smap-t">유사 답변 검색(RAG) + 노선 운영 API 조회</div></div>
+        <div class="smap-i on"><div class="smap-n">05</div><div class="smap-t">주무관 검토·수정 → 팀장 1-클릭 승인</div></div>
+        <div class="smap-i"><div class="smap-n">06</div><div class="smap-t">승인본 민원 포털 회신 + 내부 DB 축적</div></div>
+      </div>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">EDITORIAL</div>
+          <div class="next-t">많은 조직이 "정확한 모델"만 쫓다가 <strong>5단계(승인 구조)를 설계하지 않아</strong> 도입이 무산된다. 모델 정확도는 시간이 가면 올라가지만, 승인 구조는 시간이 간다고 생기지 않는다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">003 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 004 · FRONTIER & LOCAL                                  -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Brain Connection">
+  <div class="hbar"><div class="hbar-l">PART 0 · FRONTIER &amp; LOCAL</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 0 · 오리엔테이션 ③ · 프론티어 모델과 로컬 모델 · 8MIN</div>
+    <div class="hl-title">프론티어 모델과 로컬 모델은 대체가 아니라 역할 분담이다</div>
+    <div class="hl-sub">외부망의 프론티어 모델과 내부망의 로컬 모델은 경쟁 관계가 아니라 서로 다른 제약을 담당하는 부품이다. 공공 실무의 기본값은 둘 중 하나를 고르는 것이 아니라 둘을 조합하는 것 — 하이브리드다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd" style="grid-template-rows:auto auto;grid-template-columns:1fr;gap:1px">
+    <div class="cmp2">
+      <div class="cmp2c">
+        <div class="cmp2c-k">01 · FRONTIER MODEL · 외부망</div>
+        <div class="cmp2c-h">고난도 추론과 긴 문맥을 다루는 "생각의 뇌"</div>
+        <div class="cmp2c-d">프론티어 모델(GPT · Claude · Gemini · HyperCLOVA 등 상용 API)은 복잡한 문제 분해, 긴 문서 구조 파악, 멀티모달 처리에 강하다. 단, 민감 정보를 직접 전송하면 안 된다는 제약이 있다.</div>
+        <ul class="cmp2c-list">
+          <li>정책 리서치, 보고서 초안, 복잡한 추론</li>
+          <li>긴 문서 요약, 멀티모달 정리, 비교 평가</li>
+          <li>아이디어 생성, 대안 도출, 목차 제안</li>
+        </ul>
+        <div class="cmp2c-fig">GPT · CLAUDE · GEMINI · HYPERCLOVA</div>
+      </div>
+      <div class="cmp2c dk">
+        <div class="cmp2c-k">02 · LOCAL MODEL · 내부망</div>
+        <div class="cmp2c-h">민감 데이터와 반복 처리를 담당하는 "손발의 뇌"</div>
+        <div class="cmp2c-d">로컬 모델(Ollama · sLLM)은 자체 서버에서 동작하므로 민원 원문, 내부 계획안, 폐쇄망 문서처럼 외부 전송이 어려운 재료를 다룰 수 있다. 속도와 보안 로그 추적이 장점이고, 장문 비교·깊은 추론에는 약하다.</div>
+        <ul class="cmp2c-list">
+          <li>민원 본문 처리, 내부 문서 분류</li>
+          <li>반복 요약, 라벨링, 검색 인덱싱</li>
+          <li>망 분리 환경의 일상 업무 자동화</li>
+        </ul>
+        <div class="cmp2c-fig">OLLAMA · LLAMA · QWEN · SLLM 계열</div>
+      </div>
+    </div>
+    <div style="background:var(--bg);padding:22px 30px;display:grid;grid-template-columns:1.5fr 1fr;gap:24px;align-items:center">
+      <div class="hybrid">
+        <div class="hybrid-k">03 · HYBRID · 공공 실무의 기본값</div>
+        <div class="hybrid-h">초안은 프론티어에서, 민감 데이터와 최종 검토는 로컬에서</div>
+        <div class="hybrid-d">거점리더의 판단 기준은 "어느 모델이 더 똑똑한가"가 아니라 <strong>"어느 재료를 어디에 올릴 수 있는가"</strong>다. 아이디어와 구조는 외부에서 빠르게 만들고, 근거 확인과 배포는 내부에서 처리하는 패턴이 실제 도입에 가장 가깝다. 이 원칙이 뒤 차시의 RAG와 MCP 설계에도 그대로 이어진다.</div>
+      </div>
+      <div>
+        <div class="sh"><span class="sh-n">JUDGMENT RULE</span></div>
+        <div class="sh-line"></div>
+        <div class="pit">
+          <div class="pit-lb">모델 선택의 4가지 기준</div>
+          <div class="pit-h">성능 순위가 아니라 4가지 기준으로 결정한다</div>
+          <div class="pit-d">① 입력 데이터의 민감도, ② 승인·결재 절차의 재현 필요성, ③ 출력 로그의 보존 의무, ④ 동일 조건에서의 재현 가능성. 이 네 축이 선택을 결정하고 벤치마크 점수는 그다음이다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">004 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 005 · 8-WEEK MAP                                        -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="8-Week Map">
+  <div class="hbar"><div class="hbar-l">PART 0 · 8-WEEK MAP</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 0 · 오리엔테이션 ④ · 8주 커리큘럼 지도 · 7MIN</div>
+    <div class="hl-title">8주는 네 스테이지로 나뉜다 — 지형 · 재료 · 어시스트 · 에이전트</div>
+    <div class="hl-sub">1차시는 지도다. 이후의 차시는 이 지도에 재료와 도구, 서비스와 배포 방식을 채워 넣는 과정이다. 오늘 구조를 잡아 두면 뒤 차시에 나오는 API · MCP · RAG · 에이전트도 같은 틀 위에서 읽힌다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd" style="grid-template-rows:auto 1fr;grid-template-columns:1fr;gap:1px">
+    <div style="background:var(--bg);padding:22px 30px 14px">
+      <div class="sh"><span class="sh-n">8-WEEK STAGES</span><span class="sh-t">단계 · 주차 · 핵심 작업</span></div>
+      <div class="sh-line"></div>
+      <div class="tline">
+        <div class="tblock">
+          <div class="tblock-w">STAGE 01 · W1</div>
+          <div class="tblock-h">지형 파악</div>
+          <div class="tblock-sess">1차시 — 지형도</div>
+          <div class="tblock-d">거점리더 역할, LLM 지형, 구현 유형, 거버넌스의 기본 구조를 잡는 주차. 오늘 이 수업이 여기에 해당한다.</div>
+        </div>
+        <div class="tblock">
+          <div class="tblock-w">STAGE 02 · W2~W3</div>
+          <div class="tblock-h">재료 채우기</div>
+          <div class="tblock-sess">2~3차시 — 프론티어 모델 · 메타 프롬프트</div>
+          <div class="tblock-d">모델의 특성 · 프롬프트 4단계 · 도구 조합 방식을 익힌다. 이 단계를 거쳐야 이후의 구현이 즉흥이 아닌 설계가 된다.</div>
+        </div>
+        <div class="tblock">
+          <div class="tblock-w">STAGE 03 · W4~W5</div>
+          <div class="tblock-h">어시스트 구현</div>
+          <div class="tblock-sess">4~5차시 — 바이브 코딩 ①② · 로컬 AI</div>
+          <div class="tblock-d">데이터 시각화 · 분석, 파일·HWP 자동화, VBA+Ollama 내부망 연동. 업무 단위의 작은 구현을 직접 만드는 스테이지.</div>
+        </div>
+        <div class="tblock dk">
+          <div class="tblock-w">STAGE 04 · W6~W8</div>
+          <div class="tblock-h">에이전트 확장</div>
+          <div class="tblock-sess">6~8차시 — 에이전트 도구 · RAG · API·MCP</div>
+          <div class="tblock-d">에이전트 도구 5종, RAG 파이프라인, API·MCP 기반 멀티 에이전트. 마지막은 자기 부서 미션 캔버스 발표.</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--bg);padding:18px 30px 22px;display:grid;grid-template-columns:1.1fr 1fr;gap:32px;align-items:stretch">
+      <div>
+        <div class="sh"><span class="sh-n">READING FRAME</span><span class="sh-t">뒤 차시를 한 틀로 읽는 방법</span></div>
+        <div class="sh-line"></div>
+        <table class="mtbl" style="margin-top:4px">
+          <thead><tr><th style="width:130px">네 축</th><th>각 차시에서 이 축은 어떻게 나타나는가</th></tr></thead>
+          <tbody>
+            <tr><td>RAW MATERIAL</td><td class="q">모델 — 프론티어·로컬, reasoning, 오픈소스 (2차시·4차시)</td></tr>
+            <tr><td>CONNECTOR</td><td class="q">API · MCP — 도구와 시스템을 연결하는 표준 (8차시)</td></tr>
+            <tr><td>SYSTEM</td><td class="q">RAG · 워크플로우 — 단일 답변을 넘어 근거와 단계 (5·7차시)</td></tr>
+            <tr><td>OUTPUT</td><td class="q">미션 캔버스 — 자기 부서 문제를 한 장 구조로 (8차시 캡스톤)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;justify-content:center">
+        <div class="co">
+          <div class="co-lb">READING TIP</div>
+          <div class="co-main">순서를 기억한다 : 재료 → 연결 → 실행 → 검증</div>
+          <p>각 차시의 세부 내용은 달라도 이 네 질문은 반복된다. 어떤 재료를 쓰고, 어떤 연결을 만들고, 어떤 실행 단위로 조립하고, 어디서 검증할 것인가.</p>
+        </div>
+        <div class="next">
+          <div class="next-k">EDITORIAL</div>
+          <div class="next-t">이 과정을 끝까지 들은 뒤 남는 것은 <strong>기술 리스트가 아니라 판단 기준</strong>이다. 기술은 매달 바뀌지만 기준은 오래 간다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">005 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 006 · microGPT                                          -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="microGPT">
+  <div class="hbar"><div class="hbar-l">PART A-1 · TRANSFORMER TOUCH</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-1 · 트랜스포머 터치 ① · microGPT가 보여주는 것 · 5MIN</div>
+    <div class="hl-title">트랜스포머는 4단계 루프의 반복이다</div>
+    <div class="hl-sub">트랜스포머를 이해하는 목적은 수식을 외우기 위해서가 아니다. 지금 눈앞의 LLM이 사실은 데이터 읽기 · 토큰화 · attention · 생성이라는 단순 루프의 반복임을 알면, 기술을 덜 신비롭게 보고 더 냉정하게 적용할 수 있다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2n">
+    <div class="col">
+      <div class="sh"><span class="sh-n">4-STEP LOOP</span><span class="sh-t">모델 내부에서 일어나는 일</span></div>
+      <div class="sh-line"></div>
+      <div class="flow h4" style="margin-top:10px">
+        <div class="flow-box"><div class="flow-box-k">STEP 01</div><div class="flow-box-t">LOAD<br>토큰화</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box"><div class="flow-box-k">STEP 02</div><div class="flow-box-t">ATTEND<br>가중치</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box"><div class="flow-box-k">STEP 03</div><div class="flow-box-t">PREDICT<br>다음 토큰</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dk"><div class="flow-box-k">STEP 04</div><div class="flow-box-t">REPEAT<br>루프</div></div>
+      </div>
+      <div class="card-body" style="margin-top:14px">문장을 모델이 읽을 수 있는 토큰 집합으로 준비하고(LOAD), 문맥 안에서 어떤 부분을 더 중요하게 볼지 계산하고(ATTEND), 다음에 올 가능성이 높은 토큰을 고른 뒤(PREDICT), 이 과정을 반복한다(REPEAT). 이 4단계가 답변·요약·코드를 만들어내는 전부다.</div>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">PUBLIC IMPLICATION</div>
+          <div class="pit-h">입력 구조가 좋을수록 4단계 루프의 출력이 안정된다</div>
+          <div class="pit-d">모델 내부는 바꿀 수 없다. 그러나 LOAD 단계에 어떤 문서를 어떤 순서로 넣을지는 바꿀 수 있다. 거점리더가 영향을 줄 수 있는 유일한 층위다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">HISTORICAL CONTEXT</span><span class="sh-t">언어모델의 3세대 진화</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:110px">세대</th><th>작동 방식</th><th style="width:110px">한계</th></tr></thead>
+        <tbody>
+          <tr><td>n-gram</td><td class="q">직전 n-1개 단어만 보고 다음 단어를 예측</td><td>긴 문맥 불가</td></tr>
+          <tr><td>RNN / LSTM</td><td class="q">은닉 상태에 문맥을 누적하며 순차 처리</td><td>정보 소실 · 속도</td></tr>
+          <tr><td>TRANSFORMER</td><td class="q">문장 전체를 행렬로 병렬 처리, Self-Attention</td><td>긴 문맥 · 계산 비용</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="co">
+          <div class="co-lb">TAKEAWAY</div>
+          <div class="co-main">LLM은 마법 상자가 아니라 "텍스트를 잘 이어붙이는 고성능 추론기"다</div>
+          <p>신비를 걷어내면 적용 판단이 쉬워진다. 입력 구조와 근거 구조를 잘 만들수록 결과가 좋아진다 — 이것이 공공 업무에 LLM을 끼워 넣는 유일한 원리다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">006 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 007 · ATTENTION WHY                                     -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Attention Why">
+  <div class="hbar"><div class="hbar-l">PART A-1 · ATTENTION WHY</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-1 · 트랜스포머 터치 ② · Attention이 중요한 이유 · 4MIN</div>
+    <div class="hl-title">Attention : 문장 속 "지금 중요한 단서"를 가려내는 계산</div>
+    <div class="hl-sub">공공 문서는 조건절 · 예외 조항 · 반복성 같은 한두 토큰에서 해석이 뒤집힌다. Attention이 약하면 LLM은 배경 설명에 답하고 핵심 요구를 놓친다 — 문서 해석 품질이 곧 이 계산의 강약에 달려 있다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">EXAMPLE · 실제 민원</span><span class="sh-t">검게 강조된 토큰이 답변 품질을 결정한다</span></div>
+      <div class="sh-line"></div>
+      <div class="qex">
+        <span class="dim">"버스 노선 증설 관련하여 주민 300명 서명 받아 제출합니다.</span> 관련 민원은 <span class="hot">2024년에도 제출</span>했으나 <span class="hot">반영되지 않았습니다</span>. 이번에는 <span class="hot">시장 답변</span> 요청드립니다.<span class="dim">"</span>
+      </div>
+      <div class="grow" style="justify-content:flex-start;gap:10px">
+        <div class="draft weak">
+          <div class="draft-k">ATTENTION 약한 모델 · 초안</div>
+          <div class="draft-t">"주민 300명이 버스 노선 증설을 요청했습니다. 관계 부서와 협의하여 검토하겠습니다."</div>
+          <div class="draft-note">반복 민원임을 모르고, 시장 답변 요청도 누락 → 담당자가 처음부터 다시 작성.</div>
+        </div>
+        <div class="draft strong">
+          <div class="draft-k">ATTENTION 강한 모델 · 초안</div>
+          <div class="draft-t">"2024년에 이어 재차 제출되신 민원으로, 당시 미반영 사유는 …이며, 요청하신 시장 명의 답변은 별도 결재 라인에 올렸습니다."</div>
+          <div class="draft-note">반복성 · 미반영 이력 · 수신자 지정을 모두 포착 → 담당자는 사실 확인만.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">BY DOCUMENT TYPE</span><span class="sh-t">각 유형에서 반드시 잡아야 하는 단서</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:120px">문서 유형</th><th>잡아야 할 단서</th></tr></thead>
+        <tbody>
+          <tr><td>법령 · 조례</td><td class="q">조건절 · 예외 조항 · 시행일 · 적용 범위</td></tr>
+          <tr><td>민원</td><td class="q">반복성 · 핵심 요구 · 수신자 지정 · 감정 강도</td></tr>
+          <tr><td>회의록</td><td class="q">결정 문구 · 담당자 · 기한 · 조건부 합의</td></tr>
+          <tr><td>보고서</td><td class="q">수치 변동 · 근거 출처 · 한정 조건</td></tr>
+          <tr><td>공문</td><td class="q">발수신 기관 · 협조 요청 · 회신 기한 · 붙임 연번</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">BRIDGE · 다음 주제</div>
+          <div class="next-t">"어떤 토큰이 지금 중요한가" — 이 하나의 질문이 변주되어 나간다. 다음 슬라이드(Q·K·V)는 이 계산의 <strong>수학적 원리</strong>, 2주차 RAG는 <strong>외부 문서에서 단서를 골라 넣는 법</strong>이다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">007 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 008 · Q K V                                             -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="QKV">
+  <div class="hbar"><div class="hbar-l">PART A-1 · SELF-ATTENTION</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-1 · 트랜스포머 터치 ③ · Q·K·V 세 질문 · 4MIN</div>
+    <div class="hl-title">Self-Attention은 세 질문의 반복이다</div>
+    <div class="hl-sub">Q(Query) · K(Key) · V(Value)를 수학 공식으로 외울 필요는 없다. "지금 무엇을 찾는가 · 문장 안에는 어떤 단서가 있는가 · 그 단서를 얼마나 반영할 것인가"라는 세 질문으로 이해하면 공공 문서 해석에 그대로 연결된다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">Q · QUERY</div>
+      <div class="card-anchor">지금 알고 싶은 <em>질문</em></div>
+      <div class="card-body">현재 토큰이 다른 문장 속에서 어떤 정보를 찾고 있는지에 해당한다. 민원 답변을 생성할 때는 "이 민원의 핵심 요구가 무엇인가"라는 질문이 Q의 역할을 한다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">좋은 프롬프트가 좋은 답변을 만드는 이유 — 프롬프트가 모델의 Q를 명확히 설정하기 때문이다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">K · KEY</div>
+      <div class="card-anchor">문장 속 <em>단서</em>의 주소</div>
+      <div class="card-body">다른 토큰들이 각자 무엇을 담고 있는지 표시하는 표식이다. 법령 조문 해석에서는 <strong>조건 · 예외 · 적용 범위</strong>를 담은 단어들이 강한 K가 되고, Q(질문)와 매칭될 때 활성화된다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">검색 엔진의 키워드 매칭과 유사한 원리다. Q와 K가 잘 맞을수록 다음 단계(V)가 정확해진다.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">V · VALUE</div>
+      <div class="card-anchor">실제로 가져올 <em>내용</em></div>
+      <div class="card-body">중요한 단서로 판단된 토큰의 정보를 얼마나 섞어 답변에 반영할지 정한다. 최종적으로 답변의 근거 밀도와 정확도를 좌우하는 값이다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">문맥을 잘못 읽으면 잘못된 근거가 "자연스럽게" 생성되는 이유 — V가 엉뚱한 K를 반영했기 때문이다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">008 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 009 · TRANSFORMER IMPLICATIONS (v3 sample 정제본)       -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Transformer Implications">
+  <div class="hbar"><div class="hbar-l">PART A-1 · DESIGN CONSEQUENCES</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-1 · 트랜스포머 터치 ④ · 공공 설계 세 결론 · 4MIN</div>
+    <div class="hl-title">트랜스포머가 남긴 공공 설계 3결론</div>
+    <div class="hl-sub">입력 구조화 · 근거 선별 · 승인 루프. 모델이 바뀌어도 이 셋의 유효성은 그대로이고, 이후 다룰 RAG · MCP · 에이전트는 모두 이 셋의 구체 구현이다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">결론 01 · INPUT DESIGN</div>
+      <div class="card-anchor">프롬프트 <em>형식</em>이<br>답변 품질을 만든다</div>
+      <div class="card-body">자유 서술 요청은 자유 서술 답변을 부른다. 섹션을 고정한 요청은 예측 가능한 답변을 만든다. 같은 모델·같은 문서라도 입력 양식에 따라 출력이 달라진다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-body" style="color:var(--ink3);font-size:12.5px;font-style:italic">"좋은 모델"보다 "좋은 입력 양식"을 먼저 설계한다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">결론 02 · CONTEXT</div>
+      <div class="card-anchor">긴 문서를 통째로<br><em>넣지 않는다</em></div>
+      <div class="card-body">컨텍스트 창이 커져도 중간 정보는 모델이 실질적으로 무시하는 경향이 있다(Lost in the Middle). 관련 부분만 골라 투입할 때 품질이 달라진다. RAG가 별도 기술 영역으로 분화된 이유다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-body" style="color:var(--on2);font-size:12.5px;font-style:italic">검색 → 청크 → 재순위 → 투입의 순서로 설계한다.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">결론 03 · HUMAN-IN-THE-LOOP</div>
+      <div class="card-anchor">자동 발송이 아니라<br><em>초안 + 승인</em></div>
+      <div class="card-body">공공은 오답 한 건의 행정·법적 비용이 크다. 완전 자동화는 도입이 어렵고 "초안 생성 + 담당자 승인"이 현실적 구조다. 자동화 범위와 판단 위임 범위는 다른 문제다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-body" style="color:var(--ink3);font-size:12.5px;font-style:italic">자동화 범위 ≠ 판단 위임 범위. 이 구분이 거버넌스의 출발점이다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">009 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 010 · TEXT LLM                                          -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Text LLM">
+  <div class="hbar"><div class="hbar-l">PART A-2 · TEXT LLM EVOLUTION</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-2 · LLM 지형도 ① · 텍스트 LLM의 진화 · 6MIN</div>
+    <div class="hl-title">크기 경쟁에서 추론 경쟁으로 이동했다</div>
+    <div class="hl-sub">초기의 LLM 경쟁은 파라미터 크기와 벤치마크 점수 중심이었다. 최근의 경쟁은 reasoning · tool use · long context · 멀티모달 통합처럼 실제 업무에 연결되는 능력 중심으로 이동했다. 공공 실무에서도 "얼마나 큰가"보다 "얼마나 생각하는가"를 먼저 본다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">OLD vs NEW</span><span class="sh-t">LLM을 평가하는 두 세대의 기준</span></div>
+      <div class="sh-line"></div>
+      <div class="cmp2" style="background:transparent;gap:1px">
+        <div class="cmp2c">
+          <div class="cmp2c-k">OLD · 모델 순위표 중심</div>
+          <div class="cmp2c-h">"얼마나 큰가"</div>
+          <div class="cmp2c-d">파라미터 수, 벤치마크 1등 여부, 공개 데모의 화려함이 평가 축이었다. 실무 연결 구조가 빠지기 쉬웠다.</div>
+          <div class="cmp2c-fig">PARAM · BENCHMARK · DEMO</div>
+        </div>
+        <div class="cmp2c dk">
+          <div class="cmp2c-k">NEW · 업무 연결 능력 중심</div>
+          <div class="cmp2c-h">"얼마나 생각하는가"</div>
+          <div class="cmp2c-d">Reasoning · Tool Use · Long Context · 근거 인용이 평가 축이다. 정책 해석과 감사 대응 같은 공공 업무에서 결정적이다.</div>
+          <div class="cmp2c-fig">REASONING · TOOL · CONTEXT</div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">EVALUATION SHIFT</div>
+          <div class="pit-h">벤치마크 1등이 실무 1등이 아니다</div>
+          <div class="pit-d">공공 업무는 단답 정확도보다 <strong>근거를 설명할 수 있는가, 도구를 호출할 수 있는가, 긴 문서를 끝까지 읽는가</strong>가 중요하다. 리더보드만 보면 놓친다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">CURRENT AXES</span><span class="sh-t">지금 LLM을 가르는 네 가지 축</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:130px">축</th><th>의미</th></tr></thead>
+        <tbody>
+          <tr><td>REASONING</td><td class="q">단계별 사고 · 조건 충돌 검증 · 판단 설명</td></tr>
+          <tr><td>TOOL USE</td><td class="q">외부 API · 계산기 · 검색을 스스로 호출하는 능력</td></tr>
+          <tr><td>LONG CONTEXT</td><td class="q">긴 문서 전체를 유지하며 읽는 범위</td></tr>
+          <tr><td>MULTIMODAL</td><td class="q">텍스트 + 이미지 + 표 + 음성 통합 처리</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="co">
+          <div class="co-lb">PUBLIC IMPLICATION</div>
+          <div class="co-main">좋은 모델은 정답을 잘 내는 모델이 아니라 절차를 설명할 수 있는 모델이다</div>
+          <p>감사 대응과 업무 보고를 생각하면 결과만 맞는 것보다 <strong>과정과 근거를 다시 보여 줄 수 있는지</strong>가 더 중요하다. 공공의 LLM 선택 기준이 일반 기업과 달라지는 지점이다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">010 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 011 · MULTIMODAL                                        -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Multimodal">
+  <div class="hbar"><div class="hbar-l">PART A-2 · MULTIMODAL</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-2 · LLM 지형도 ② · 멀티모달 통합 · 5MIN</div>
+    <div class="hl-title">단일 모델이 텍스트 · 이미지 · 표 · 음성을 함께 읽는다</div>
+    <div class="hl-sub">텍스트만 잘 다루는 시대를 지나, 이미지와 표 · 음성 · 동영상의 일부 신호를 함께 읽는 방향으로 모델이 진화하고 있다. 공공 환경에서는 문서와 표 · 회의 녹음 · 현장 사진이 한 흐름에서 엮일 가능성이 커진다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">MODALITY COMBINATIONS</span><span class="sh-t">공공 업무에서의 멀티모달 활용</span></div>
+      <div class="sh-line"></div>
+      <div class="grid2x2" style="flex:1">
+        <div class="qd"><div class="qd-k">TEXT + TABLE</div><div class="qd-h">보고서와 표를 한 번에 읽는다</div><div class="qd-d">표를 따로 옮겨 적지 않아도 설명과 수치를 함께 파악할 수 있다. 재무 · 예산 · 통계 보고에서 바로 체감된다.</div></div>
+        <div class="qd"><div class="qd-k">TEXT + IMAGE</div><div class="qd-h">현장 사진과 문장을 같이 본다</div><div class="qd-d">시설물 점검 · 홍보물 검토 · 시각 자료 품질 확인처럼 텍스트만으로 설명하기 어려운 작업의 진입 장벽이 낮아진다.</div></div>
+        <div class="qd"><div class="qd-k">TEXT + AUDIO</div><div class="qd-h">회의 녹음과 결론 문서를 잇는다</div><div class="qd-d">회의 종료 후 음성 전사 → 요약 → action item 분리까지 한 흐름으로 이어진다. 7·8차시 구현 사례와 연결된다.</div></div>
+        <div class="qd dk"><div class="qd-k">FULL MULTIMODAL</div><div class="qd-h">문서+사진+녹음 통합 판단</div><div class="qd-d">점검 보고서의 문장 · 첨부 사진 · 현장 녹음을 한 번에 보내고 종합 평가를 받는다. 아직 품질 편차가 크다.</div></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">PUBLIC USE CASES</span><span class="sh-t">공공 영역에서의 적용 지점</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:130px">업무 영역</th><th>적용 방식</th></tr></thead>
+        <tbody>
+          <tr><td>시설 점검</td><td class="q">현장 사진 + 점검표 → 이상 항목 자동 추출</td></tr>
+          <tr><td>회의 지원</td><td class="q">녹음 + 참석자 명단 → 발언자별 요약 · 결정 사항 추출</td></tr>
+          <tr><td>통계 가공</td><td class="q">보고서 PDF 내 표 + 본문 → 수치 정합성 검증</td></tr>
+          <tr><td>민원 답변</td><td class="q">민원 본문 + 첨부 사진 → 현장 상황 고려한 답변 초안</td></tr>
+          <tr><td>홍보 검토</td><td class="q">홍보물 이미지 + 캡션 → 문구·디자인 검토 의견</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">EDITORIAL</div>
+          <div class="next-t">멀티모달이 만능은 아니다. <strong>어떤 파일을 어떤 순서로 넣고 어떤 결과 형식으로 뽑을지</strong>를 설계해야 안정적으로 쓸 수 있다. 입력이 섞일수록 구조화가 더 중요해진다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">011 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 012 · sLLM                                              -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="sLLM">
+  <div class="hbar"><div class="hbar-l">PART A-2 · SMALL LLM</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-2 · LLM 지형도 ③ · sLLM 소형 언어모델 · 6MIN</div>
+    <div class="hl-title">sLLM은 프론티어의 대체가 아니라 제약 해결용 부품이다</div>
+    <div class="hl-sub">소형 모델(sLLM)은 프론티어 모델을 대체하는 존재가 아니라 <strong>망 분리 · 비용 통제 · 로컬 실행</strong>이라는 제약을 해결하는 실무형 부품이다. 질문은 "얼마나 좋은가"가 아니라 "어디까지 맡길 수 있는가"다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">FIT MATRIX</span><span class="sh-t">sLLM이 잘 맞는 일 vs 한계가 드러나는 일</span></div>
+      <div class="sh-line"></div>
+      <div class="cmp2" style="background:transparent;gap:1px">
+        <div class="cmp2c">
+          <div class="cmp2c-k">WHEN FITS · 잘 맞는 업무</div>
+          <div class="cmp2c-h">반복 규칙이 분명한 업무</div>
+          <div class="cmp2c-d">민원 유형화 · 내부 보고서 요약 · 폐쇄망 문서 질의응답처럼 반복 패턴이 있고 기대 출력이 좁은 업무에서 sLLM은 충분히 유용하다.</div>
+          <div class="cmp2c-fig">CLASSIFICATION · SUMMARY · LABEL</div>
+        </div>
+        <div class="cmp2c dk">
+          <div class="cmp2c-k">WHEN LIMITS · 한계</div>
+          <div class="cmp2c-h">복잡한 추론 · 장문 비교</div>
+          <div class="cmp2c-d">여러 정책안 비교, 보고서와 법령의 충돌 점검, 긴 문맥 읽기는 프론티어 모델이 더 안정적이다. 억지로 맡기면 품질이 급격히 떨어진다.</div>
+          <div class="cmp2c-fig">COMPARISON · LONG CONTEXT · DEEP REASONING</div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="co">
+          <div class="co-lb">OPERATING CONDITION</div>
+          <div class="co-main">망 분리 · CPU 실행 · 비용 통제가 장점이다</div>
+          <p>GPU가 없거나 외부 API 전송이 제한된 환경에서도 운영 가능하다. 응답 시간과 비용을 예측하기 쉬워 지속 운영이 필요한 부서 업무와 잘 맞는다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">BEST ROLE</span><span class="sh-t">내부망에서의 역할 배치</span></div>
+      <div class="sh-line"></div>
+      <div class="card-body" style="color:var(--ink2)">프론티어 모델이 외부에서 <strong style="color:var(--ink)">구조와 초안</strong>을 만드는 두뇌라면, sLLM은 내부망에서 <strong style="color:var(--ink)">자주 반복되는 실행</strong>을 맡는 손발에 가깝다. 핵심 판단보다 안정적 내부 처리 루틴을 맡긴다고 생각하면 배치가 쉬워진다.</div>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">CHECK BEFORE USE · 3 QUESTIONS</div>
+          <div class="pit-h">로컬 모델 앞에서는 "복잡한 판단"보다 "반복되는 내부 처리"를 먼저 떠올린다</div>
+          <div class="pit-d">① 같은 형식의 문서를 많이 처리해야 하는가?<br>② 외부 전송이 막혀 있는가?<br>③ 비용과 속도를 예측해야 하는가?<br><br>세 질문에 '예'가 많을수록 sLLM은 좋은 선택지다. 4·5차시에서 Ollama를 이용한 실제 구현을 다룬다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">012 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 013 · MODEL CHOICE MAP                                  -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Frontier vs Local">
+  <div class="hbar"><div class="hbar-l">PART A-2 · MODEL CHOICE MAP</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-2 · LLM 지형도 ④ · 프론티어 vs 로컬 선택 지도 · 6MIN</div>
+    <div class="hl-title">모델 선택은 난이도와 민감도의 사분면으로 결정한다</div>
+    <div class="hl-sub">실무에서 자주 맞닥뜨리는 판단은 "어느 모델이 더 좋나"가 아니라 "이 업무를 외부망에 태워도 되는가"이다. 그 판단에 난이도와 민감도를 두 축으로 두면 대부분의 케이스가 네 칸에 정리된다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col" style="padding:0;background:transparent">
+      <div class="grid2x2" style="height:100%">
+        <div class="qd"><div class="qd-k">Q1 · 고난도 · 저민감도</div><div class="qd-h">프론티어 우선</div><div class="qd-d">정책 대안 비교 · 긴 문서 종합 · 구조적 추론. 외부망 모델의 가치가 크다. 근거 문서는 정제본이나 발췌본으로 다룬다.</div></div>
+        <div class="qd"><div class="qd-k">Q2 · 저난도 · 고민감도</div><div class="qd-h">로컬 우선</div><div class="qd-d">개인정보 · 내부 검토안 · 폐쇄망 산출물. 성능보다 통제 가능성이 중요하다. 외부 반출이 어려운 자료는 내부망 처리로 시작한다.</div></div>
+        <div class="qd"><div class="qd-k">Q3 · 고난도 · 고민감도</div><div class="qd-h">분할 설계 + 승인</div><div class="qd-d">비민감 영역만 외부에서 구조화하고, 민감 원문과 최종 판단은 내부망 + 사람 승인으로 나눠 처리한다. 설계가 가장 까다로운 구간.</div></div>
+        <div class="qd dk"><div class="qd-k">Q4 · 저난도 · 저민감도</div><div class="qd-h">비용과 속도로 결정</div><div class="qd-d">대량 반복 처리면 로컬·하이브리드가 유리. 품질이 더 중요하면 프론티어. 재현성과 운영비를 같이 본다.</div></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">FINAL FILTER</span><span class="sh-t">네 칸이 정해진 뒤 마지막 점검</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:130px">마지막 축</th><th>점검 포인트</th></tr></thead>
+        <tbody>
+          <tr><td>설명 가능성</td><td class="q">감사 대응과 보고를 위해 로그·근거가 남는 구조인가</td></tr>
+          <tr><td>처리량</td><td class="q">같은 작업을 얼마나 자주 반복하는가</td></tr>
+          <tr><td>재현성</td><td class="q">같은 입력에 같은 출력을 내는가</td></tr>
+          <tr><td>운영비</td><td class="q">월 단위 API 비용 · 인프라 비용을 예측 가능한가</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">DECISION FRAME</div>
+          <div class="next-t">사분면이 1차 분류, <strong>설명 가능성과 처리량</strong>이 2차 필터다. 실무에서는 이 순서로 내려오며 판단해야 "이 업무를 어느 모델에?"라는 질문에 즉답할 수 있게 된다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">013 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 014 · OPEN SOURCE                                       -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Open Source">
+  <div class="hbar"><div class="hbar-l">PART A-2 · OPEN SOURCE</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-2 · LLM 지형도 ⑤ · 오픈소스 생태계 · 5MIN</div>
+    <div class="hl-title">오픈소스는 모델을 만드는 곳이 아니라 부품을 찾는 곳이다</div>
+    <div class="hl-sub">거점리더에게 오픈소스 생태계는 "모델을 직접 만든다"는 뜻이 아니라 "필요한 부품을 발견하고 조합한다"는 뜻이다. Hugging Face를 중심으로 한 생태계에서는 모델 · 데이터셋 · 데모를 같이 보는 시야가 필요하다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">PART 01 · MODEL</div>
+      <div class="card-anchor">모델은 <em>용도</em>와<br>라이선스로 본다</div>
+      <div class="card-body">파라미터 크기만 보고 고르면 실패한다. 로컬 실행 가능성 · 라이선스 조건 · 학습 데이터의 언어 비중 · 벤치마크 특성을 함께 본다. 같은 크기여도 한국어 품질은 극단적으로 다르다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">무료 모델이라도 상업적 사용 · 재배포 · 파인튜닝 허용 여부가 라이선스마다 다르다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">PART 02 · DATASET</div>
+      <div class="card-anchor">데이터셋이 모델의<br><em>체질</em>을 결정한다</div>
+      <div class="card-body">어떤 벤치마크와 학습 자료 위에서 나온 모델인지 확인해야 현실적인 기대치를 세울 수 있다. 영어 중심 데이터로 학습된 모델은 한국어 법령·행정 용어에 약하다. 반대로 한국어 특화 모델은 국제 벤치마크에서 뒤처지기도 한다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">모델 카드(model card)에 기재된 학습 데이터와 평가 결과를 반드시 읽는다.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">PART 03 · SPACE</div>
+      <div class="card-anchor">데모는 <em>감각</em>을<br>빠르게 만들어준다</div>
+      <div class="card-body">Hugging Face Spaces 같은 데모 페이지에서 실제로 몇 건 돌려보면 설명서로는 알 수 없는 품질과 속도가 드러난다. 모델 카드만 읽지 말고 현장 문장을 직접 넣어본다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">좋은 거점리더는 모델 이름만 아는 사람이 아니라, 데모를 5건 돌려본 사람이다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">014 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 015 · FINE-TUNING                                       -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Fine Tuning">
+  <div class="hbar"><div class="hbar-l">PART A-2 · FINE-TUNING</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-2 · LLM 지형도 ⑥ · 파인튜닝 판단 기준 · 5MIN</div>
+    <div class="hl-title">파인튜닝은 첫 번째 카드가 아니라 마지막 카드다</div>
+    <div class="hl-sub">현장에서 자주 나오는 오해는 "우리 데이터가 있으니 파인튜닝부터 해야 한다"는 생각이다. 실제로는 프롬프트 · RAG · 워크플로우 분해만으로 해결되는 문제가 훨씬 많다. 파인튜닝은 앞선 세 방법이 모두 부족할 때 꺼내는 카드다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:22px 30px">
+      <div class="ladder" style="flex:1">
+        <div class="ladder-step">
+          <div class="ladder-n">01</div>
+          <div class="ladder-b">
+            <div class="ladder-h">프롬프트 · 출력 형식을 먼저 다듬는다</div>
+            <div class="ladder-d">결과 형식이 흔들리는 문제는 대부분 프롬프트 · 예시 · 검수 규칙 · 출력 템플릿으로 개선된다. "무엇을 어떤 형식으로 내놓을지"를 먼저 분명히 적어본다.</div>
+          </div>
+          <div class="ladder-tag">FIRST · 저비용</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">02</div>
+          <div class="ladder-b">
+            <div class="ladder-h">RAG로 지식을 연결한다</div>
+            <div class="ladder-d">모델이 모르는 사실 때문에 틀리는 문제라면 학습보다 검색과 근거 주입이 빠르고 안전하다. 최신 규정 · 내부 매뉴얼 · 업무 지침처럼 바뀌는 지식은 특히 RAG가 먼저다.</div>
+          </div>
+          <div class="ladder-tag">SECOND · 중비용</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">03</div>
+          <div class="ladder-b">
+            <div class="ladder-h">도구 사용과 워크플로우 분해를 시도한다</div>
+            <div class="ladder-d">계산 · 조회 · 포맷팅 · 검증 같은 과업은 모델을 바꾸기보다 도구 호출과 단계 분해로 해결하는 편이 낫다. 모델은 판단을, 도구는 실행을 맡기면 훨씬 안정적이다.</div>
+          </div>
+          <div class="ladder-tag">THIRD · 설계 비용</div>
+        </div>
+        <div class="ladder-step dk">
+          <div class="ladder-n">04</div>
+          <div class="ladder-b">
+            <div class="ladder-h">그 다음에야 파인튜닝을 검토한다</div>
+            <div class="ladder-d">조직 고유 문체를 내재화해야 하거나 특정 스타일을 아주 안정적으로 재현해야 할 때에만 고려한다. 비용 · 데이터 준비 · 평가 체계를 감당할 만큼 반복 가치가 있는지도 함께 따진다.</div>
+          </div>
+          <div class="ladder-tag">ONLY THEN · 고비용</div>
+        </div>
+      </div>
+      <div class="co" style="margin-top:14px">
+        <div class="co-lb">ASK BEFORE TRAINING</div>
+        <div class="co-main">지식 부족인가, 지시 부족인가, 실행 구조 부족인가를 먼저 구분한다</div>
+        <p>모델이 무엇을 몰라서 틀리는지(→RAG), 어떻게 하라는 지시가 약해서 틀리는지(→프롬프트), 아니면 계산·조회 같은 실행 단위가 빠져서 틀리는지(→도구)를 먼저 나누면 불필요한 파인튜닝을 피할 수 있다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">015 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 016 · REASONING MODELS                                  -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Reasoning">
+  <div class="hbar"><div class="hbar-l">PART A-2 · REASONING MODELS</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-2 · LLM 지형도 ⑦ · Reasoning 모델 · 5MIN</div>
+    <div class="hl-title">추론형 모델은 요약이 아니라 판단에 쓴다</div>
+    <div class="hl-sub">추론형 모델(Reasoning Model)은 답을 빨리 뱉는 대신 더 오래 생각하며 단계적 판단을 수행한다. 정책 비교 · 규정 해석 · 조건 충돌 확인처럼 단순 요약을 넘어선 과업에서 가치가 커진다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">FIT vs TRADEOFF</span><span class="sh-t">Reasoning 모델의 장단점</span></div>
+      <div class="sh-line"></div>
+      <div class="cmp2" style="background:transparent;gap:1px">
+        <div class="cmp2c">
+          <div class="cmp2c-k">BEST FOR · 잘 맞는 업무</div>
+          <div class="cmp2c-h">비교 · 판단 · 시나리오 평가</div>
+          <div class="cmp2c-d">두 정책안의 차이를 정리하거나, 예외 조항이 어떤 결과를 낳는지 따지는 작업은 reasoning 모델이 강점을 보인다. 조건 충돌 · 리스크 평가도 여기에 해당한다.</div>
+          <div class="cmp2c-fig">COMPARE · JUDGE · EVALUATE</div>
+        </div>
+        <div class="cmp2c dk">
+          <div class="cmp2c-k">TRADEOFF · 주의점</div>
+          <div class="cmp2c-h">시간과 비용이 더 든다</div>
+          <div class="cmp2c-d">모든 작업에 쓸 필요는 없다. 단순 변환 · 포맷팅 · 번역 같은 "판단이 없는" 업무는 가벼운 모델이나 워크플로우 분해가 더 낫고 저렴하다.</div>
+          <div class="cmp2c-fig">SLOWER · EXPENSIVE · OVERKILL</div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">QUESTION TO ASK</div>
+          <div class="pit-h">이 일은 요약인가, 판단인가</div>
+          <div class="pit-d">판단 비중이 높을수록 reasoning 모델의 가치가 커진다. 거점리더는 업무를 이 기준으로 먼저 나눌 수 있어야 한다. 그 다음이 모델 선택이다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">PUBLIC APPLICATION</span><span class="sh-t">공공 업무 중 Reasoning 가치가 큰 영역</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:120px">업무</th><th>왜 Reasoning인가</th></tr></thead>
+        <tbody>
+          <tr><td>정책 대안 비교</td><td class="q">여러 옵션의 장단점 · 예상 효과를 단계별로 평가</td></tr>
+          <tr><td>법령 해석</td><td class="q">조건절 · 예외 조항의 상호작용을 추론</td></tr>
+          <tr><td>민원 분류</td><td class="q">복합 민원(2개 이상 쟁점)을 쟁점별로 분리</td></tr>
+          <tr><td>감사 대응</td><td class="q">규정 충돌 가능성을 미리 탐지 · 근거 문서 제시</td></tr>
+          <tr><td>예산 배분</td><td class="q">제약 조건을 만족하는 조합을 탐색 · 설명</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">DESIGN RULE</div>
+          <div class="next-t">Reasoning 모델은 <strong>출력 근거를 함께 달라고 요청</strong>할 때 진가가 나온다. "결과만"이 아니라 "결정에 이르는 과정"을 출력 포맷에 넣어두면 감사 대응에도 그대로 활용할 수 있다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">016 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 017 · RAG OVERVIEW                                      -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="RAG Overview">
+  <div class="hbar"><div class="hbar-l">PART A-3 · RAG</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-3 · 에이전트 기술 ① · RAG 개요 · 6MIN</div>
+    <div class="hl-title">RAG는 LLM이 모르는 지식을 "외부에서 찾아 넣어주는" 구조다</div>
+    <div class="hl-sub">RAG(Retrieval-Augmented Generation)는 LLM에게 필요한 문서를 먼저 검색해 프롬프트에 넣어주고 답을 생성하게 하는 방식이다. 파인튜닝보다 빠르고 안전하며, 최신 규정·내부 매뉴얼처럼 자주 바뀌는 지식에 특히 강하다. 7차시에서 구현을 본격 다룬다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2n">
+    <div class="col">
+      <div class="sh"><span class="sh-n">4-STEP PIPELINE</span><span class="sh-t">RAG 파이프라인의 4단계</span></div>
+      <div class="sh-line"></div>
+      <div class="flow h4" style="margin-top:10px">
+        <div class="flow-box"><div class="flow-box-k">01</div><div class="flow-box-t">넣기<br>INDEX</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box"><div class="flow-box-k">02</div><div class="flow-box-t">쪼개기<br>CHUNK</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box on"><div class="flow-box-k">03</div><div class="flow-box-t">찾기<br>RETRIEVE</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dk"><div class="flow-box-k">04</div><div class="flow-box-t">답하기<br>GENERATE</div></div>
+      </div>
+      <table class="mtbl" style="margin-top:16px">
+        <thead><tr><th style="width:100px">단계</th><th>하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>01 INDEX</td><td class="q">문서를 수집해 검색 가능한 저장소에 넣는다</td></tr>
+          <tr><td>02 CHUNK</td><td class="q">문서를 의미 단위(문단·절·조항)로 쪼갠다</td></tr>
+          <tr><td>03 RETRIEVE</td><td class="q">질문과 관련된 청크만 찾아낸다</td></tr>
+          <tr><td>04 GENERATE</td><td class="q">찾은 청크를 프롬프트에 붙여 LLM이 답변 생성</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">WHY RAG</span><span class="sh-t">파인튜닝 대신 RAG를 먼저 쓰는 이유</span></div>
+      <div class="sh-line"></div>
+      <div class="cmp2" style="background:transparent;gap:1px">
+        <div class="cmp2c">
+          <div class="cmp2c-k">FINE-TUNING</div>
+          <div class="cmp2c-h">모델에 지식을 구워넣는다</div>
+          <div class="cmp2c-d">비용 · 시간 큼. 지식이 바뀌면 재학습. 근거 출처 추적 어려움.</div>
+        </div>
+        <div class="cmp2c dk">
+          <div class="cmp2c-k">RAG</div>
+          <div class="cmp2c-h">지식을 실시간으로 갖다 쓴다</div>
+          <div class="cmp2c-d">비용 낮음. 지식 갱신은 문서만 교체. 답변 옆에 출처 인용 가능.</div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="co">
+          <div class="co-lb">PUBLIC FIT</div>
+          <div class="co-main">공공 문서 대부분은 RAG가 최적이다</div>
+          <p>법령 · 조례 · 내부 규정 · 업무 매뉴얼 · 과거 민원 답변 · 회의록 · 보고서 — 이 모두가 주기적으로 갱신되고, 답변에 <strong>출처를 명시해야 하는</strong> 자료들이다. RAG의 기본 조건과 정확히 맞는다.</p>
+        </div>
+        <div class="next">
+          <div class="next-k">NEXT</div>
+          <div class="next-t">7차시에서 "벡터DB 없이도 80% 품질" 접근법으로 로컬 RAG를 직접 구현한다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">017 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 018 · MCP                                               -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="MCP">
+  <div class="hbar"><div class="hbar-l">PART A-3 · MCP</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-3 · 에이전트 기술 ② · MCP 개요 · 6MIN</div>
+    <div class="hl-title">MCP는 에이전트가 도구를 표준 방식으로 꽂는 "만국공통 콘센트"다</div>
+    <div class="hl-sub">MCP(Model Context Protocol)는 AI 에이전트가 외부 도구·데이터와 표준적으로 연결되는 프로토콜이다. 비유하자면 <strong>USB-C 규격</strong>이다. 각 도구마다 다른 규격을 외울 필요 없이 하나의 표준으로 꽂으면 된다. 8차시에서 본격 다룬다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">CONCEPT</span><span class="sh-t">MCP가 해결하는 문제</span></div>
+      <div class="sh-line"></div>
+      <div class="cmp2" style="background:transparent;gap:1px">
+        <div class="cmp2c">
+          <div class="cmp2c-k">BEFORE MCP</div>
+          <div class="cmp2c-h">도구마다 다른 연결 방식</div>
+          <div class="cmp2c-d">Slack 연동 방식, Google Drive 연동 방식, 자체 DB 연동 방식이 전부 달랐다. 새 도구마다 별도 개발 필요.</div>
+          <div class="cmp2c-fig">CUSTOM INTEGRATION × N</div>
+        </div>
+        <div class="cmp2c dk">
+          <div class="cmp2c-k">AFTER MCP</div>
+          <div class="cmp2c-h">표준 프로토콜 하나로 통일</div>
+          <div class="cmp2c-d">MCP를 지원하는 도구라면 설정 파일 한 줄로 연결. Claude · ChatGPT · Cursor 등 모든 클라이언트에서 동일하게 작동.</div>
+          <div class="cmp2c-fig">ONE PROTOCOL · MANY TOOLS</div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">HISTORICAL CONTEXT</div>
+          <div class="pit-h">1년 만에 한 회사의 실험에서 업계 표준으로</div>
+          <div class="pit-d">2024.11 Anthropic이 공개 → 2025.03 OpenAI 채택 → 2025.04 Google 지원 → 2025.09 Registry 런칭 → 2025.12 Linux Foundation 이관. 이 속도의 표준 채택은 업계에서도 드물다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">WHAT MCP CAN DO</span><span class="sh-t">MCP로 할 수 있는 일의 범위</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:130px">업무 영역</th><th>연결 예시</th></tr></thead>
+        <tbody>
+          <tr><td>문서 관리</td><td class="q">Google Drive · Notion · SharePoint</td></tr>
+          <tr><td>팀 커뮤니케이션</td><td class="q">Slack · Teams · 이메일</td></tr>
+          <tr><td>프로젝트 관리</td><td class="q">GitHub · Linear · Jira</td></tr>
+          <tr><td>데이터베이스</td><td class="q">PostgreSQL · Supabase · 내부 DB</td></tr>
+          <tr><td>공공 데이터</td><td class="q">국가법령정보 · 공공데이터포털 · 국세청 API</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">EDITORIAL</div>
+          <div class="next-t">MCP 서버를 <strong>만드는</strong> 건 개발자의 일이다. 그러나 MCP 서버를 <strong>연결해서 쓰는</strong> 건 누구나 할 수 있다. 더 중요한 건 "어떤 서버를 연결해야 이 업무에 최적인가"를 설계하는 역량이다. 이건 업무를 이해하는 사람 — 비개발자 거점리더 — 가 더 잘할 수 있다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">018 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 019 · RAG MCP A2A MAP                                   -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="RAG MCP A2A Map">
+  <div class="hbar"><div class="hbar-l">PART A-3 · TECH MAP</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-3 · 에이전트 기술 ③ · RAG · MCP · A2A의 관계 · 5MIN</div>
+    <div class="hl-title">RAG는 지식 연결, MCP는 도구 연결, A2A는 에이전트 연결이다</div>
+    <div class="hl-sub">RAG · MCP · A2A는 경쟁 기술이 아니라 <strong>연결의 세 층위</strong>다. 각각 다른 문제를 해결하고, 실제로는 셋이 합쳐져 하나의 멀티 에이전트 시스템을 만든다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">층위 01 · KNOWLEDGE</div>
+      <div class="card-anchor">RAG = <em>지식</em>을 연결한다</div>
+      <div class="card-body">모델이 모르는 사실을 외부 문서에서 검색해 답변에 주입한다. 법령 · 매뉴얼 · 내부 보고서처럼 바뀌는 지식에 대응하는 층위다. LLM 한 개 + 문서 저장소의 조합.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">Q&amp;A 챗봇, 정책 문서 검색, 내부 지식 검색이 여기에 해당한다. (7차시)</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">층위 02 · TOOL</div>
+      <div class="card-anchor">MCP = <em>도구</em>를 연결한다</div>
+      <div class="card-body">LLM이 직접 할 수 없는 일(계산 · 조회 · 쓰기 · 외부 API 호출)을 표준 프로토콜로 수행한다. 행동 권한을 부여하는 층위. LLM 한 개 + 여러 도구의 조합.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">Slack 메시지 전송, DB 조회, 파일 생성, 공공 API 호출이 여기에 해당한다. (8차시)</div>
+    </div>
+    <div class="card">
+      <div class="card-k">층위 03 · AGENT</div>
+      <div class="card-anchor">A2A = <em>에이전트</em>끼리 연결한다</div>
+      <div class="card-body">각자 다른 역할을 가진 AI 에이전트들이 서로 질의하고 협업한다. 법무 에이전트 · 기술 에이전트 · 마케팅 에이전트가 회의하듯 토론하는 구조. 여러 LLM의 조합.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">복합 의사결정, 다관점 검토, 종합 보고서 작성에 활용된다. (8차시 캡스톤)</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">019 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 020 · A2A                                               -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="A2A">
+  <div class="hbar"><div class="hbar-l">PART A-3 · A2A</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-3 · 에이전트 기술 ④ · A2A 에이전트 협업 · 5MIN</div>
+    <div class="hl-title">Agent-to-Agent는 전문 에이전트들의 회의 구조다</div>
+    <div class="hl-sub">A2A(Agent-to-Agent)는 서로 다른 역할을 가진 AI 에이전트들이 질의하고 답하며 협업하는 구조다. 단일 LLM이 모든 걸 하는 대신, 각자 전문 영역을 가진 에이전트들이 회의실에서 토론하듯 일을 처리한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">TWO PATTERNS</span><span class="sh-t">멀티 에이전트 구조의 두 형태</span></div>
+      <div class="sh-line"></div>
+      <div class="cmp2" style="background:transparent;gap:1px">
+        <div class="cmp2c">
+          <div class="cmp2c-k">① 서브 에이전트 (위계형)</div>
+          <div class="cmp2c-h">팀장 + 팀원 구조</div>
+          <div class="cmp2c-d">오케스트레이터(팀장)가 업무를 쪼개 서브 에이전트(팀원)에게 분배하고 결과를 취합한다. 팀장이 없으면 아무도 움직이지 않는다.</div>
+          <div class="cmp2c-fig">ORCHESTRATOR → WORKERS</div>
+        </div>
+        <div class="cmp2c dk">
+          <div class="cmp2c-k">② 피어 에이전트 (수평형)</div>
+          <div class="cmp2c-h">전문가 회의 구조</div>
+          <div class="cmp2c-d">법무 · 기술 · 마케팅 전문가 3명이 회의실에서 토론. 한쪽이 "이건 위험해" 하면 다른 쪽이 "그럼 이렇게 바꾸자"로 이어지는 수평 협업.</div>
+          <div class="cmp2c-fig">PEER ↔ PEER ↔ PEER</div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="co">
+          <div class="co-lb">HYBRID IN REALITY</div>
+          <div class="co-main">현실의 강한 시스템은 둘을 섞는다</div>
+          <p>전략은 피어(회의)로 방향을 잡고, 실행은 서브(팀장+팀원)로 병렬 처리한다. 실제 조직이 돌아가는 방식과 동일하다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">PUBLIC APPLICATION</span><span class="sh-t">공공 업무에서의 멀티 에이전트 예</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:130px">업무 시나리오</th><th>에이전트 구성</th></tr></thead>
+        <tbody>
+          <tr><td>정책 검토</td><td class="q">법령 해석 + 예산 검토 + 시민 반응 분석 (피어)</td></tr>
+          <tr><td>민원 종합</td><td class="q">분류 + 답변 생성 + 검증 (서브)</td></tr>
+          <tr><td>감사 대응</td><td class="q">규정 조회 + 이력 정리 + 리스크 평가 (피어)</td></tr>
+          <tr><td>보고서 작성</td><td class="q">자료 수집 + 초안 + 검토 + 포맷팅 (서브)</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">NEXT</div>
+          <div class="next-t">8차시 캡스톤에서 <strong>인사 데이터 분석 멀티 에이전트</strong>를 구현하고, 각 에이전트가 서로 어떻게 대화하며 결과를 만드는지 직접 경험한다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">020 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 021 · AGENT TOOLS                                       -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Agent Tools">
+  <div class="hbar"><div class="hbar-l">PART A-3 · AGENT TOOLS</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-3 · 에이전트 기술 ⑤ · 에이전트 도구 생태계 · 5MIN</div>
+    <div class="hl-title">에이전트 도구는 LLM에게 키보드와 파일시스템을 쥐여주는 방식이다</div>
+    <div class="hl-sub">어시스트 모드의 LLM이 답변을 "제안"만 하는 반면, 에이전트 도구는 LLM이 직접 파일을 만들고 · 터미널을 실행하고 · 코드를 수정하도록 권한을 부여한다. 6차시에서 5종을 직접 다룬다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">TOOL 01 · CLAUDE CODE</div>
+      <div class="card-anchor">Anthropic의<br><em>터미널형</em> 에이전트</div>
+      <div class="card-body">CLI 기반. 프로젝트 컨텍스트 전체를 읽고 파일 수정 · 테스트 실행 · Git 작업까지 수행한다. Rules · Skills · Sub-agent 체계로 확장 가능.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">공공 실무에서 가장 자주 쓰이는 에이전트. 6차시 중심 도구.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">TOOL 02 · CURSOR</div>
+      <div class="card-anchor">에디터 통합형<br><em>IDE</em> 에이전트</div>
+      <div class="card-body">VS Code 기반 에디터에 에이전트가 통합된 형태. 코드베이스를 시각적으로 탐색하며 수정 제안. 초보자 친화적 UI.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">시각적 편집을 선호하는 사용자에게 적합.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">TOOL 03 · ANTIGRAVITY</div>
+      <div class="card-anchor">Google의<br>에이전트 개발 플랫폼</div>
+      <div class="card-body">Google이 새롭게 공개한 에이전트 기반 개발 환경. Gemini 모델 기반 자동화 · 멀티 에이전트 워크플로우 내장.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">Gemini 생태계와 Google Cloud 연동이 필요한 경우 선택.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">TOOL 04 · CODEX</div>
+      <div class="card-anchor">OpenAI의<br>코딩 에이전트</div>
+      <div class="card-body">OpenAI의 코드 실행 + 파일 조작 에이전트. GPT 계열 모델과 깊게 통합. Swarm 기반의 멀티 에이전트 확장도 가능.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">GPT 사용이 정해진 조직에서 첫 에이전트로 시도하기 좋다.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">TOOL 05 · OPENCODE</div>
+      <div class="card-anchor">오픈소스<br>에이전트 프레임워크</div>
+      <div class="card-body">특정 기업에 종속되지 않는 오픈소스 기반 에이전트. 로컬 모델 · 커스텀 규칙 · 내부망 배포가 필요한 환경에 적합.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">망 분리 환경 · 특정 벤더 의존 회피가 필요한 공공 부서에 유용.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">선택 기준</div>
+      <div class="card-anchor">도구보다 <em>권한 구조</em>를 먼저 본다</div>
+      <div class="card-body">어떤 도구든 "LLM에게 무엇을 허용할지"가 핵심이다. 파일 쓰기 권한 · 터미널 실행 권한 · 외부 API 호출 권한을 명확히 정한 뒤 도구를 고른다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">도구 비교는 6차시 첫 파트에서 7가지 기준으로 분류한다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">021 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 022 · PROMPT 4 STAGES                                   -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Prompt 4 Stages">
+  <div class="hbar"><div class="hbar-l">PART A-4 · PROMPT EVOLUTION</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-4 · 프롬프트 4단계 진화 ① · 개요 · 6MIN</div>
+    <div class="hl-title">프롬프트 엔지니어링은 4단계로 진화해왔다</div>
+    <div class="hl-sub">프롬프트는 "질문을 잘 쓰는 기술"에서 "메타 지시를 설계하는 기술"로 · "컨텍스트와 도구를 조율하는 기술"로 · "에이전트 권한을 부여하는 기술"로 이동해왔다. 각 단계는 앞 단계를 포함하며 확장된다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:22px 30px">
+      <div class="ladder" style="flex:1">
+        <div class="ladder-step">
+          <div class="ladder-n">01</div>
+          <div class="ladder-b">
+            <div class="ladder-h">PROMPT · 단일 지시</div>
+            <div class="ladder-d">"이 민원을 요약해줘" — 한 번의 질문과 한 번의 답. 작은 업무 · 단발성 요청에 적합. 이 단계에서는 명확한 지시 · 출력 형식 · 예시 제공이 핵심 기술이다.</div>
+          </div>
+          <div class="ladder-tag">SINGLE TURN</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">02</div>
+          <div class="ladder-b">
+            <div class="ladder-h">META PROMPT · 역할과 규칙의 사전 설정</div>
+            <div class="ladder-d">"당신은 공공 민원 담당자다. 다음 규칙을 따른다: ① ② ③ …" — 시스템 프롬프트로 페르소나 · 규칙 · 출력 포맷을 미리 정한다. 반복 업무의 품질을 안정시킨다.</div>
+          </div>
+          <div class="ladder-tag">SYSTEM ROLE</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">03</div>
+          <div class="ladder-b">
+            <div class="ladder-h">CONTEXT + TOOLS · 자료와 도구의 조율</div>
+            <div class="ladder-d">"관련 조례를 먼저 검색하고 · API로 최신 현황을 조회한 뒤 · 답변 초안을 작성하라" — RAG · 도구 호출 · 워크플로우가 등장. 모델이 외부 자원을 조율하도록 설계.</div>
+          </div>
+          <div class="ladder-tag">ORCHESTRATION</div>
+        </div>
+        <div class="ladder-step dk">
+          <div class="ladder-n">04</div>
+          <div class="ladder-b">
+            <div class="ladder-h">AGENT DESIGN · 권한과 자율의 설계</div>
+            <div class="ladder-d">"너에게 이 권한 범위 안에서 자율 실행을 허용한다. 승인이 필요한 작업은 여기 목록이다." — 에이전트에게 실행 권한을 부여하고, 경계와 검수 지점을 설계. 진정한 자동화가 시작되는 단계.</div>
+          </div>
+          <div class="ladder-tag">AUTONOMOUS</div>
+        </div>
+      </div>
+      <div class="co" style="margin-top:14px">
+        <div class="co-lb">PROGRESSION PRINCIPLE</div>
+        <div class="co-main">각 단계는 이전 단계를 대체하지 않고 포함한다</div>
+        <p>4단계로 올라간다고 1~3단계가 사라지는 것이 아니다. 오히려 상위 단계일수록 <strong>좋은 단일 프롬프트 · 좋은 메타 프롬프트 · 좋은 컨텍스트 설계</strong>가 더 중요해진다. 기본기가 탄탄할수록 상위 단계의 실패가 줄어든다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">022 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 023 · META PROMPT                                       -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Meta Prompt">
+  <div class="hbar"><div class="hbar-l">PART A-4 · META PROMPT</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-4 · 프롬프트 4단계 진화 ② · 메타 프롬프트 · 5MIN</div>
+    <div class="hl-title">메타 프롬프트는 "페르소나·규칙·포맷"을 미리 심어두는 방식이다</div>
+    <div class="hl-sub">같은 업무를 반복할 때 매번 똑같은 지시를 적으면 낭비이고, 품질 편차도 커진다. 메타 프롬프트는 역할 · 규칙 · 출력 양식을 시스템 프롬프트에 한 번 심어두고, 본 프롬프트는 개별 과업만 기술하도록 분리하는 설계다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">STRUCTURE</span><span class="sh-t">메타 프롬프트의 4구성 요소</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:110px">구성</th><th>무엇을 담는가</th></tr></thead>
+        <tbody>
+          <tr><td>PERSONA</td><td class="q">누구로서 답할지 ("공공 민원 답변 담당자" 등)</td></tr>
+          <tr><td>CONTEXT</td><td class="q">배경 · 조직 · 제약 조건 (내부망 · 공문 형식 등)</td></tr>
+          <tr><td>RULES</td><td class="q">지킬 것 · 하지 말 것 (인용 규칙 · 금지 표현)</td></tr>
+          <tr><td>FORMAT</td><td class="q">출력 양식 (섹션 제목 · 길이 · 말투)</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="co">
+          <div class="co-lb">WHY IT WORKS</div>
+          <div class="co-main">매번 재설정하던 기본 맥락을 "상수"로 고정한다</div>
+          <p>반복 업무에서 <strong>본 프롬프트는 가변 부분만</strong> 기술하게 되어 분량이 줄고 편차도 줄어든다. 메타 프롬프트 자체는 버전 관리해서 조직 자산으로 쌓는다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">EXAMPLE</span><span class="sh-t">민원 답변용 메타 프롬프트 구조</span></div>
+      <div class="sh-line"></div>
+      <div class="code">[PERSONA]
+당신은 ○○구 민원 답변 담당자다.
+시민 존중 · 정확한 법령 인용 · 간결한 문체를 지킨다.
+
+[CONTEXT]
+- 모든 답변은 공문 형식으로 작성된다
+- 인용 법령은 조문 번호까지 명시한다
+- 답변 말미에 담당 부서 · 연락처가 들어간다
+
+[RULES]
+- 가정적 · 추측적 표현 금지
+- 법적 확답이 어려운 사안은 안내 수준으로
+- 외부 민감 정보는 일반화하여 서술
+
+[FORMAT]
+1. 접수 확인 (1문장)
+2. 사안 요약 (2-3문장)
+3. 관련 법령/근거 (조문 인용)
+4. 답변 본문 (4-5문장)
+5. 담당 안내</div>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">NEXT</div>
+          <div class="next-t">3차시에서 메타 프롬프트 설계 실습을 한다. 이후 이 템플릿을 조직 자산으로 쌓고, 7차시에서 RAG · 8차시에서 MCP와 결합해 확장한다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">023 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 024 · CONTEXT & TOOLS                                   -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Context Tools">
+  <div class="hbar"><div class="hbar-l">PART A-4 · CONTEXT &amp; TOOLS</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-4 · 프롬프트 4단계 진화 ③ · 컨텍스트와 도구 · 5MIN</div>
+    <div class="hl-title">3단계부터는 프롬프트가 아니라 오케스트레이션이다</div>
+    <div class="hl-sub">3단계에서는 "모델이 자료를 찾고 도구를 호출하게 하라"는 설계가 들어간다. RAG · Function Calling · 워크플로우 분해가 모두 이 단계에 포함된다. 여기서부터는 "질문을 잘 쓴다"는 표현보다 "시스템을 설계한다"는 표현이 더 어울린다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">CONTEXT · 자료</div>
+      <div class="card-anchor">무엇을 <em>근거</em>로<br>판단하게 할 것인가</div>
+      <div class="card-body">RAG로 관련 문서를 검색해 프롬프트에 주입한다. 모델이 "외운 것"이 아닌 "가져온 것"으로 답하게 된다. 최신성과 출처 추적이 확보된다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">법령 · 매뉴얼 · 내부 보고서처럼 바뀌는 자료에 특히 강하다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">TOOLS · 도구</div>
+      <div class="card-anchor">어떤 <em>행동</em>을<br>허용할 것인가</div>
+      <div class="card-body">Function Calling · MCP로 외부 API · DB · 파일 시스템을 호출하게 한다. 모델이 "말만" 하지 않고 실제 실행을 수행한다. 계산 · 조회 · 쓰기가 가능해진다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">권한 범위 · 실행 로그 · 오류 대응을 함께 설계한다.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">WORKFLOW · 순서</div>
+      <div class="card-anchor">어떤 <em>단계</em>로<br>처리할 것인가</div>
+      <div class="card-body">한 번의 호출로 끝내지 않고, 여러 단계로 분해한다. 각 단계의 출력을 다음 단계의 입력으로 연결한다. 복잡한 업무일수록 단계 분해가 품질을 결정한다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">"분류 → 검색 → 초안 → 검증 → 포맷팅" 같은 연쇄 흐름이 전형적이다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">024 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 025 · BOUNDARY LINE                                     -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Boundary Line">
+  <div class="hbar"><div class="hbar-l">PART A-4 · ASSIST vs AGENT</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-4 · 프롬프트 4단계 진화 ④ · 어시스트와 에이전트의 경계선 · 6MIN</div>
+    <div class="hl-title">어시스트와 에이전트는 "실행 권한"의 유무로 갈린다</div>
+    <div class="hl-sub">3단계(어시스트)와 4단계(에이전트)를 가르는 결정적 차이는 <strong>실행 권한</strong>이다. 어시스트는 "제안"만 한다 — 최종 실행은 사람이 한다. 에이전트는 정해진 범위 안에서 직접 실행한다 — 사람은 범위를 설계하고 결과를 검수한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">ASSIST MODE</span><span class="sh-t">LLM이 "제안"하는 모드</span></div>
+      <div class="sh-line"></div>
+      <div class="cmp2c">
+        <div class="cmp2c-k">특징</div>
+        <div class="cmp2c-h">모든 실행은 사람이 한다</div>
+        <div class="cmp2c-d">LLM은 답변 · 코드 · 분석 결과를 <strong>텍스트로 제안</strong>한다. 사람이 복사 · 붙여넣기 · 실행 · 수정한다. ChatGPT · Claude 대화창이 여기에 해당.</div>
+        <ul class="cmp2c-list">
+          <li>즉시 피드백 · 수정 루프 용이</li>
+          <li>위험도 낮음 — 사람이 최종 결정</li>
+          <li>단위 업무 · 학습 · 탐색에 적합</li>
+          <li>대규모 자동화에는 한계</li>
+        </ul>
+        <div class="cmp2c-fig">4·5차시 · 바이브 코딩 ①②</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">AGENT MODE</span><span class="sh-t">LLM이 "실행"하는 모드</span></div>
+      <div class="sh-line"></div>
+      <div class="cmp2c dk">
+        <div class="cmp2c-k">특징</div>
+        <div class="cmp2c-h">정해진 범위에서 직접 실행한다</div>
+        <div class="cmp2c-d">LLM이 <strong>파일을 만들고 · 명령을 실행하고 · API를 호출</strong>한다. 사람은 권한 범위와 검수 지점을 설계한다. Claude Code · Cursor · MCP 기반 시스템이 여기에 해당.</div>
+        <ul class="cmp2c-list">
+          <li>반복 업무의 전면 자동화 가능</li>
+          <li>위험도 상승 — 권한 설계 필수</li>
+          <li>워크플로우 · 시스템 구축에 적합</li>
+          <li>감사 · 승인 구조 반드시 포함</li>
+        </ul>
+        <div class="cmp2c-fig">6~8차시 · 에이전트 · RAG · MCP</div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">025 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 026 · BOUNDARY CASES                                    -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Boundary Cases">
+  <div class="hbar"><div class="hbar-l">PART A-4 · WHICH MODE</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-4 · 프롬프트 4단계 진화 ⑤ · 어느 모드를 고를까 · 4MIN</div>
+    <div class="hl-title">업무 유형에 따라 어시스트와 에이전트를 선택한다</div>
+    <div class="hl-sub">모든 업무에 에이전트를 써야 하는 것은 아니다. 1회성 · 탐색적 · 창의적 업무는 어시스트가 적합하고, 반복적 · 정형적 · 대량 업무는 에이전트가 유리하다. 판단 기준을 정리해둔다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">CHOICE MATRIX</span><span class="sh-t">업무 성격별 권장 모드</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:140px">업무 성격</th><th style="width:110px">권장 모드</th><th>이유</th></tr></thead>
+        <tbody>
+          <tr><td>1회성 분석</td><td class="q">어시스트</td><td>설계 비용이 실행 비용보다 크다</td></tr>
+          <tr><td>창의적 초안</td><td class="q">어시스트</td><td>다양한 대안 · 빠른 피드백이 중요</td></tr>
+          <tr><td>탐색 · 학습</td><td class="q">어시스트</td><td>예상 결과가 정해져 있지 않다</td></tr>
+          <tr><td>매일 반복</td><td class="q">에이전트</td><td>자동화 투자 대비 회수 빠르다</td></tr>
+          <tr><td>정형 처리</td><td class="q">에이전트</td><td>규칙으로 기술 가능 · 안정성 확보</td></tr>
+          <tr><td>다단계 연쇄</td><td class="q">에이전트</td><td>사람이 중간에 끼면 병목 발생</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">PITFALL</div>
+          <div class="pit-h">에이전트를 써야 한다는 유행에 흔들리지 않는다</div>
+          <div class="pit-d">1회성 · 창의적 업무에 에이전트 시스템을 구축하는 것은 낭비다. 반대로 매일 100건씩 돌아가는 업무를 계속 어시스트로 수작업하는 것도 낭비다. 업무 성격이 먼저, 모드 선택은 그 다음이다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">TRANSITION PATH</span><span class="sh-t">어시스트 → 에이전트로 넘어가는 시점</span></div>
+      <div class="sh-line"></div>
+      <div class="card-body" style="color:var(--ink2)">대부분의 공공 업무는 <strong style="color:var(--ink)">어시스트로 시작해 에이전트로 승격</strong>된다. 처음에는 어시스트로 절차를 탐색하고, 안정되면 그 절차를 에이전트 워크플로우로 옮긴다.</div>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">TRANSITION CRITERIA</div>
+          <div class="next-t">① 절차가 3회 이상 성공적으로 반복되었는가<br>② 예외 케이스가 정의되어 있는가<br>③ 실패 시 롤백 가능한가<br>④ 승인 지점이 명확한가<br><br>네 질문에 모두 '예'일 때 에이전트로 승격을 검토한다. 이 기준을 3차시와 6차시에서 다시 다룬다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">026 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 027 · CLAUDE CODE LAYERS                                -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Claude Code Layers">
+  <div class="hbar"><div class="hbar-l">PART A-4 · CLAUDE CODE LAYERS</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-4 · 프롬프트 4단계 진화 ⑥ · Claude Code의 5층위 · 5MIN</div>
+    <div class="hl-title">현대적 에이전트는 5개 층위로 구성된다</div>
+    <div class="hl-sub">Claude Code를 예로 들면 에이전트의 실행 환경은 단일 프롬프트가 아니다. 사용자 지시 · 프로젝트 규칙 · 스킬 · 도구 · 승인의 5개 층위가 겹겹이 쌓여 하나의 실행 맥락을 만든다. 결과 품질은 위쪽 한 줄보다 아래 층위의 설계에 더 많이 좌우된다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:22px 30px">
+      <div class="ladder" style="flex:1">
+        <div class="ladder-step">
+          <div class="ladder-n">01</div>
+          <div class="ladder-b">
+            <div class="ladder-h">USER PROMPT · 사용자 지시</div>
+            <div class="ladder-d">"이 민원 답변 초안 3개 만들어줘" — 한 번의 대화. 가장 표면에 있는 층. 아래 층위가 잘 설계되어 있으면 이 지시는 짧아도 된다.</div>
+          </div>
+          <div class="ladder-tag">SURFACE</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">02</div>
+          <div class="ladder-b">
+            <div class="ladder-h">PROJECT RULES · 프로젝트 규칙</div>
+            <div class="ladder-d">CLAUDE.md 같은 파일로 프로젝트 전체에 적용되는 규칙 · 금지 사항 · 문체 · 표준을 기술한다. 모든 대화에 자동으로 포함된다.</div>
+          </div>
+          <div class="ladder-tag">REPO LEVEL</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">03</div>
+          <div class="ladder-b">
+            <div class="ladder-h">SKILLS · 재사용 가능한 능력</div>
+            <div class="ladder-d">특정 업무를 위한 단위 지식 · 워크플로우 · 템플릿을 모듈화한 것. "민원 답변 스킬" · "보고서 생성 스킬"처럼 필요할 때 호출된다.</div>
+          </div>
+          <div class="ladder-tag">MODULAR</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">04</div>
+          <div class="ladder-b">
+            <div class="ladder-h">TOOLS · 연결된 도구</div>
+            <div class="ladder-d">파일 시스템 · 터미널 · MCP 서버 · API 등 에이전트가 실제로 호출할 수 있는 외부 기능. 권한 범위가 여기서 정해진다.</div>
+          </div>
+          <div class="ladder-tag">ACTION</div>
+        </div>
+        <div class="ladder-step dk">
+          <div class="ladder-n">05</div>
+          <div class="ladder-b">
+            <div class="ladder-h">APPROVAL &amp; VERIFICATION · 승인과 검증</div>
+            <div class="ladder-d">위험한 작업에 대한 사람 승인 루프, 결과 검증 규칙, 실행 로그. 공공 환경에서는 이 층위가 가장 중요하다. 이 층이 없으면 도입이 불가능하다.</div>
+          </div>
+          <div class="ladder-tag">GOVERNANCE</div>
+        </div>
+      </div>
+      <div class="co" style="margin-top:14px">
+        <div class="co-lb">DESIGN PRINCIPLE</div>
+        <div class="co-main">위쪽 한 줄이 아니라 <strong>아래 층위의 설계</strong>가 결과를 결정한다</div>
+        <p>좋은 에이전트 시스템은 5번 승인 구조 · 4번 도구 권한 · 3번 스킬 정의 · 2번 프로젝트 규칙이 탄탄하다. 1번 사용자 지시는 짧아도 작동한다. 설계 시간은 대부분 2~5층에 투자된다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">027 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 028 · OTHER AGENTS                                      -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Other Agents">
+  <div class="hbar"><div class="hbar-l">PART A-4 · OTHER AGENTS</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-4 · 프롬프트 4단계 진화 ⑦ · 그 밖의 에이전트 · 4MIN</div>
+    <div class="hl-title">상용 에이전트 서비스들은 이 구조를 각자 다르게 구현한다</div>
+    <div class="hl-sub">Claude Code 같은 개발자용 에이전트 외에도, Genspark · Manus · Fellow처럼 "완성형 에이전트 서비스"가 있다. 사용자는 지시만 주면 자료 수집 · 분석 · 보고서 생성까지 자동 실행된다. 공공 업무에서는 두 종류를 함께 활용하게 된다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">DEVELOPER AGENTS</span><span class="sh-t">개발·구현용 에이전트</span></div>
+      <div class="sh-line"></div>
+      <div class="card-body" style="color:var(--ink2)">코드 · 시스템 · 워크플로우를 <strong style="color:var(--ink)">직접 만드는 데</strong> 특화된 에이전트. 거점리더는 이것을 이용해 업무 도구를 제작한다. 6차시의 핵심 도구들이 여기에 속한다.</div>
+      <table class="mtbl" style="margin-top:10px">
+        <thead><tr><th style="width:130px">도구</th><th>특징</th></tr></thead>
+        <tbody>
+          <tr><td>CLAUDE CODE</td><td class="q">CLI 기반, 터미널 · 파일 시스템 통합</td></tr>
+          <tr><td>CURSOR</td><td class="q">VS Code 기반 에디터 통합</td></tr>
+          <tr><td>ANTIGRAVITY</td><td class="q">Google Gemini 기반 개발 플랫폼</td></tr>
+          <tr><td>CODEX</td><td class="q">OpenAI 기반 코드 실행 에이전트</td></tr>
+          <tr><td>OPENCODE</td><td class="q">오픈소스 · 로컬 배포 가능</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">SERVICE AGENTS</span><span class="sh-t">완성형 에이전트 서비스</span></div>
+      <div class="sh-line"></div>
+      <div class="card-body" style="color:var(--ink2)">자료 수집 · 분석 · 보고서 · 발표자료 생성을 <strong style="color:var(--ink)">즉시 수행</strong>하는 완성형 서비스. 사용자는 지시만 준다. 단발성 업무에는 가장 빠른 선택.</div>
+      <table class="mtbl" style="margin-top:10px">
+        <thead><tr><th style="width:130px">서비스</th><th>특징</th></tr></thead>
+        <tbody>
+          <tr><td>GENSPARK</td><td class="q">슈퍼 에이전트 · 자료 수집 + 책 제작</td></tr>
+          <tr><td>MANUS</td><td class="q">자율 실행형 에이전트 · 장시간 작업</td></tr>
+          <tr><td>FELLOW</td><td class="q">리서치 · 보고서 작성 특화</td></tr>
+          <tr><td>PERPLEXITY</td><td class="q">검색 · 리서치 + 인용 출처</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">PRACTICAL RULE</div>
+          <div class="next-t">거점리더는 두 종류를 <strong>업무 성격에 따라 나눠 쓴다</strong>. 매일 반복되는 업무는 개발자 에이전트로 시스템 구축 / 1회성 · 탐색적 업무는 서비스 에이전트로 즉시 처리.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">028 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 029 · FOUR STAGE SUMMARY                                -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Four Stage Summary">
+  <div class="hbar"><div class="hbar-l">PART A-4 · 4-STAGE SUMMARY</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART A-4 · 프롬프트 4단계 진화 ⑧ · 요약과 다음 지도 · 4MIN</div>
+    <div class="hl-title">8주 커리큘럼은 이 4단계를 한 단계씩 오르는 여정이다</div>
+    <div class="hl-sub">1~2주차는 1·2단계 · 3~5주차는 2·3단계 · 6~8주차는 3·4단계로 올라간다. 각 차시가 프롬프트 진화의 어느 지점을 다루는지 보면, 전체 커리큘럼의 설계 의도가 분명해진다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:22px 30px">
+      <table class="mtbl" style="font-size:13.5px">
+        <thead>
+          <tr>
+            <th style="width:140px">단계</th>
+            <th style="width:200px">핵심 기술</th>
+            <th>해당 차시</th>
+            <th style="width:140px">역량 수준</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>STAGE 01 · PROMPT</td>
+            <td class="q">명확한 지시 · 예시 제공 · 출력 포맷</td>
+            <td>2차시 (프론티어 모델 마스터리)</td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">USER</td>
+          </tr>
+          <tr>
+            <td>STAGE 02 · META</td>
+            <td class="q">페르소나 · 규칙 · 포맷 사전 설정</td>
+            <td>3차시 (메타 프롬프트 오케스트레이션)</td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">DESIGNER</td>
+          </tr>
+          <tr>
+            <td>STAGE 03 · CONTEXT+TOOLS</td>
+            <td class="q">RAG · Function Calling · 워크플로우</td>
+            <td>4·5·7차시 (바이브 코딩 · RAG)</td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">ORCHESTRATOR</td>
+          </tr>
+          <tr>
+            <td>STAGE 04 · AGENT</td>
+            <td class="q">권한 · 자율 · 승인 루프 설계</td>
+            <td>6·8차시 (에이전트 도구 · MCP · 캡스톤)</td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">ARCHITECT</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px">
+        <div class="co">
+          <div class="co-lb">LEARNING ARC</div>
+          <div class="co-main">사용자 → 설계자 → 오케스트레이터 → 아키텍트</div>
+          <p>이 과정을 끝낼 때 수강생의 포지션은 "AI를 쓰는 사용자"가 아니라 "AI 시스템을 설계하는 아키텍트"다. 8차시 캡스톤에서 이것을 캔버스로 표현한다.</p>
+        </div>
+        <div class="next">
+          <div class="next-k">EDITORIAL</div>
+          <div class="next-t">각 단계는 독립된 기술이 아니라 <strong>다음 단계의 기반</strong>이다. Prompt가 부실한 Meta는 없고, Meta가 부실한 Context는 불안정하며, Context가 부실한 Agent는 위험하다. 순서대로 쌓아야 한다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">029 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 030 · MACRO MICRO AX                                    -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Macro Micro AX">
+  <div class="hbar"><div class="hbar-l">PART B · MACRO &amp; MICRO</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 지형 ① · 거시 AX와 미시 AX · 5MIN</div>
+    <div class="hl-title">공공 AI 도입은 기관 혁신과 개인 생산성이 함께 움직일 때 굴러간다</div>
+    <div class="hl-sub">거시 전략만 있으면 현장 실행이 없고, 미시 자동화만 있으면 조직 전환이 남지 않는다. 거점리더는 <strong>작은 성공을 만들고 조직 자산으로 끌어올리는</strong> 두 방향을 동시에 본다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">TWO SCALES</span><span class="sh-t">공공 AX의 두 층위</span></div>
+      <div class="sh-line"></div>
+      <div class="cmp2" style="background:transparent;gap:1px">
+        <div class="cmp2c">
+          <div class="cmp2c-k">MACRO AX · 기관 수준</div>
+          <div class="cmp2c-h">정책과 자산화</div>
+          <div class="cmp2c-d">공용 기준 · 도입 원칙 · 데이터 거버넌스 · 공유 자산 · 교육 체계. 기관 차원에서 다루는 방향성과 인프라.</div>
+          <ul class="cmp2c-list">
+            <li>AI 도입 로드맵과 거버넌스 체계</li>
+            <li>공용 프롬프트 아카이브 · 지식 자산</li>
+            <li>부서 공통 역량 프레임워크</li>
+          </ul>
+          <div class="cmp2c-fig">ORGANIZATION LEVEL</div>
+        </div>
+        <div class="cmp2c dk">
+          <div class="cmp2c-k">MICRO AX · 개인·팀 수준</div>
+          <div class="cmp2c-h">구체적 업무 개선</div>
+          <div class="cmp2c-d">보고서 초안 · 민원 분류 · 통계 가공 · 회의록 요약. 당장 체감되는 생산성 향상과 업무 재설계.</div>
+          <ul class="cmp2c-list">
+            <li>매일 반복되는 작업의 자동화</li>
+            <li>부서 단위 구현 유형 적용</li>
+            <li>실습 → 검증 → 확산의 사이클</li>
+          </ul>
+          <div class="cmp2c-fig">INDIVIDUAL · TEAM LEVEL</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">COURSE DIRECTION</span><span class="sh-t">이 과정의 흐름</span></div>
+      <div class="sh-line"></div>
+      <div class="card-body" style="color:var(--ink2)">이 8주 과정은 <strong style="color:var(--ink)">미시 구현에서 시작해 거시 자산화로 올라가는</strong> 구조다. 작은 성공 사례를 먼저 만들고, 그것을 규칙과 공유 자산으로 묶어 조직 차원으로 끌어올리는 흐름이 가장 현실적이다.</div>
+      <div class="flow h3" style="margin-top:14px">
+        <div class="flow-box"><div class="flow-box-k">STEP 01</div><div class="flow-box-t">미시 구현<br>실습</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box on"><div class="flow-box-k">STEP 02</div><div class="flow-box-t">검증 +<br>확산</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dk"><div class="flow-box-k">STEP 03</div><div class="flow-box-t">거시 자산화<br>기관 레벨</div></div>
+      </div>
+      <div class="grow">
+        <div class="co">
+          <div class="co-lb">BALANCE</div>
+          <div class="co-main">거점리더의 위치는 두 축의 연결점이다</div>
+          <p>기관 정책을 부서로 번역하고 · 부서 성과를 기관 자산으로 번역한다. 어느 한쪽만 보면 AI 도입은 금방 멈춘다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">030 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 031 · NIA 7 TYPES                                       -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="NIA 7 Types">
+  <div class="hbar"><div class="hbar-l">PART B · 7 TYPES</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 지형 ② · 공공 AI 도입의 7가지 유형 · 5MIN</div>
+    <div class="hl-title">공공 AI는 7가지 유형으로 정리된다 — 이 과정이 다루는 것은 그중 4가지다</div>
+    <div class="hl-sub">공공 AI는 한 가지 유형으로 설명되지 않는다. 지식 검색 · 문서 생성 · 분석 자동화 · 에이전트 실행 · 멀티모달 · 내부망 연동 · 업무 지원 등 서로 다른 유형이 있다. 이 과정은 그중 가장 활용도가 높은 4가지를 직접 실습한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">7 TYPES</span><span class="sh-t">공공 AI 도입 유형 · 이 과정의 커버리지</span></div>
+      <div class="sh-line"></div>
+      <div class="ladder" style="flex:1">
+        <div class="ladder-step on">
+          <div class="ladder-n">01</div>
+          <div class="ladder-b">
+            <div class="ladder-h">지식 검색형</div>
+            <div class="ladder-d">규정 · 매뉴얼 · 회의록을 찾아 답한다.</div>
+          </div>
+          <div class="ladder-tag">W7 · RAG</div>
+        </div>
+        <div class="ladder-step on">
+          <div class="ladder-n">02</div>
+          <div class="ladder-b">
+            <div class="ladder-h">문서 생성형</div>
+            <div class="ladder-d">보고서 초안 · 답변 초안 · 홍보 문안 작성.</div>
+          </div>
+          <div class="ladder-tag">W3~W5</div>
+        </div>
+        <div class="ladder-step on">
+          <div class="ladder-n">03</div>
+          <div class="ladder-b">
+            <div class="ladder-h">분석 자동화형</div>
+            <div class="ladder-d">통계 가공 · 시각화 · 정형 데이터 처리.</div>
+          </div>
+          <div class="ladder-tag">W4</div>
+        </div>
+        <div class="ladder-step on">
+          <div class="ladder-n">04</div>
+          <div class="ladder-b">
+            <div class="ladder-h">에이전트 실행형</div>
+            <div class="ladder-d">도구 호출 + 단계형 워크플로우.</div>
+          </div>
+          <div class="ladder-tag">W6~W8</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">05</div>
+          <div class="ladder-b">
+            <div class="ladder-h">멀티모달형</div>
+            <div class="ladder-d">이미지 · 음성 · 영상 처리 · 현장 사진.</div>
+          </div>
+          <div class="ladder-tag">사례로 다룸</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">06</div>
+          <div class="ladder-b">
+            <div class="ladder-h">내부망 연동형</div>
+            <div class="ladder-d">폐쇄망 문서 · VBA · 내부 DB 연결.</div>
+          </div>
+          <div class="ladder-tag">W5 부분</div>
+        </div>
+        <div class="ladder-step dk">
+          <div class="ladder-n">07</div>
+          <div class="ladder-b">
+            <div class="ladder-h">업무 지원형 · 복합</div>
+            <div class="ladder-d">캡스톤에서 부서별 문제를 통합 설계.</div>
+          </div>
+          <div class="ladder-tag">W8 · 미션 캔버스</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">COVERAGE LAYERS</span><span class="sh-t">이 과정이 다루는 3층위</span></div>
+      <div class="sh-line"></div>
+      <div class="card" style="padding:0;gap:0;background:transparent">
+        <div style="background:#f0e7d6;border-left:3px solid var(--acc);padding:16px 20px;margin-bottom:1px">
+          <div style="font-family:var(--mono);font-size:10.5px;color:var(--acc);letter-spacing:2px;font-weight:700;margin-bottom:4px">DIRECT COVERAGE</div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--ink);font-weight:700;line-height:1.3">검색 · 생성 · 분석 · 에이전트</div>
+          <div style="font-size:12.5px;color:var(--ink2);line-height:1.65;margin-top:5px">이번 과정에서 직접 실습하고 발표하는 중심 축. 4가지 유형을 부서 업무에 맞게 조합.</div>
+        </div>
+        <div style="background:var(--bg2);border-left:3px solid var(--ln);padding:16px 20px;margin-bottom:1px">
+          <div style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:4px">ADJACENT</div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--ink);font-weight:700;line-height:1.3">멀티모달 · 내부망 연동</div>
+          <div style="font-size:12.5px;color:var(--ink2);line-height:1.65;margin-top:5px">실습 예시와 구현 유형 안에서 반복해서 다뤄진다. 직접 구축은 심화 과정의 영역.</div>
+        </div>
+        <div style="background:var(--dk);padding:16px 20px;color:var(--on)">
+          <div style="font-family:var(--mono);font-size:10.5px;color:var(--acc3);letter-spacing:2px;font-weight:700;margin-bottom:4px">END GAME</div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--on);font-weight:700;line-height:1.3">부서별 미션 카드</div>
+          <div style="font-size:12.5px;color:var(--on2);line-height:1.65;margin-top:5px">자기 기관의 문제를 어떤 유형으로 정의할지 스스로 말할 수 있어야 한다. 8차시 캡스톤의 요구 수준.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">031 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 032 · 2x2 MATRIX                                        -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="2x2 Matrix">
+  <div class="hbar"><div class="hbar-l">PART B · 2x2 MATRIX</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 지형 ③ · 구축형 바이브 코딩의 과정 좌표 · 4MIN</div>
+    <div class="hl-title">직접 구축 vs 어시스트 구축 × 개인 vs 조직 — 4사분면</div>
+    <div class="hl-sub">도구를 직접 만들 것인가 어시스트로 만들 것인가 × 개인 생산성인가 조직 도입인가를 동시에 보면 구현 유형의 위치가 보인다. 이 좌표계가 뒤에 나오는 9가지 유형을 읽는 배경이 된다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:24px 30px">
+      <div class="grid2x2" style="flex:1">
+        <div class="qd">
+          <div class="qd-k">Q1 · MICRO + DIRECT</div>
+          <div class="qd-h">빠른 개인 생산성 개선</div>
+          <div class="qd-d">단일 보고서 초안, 회의록 요약, 차트 생성처럼 지금 당장 체감 가능한 개선. Frontier 모델 + 좋은 프롬프트만으로도 시작 가능.</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;margin-top:auto;padding-top:8px;border-top:1px solid var(--ln)">유형 1~2 · HTML · PYTHON</div>
+        </div>
+        <div class="qd">
+          <div class="qd-k">Q2 · MICRO + ASSIST</div>
+          <div class="qd-h">도구 도움을 받는 구현</div>
+          <div class="qd-d">HTML 단일 파일, 파이썬 스크립트, 엑셀 함수처럼 작은 도구를 에이전트 어시스트와 함께 만든다. 4~5차시의 핵심 영역.</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;margin-top:auto;padding-top:8px;border-top:1px solid var(--ln)">유형 3~4 · STANDALONE · NODE</div>
+        </div>
+        <div class="qd">
+          <div class="qd-k">Q3 · MACRO + DIRECT</div>
+          <div class="qd-h">공용 기준과 자산화</div>
+          <div class="qd-d">조직 규칙, 공용 프롬프트, 아카이브, 승인 체계를 정의하는 영역. 코드보다 문서 · 프로세스 설계가 중심.</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;margin-top:auto;padding-top:8px;border-top:1px solid var(--ln)">유형 5~6 · VBA · RAG</div>
+        </div>
+        <div class="qd dk">
+          <div class="qd-k">Q4 · MACRO + ASSIST</div>
+          <div class="qd-h">에이전트 기반 서비스 구축</div>
+          <div class="qd-d">MCP · 멀티 에이전트 · 전사 서비스처럼 조직 차원의 실행 구조가 들어간다. 가장 고도의 설계가 필요하다.</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--acc3);letter-spacing:1.5px;font-weight:700;margin-top:auto;padding-top:8px;border-top:1px solid #3a2f24">유형 7~9 · AGENT · MCP · FULLSTACK</div>
+        </div>
+      </div>
+      <div class="next" style="margin-top:14px">
+        <div class="next-k">READING RULE</div>
+        <div class="next-t">뒤에 이어지는 9가지 구현 유형은 이 네 사분면 위에 놓인다. <strong>유형 번호가 커질수록 위·오른쪽으로 이동</strong>한다 — 개인에서 조직으로, 직접에서 에이전트로. 자기 부서의 문제가 어느 사분면에서 시작하는지 먼저 정하면 유형 선택이 쉬워진다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">032 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 033 · TYPE INTRO                                        -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type Intro">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE SYSTEM</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 지형 ④ · 9가지 구현 유형 소개 · 3MIN</div>
+    <div class="hl-title">이 과정에서 다루는 9가지 구현 유형</div>
+    <div class="hl-sub">9가지 구현 유형은 <strong>난이도·목적·인프라 요구사항</strong>에 따라 정렬되어 있다. 유형 1(HTML)부터 유형 9(풀스택 에이전트)까지 단계적으로 올라가며, 각 유형이 커버하는 업무와 해당 차시를 명시한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:24px 30px">
+      <div class="typelist">
+        <div class="type"><div class="type-n">01</div><div class="type-h">HTML 단일 파일</div><div class="type-d">브라우저에서 바로 열리는 인터랙티브 도구. 계산기 · 체크리스트 · 차트.</div><div class="type-tag">W2 · NO INSTALL</div></div>
+        <div class="type"><div class="type-n">02</div><div class="type-h">Python 스크립트</div><div class="type-d">파일 처리 · 자동 리포트 · 대량 변환. 커맨드라인 1회 실행형.</div><div class="type-tag">W4 · PYTHON</div></div>
+        <div class="type"><div class="type-n">03</div><div class="type-h">Standalone 실행형</div><div class="type-d">GUI 도구 · 독립 실행 파일. 배포 가능한 소규모 유틸리티.</div><div class="type-tag">W4 · STANDALONE</div></div>
+        <div class="type"><div class="type-n">04</div><div class="type-h">Node 웹앱</div><div class="type-d">JavaScript 기반 내부 웹 도구. 팀 단위 공유 가능한 경량 서비스.</div><div class="type-tag">W5 · WEB</div></div>
+        <div class="type"><div class="type-n">05</div><div class="type-h">VBA + Ollama</div><div class="type-d">엑셀 · 한글 매크로에 로컬 LLM을 꽂는다. 내부망 · 민감 데이터용.</div><div class="type-tag">W5 · INTRANET</div></div>
+        <div class="type"><div class="type-n">06</div><div class="type-h">Local RAG</div><div class="type-d">벡터DB 없이도 80% 품질. 로컬 문서 저장소 기반 Q&amp;A.</div><div class="type-tag">W7 · RAG</div></div>
+        <div class="type"><div class="type-n">07</div><div class="type-h">Internal Agent</div><div class="type-d">부서 내부 업무용 전용 에이전트. 정형 업무 자동화.</div><div class="type-tag">W6 · AGENT</div></div>
+        <div class="type"><div class="type-n">08</div><div class="type-h">MCP + SQL</div><div class="type-d">DB 연결 + 표준 프로토콜. 데이터 조회 · 통계 생성 자동화.</div><div class="type-tag">W8 · MCP</div></div>
+        <div class="type dk"><div class="type-n">09</div><div class="type-h">Fullstack Agent</div><div class="type-d">프론트+백엔드+에이전트 통합. 기관 단위 서비스.</div><div class="type-tag">W8 · FULL</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">033 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 034 · TYPE CHOICE MAP                                   -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type Choice Map">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE CHOICE</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 지형 ⑤ · 유형 선택 의사결정 지도 · 5MIN</div>
+    <div class="hl-title">유형 선택은 "혼자인가 · 반복되나 · 민감한가"의 3질문으로 갈린다</div>
+    <div class="hl-sub">9가지 유형 중 어느 것을 선택할지는 도구의 화려함이 아니라 업무의 세 가지 조건으로 결정된다. 사용자 수 · 반복 빈도 · 데이터 민감도. 이 세 축의 조합이 적합한 유형을 지정한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">DECISION TABLE</span><span class="sh-t">3질문 × 9유형 매핑</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:60px">유형</th><th style="width:70px">사용자</th><th style="width:70px">반복</th><th style="width:90px">민감도</th><th>적합 상황</th></tr></thead>
+        <tbody>
+          <tr><td>01 HTML</td><td class="q">개인</td><td class="q">저·중</td><td class="q">공개 OK</td><td>브라우저로 도는 계산·시각화</td></tr>
+          <tr><td>02 PYTHON</td><td class="q">개인·팀</td><td class="q">중·고</td><td class="q">공개 OK</td><td>반복 파일·리포트 자동화</td></tr>
+          <tr><td>03 STANDALONE</td><td class="q">팀</td><td class="q">고</td><td class="q">중</td><td>독립 배포 가능한 GUI 도구</td></tr>
+          <tr><td>04 NODE</td><td class="q">팀</td><td class="q">고</td><td class="q">중</td><td>부서 내부용 웹 도구</td></tr>
+          <tr><td>05 VBA+OLLAMA</td><td class="q">개인·팀</td><td class="q">고</td><td class="q">고 · 폐쇄망</td><td>내부망 엑셀·한글 연동</td></tr>
+          <tr><td>06 LOCAL RAG</td><td class="q">팀·부서</td><td class="q">고</td><td class="q">고</td><td>내부 문서 Q&amp;A</td></tr>
+          <tr><td>07 INTERNAL AGENT</td><td class="q">부서</td><td class="q">고</td><td class="q">중·고</td><td>정형 업무 자동화</td></tr>
+          <tr><td>08 MCP+SQL</td><td class="q">부서·기관</td><td class="q">고</td><td class="q">중·고</td><td>DB 조회·통계 자동화</td></tr>
+          <tr><td>09 FULLSTACK</td><td class="q">기관</td><td class="q">고</td><td class="q">가변</td><td>대외 서비스·대형 시스템</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">SELECTION PRINCIPLE</span><span class="sh-t">유형 선택의 원칙</span></div>
+      <div class="sh-line"></div>
+      <div class="pit">
+        <div class="pit-lb">RULE 01 · 시작은 가볍게</div>
+        <div class="pit-h">처음부터 유형 9를 짓지 않는다</div>
+        <div class="pit-d">유형 1~2로 개념 증명 → 유형 3~6으로 부서 배포 → 유형 7~9로 기관 서비스. 이 순서를 뒤집으면 대부분 실패한다.</div>
+      </div>
+      <div class="pit">
+        <div class="pit-lb">RULE 02 · 민감도가 1순위</div>
+        <div class="pit-h">민감 데이터가 있으면 외부망 유형을 지운다</div>
+        <div class="pit-d">데이터 민감도가 "고"라면 유형 1~4는 제외한다. 유형 5(VBA+Ollama) · 유형 6(Local RAG) 중심으로 좁혀 본다.</div>
+      </div>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">EDITORIAL</div>
+          <div class="next-t">한 업무를 여러 유형으로 만들 수도 있다. <strong>유형은 경쟁이 아니라 성숙 단계</strong>다. 오늘의 유형 2가 6개월 뒤 유형 7로 확장되는 것이 자연스럽다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">034 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 035 · TYPE 1 HTML                                       -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type 1 HTML">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE 01 / 09</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 유형 ① · HTML 단일 파일 · 4MIN</div>
+    <div class="hl-title">유형 01 · 브라우저에서 바로 열리는 HTML 단일 파일</div>
+    <div class="hl-sub">설치 없이 파일 하나로 동작하는 도구. 계산기 · 체크리스트 · 시각화처럼 <strong>개인·팀 단위의 즉시 활용</strong>에 적합하다. 공공 환경에서 진입 장벽이 가장 낮고, 거점리더가 가장 먼저 만드는 유형.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">STRENGTH</div>
+      <div class="card-anchor">설치 없이 <em>즉시</em> 동작한다</div>
+      <div class="card-body">HTML 파일 하나를 더블클릭하면 브라우저에서 열린다. 배포는 파일 공유 · 이메일 첨부 · 내부 포털 업로드로 끝. 별도 서버 · 권한 · 설치 매뉴얼이 필요 없다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">가장 가볍고, 가장 빠른 첫 구현. 4시간이면 완성 가능.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">USE CASES</div>
+      <div class="card-anchor">공공 업무 <em>활용 예</em></div>
+      <div class="card-body">출장비 계산기 · 민원 분류 체크리스트 · 회의록 템플릿 · 예산 시뮬레이터 · 설문 결과 시각화. 규칙이 명확하고 <strong>1회성 입력 · 즉시 출력</strong> 형태의 업무가 잘 맞는다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">"엑셀로 하면 되지 않나?" — 엑셀은 수식 변경이 사용자에게 노출되지만 HTML은 로직이 숨겨진다.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">LIMIT</div>
+      <div class="card-anchor">데이터 <em>저장</em>과 외부 연결은 약하다</div>
+      <div class="card-body">파일 업로드 · 데이터 영구 저장 · 외부 API 호출은 제한된다. 이 이상이 필요하면 유형 2(Python) 또는 유형 4(Node)로 승격한다. 인터랙티브 계산 · 시각화에는 여전히 최적.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">6차시(에이전트 도구)에서 실제 실습 케이스로 다룬다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">035 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 036 · TYPE 2 PYTHON                                     -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type 2 Python">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE 02 / 09</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 유형 ② · Python 스크립트 · 4MIN</div>
+    <div class="hl-title">유형 02 · 파일을 대량으로 처리하는 Python 스크립트</div>
+    <div class="hl-sub">명령어 하나로 폴더 전체의 파일을 변환 · 추출 · 분석하는 스크립트. 엑셀 100개 합치기 · PDF 텍스트 추출 · 월간 리포트 자동 생성 같은 <strong>반복적인 파일 작업</strong>의 기본 해법이다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">TYPICAL WORKFLOW</span><span class="sh-t">Python 스크립트의 작동 구조</span></div>
+      <div class="sh-line"></div>
+      <div class="flow h3" style="margin-top:10px">
+        <div class="flow-box"><div class="flow-box-k">INPUT</div><div class="flow-box-t">폴더·파일<br>로드</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box on"><div class="flow-box-k">PROCESS</div><div class="flow-box-t">변환·추출<br>집계</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dk"><div class="flow-box-k">OUTPUT</div><div class="flow-box-t">파일·리포트<br>생성</div></div>
+      </div>
+      <div class="card-body" style="margin-top:12px">실행은 터미널 한 줄. 같은 스크립트를 매월 말에 돌리면 월간 리포트가 자동 생성된다. 엑셀 매크로와 달리 <strong>파일 포맷 · OS · 버전에 덜 구애받는다</strong>.</div>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">BARRIER</div>
+          <div class="pit-h">Python 설치 · 가상환경 설정이 필요하다</div>
+          <div class="pit-d">처음 한 번 설치하면 이후는 재사용. 부서 공통 환경을 구축하면 진입 장벽은 크게 낮아진다. 에이전트 도구를 쓰면 스크립트 작성 자체도 자동화된다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">USE CASES</span><span class="sh-t">공공 업무 활용 예</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:140px">업무</th><th>스크립트가 하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>월간 집계</td><td class="q">부서 제출 엑셀 n개 → 통합본 + 요약표 생성</td></tr>
+          <tr><td>PDF 처리</td><td class="q">스캔된 공문 PDF → 텍스트 추출 + 인덱싱</td></tr>
+          <tr><td>통계 정리</td><td class="q">CSV 원본 → 정제 + 시각화 + 차트 저장</td></tr>
+          <tr><td>파일명 정리</td><td class="q">기관 표준에 맞춰 수백 개 파일 일괄 rename</td></tr>
+          <tr><td>중복 점검</td><td class="q">폴더 내 유사 문서 · 중복 파일 자동 탐지</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">WHERE THIS APPEARS</div>
+          <div class="next-t">4차시(바이브 코딩 ①) 데이터 분석 파트에서 직접 만들어본다. 스크립트 + LLM 결합이 핵심.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">036 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 037 · TYPE 3 STANDALONE                                 -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type 3 Standalone">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE 03 / 09</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 유형 ③ · Standalone 실행형 · 4MIN</div>
+    <div class="hl-title">유형 03 · GUI가 있는 독립 실행 파일</div>
+    <div class="hl-sub">더블클릭하면 창이 열리고 버튼과 입력란이 있는 도구. <strong>비개발자 동료에게도 배포 가능한</strong> 유틸리티 수준의 프로그램. Python 스크립트에서 한 단계 승격한 형태로, 부서 공용 도구에 적합하다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">FORM</div>
+      <div class="card-anchor">버튼과 입력란이 있는 <em>창</em></div>
+      <div class="card-body">Electron · Tauri · PyInstaller 등으로 GUI 앱을 exe 또는 앱 파일로 패키징. 사용자는 개발 환경 없이 설치본만 받으면 된다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">최종 사용자는 개발자가 아니라 부서 동료다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">GOOD FOR</div>
+      <div class="card-anchor">같은 업무를 <em>여러 사람</em>이 반복할 때</div>
+      <div class="card-body">민원 분류 도구 · 자료 검토 체크리스트 · 간이 분석 도구. 개인이 쓰던 Python 스크립트를 부서 공용으로 확장할 때 이 형태가 된다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">사용자가 CLI를 무서워하는 환경에서 필수.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">TRADEOFF</div>
+      <div class="card-anchor">배포와 업데이트에 <em>수고</em>가 든다</div>
+      <div class="card-body">설치본 배포 · 버전 관리 · 업데이트 배포가 필요해진다. 공공 환경에서는 내부망 반입 절차도 추가된다. 꼭 GUI가 필요한지 먼저 점검한다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">대체로 유형 4(웹앱)로 가는 편이 유지보수가 쉽다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">037 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 038 · TYPE 4 NODE                                       -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type 4 Node">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE 04 / 09</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 유형 ④ · Node 웹앱 · 4MIN</div>
+    <div class="hl-title">유형 04 · 팀이 접속해서 쓰는 내부용 웹 도구</div>
+    <div class="hl-sub">부서 내부망에 띄워두고 팀원들이 브라우저로 접속해 쓰는 웹 도구. HTML 단일 파일의 간편함 + 서버 기반의 데이터 저장 · 로그인 기능을 합친 형태. 내부 포털 수준의 유틸리티.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">WHY WEB</span><span class="sh-t">데스크톱 앱 대신 웹앱을 선택하는 이유</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:130px">비교축</th><th style="width:140px">Standalone</th><th>Node 웹앱</th></tr></thead>
+        <tbody>
+          <tr><td>배포</td><td class="q">설치본 각자 배포</td><td class="q">URL 한 줄 공유</td></tr>
+          <tr><td>업데이트</td><td class="q">사용자가 새 설치본</td><td class="q">서버에서 즉시 반영</td></tr>
+          <tr><td>데이터 공유</td><td class="q">로컬 저장</td><td class="q">서버 저장 · 공유 가능</td></tr>
+          <tr><td>로그인·권한</td><td class="q">구현 난이도 높음</td><td class="q">표준 방식 존재</td></tr>
+          <tr><td>OS 의존성</td><td class="q">윈도·맥·리눅스 별도</td><td class="q">브라우저만 있으면 됨</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="co">
+          <div class="co-lb">VERDICT</div>
+          <div class="co-main">거의 모든 부서 공용 도구는 웹앱이 유리하다</div>
+          <p>특별한 이유(오프라인 필수, 고속 로컬 처리)가 아니라면 웹앱을 선택한다. 특히 업데이트가 잦은 도구는 서버 배포의 장점이 결정적이다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">USE CASES</span><span class="sh-t">공공 업무 활용 예</span></div>
+      <div class="sh-line"></div>
+      <div class="card-body" style="color:var(--ink2)">부서 내부용 소규모 웹 도구는 Node.js · React · 간단한 DB로 구성된다. <strong style="color:var(--ink)">공공 클라우드(G-Cloud)</strong> 또는 <strong style="color:var(--ink)">내부망 서버</strong>에 배포. 외부 접속은 제한.</div>
+      <table class="mtbl" style="margin-top:10px">
+        <thead><tr><th style="width:130px">업무</th><th>웹앱이 하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>회의 관리</td><td class="q">일정 · 참석자 · 안건 · 회의록 연결</td></tr>
+          <tr><td>민원 대시보드</td><td class="q">부서별 민원 현황 · 처리 속도 · 지연 건</td></tr>
+          <tr><td>공문 추적</td><td class="q">발송 · 수신 · 회신 상태 시각화</td></tr>
+          <tr><td>예산 조회</td><td class="q">항목별 · 시점별 예산 집행 조회</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">WHERE THIS APPEARS</div>
+          <div class="next-t">5차시(바이브 코딩 ②)에서 Node 기반 내부 도구 제작을 다룬다. 에이전트 어시스트로 비개발자도 구축 가능하다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">038 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 039 · TYPE 5 VBA OLLAMA                                 -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type 5 VBA Ollama">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE 05 / 09</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 유형 ⑤ · VBA + Ollama · 5MIN</div>
+    <div class="hl-title">유형 05 · 엑셀·한글 매크로에 로컬 LLM을 꽂는다</div>
+    <div class="hl-sub">공공 실무에서 가장 현실적인 조합 중 하나. 엑셀 VBA · 한글 매크로에 내부 네트워크의 Ollama 로컬 LLM을 연결하면 <strong>민감 데이터가 외부로 나가지 않으면서</strong> 기존 문서 환경에 AI가 들어온다. 망 분리 · 외부 전송 제한 환경의 해답.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">ARCHITECTURE</span><span class="sh-t">내부망에서의 연결 구조</span></div>
+      <div class="sh-line"></div>
+      <div class="flow h3" style="margin-top:10px">
+        <div class="flow-box"><div class="flow-box-k">EXCEL · HWP</div><div class="flow-box-t">문서<br>매크로</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box on"><div class="flow-box-k">VBA · HWP</div><div class="flow-box-t">HTTP 요청<br>로컬호스트</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dk"><div class="flow-box-k">OLLAMA</div><div class="flow-box-t">로컬 LLM<br>내부망</div></div>
+      </div>
+      <div class="card-body" style="margin-top:12px;color:var(--ink2)">기존 공무원이 매일 쓰는 문서 도구(엑셀 · 한글)에 매크로 한 줄을 추가해 로컬 LLM 호출. 외부 API · 클라우드 · 인터넷 연결 일체 없음. 데이터는 PC와 내부 서버 사이에서만 움직인다.</div>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">WHY IT MATTERS</div>
+          <div class="pit-h">공공 실무의 현실을 가장 잘 반영하는 조합</div>
+          <div class="pit-d">개인정보 · 민원 원문 · 내부 검토안을 엑셀/한글로 다루는 환경에서, 외부 API로 전송 불가능한 상황은 자주 발생한다. 이 조합은 그 제약을 뚫는 유일한 해법이다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">USE CASES</span><span class="sh-t">공공 업무 활용 예</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:130px">업무</th><th>조합이 하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>민원 엑셀 분류</td><td class="q">민원 본문 셀 → 분류 결과 자동 입력</td></tr>
+          <tr><td>보고서 요약</td><td class="q">한글 문서 본문 → 요약본 생성</td></tr>
+          <tr><td>공문 초안</td><td class="q">요청사항 + 양식 → 초안 생성</td></tr>
+          <tr><td>통계 해석</td><td class="q">엑셀 통계표 → 해석문 · 요약 자동 생성</td></tr>
+          <tr><td>개인정보 마스킹</td><td class="q">엑셀 셀의 민감 정보 자동 가리기</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">WHERE THIS APPEARS</div>
+          <div class="next-t">5차시(바이브 코딩 ② · 업무 자동화)에서 실제 구현을 다룬다. 외부망에서 에이전트로 코드 생성 → 내부망에서 배포 · 실행의 분리 패턴도 함께 학습한다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">039 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 040 · TYPE 6 LOCAL RAG                                  -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type 6 Local RAG">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE 06 / 09</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 유형 ⑥ · Local RAG · 5MIN</div>
+    <div class="hl-title">유형 06 · 벡터DB 없이도 80% 품질을 내는 로컬 RAG</div>
+    <div class="hl-sub">부서 내부 문서를 기반으로 질의응답하는 시스템. 초보자는 "Pinecone · Weaviate 같은 벡터DB가 필요하다"고 생각하지만, 실제로는 파일 시스템 + 키워드 검색 + LLM 조합만으로도 <strong>대부분의 업무에서 80% 품질</strong>이 나온다. 진입 장벽이 낮다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">STEP 01 · 수집</div>
+      <div class="card-anchor">부서 문서를 <em>한 폴더</em>에 모은다</div>
+      <div class="card-body">업무 매뉴얼 · 규정 · 과거 답변 사례 · 회의록 · 양식 등을 한 곳에 모은다. PDF · 한글 · 워드 · 엑셀 혼재 가능. 별도 변환 없이 시작한다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">가장 시간이 걸리는 단계이자 가장 중요한 단계.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">STEP 02 · 쪼개기+검색</div>
+      <div class="card-anchor">문서를 <em>청크</em>로 나누고<br>키워드로 찾는다</div>
+      <div class="card-body">문서를 문단 · 절 단위로 분리. 질문이 오면 <strong>키워드 매칭 · BM25 · 간단한 임베딩 검색</strong>으로 관련 청크를 찾는다. 벡터DB 없이도 충분히 동작.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">벡터DB가 정말 필요한 순간은 문서가 수만 건 이상일 때.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">STEP 03 · 답변+인용</div>
+      <div class="card-anchor">LLM이 찾은 청크로<br><em>답과 출처</em>를 낸다</div>
+      <div class="card-body">LLM이 검색된 청크를 근거로 답변을 생성한다. 답변 옆에 <strong>출처 문서명과 페이지를 명시</strong>하도록 시스템 프롬프트로 지시. 감사 대응에 그대로 쓰인다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">7차시에서 이 3단계를 직접 구현한다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">040 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 041 · TYPE 7 INTERNAL AGENT                             -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type 7 Internal Agent">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE 07 / 09</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 유형 ⑦ · Internal Agent · 5MIN</div>
+    <div class="hl-title">유형 07 · 부서 내부 업무용 전용 에이전트</div>
+    <div class="hl-sub">특정 부서의 반복 업무를 자동 실행하는 에이전트. 정형화된 루틴 — 일일 집계 · 주간 리포트 · 민원 초안 · 공문 처리 — 을 사람 개입 없이 처리하되, <strong>실행 로그와 승인 루프</strong>가 함께 설계된다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">ARCHITECTURE</span><span class="sh-t">내부 에이전트의 구성 요소</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:130px">구성</th><th>역할</th></tr></thead>
+        <tbody>
+          <tr><td>TRIGGER</td><td class="q">시간 · 이벤트 · 사용자 명령 — 실행 시작 조건</td></tr>
+          <tr><td>MEMORY</td><td class="q">과거 처리 이력 · 학습된 패턴</td></tr>
+          <tr><td>TOOLS</td><td class="q">DB 조회 · 파일 생성 · 메일 발송 · API 호출</td></tr>
+          <tr><td>PLANNER</td><td class="q">업무를 단계로 분해 · 순서 결정 · 병렬화</td></tr>
+          <tr><td>APPROVAL</td><td class="q">위험 작업은 사람 승인 대기 (이메일 발송 · 예산 집행 등)</td></tr>
+          <tr><td>LOG</td><td class="q">모든 단계의 실행 · 결정 · 결과 기록</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">KEY PRINCIPLE</div>
+          <div class="pit-h">APPROVAL과 LOG 없는 에이전트는 공공에서 작동하지 않는다</div>
+          <div class="pit-d">기능이 아무리 많아도 승인 루프 · 감사 로그가 없으면 배포가 불가능하다. 두 요소를 처음부터 설계에 포함한다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">USE CASES</span><span class="sh-t">부서별 에이전트 예시</span></div>
+      <div class="sh-line"></div>
+      <div class="card-body" style="color:var(--ink2)">반복 · 정형 · 규칙 기반 업무가 가장 먼저 에이전트화된다. 처음부터 자동 실행을 노리지 말고 <strong style="color:var(--ink)">어시스트 → 반자동 → 자동</strong>의 단계를 거친다.</div>
+      <table class="mtbl" style="margin-top:10px">
+        <thead><tr><th style="width:130px">부서</th><th>에이전트가 하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>민원부서</td><td class="q">분류 → 초안 → 담당 배정 (최종 발송만 사람)</td></tr>
+          <tr><td>인사부서</td><td class="q">근태 집계 → 이상 감지 → 보고서 생성</td></tr>
+          <tr><td>회계부서</td><td class="q">예산 집행 모니터링 → 이상 집행 알림</td></tr>
+          <tr><td>기획부서</td><td class="q">주간 지표 수집 → 대시보드 업데이트</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">WHERE THIS APPEARS</div>
+          <div class="next-t">6차시(에이전트 도구 마스터리)에서 실제 내부 에이전트 프로토타입을 만든다. 권한 · 승인 · 로그 설계가 중심 주제.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">041 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 042 · TYPE 8 MCP SQL                                    -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type 8 MCP SQL">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE 08 / 09</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 유형 ⑧ · MCP + SQL · 5MIN</div>
+    <div class="hl-title">유형 08 · 기관 DB를 MCP로 연결해 자연어로 조회한다</div>
+    <div class="hl-sub">기관 내부 DB · SQL 서버를 MCP 서버로 감싸면 에이전트가 "지난달 민원 부서별 처리 건수" 같은 자연어 질문을 받아 <strong>자동으로 SQL을 생성 · 실행 · 결과를 요약</strong>한다. 데이터 분석 진입 장벽이 극적으로 낮아진다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">WORKFLOW</span><span class="sh-t">자연어 → SQL → 결과 요약</span></div>
+      <div class="sh-line"></div>
+      <div class="flow h4" style="margin-top:10px">
+        <div class="flow-box"><div class="flow-box-k">USER</div><div class="flow-box-t">자연어<br>질문</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box on"><div class="flow-box-k">AGENT</div><div class="flow-box-t">SQL<br>생성</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box"><div class="flow-box-k">MCP</div><div class="flow-box-t">실행<br>권한</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dk"><div class="flow-box-k">DB</div><div class="flow-box-t">결과<br>조회</div></div>
+      </div>
+      <div class="qex" style="margin-top:14px">
+        <span class="dim">사용자:</span> "지난달 민원 중 <span class="hot">처리 지연 7일 이상</span> 건을 부서별로 보여줘"<br><br>
+        <span class="dim">에이전트:</span> SQL 생성 → MCP로 DB 실행 → 표 + 요약 답변 반환.
+      </div>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">SAFETY</div>
+          <div class="pit-h">읽기 권한만 주는 것이 기본</div>
+          <div class="pit-d">SELECT만 허용 · INSERT/UPDATE/DELETE 금지. 테이블별 접근 권한도 세분화. 에이전트가 실수로라도 데이터를 수정할 수 없게 구조적으로 차단한다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">USE CASES</span><span class="sh-t">공공 DB 조회 시나리오</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:140px">시나리오</th><th>자연어 질문 예</th></tr></thead>
+        <tbody>
+          <tr><td>월간 통계</td><td class="q">"이번 달 부서별 민원 건수 비교"</td></tr>
+          <tr><td>추이 분석</td><td class="q">"최근 6개월 주거 관련 민원 증감"</td></tr>
+          <tr><td>이상 탐지</td><td class="q">"평균 대비 급증한 민원 유형"</td></tr>
+          <tr><td>비교 보고</td><td class="q">"작년 동기 대비 처리 속도 변화"</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">WHERE THIS APPEARS</div>
+          <div class="next-t">8차시(API · MCP 기반 멀티 에이전트)에서 실제 MCP 서버와 DB를 연결해 자연어 질의응답 시스템을 만든다. <strong>인사 데이터 분석</strong>을 실제 캡스톤 주제로 다룬다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">042 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 043 · TYPE 9 FULLSTACK                                  -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Type 9 Fullstack">
+  <div class="hbar"><div class="hbar-l">PART B · TYPE 09 / 09</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART B · 구현 유형 ⑨ · Fullstack Agent · 5MIN</div>
+    <div class="hl-title">유형 09 · 프론트+백엔드+에이전트를 모두 갖춘 기관 서비스</div>
+    <div class="hl-sub">기관 단위 사용자를 대상으로 한 통합 AI 서비스. 내부 민원 응대 챗봇 · 정책 질의 포털 · 전자 민원 시스템의 AI 기능이 여기에 해당. <strong>9개 유형 중 난이도 · 설계 비용이 가장 높고</strong>, 대부분의 거점리더에게는 발주자 · 감리자의 역할이 요구된다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">STACK LAYERS</span><span class="sh-t">풀스택 에이전트의 층위</span></div>
+      <div class="sh-line"></div>
+      <div class="ladder" style="flex:1">
+        <div class="ladder-step">
+          <div class="ladder-n">01</div>
+          <div class="ladder-b">
+            <div class="ladder-h">FRONTEND · 사용자 화면</div>
+            <div class="ladder-d">웹 · 모바일 · 포털 연동 UI</div>
+          </div>
+          <div class="ladder-tag">UI/UX</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">02</div>
+          <div class="ladder-b">
+            <div class="ladder-h">BACKEND · 서비스 로직</div>
+            <div class="ladder-d">인증 · 권한 · 비즈니스 규칙 · 로그</div>
+          </div>
+          <div class="ladder-tag">API</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">03</div>
+          <div class="ladder-b">
+            <div class="ladder-h">AGENT LAYER · 판단</div>
+            <div class="ladder-d">LLM 호출 · 도구 선택 · 워크플로우</div>
+          </div>
+          <div class="ladder-tag">LLM + MCP</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">04</div>
+          <div class="ladder-b">
+            <div class="ladder-h">DATA · 지식</div>
+            <div class="ladder-d">DB · RAG · 외부 API 연결</div>
+          </div>
+          <div class="ladder-tag">STORAGE</div>
+        </div>
+        <div class="ladder-step dk">
+          <div class="ladder-n">05</div>
+          <div class="ladder-b">
+            <div class="ladder-h">GOVERNANCE · 운영</div>
+            <div class="ladder-d">모니터링 · 승인 · 감사 · 업데이트</div>
+          </div>
+          <div class="ladder-tag">OPERATION</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">HUB LEADER'S ROLE</span><span class="sh-t">거점리더의 역할 변화</span></div>
+      <div class="sh-line"></div>
+      <div class="card-body" style="color:var(--ink2)">풀스택 에이전트 유형에서 거점리더는 <strong style="color:var(--ink)">직접 코딩하는 개발자</strong>가 아니다. 외주 · 내부 개발팀과 협업하는 <strong style="color:var(--ink)">기획자 · 설계자 · 감리자</strong>의 포지션이다. 그래서 다음 역량이 중요하다.</div>
+      <table class="mtbl" style="margin-top:10px">
+        <thead><tr><th style="width:140px">역할</th><th>거점리더가 해야 하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>요구사항 정의</td><td class="q">업무를 설계 가능한 스펙으로 번역</td></tr>
+          <tr><td>아키텍처 이해</td><td class="q">제안된 구조의 적절성 판단 · 질문</td></tr>
+          <tr><td>테스트 시나리오</td><td class="q">공공 업무 관점의 검수 항목 설계</td></tr>
+          <tr><td>운영 거버넌스</td><td class="q">승인 · 감사 · 업데이트 체계 수립</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">EDITORIAL</div>
+          <div class="next-t">풀스택을 <strong>직접 만들 수 있다면</strong> 가장 좋다. 그러나 대부분은 <strong>직접 만들지 않아도 된다</strong>. 유형 9는 거점리더가 "제대로 된 것을 발주하는 능력"의 시험대다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">043 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 044 · ORCHESTRATION 5Q                                  -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Orchestration 5Q">
+  <div class="hbar"><div class="hbar-l">PART C · ORCHESTRATION</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART C · 오케스트레이션과 거버넌스 ① · 5가지 기본 질문 · 5MIN</div>
+    <div class="hl-title">오케스트레이션은 5가지 질문으로 설계한다</div>
+    <div class="hl-sub">어떤 유형을 고르든, 실제 시스템은 <strong>5개 축</strong>으로 기술된다. 트리거 · 재료 · 처리 · 시스템프롬프트 · 출력. 이 5가지를 답할 수 없으면 시스템은 아직 설계되지 않은 것이다. 8차시 미션 캔버스의 핵심 프레임.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:24px 30px">
+      <div class="typelist" style="grid-template-columns:repeat(5,1fr);flex:1">
+        <div class="type"><div class="type-n">01</div><div class="type-h">TRIGGER<br>언제 시작?</div><div class="type-d">실행을 시작하는 조건. 시간 · 이벤트 · 사용자 명령 · 외부 신호. "매일 9시" · "민원 접수" · "/명령" 등.</div><div class="type-tag">WHEN</div></div>
+        <div class="type"><div class="type-n">02</div><div class="type-h">MATERIAL<br>무엇을 재료로?</div><div class="type-d">입력되는 모든 것. 문서 · DB 행 · API 응답 · 과거 이력. 재료가 부족하면 판단 품질이 떨어진다.</div><div class="type-tag">WHAT IN</div></div>
+        <div class="type"><div class="type-n">03</div><div class="type-h">PROCESS<br>어떻게 판단?</div><div class="type-d">처리 단계와 순서. 분류 → 검색 → 초안 → 검증 → 포맷팅. 각 단계의 모델 · 도구 · 조건.</div><div class="type-tag">HOW</div></div>
+        <div class="type"><div class="type-n">04</div><div class="type-h">SYSTEM PROMPT<br>어떤 규칙?</div><div class="type-d">페르소나 · 규칙 · 금지 · 출력 형식. 메타 프롬프트로 행동 경계를 정한다. 공공 문체 · 법적 제약 포함.</div><div class="type-tag">RULES</div></div>
+        <div class="type dk"><div class="type-n">05</div><div class="type-h">OUTPUT<br>어떻게 내보내기?</div><div class="type-d">결과의 목적지 · 포맷 · 승인 루프. 화면 · 파일 · 이메일 · DB · 사람 검수. 승인 없는 자동 발송은 금지.</div><div class="type-tag">WHERE OUT</div></div>
+      </div>
+      <div class="co" style="margin-top:14px">
+        <div class="co-lb">DESIGN CHECK</div>
+        <div class="co-main">이 5가지를 모두 한 줄씩 답할 수 없으면 시스템 설계는 미완성이다</div>
+        <p>복잡한 아키텍처 다이어그램보다 이 5줄이 먼저다. 트리거 · 재료 · 처리 · 규칙 · 출력을 각각 <strong>한 문장으로</strong> 말할 수 있어야 개발팀과 협업이 시작된다. 이것이 8차시 미션 캔버스의 기본 단위다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">044 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 045 · GOVERNANCE 5 LAYERS                               -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Governance">
+  <div class="hbar"><div class="hbar-l">PART C · GOVERNANCE</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART C · 오케스트레이션과 거버넌스 ② · 거버넌스 5층위 · 5MIN</div>
+    <div class="hl-title">공공 AI 거버넌스는 5개 층위로 구성된다</div>
+    <div class="hl-sub">공공에서 AI 시스템이 작동하려면 기능만으로는 부족하다. 권한 · 감사 · 승인 · 재현 · 책임의 5개 층위가 함께 설계되어야 한다. 한 층위라도 빠지면 공공 배포는 불가능하다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:22px 30px">
+      <div class="ladder" style="flex:1">
+        <div class="ladder-step">
+          <div class="ladder-n">01</div>
+          <div class="ladder-b">
+            <div class="ladder-h">ACCESS · 권한 관리</div>
+            <div class="ladder-d">누가 · 어떤 데이터에 · 어떤 기능에 접근할 수 있는가. 부서 · 직급 · 역할별 차등 권한. 외부 사용자와 내부 사용자의 경계.</div>
+          </div>
+          <div class="ladder-tag">WHO</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">02</div>
+          <div class="ladder-b">
+            <div class="ladder-h">AUDIT · 감사 로그</div>
+            <div class="ladder-d">모든 LLM 호출 · 도구 실행 · 사용자 액션의 로그 기록. 감사 요청 시 추적 가능한 형태로 저장. 재현 가능한 단위로.</div>
+          </div>
+          <div class="ladder-tag">TRACE</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">03</div>
+          <div class="ladder-b">
+            <div class="ladder-h">APPROVAL · 승인 루프</div>
+            <div class="ladder-d">위험도 있는 액션에 사람 승인 단계. 대외 발송 · 예산 집행 · 개인정보 노출이 포함된 작업은 자동 실행 금지.</div>
+          </div>
+          <div class="ladder-tag">HUMAN IN LOOP</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">04</div>
+          <div class="ladder-b">
+            <div class="ladder-h">REPRODUCIBILITY · 재현성</div>
+            <div class="ladder-d">같은 입력 · 같은 조건에서 같은 결과를 내는가. 모델 버전 · 프롬프트 버전 · RAG 문서 버전을 관리. 6개월 뒤 재현 가능해야 한다.</div>
+          </div>
+          <div class="ladder-tag">VERSIONED</div>
+        </div>
+        <div class="ladder-step dk">
+          <div class="ladder-n">05</div>
+          <div class="ladder-b">
+            <div class="ladder-h">ACCOUNTABILITY · 책임 소재</div>
+            <div class="ladder-d">AI의 오류로 문제가 생겼을 때 누가 책임지는가. 설계자 · 운영자 · 승인자의 역할 구분. 책임 분담 구조가 사전에 문서화.</div>
+          </div>
+          <div class="ladder-tag">OWNERSHIP</div>
+        </div>
+      </div>
+      <div class="next" style="margin-top:14px">
+        <div class="next-k">EDITORIAL</div>
+        <div class="next-t">많은 시범 프로젝트가 1~2번만 갖추고 3~5번을 빠뜨린다. 결과는 <strong>"기술 시연은 성공, 정식 도입은 무산"</strong>이다. 5개 층위를 모두 설계한 뒤 배포하는 습관이 거점리더에게 요구된다. 기능보다 거버넌스가 먼저다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">045 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 046 · DEMO A-D                                          -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Demo A-D">
+  <div class="hbar"><div class="hbar-l">PART D · LIVE DEMO 1/2</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART D · 실습 맛보기 ① · 데모 A-D · 6MIN</div>
+    <div class="hl-title">8주 커리큘럼의 미리보기 — 4가지 데모</div>
+    <div class="hl-sub">오늘 당장 따라하지 않아도 된다. 뒤 차시에서 만들 결과물이 어떤 모습인지 <strong>미리 한눈에 보여주기 위한</strong> 4가지 데모. 각 차시의 기대치를 시각적으로 잡는 것이 목적이다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">DEMO A · 2차시</span><span class="sh-t">프론티어 모델 · 정책 리서치</span></div>
+      <div class="sh-line"></div>
+      <div class="card" style="padding:18px 22px;gap:8px">
+        <div class="card-k">USE</div>
+        <div class="card-anchor" style="font-size:20px">5분 만에 끝내는 <em>정책 비교 보고서</em></div>
+        <div class="card-body" style="font-size:13px">정책 주제 + 비교 대상을 던지면 Claude · GPT가 각 대안의 장단점과 예상 효과를 섹션별로 정리해 초안을 돌려준다. 반나절 작업이 5분으로.</div>
+        <div class="card-note" style="font-size:11.5px">2차시 실습에서 메타 프롬프트로 이 결과물을 안정적으로 재현하는 방법을 다룬다.</div>
+      </div>
+      <div class="sh" style="margin-top:6px"><span class="sh-n">DEMO B · 3차시</span><span class="sh-t">메타 프롬프트 · 답변 자동화</span></div>
+      <div class="sh-line"></div>
+      <div class="card dk" style="padding:18px 22px;gap:8px">
+        <div class="card-k">USE</div>
+        <div class="card-anchor" style="font-size:20px">민원 본문 → <em>10초 만에</em> 공문 형식 답변 초안</div>
+        <div class="card-body" style="font-size:13px">시스템 프롬프트에 기관 · 말투 · 인용 규칙을 고정해두면, 본 프롬프트는 민원 본문만 붙이면 된다. 출력은 바로 쓸 수 있는 공문 형식.</div>
+        <div class="card-note" style="font-size:11.5px">3차시에서 메타 프롬프트의 조립 방법을 직접 연습.</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">DEMO C · 4차시</span><span class="sh-t">바이브 코딩 ① · 데이터 분석</span></div>
+      <div class="sh-line"></div>
+      <div class="card" style="padding:18px 22px;gap:8px">
+        <div class="card-k">USE</div>
+        <div class="card-anchor" style="font-size:20px">엑셀 원본 → <em>반나절</em>에 대시보드</div>
+        <div class="card-body" style="font-size:13px">민원 엑셀을 에이전트에게 넘기면 클린징 → 집계 → 시각화를 자동 처리하고, HTML 파일 하나로 인터랙티브 대시보드를 만든다.</div>
+        <div class="card-note" style="font-size:11.5px">4차시에서 이 과정을 직접 만든다. 비개발자도 가능.</div>
+      </div>
+      <div class="sh" style="margin-top:6px"><span class="sh-n">DEMO D · 5차시</span><span class="sh-t">바이브 코딩 ② · 업무 자동화</span></div>
+      <div class="sh-line"></div>
+      <div class="card dk" style="padding:18px 22px;gap:8px">
+        <div class="card-k">USE</div>
+        <div class="card-anchor" style="font-size:20px">엑셀에서 <em>직접</em> 돌아가는 AI 함수</div>
+        <div class="card-body" style="font-size:13px">엑셀 셀에 =AI(민원본문)을 치면 분류 · 요약이 자동 반환. 내부망 Ollama를 VBA로 연결해 민감 데이터도 안전.</div>
+        <div class="card-note" style="font-size:11.5px">5차시의 내부망 구현 실습 주제.</div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">046 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 047 · DEMO E-H                                          -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Demo E-H">
+  <div class="hbar"><div class="hbar-l">PART D · LIVE DEMO 2/2</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART D · 실습 맛보기 ② · 데모 E-H · 6MIN</div>
+    <div class="hl-title">6~8차시에서 만들 결과물 — 에이전트와 멀티 에이전트</div>
+    <div class="hl-sub">후반부 차시는 에이전트 · RAG · MCP · 멀티 에이전트가 중심이다. 이 4가지 데모는 "거점리더가 직접 이런 것을 만들 수 있는가"에 답한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">DEMO E · 6차시</span><span class="sh-t">에이전트 도구 마스터리</span></div>
+      <div class="sh-line"></div>
+      <div class="card" style="padding:18px 22px;gap:8px">
+        <div class="card-k">USE</div>
+        <div class="card-anchor" style="font-size:20px">Claude Code가 <em>부서 도구</em>를 만든다</div>
+        <div class="card-body" style="font-size:13px">"민원 분류 + 담당 배정 + 답변 초안을 자동으로 해주는 내부 도구가 필요해" → Claude Code가 요구사항을 분해하고 · 파일을 만들고 · 테스트를 돌린다.</div>
+        <div class="card-note" style="font-size:11.5px">거점리더는 코딩하지 않는다. 요구와 검수만.</div>
+      </div>
+      <div class="sh" style="margin-top:6px"><span class="sh-n">DEMO F · 7차시</span><span class="sh-t">RAG 파이프라인</span></div>
+      <div class="sh-line"></div>
+      <div class="card dk" style="padding:18px 22px;gap:8px">
+        <div class="card-k">USE</div>
+        <div class="card-anchor" style="font-size:20px">부서 <em>규정집 전체</em>를 Q&amp;A로</div>
+        <div class="card-body" style="font-size:13px">규정 PDF · 지침 한글 파일 · 과거 답변을 모아 로컬 RAG 구축. "이 조건에 해당하는 규정은?" 질문에 근거 출처까지 함께 답변.</div>
+        <div class="card-note" style="font-size:11.5px">벡터DB 없이도 80% 품질이 나온다.</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">DEMO G · 8차시 前</span><span class="sh-t">MCP 서버 연결</span></div>
+      <div class="sh-line"></div>
+      <div class="card" style="padding:18px 22px;gap:8px">
+        <div class="card-k">USE</div>
+        <div class="card-anchor" style="font-size:20px">자연어로 <em>DB에 질문</em>하기</div>
+        <div class="card-body" style="font-size:13px">"지난 분기 부서별 민원 처리 속도 비교해줘" → MCP 서버가 SQL 생성 → DB 조회 → 표 + 해석까지 자동 생성. 데이터 분석 진입 장벽 극적 하락.</div>
+        <div class="card-note" style="font-size:11.5px">읽기 권한만으로 안전하게 운영.</div>
+      </div>
+      <div class="sh" style="margin-top:6px"><span class="sh-n">DEMO H · 8차시 캡스톤</span><span class="sh-t">멀티 에이전트</span></div>
+      <div class="sh-line"></div>
+      <div class="card dk" style="padding:18px 22px;gap:8px">
+        <div class="card-k">USE</div>
+        <div class="card-anchor" style="font-size:20px">3명의 <em>AI 전문가</em>가 인사 데이터를 회의한다</div>
+        <div class="card-body" style="font-size:13px">분석 · 법무 · HR 에이전트 3명이 서로 질의하며 결론을 도출. "이 부서의 이직률 상승의 숨은 요인" 같은 복합 질문에 다관점 답변.</div>
+        <div class="card-note" style="font-size:11.5px">수강 종료 시점의 수강생이 직접 만드는 결과물.</div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">047 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 048 · SETUP ROADMAP                                     -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Setup Roadmap">
+  <div class="hbar"><div class="hbar-l">PART D · SETUP</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART D · 실습 맛보기 ③ · 환경 세팅 로드맵 · 5MIN</div>
+    <div class="hl-title">2차시 전까지 갖춰야 할 환경 4가지</div>
+    <div class="hl-sub">다음 주부터 실제 실습을 위해 필요한 기본 환경. 각 항목은 공공 환경의 제약(망 분리 · 설치 권한 · 라이선스)을 고려해 제시한다. 시급도와 설치 난이도를 함께 표시한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="col">
+      <div class="sh"><span class="sh-n">ESSENTIAL 4</span><span class="sh-t">필수 환경 체크리스트</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:140px">항목</th><th style="width:110px">시급도</th><th>필요한 이유</th></tr></thead>
+        <tbody>
+          <tr><td>① FRONTIER 모델</td><td class="q">필수</td><td>Claude · GPT · Gemini 중 하나 (2차시부터)</td></tr>
+          <tr><td>② 에이전트 도구</td><td class="q">필수</td><td>Claude Code · Cursor 중 하나 (6차시부터)</td></tr>
+          <tr><td>③ Python 환경</td><td class="q">권장</td><td>3.10 이상 · uv 또는 pipx (4차시부터)</td></tr>
+          <tr><td>④ 내부 Ollama</td><td class="q">선택</td><td>민감 데이터 실습용 (5차시 · 기관 환경 따라)</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">ORGANIZATION CONSTRAINT</div>
+          <div class="pit-h">내부망 기관은 반입 절차가 추가된다</div>
+          <div class="pit-d">폐쇄망에서 설치 시 보안 검토 · 반입 승인 · 내부 저장소 배포 절차가 필요할 수 있다. 소속 기관의 보안 정책을 먼저 확인한다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">RECOMMENDED STACK</span><span class="sh-t">거점리더 권장 조합</span></div>
+      <div class="sh-line"></div>
+      <div class="card-body" style="color:var(--ink2)">아래 조합은 공공 환경에서 <strong style="color:var(--ink)">가장 마찰이 적은 기본 스택</strong>이다. 개인 취향에 맞게 대체 가능하나, 교육 중에는 공통 환경을 권장한다.</div>
+      <div class="code" style="margin-top:10px">
+<span class="cm"># 1. 프론티어 모델 (최소 하나)</span>
+<span class="kw">CLAUDE</span>       · claude.ai / API
+<span class="kw">GPT</span>          · chat.openai.com / API
+
+<span class="cm"># 2. 에이전트 도구</span>
+<span class="kw">CLAUDE CODE</span>  · npm install -g
+<span class="kw">CURSOR</span>       · cursor.sh 다운로드
+
+<span class="cm"># 3. Python 환경</span>
+<span class="kw">UV</span>           · uv.astral.sh (빠른 설치)
+<span class="kw">PYTHON 3.11</span>  · uv가 자동 관리
+
+<span class="cm"># 4. 로컬 LLM (내부망 대상)</span>
+<span class="kw">OLLAMA</span>       · ollama.com
+<span class="kw">MODEL</span>        · llama3.1 · qwen2.5</div>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">PRE-CLASS TASK</div>
+          <div class="next-t">다음 주까지 <strong>①과 ②</strong>는 반드시 설치. 설치 문제는 강의 전 문의 채널에서 지원. 환경이 안 맞으면 실습 참여가 어려워진다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">048 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 049 · PUBLIC ACTIVATION                                 -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Public Activation">
+  <div class="hbar"><div class="hbar-l">PART D · ACTIVATION</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART D · 실습 맛보기 ④ · 공공 조직의 활성화 단계 · 5MIN</div>
+    <div class="hl-title">부서에서 AI를 정착시키는 4단계</div>
+    <div class="hl-sub">거점리더의 역할은 개인 학습을 넘어 <strong>부서 전체를 움직이는 것</strong>이다. 혼자 잘 쓰는 단계에서 부서가 함께 쓰는 단계로 가려면 4개의 활성화 단계를 순차적으로 밟아야 한다. 이 과정 8주 일정과 연결된다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:22px 30px">
+      <div class="ladder" style="flex:1">
+        <div class="ladder-step">
+          <div class="ladder-n">01</div>
+          <div class="ladder-b">
+            <div class="ladder-h">PERSONAL · 자기 업무에서 쓴다</div>
+            <div class="ladder-d">거점리더 본인이 매일 업무에 AI를 사용. 어떤 업무에 효과가 큰지 · 어떤 업무는 안 맞는지를 직접 경험. 2주차 전후.</div>
+          </div>
+          <div class="ladder-tag">ME</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">02</div>
+          <div class="ladder-b">
+            <div class="ladder-h">PROOF · 작은 성공 사례를 만든다</div>
+            <div class="ladder-d">부서 내 눈에 띄는 한두 건의 업무 개선 사례. "민원 처리가 반나절 → 30분" 같은 체감 가능한 변화. 4~5주차 실습과 연결.</div>
+          </div>
+          <div class="ladder-tag">WIN</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">03</div>
+          <div class="ladder-b">
+            <div class="ladder-h">SHARE · 동료에게 전파한다</div>
+            <div class="ladder-d">성공 사례를 동료들이 재현 가능한 형태로 문서화. 프롬프트 · 템플릿 · 매뉴얼 · 미니 교육. 6~7주차에 해당.</div>
+          </div>
+          <div class="ladder-tag">TEAM</div>
+        </div>
+        <div class="ladder-step dk">
+          <div class="ladder-n">04</div>
+          <div class="ladder-b">
+            <div class="ladder-h">INSTITUTIONALIZE · 부서 자산으로 만든다</div>
+            <div class="ladder-d">공용 프롬프트 저장소 · 공유 RAG · 부서 표준 워크플로우. 거점리더가 이동해도 사용되는 형태로. 8주차 미션 캔버스에서 설계.</div>
+          </div>
+          <div class="ladder-tag">DEPT ASSET</div>
+        </div>
+      </div>
+      <div class="co" style="margin-top:14px">
+        <div class="co-lb">STAGE JUMP</div>
+        <div class="co-main">한 단계를 건너뛰면 반드시 실패한다</div>
+        <p>2단계(성공 사례) 없이 3단계(공유)로 가면 설득력이 없다. 3단계(공유) 없이 4단계(자산화)로 가면 쓰는 사람이 없다. <strong>한 단계씩 올라간다는 원칙</strong>이 거점리더의 성패를 가른다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">049 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 050 · MISSION GOOD BAD                                  -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Mission Good Bad">
+  <div class="hbar"><div class="hbar-l">PART E · MISSION CRITERIA</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART E · 거점 미션 카드 ① · 좋은 미션과 나쁜 미션 · 5MIN</div>
+    <div class="hl-title">좋은 미션과 나쁜 미션은 "구체성"에서 갈린다</div>
+    <div class="hl-sub">미션 카드는 막연한 포부가 아니다. <strong>트리거 · 재료 · 처리 · 승인 · 출력을 한 줄씩 답할 수 있는 수준의 구체성</strong>이 요구된다. 좋은 예와 나쁜 예를 대비해 기준을 잡는다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">BAD EXAMPLE</span><span class="sh-t">막연한 미션</span></div>
+      <div class="sh-line"></div>
+      <div class="draft weak">
+        <div class="draft-k">미션 · 나쁜 예</div>
+        <div class="draft-t">"우리 부서의 민원 업무를 AI로 혁신한다"</div>
+        <div class="draft-note">— 대상 업무가 구체적이지 않음. 어떤 민원? 어떤 단계? 누가 쓸? 무엇을 출력? 답할 수 없음.</div>
+      </div>
+      <div class="draft weak" style="margin-top:12px">
+        <div class="draft-k">미션 · 나쁜 예</div>
+        <div class="draft-t">"ChatGPT를 도입해 업무 생산성을 2배로 올린다"</div>
+        <div class="draft-note">— 수치는 구체적이지만 업무가 추상적. "어떤 업무의 어느 단계를 어떻게 바꿀지"가 빠짐.</div>
+      </div>
+      <div class="grow">
+        <div class="pit">
+          <div class="pit-lb">COMMON FAILURE</div>
+          <div class="pit-h">"혁신" · "자동화" · "디지털화" 같은 추상 단어</div>
+          <div class="pit-d">이런 단어로 표현된 미션은 실행되지 않는다. 거점리더의 첫 번째 작업은 <strong>추상어를 구체어로 바꾸는 일</strong>이다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">GOOD EXAMPLE</span><span class="sh-t">실행 가능한 미션</span></div>
+      <div class="sh-line"></div>
+      <div class="draft strong">
+        <div class="draft-k">미션 · 좋은 예</div>
+        <div class="draft-t">"주차 관련 민원 접수 시, LLM이 유형 분류 + 초안 작성 → 담당 주무관 검수 → 팀장 승인으로 회신까지 2시간 내 처리"</div>
+        <div class="draft-note">— 대상(주차 민원) · 트리거(접수) · 처리(분류+초안) · 검수(주무관) · 승인(팀장) · 출력(회신) · 기준(2시간)이 모두 명시됨.</div>
+      </div>
+      <div class="draft strong" style="margin-top:12px">
+        <div class="draft-k">미션 · 좋은 예</div>
+        <div class="draft-t">"부서 규정집(PDF 150쪽)을 RAG로 구축하여 직원이 자연어로 질문 시 30초 내 근거 조문과 함께 답변 제공"</div>
+        <div class="draft-note">— 재료(규정집 PDF) · 처리(RAG) · 사용자(직원) · 속도(30초) · 출력(답변+근거)가 모두 명시됨.</div>
+      </div>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">RULE OF THUMB</div>
+          <div class="next-t">미션이 구체적이면 <strong>개발자에게 그대로 전달 가능한 요구사항</strong>이 된다. 추상적이면 회의가 반복된다. 이 차이가 8주 차시의 산출물 품질을 결정한다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">050 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 051 · MISSION CARD TEMPLATE                             -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Mission Card">
+  <div class="hbar"><div class="hbar-l">PART E · MISSION CARD</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART E · 거점 미션 카드 ② · 템플릿과 8주 일정 · 5MIN</div>
+    <div class="hl-title">오늘 작성하는 초안, 8주에 걸쳐 완성하는 미션 카드</div>
+    <div class="hl-sub">1차시 끝에 수강생은 각자 <strong>미션 카드 초안</strong>을 작성한다. 이후 매 차시마다 새 기술을 배우며 카드를 구체화한다. 8차시에는 발표 가능한 완성본이 된다. 아래는 카드의 6개 필드와 각 차시에서 채워지는 항목.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:22px 30px">
+      <table class="mtbl">
+        <thead>
+          <tr>
+            <th style="width:140px">미션 카드 필드</th>
+            <th style="width:380px">기재 내용</th>
+            <th style="width:120px">오늘 초안</th>
+            <th>8주 완성본</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>① TRIGGER</td>
+            <td class="q">언제 시작되는가 (시간 · 이벤트 · 명령)</td>
+            <td class="q" style="font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--acc)">문장 수준</td>
+            <td>실제 이벤트 · API 연결까지 기술</td>
+          </tr>
+          <tr>
+            <td>② MATERIAL</td>
+            <td class="q">무엇을 재료로 쓸 것인가 (문서 · DB · API)</td>
+            <td class="q" style="font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--acc)">리스트</td>
+            <td>접근 권한 · RAG 설계까지 기술</td>
+          </tr>
+          <tr>
+            <td>③ PROCESS</td>
+            <td class="q">어떤 단계로 처리할 것인가 (분류 · 검색 · 생성 · 검증)</td>
+            <td class="q" style="font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--acc)">3-5단계</td>
+            <td>각 단계 모델 · 도구 · 조건 명시</td>
+          </tr>
+          <tr>
+            <td>④ SYSTEM PROMPT</td>
+            <td class="q">어떤 규칙 · 페르소나 · 포맷으로</td>
+            <td class="q" style="font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--acc)">페르소나 · 규칙</td>
+            <td>완성된 시스템 프롬프트 + 버전 관리</td>
+          </tr>
+          <tr>
+            <td>⑤ OUTPUT</td>
+            <td class="q">어떻게 내보내기 (화면 · 파일 · 승인 루프)</td>
+            <td class="q" style="font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--acc)">목적지 · 포맷</td>
+            <td>승인 · 배포 · 로그 구조</td>
+          </tr>
+          <tr>
+            <td>⑥ GOVERNANCE</td>
+            <td class="q">권한 · 감사 · 책임 구조</td>
+            <td class="q" style="font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--acc)">개념 수준</td>
+            <td>5층위 거버넌스 완성</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px">
+        <div class="co">
+          <div class="co-lb">TODAY'S TASK</div>
+          <div class="co-main">①~⑤를 각 한 문장씩 — 총 5문장</div>
+          <p>완벽할 필요 없다. <strong>지금 부서에서 가장 자주 반복되는 업무 하나</strong>를 골라, 5문장으로 기술해 본다. 이게 8주의 출발점이다.</p>
+        </div>
+        <div class="next">
+          <div class="next-k">MILESTONE</div>
+          <div class="next-t">차시별로 카드가 발전한다. 2차시 · 3차시 → ④ 구체화 / 4·5·6차시 → ③ 기술 선택 / 7차시 → ② RAG 설계 / 8차시 → ⑤⑥ 완성 + <strong>최종 발표</strong>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">051 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 052 · SESSION SUMMARY                                   -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Session Summary">
+  <div class="hbar"><div class="hbar-l">PART E · SESSION 01 SUMMARY</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART E · 마무리 ① · 1차시 핵심 정리 · 4MIN</div>
+    <div class="hl-title">오늘 남겨야 할 5가지 — 지도가 아니라 "기준"</div>
+    <div class="hl-sub">1차시는 8주의 지도이자, 동시에 <strong>판단 기준</strong>을 세우는 시간이었다. 오늘 이후 어떤 새 기술 · 도구가 나와도 이 5가지 기준이 흔들리지 않으면 거점리더의 정체성도 흔들리지 않는다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col1" style="grid-template-columns:1fr">
+    <div class="col" style="padding:22px 30px">
+      <div class="typelist" style="grid-template-columns:repeat(5,1fr);flex:1">
+        <div class="type">
+          <div class="type-n">01</div>
+          <div class="type-h">정체성</div>
+          <div class="type-d">거점리더는 AI 사용자가 아니라 <strong>구조 번역자</strong>다. 코드가 아니라 업무를 트리거 · 재료 · 출력으로 번역한다.</div>
+          <div class="type-tag">IDENTITY</div>
+        </div>
+        <div class="type">
+          <div class="type-n">02</div>
+          <div class="type-h">구조</div>
+          <div class="type-d">공공 AI 시스템은 <strong>6단계</strong>로 읽는다. LLM은 3단계에만 들어간다. 품질은 2단계와 5단계가 결정한다.</div>
+          <div class="type-tag">6-STAGE</div>
+        </div>
+        <div class="type">
+          <div class="type-n">03</div>
+          <div class="type-h">모델</div>
+          <div class="type-d">프론티어와 로컬은 <strong>역할 분담</strong>. 난이도 · 민감도의 사분면에서 먼저 위치를 잡고 모델을 고른다.</div>
+          <div class="type-tag">HYBRID</div>
+        </div>
+        <div class="type">
+          <div class="type-n">04</div>
+          <div class="type-h">진화</div>
+          <div class="type-d">프롬프트는 <strong>4단계</strong>로 진화해왔다. 단일 → 메타 → 컨텍스트+도구 → 에이전트. 이 과정이 그 여정이다.</div>
+          <div class="type-tag">4-STAGE</div>
+        </div>
+        <div class="type dk">
+          <div class="type-n">05</div>
+          <div class="type-h">거버넌스</div>
+          <div class="type-d">기능보다 <strong>거버넌스</strong>가 먼저다. 권한 · 감사 · 승인 · 재현 · 책임 5층위가 빠지면 공공 배포는 불가능.</div>
+          <div class="type-tag">5-LAYER</div>
+        </div>
+      </div>
+      <div class="co" style="margin-top:16px">
+        <div class="co-lb">FINAL NOTE</div>
+        <div class="co-main">기술은 매년 바뀐다. 그러나 이 5가지 기준은 바뀌지 않는다.</div>
+        <p>모델 이름 · 도구 브랜드 · API 스펙은 6개월마다 바뀐다. 그러나 <strong>업무를 6단계로 나누는 감각 · 프론티어와 로컬의 역할 분담 · 프롬프트 4단계의 위계 · 거버넌스 5층위</strong>는 바뀌지 않는다. 이것이 거점리더가 가져가야 할 자산이다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">052 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 053 · NEXT SESSION                                      -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Next Session">
+  <div class="hbar"><div class="hbar-l">PART E · NEXT SESSION</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART E · 마무리 ② · 다음 주 예고 · 3MIN</div>
+    <div class="hl-title">2차시 예고 — 프론티어 모델을 제대로 쓴다는 것</div>
+    <div class="hl-sub">다음 주는 지도에서 내려와 실제 도구를 쥐는 날이다. Claude · GPT · Gemini를 <strong>제대로 활용</strong>하기 위한 메타 프롬프트 · 역할 설정 · 출력 포맷 설계를 다룬다. 오늘 작성한 미션 카드의 ④번 필드를 구체화하는 시간.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2">
+    <div class="col">
+      <div class="sh"><span class="sh-n">SESSION 02 AGENDA</span><span class="sh-t">2차시 주요 주제</span></div>
+      <div class="sh-line"></div>
+      <div class="ladder" style="flex:1">
+        <div class="ladder-step">
+          <div class="ladder-n">01</div>
+          <div class="ladder-b">
+            <div class="ladder-h">프론티어 모델 특성 비교</div>
+            <div class="ladder-d">Claude · GPT · Gemini · HyperCLOVA의 강점과 차이</div>
+          </div>
+          <div class="ladder-tag">15MIN</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">02</div>
+          <div class="ladder-b">
+            <div class="ladder-h">메타 프롬프트 설계 실습</div>
+            <div class="ladder-d">페르소나 · 규칙 · 포맷 · 예시의 조립</div>
+          </div>
+          <div class="ladder-tag">40MIN</div>
+        </div>
+        <div class="ladder-step">
+          <div class="ladder-n">03</div>
+          <div class="ladder-b">
+            <div class="ladder-h">출력 포맷의 공공 번역</div>
+            <div class="ladder-d">공문 · 보고서 · 답변 초안의 구조화된 출력</div>
+          </div>
+          <div class="ladder-tag">30MIN</div>
+        </div>
+        <div class="ladder-step dk">
+          <div class="ladder-n">04</div>
+          <div class="ladder-b">
+            <div class="ladder-h">미션 카드 ④ 구체화</div>
+            <div class="ladder-d">오늘 초안의 시스템 프롬프트 필드를 완성</div>
+          </div>
+          <div class="ladder-tag">15MIN</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="sh"><span class="sh-n">PRE-WORK</span><span class="sh-t">다음 주까지 준비할 것</span></div>
+      <div class="sh-line"></div>
+      <table class="mtbl">
+        <thead><tr><th style="width:50px">#</th><th>할 일</th></tr></thead>
+        <tbody>
+          <tr><td>01</td><td class="q">Claude 또는 GPT 중 최소 한 개의 계정 준비 (유료 권장)</td></tr>
+          <tr><td>02</td><td class="q">오늘 작성한 미션 카드 초안 5문장을 파일로 보관</td></tr>
+          <tr><td>03</td><td class="q">부서에서 AI 적용할 만한 업무 3개를 추가로 메모</td></tr>
+          <tr><td>04</td><td class="q">현재 쓰는 프롬프트 중 효과적이었던 예시 1~2개 정리</td></tr>
+        </tbody>
+      </table>
+      <div class="grow">
+        <div class="next">
+          <div class="next-k">PREPARATION MINDSET</div>
+          <div class="next-t">다음 주는 <strong>"잘 쓰는 법"</strong>을 배우는 시간이 아니다. <strong>"잘 쓰게 하는 법"</strong>을 배우는 시간이다. 거점리더는 프롬프트를 개인이 아니라 조직이 재사용할 자산으로 만든다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">053 / 054</span></div></div>
+</div></div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 054 · CLOSING                                           -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Closing">
+  <div class="hbar"><div class="hbar-l">SESSION 01 · CLOSE</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 01 of 08</div></div>
+
+  <div style="position:absolute;top:120px;right:72px;font-family:var(--serif);font-size:320px;line-height:1;color:var(--acc);font-weight:300;opacity:0.07;letter-spacing:-0.06em;pointer-events:none;font-style:italic">/8</div>
+
+  <div style="position:absolute;top:110px;left:80px;display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:3px;font-weight:700">
+    <div style="width:26px;height:2px;background:var(--acc)"></div>
+    SESSION 01 COMPLETE · 1 OF 8
+  </div>
+
+  <div style="position:absolute;top:170px;left:80px;max-width:1100px">
+    <div style="font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:18px">MARCH FORWARD</div>
+    <h1 style="font-family:var(--serif);font-weight:700;font-size:58px;line-height:1.1;letter-spacing:-0.03em;color:var(--ink);margin-bottom:22px">거점리더는 <span style="color:var(--acc)">구조</span>를 남기고 떠난다</h1>
+    <div style="width:72px;height:3px;background:var(--ink);margin-bottom:24px"></div>
+    <div style="font-family:var(--serif);font-size:21px;color:var(--ink);font-weight:500;line-height:1.55;letter-spacing:-0.01em;max-width:1050px">이 과정이 끝날 때 수강생이 가져가야 할 것은 도구 목록이 아니다. 자기 부서를 6단계로 읽고, 업무를 4단계 프롬프트로 옮기고, 5층위 거버넌스로 배포할 수 있는 — 사람이 옮겨도 남는 <strong style="color:var(--ink);font-weight:700">시스템 설계 능력</strong>이다.</div>
+  </div>
+
+  <div style="position:absolute;bottom:120px;left:80px;right:80px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--ln2)">
+    <div style="background:var(--bg);padding:22px 28px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2.5px;color:var(--ink3);font-weight:700;margin-bottom:8px">TODAY · 1차시</div>
+      <div style="font-family:var(--serif);font-size:22px;color:var(--ink);font-weight:700;line-height:1.25;margin-bottom:6px">지형도와 기준</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.65">거점리더의 정체 · 시스템 6단계 · 9가지 구현 유형 · 거버넌스 5층위. 오늘은 지도와 기준의 날.</div>
+    </div>
+    <div style="background:#f0e7d6;padding:22px 28px;border-left:3px solid var(--acc)">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2.5px;color:var(--acc);font-weight:700;margin-bottom:8px">NEXT · 2차시</div>
+      <div style="font-family:var(--serif);font-size:22px;color:var(--ink);font-weight:700;line-height:1.25;margin-bottom:6px">프론티어 모델</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.65">메타 프롬프트 · 역할 설정 · 공공 출력 포맷. 미션 카드의 ④ 필드를 구체화한다.</div>
+    </div>
+    <div style="background:var(--dk);padding:22px 28px;color:var(--on)">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2.5px;color:var(--acc3);font-weight:700;margin-bottom:8px">CAPSTONE · 8차시</div>
+      <div style="font-family:var(--serif);font-size:22px;color:var(--on);font-weight:700;line-height:1.25;margin-bottom:6px">미션 카드 발표</div>
+      <div style="font-size:13px;color:var(--on2);line-height:1.65">6개 필드가 완성된 미션 카드를 부서 문제에 대입해 발표. 8주의 결과물.</div>
+    </div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">054 / 054</span></div></div>
+</div></div>
+
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll('.toolbar,.deck-nav').forEach(e=>e.remove());
+  const tb = document.createElement('div');
+  tb.className = 'toolbar';
+  tb.innerHTML = `<button onclick="pNav(-1)">◀</button><span class="pg" id="pgInd">1 / 1</span><button onclick="pNav(1)">▶</button><button onclick="window.print()">⬇ PDF</button><button onclick="tFull()">⛶ FULL</button><button id="editBtn" onclick="tEdit()">✎ EDIT</button>`;
+  document.body.appendChild(tb);
+})();
+
+const allSlides = document.querySelectorAll('.slide');
+const allStages = document.querySelectorAll('.stage');
+const deck = document.getElementById('deck');
+
+function fitSlides(){const vw=innerWidth,vh=innerHeight;const r=Math.min(vw/1600,vh/900);allSlides.forEach(s=>{s.style.transform=`scale(${r})`;s.style.transformOrigin='center center'})}
+addEventListener('resize',fitSlides);fitSlides();
+
+function curIdx(){let i=0,m=1e9;allStages.forEach((s,x)=>{const d=Math.abs(s.getBoundingClientRect().top+s.getBoundingClientRect().height/2-innerHeight/2);if(d<m){m=d;i=x}});return i}
+function pNav(dir){const i=curIdx()+dir;if(i>=0&&i<allStages.length)allStages[i].scrollIntoView({behavior:'smooth'})}
+function updPg(){document.getElementById('pgInd').textContent=`${curIdx()+1} / ${allStages.length}`}
+deck.addEventListener('scroll',updPg);updPg();
+function tFull(){if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}
+
+let editMode=false;
+function tEdit(){
+  editMode=!editMode;
+  const btn=document.getElementById('editBtn'),tb=document.querySelector('.toolbar');
+  const SEL='.hl-kicker,.hl-title,.hl-sub,.card-k,.card-anchor,.card-body,.card-note,.co-lb,.co-main,.co p,.next-k,.next-t,.pit-lb,.pit-h,.pit-d,.sh-n,.sh-t,.hybrid-k,.hybrid-h,.hybrid-d,.draft-k,.draft-t,.draft-note,.cmp2c-k,.cmp2c-h,.cmp2c-d,.cmp2c-fig,.qd-k,.qd-h,.qd-d,.ladder-h,.ladder-d,.ladder-tag,.tblock-w,.tblock-h,.tblock-d,.tblock-sess,.type-h,.type-d,.type-tag,.flow-box-t,.hbar-l,.hbar-r,.fbar-title,.mtbl td,.mtbl th,h1,p,.slide>div>div>div[style],.slide>div>div>p[style],.slide div[style*="font-size"],.slide span[style*="font-size"]';
+  if(editMode){
+    btn.textContent='✎ EDITING';btn.style.background='#b8532a';btn.style.color='#fff';tb.style.borderBottom='2px solid #b8532a';
+    document.querySelectorAll(SEL).forEach(el=>{el.contentEditable='true';el.style.outline='1px dashed rgba(184,83,42,0.3)';el.style.cursor='text'});
+    deck.style.scrollSnapType='none';
+    sToast('EDIT ON — 텍스트 클릭 수정 · Ctrl+S 저장 · E 또는 ESC로 종료');
+  }else{
+    btn.textContent='✎ EDIT';btn.style.background='';btn.style.color='';tb.style.borderBottom='';
+    document.querySelectorAll('[contenteditable="true"]').forEach(el=>{el.contentEditable='false';el.style.outline='';el.style.cursor=''});
+    deck.style.scrollSnapType='y mandatory';
+    sToast('EDIT OFF — 프레젠테이션 모드');
+  }
+}
+function sToast(m){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(14,10,6,0.92);color:#ede4d3;font-family:var(--mono,monospace);font-size:11px;letter-spacing:1.5px;padding:10px 24px;border-radius:4px;z-index:300;pointer-events:none;opacity:0;transition:opacity 0.4s';document.body.appendChild(t)}t.textContent=m;t.style.opacity='1';clearTimeout(t._tid);t._tid=setTimeout(()=>{t.style.opacity='0'},3000)}
+
+document.addEventListener('keydown',e=>{
+  if(editMode){
+    if(e.key==='s'&&(e.ctrlKey||e.metaKey)){e.preventDefault();const b=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=document.title.replace(/[^a-zA-Z0-9가-힣\s·_-]/g,'')+'.html';a.click();URL.revokeObjectURL(a.href);sToast('HTML 파일 저장 완료')}
+    if(e.key==='Escape'||e.key==='e'||e.key==='E'){if(!document.activeElement||document.activeElement===document.body)tEdit()}
+    return;
+  }
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '||e.key==='PageDown'){e.preventDefault();pNav(1)}
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();pNav(-1)}
+  else if(e.key==='Home'){e.preventDefault();allStages[0].scrollIntoView({behavior:'smooth'})}
+  else if(e.key==='End'){e.preventDefault();allStages[allStages.length-1].scrollIntoView({behavior:'smooth'})}
+  else if(e.key==='f'||e.key==='F11'){e.preventDefault();tFull()}
+  else if(e.key==='Escape'){if(document.fullscreenElement)document.exitFullscreen()}
+  else if(e.key==='e'||e.key==='E'){tEdit()}
+});
+</script>
+</body>
+</html>
