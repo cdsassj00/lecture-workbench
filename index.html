@@ -227,12 +227,12 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
       <div class="tab-body" id="tabComp">
         <div class="sec">
           <div class="sec-t">블록 삽입</div>
-          <div class="hint" style="margin-bottom:10px">편집 모드에서 클릭하면 현재 슬라이드 본문 끝에 삽입됩니다</div>
+          <div class="hint" style="margin-bottom:10px">슬라이드 블록의 <b>◎</b> 버튼을 눌러 앵커를 지정하면 그 아래에 삽입됩니다. 앵커가 없으면 본문 기본 위치에 삽입.</div>
           <div class="comp-grid" id="compGrid"></div>
         </div>
         <div class="sec" style="margin-top:12px">
           <div class="sec-t">사용법</div>
-          <div class="hint">1. 편집 모드를 켜세요<br>2. 원하는 블록을 클릭하면 현재 슬라이드에 삽입<br>3. 삽입된 블록의 텍스트를 클릭해 수정<br>4. 블록 위에 마우스를 올리면 [×] 삭제 핸들 표시</div>
+          <div class="hint">1. 편집 모드를 켜세요<br>2. 슬라이드 블록 위에 마우스를 올리면 핸들바(◎ ← ↑ ↓ → ×) 표시<br>3. <b>◎</b>로 삽입 앵커 지정(주황 아웃라인) → 컴포넌트 클릭 시 그 아래에 삽입<br>4. 삽입된 블록의 텍스트를 클릭해 수정</div>
         </div>
       </div>
 
@@ -306,6 +306,7 @@ let S = {
   dirty: false,
   editMode: false,
   insertAt: -1,      // modal에서 삽입할 위치
+  insertAnchor: null,// 컴포넌트 삽입 앵커(블록 참조)
   undoStack: [],
   redoStack: [],
   logoBase64: '',
@@ -589,6 +590,7 @@ function makeEditable(iframe) {
         return b;
       };
       
+      bar.appendChild(mkBtn('◎', '여기 아래에 컴포넌트 삽입', setInsertAnchor));
       bar.appendChild(mkBtn('←', '왼쪽 칼럼으로', (b)=>moveBlockToCol(b,'left')));
       bar.appendChild(mkBtn('↑', '위로', moveBlockUp));
       bar.appendChild(mkBtn('↓', '아래로', moveBlockDown));
@@ -605,7 +607,7 @@ function makeEditable(iframe) {
     if (!doc.getElementById('wb-handle-css')) {
       const style = doc.createElement('style');
       style.id = 'wb-handle-css';
-      style.textContent = '.wb-handle-bar button:hover{background:rgba(154,68,32,1)!important}';
+      style.textContent = '.wb-handle-bar button:hover{background:rgba(154,68,32,1)!important}.wb-anchor{outline:2px solid #b8532a!important;outline-offset:3px!important;box-shadow:0 0 0 1px rgba(184,83,42,0.15)!important}';
       doc.head.appendChild(style);
     }
     
@@ -618,10 +620,26 @@ function saveSlideState(doc) {
     // 핸들 제거 후 저장 (핸들이 HTML에 박히면 안 됨)
     const clone = stage.cloneNode(true);
     clone.querySelectorAll('.wb-handle-bar').forEach(h => h.remove());
+    clone.querySelectorAll('.wb-anchor').forEach(el => el.classList.remove('wb-anchor'));
     const style = clone.querySelector('#wb-handle-css');
     if (style) style.remove();
     S.slides[S.selectedIdx].html = clone.innerHTML;
     markDirty();
+  }
+}
+
+function setInsertAnchor(block) {
+  const iframe = document.getElementById('canvasIframe');
+  if (!iframe || !iframe.contentDocument) return;
+  const doc = iframe.contentDocument;
+  doc.querySelectorAll('.wb-anchor').forEach(el => el.classList.remove('wb-anchor'));
+  if (S.insertAnchor === block) {
+    S.insertAnchor = null;
+    toast('앵커 해제');
+  } else {
+    block.classList.add('wb-anchor');
+    S.insertAnchor = block;
+    toast('앵커 설정 — 다음 컴포넌트가 이 아래에 삽입됩니다');
   }
 }
 
@@ -987,30 +1005,33 @@ function insertComponent(comp) {
     doc.head.appendChild(style);
   }
   
-  // 2. 삽입 위치 찾기 — 우선순위: 첫 번째 .col > .bd > .slide
-  let target = null;
-  const cols = doc.querySelectorAll('.col');
-  if (cols.length > 0) {
-    // 첫 번째 칼럼에 삽입 (가장 직관적)
-    target = cols[0];
-  } else {
-    // 칼럼이 없는 슬라이드 (hero 등) → .bd 또는 .slide에 직접
-    target = doc.querySelector('.bd') || doc.querySelector('.slide');
-  }
-  
-  if (!target) { toast('삽입할 위치를 찾을 수 없습니다'); return; }
-  
-  // 3. fbar 앞에 삽입 (fbar가 있으면 그 앞에, 없으면 끝에)
-  const fbar = target.querySelector('.fbar') || target.closest('.slide')?.querySelector('.fbar');
-  
   const wrapper = doc.createElement('div');
   wrapper.innerHTML = comp.html;
-  while (wrapper.firstChild) {
-    if (fbar && fbar.parentNode === target) {
-      target.insertBefore(wrapper.firstChild, fbar);
-    } else {
-      target.appendChild(wrapper.firstChild);
+  const newNodes = Array.from(wrapper.children);
+
+  const anchor = S.insertAnchor;
+  if (anchor && anchor.ownerDocument === doc && anchor.isConnected) {
+    // 앵커 바로 아래에 삽입
+    let ref = anchor;
+    for (const n of newNodes) {
+      anchor.parentNode.insertBefore(n, ref.nextSibling);
+      ref = n;
     }
+    anchor.classList.remove('wb-anchor');
+    S.insertAnchor = null;
+  } else {
+    // 앵커 없을 때 기본: 첫 .col > .bd > .slide 의 fbar 앞
+    let target = null;
+    const cols = doc.querySelectorAll('.col');
+    if (cols.length > 0) target = cols[0];
+    else target = doc.querySelector('.bd') || doc.querySelector('.slide');
+    if (!target) { toast('삽입할 위치를 찾을 수 없습니다'); return; }
+    const fbar = target.querySelector('.fbar') || target.closest('.slide')?.querySelector('.fbar');
+    for (const n of newNodes) {
+      if (fbar && fbar.parentNode === target) target.insertBefore(n, fbar);
+      else target.appendChild(n);
+    }
+    toast('앵커 없음 — 기본 위치에 삽입 (블록 ◎ 클릭 시 원하는 위치 지정 가능)');
   }
   
   // 4. 저장 + 편집 핸들 재적용
