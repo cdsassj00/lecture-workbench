@@ -144,7 +144,7 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
   <div class="tb">
     <span class="tb-brand">WORKBENCH</span>
     <span class="tb-sep"></span>
-    <button class="tb-btn" onclick="openFile()">열기</button>
+    <button class="tb-btn" onclick="openFile()" id="btnOpen">열기</button>
     <button class="tb-btn" onclick="exportHtml()" id="btnExport" disabled>내보내기</button>
     <span class="tb-sep"></span>
     <button class="tb-btn" onclick="undo()" id="btnUndo" disabled>되돌리기</button>
@@ -287,7 +287,7 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
     <p>같은 폴더에 있는 교안을 바로 열 수 있습니다. 사이트 배포 시 자동 감지됩니다.</p>
     <div id="sessionListGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
     <div style="margin-top:14px;border-top:1px solid var(--wln);padding-top:12px">
-      <button class="btn btn-o" onclick="openFile()" style="width:100%">다른 파일 직접 열기</button>
+      <button class="btn btn-o" onclick="openFile()" id="btnOpenModal" style="width:100%">다른 파일 직접 열기</button>
     </div>
   </div>
 </div>
@@ -395,7 +395,19 @@ document.getElementById('logoIn').addEventListener('change', e => {
   r.readAsDataURL(file);
 });
 
-function openFile() { document.getElementById('fileIn').click(); }
+const IS_LOCAL = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(location.hostname);
+
+function openFile() {
+  if (!IS_LOCAL) { toast('배포된 사이트에서는 "교안 목록"을 사용하세요'); return; }
+  document.getElementById('fileIn').click();
+}
+
+if (!IS_LOCAL) {
+  const btnOpen = document.getElementById('btnOpen');
+  if (btnOpen) { btnOpen.disabled = true; btnOpen.title = '로컬 환경에서만 사용 가능'; }
+  const btnOpenModal = document.getElementById('btnOpenModal');
+  if (btnOpenModal) { btnOpenModal.disabled = true; btnOpenModal.style.opacity = '0.4'; btnOpenModal.style.cursor = 'not-allowed'; btnOpenModal.title = '로컬 환경에서만 사용 가능'; }
+}
 
 function loadFile(file) {
   const r = new FileReader();
@@ -1182,8 +1194,12 @@ async function fetchSession(s) {
     document.getElementById('stFile').textContent = s.file;
     toast(`Session ${s.num} 로드 — ${S.slides.length}장`);
   } catch(e) {
-    toast(`fetch 실패 — "열기" 버튼으로 직접 로드하세요`);
-    openFile();
+    if (IS_LOCAL) {
+      toast(`fetch 실패 — "열기" 버튼으로 직접 로드하세요`);
+      openFile();
+    } else {
+      toast(`파일을 불러올 수 없습니다: ${s.file}`);
+    }
   }
 }
 
