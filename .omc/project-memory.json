@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1777298616493,
+  "projectRoot": "C:\\_cursor_project\\2026전문인재강의안\\final",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {},
+  "hotPaths": [
+    {
+      "path": "curriculum.html",
+      "accessCount": 73,
+      "lastAccessed": 1777299975822,
+      "type": "directory"
+    },
+    {
+      "path": "session-01-complete.html",
+      "accessCount": 2,
+      "lastAccessed": 1777299746251,
+      "type": "file"
+    },
+    {
+      "path": "session-02-complete.html",
+      "accessCount": 2,
+      "lastAccessed": 1777299782464,
+      "type": "file"
+    },
+    {
+      "path": "session-03-complete.html",
+      "accessCount": 2,
+      "lastAccessed": 1777299785460,
+      "type": "file"
+    },
+    {
+      "path": "session-04-complete.html",
+      "accessCount": 2,
+      "lastAccessed": 1777299788258,
+      "type": "file"
+    },
+    {
+      "path": "session-05-complete.html",
+      "accessCount": 2,
+      "lastAccessed": 1777299790626,
+      "type": "file"
+    },
+    {
+      "path": "session-06-complete.html",
+      "accessCount": 2,
+      "lastAccessed": 1777299793192,
+      "type": "file"
+    },
+    {
+      "path": "session-07-complete.html",
+      "accessCount": 2,
+      "lastAccessed": 1777299795906,
+      "type": "file"
+    },
+    {
+      "path": "session-08-complete.html",
+      "accessCount": 2,
+      "lastAccessed": 1777299798609,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 2,
+      "lastAccessed": 1777299806081,
+      "type": "directory"
+    }
+  ],
+  "userDirectives": []
+}

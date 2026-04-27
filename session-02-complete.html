@@ -1869,7 +1869,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
   document.querySelectorAll('.toolbar,.deck-nav').forEach(e=>e.remove());
   const tb = document.createElement('div');
   tb.className = 'toolbar';
-  tb.innerHTML = `<button onclick="pNav(-1)">◀</button><span class="pg" id="pgInd">1 / 1</span><button onclick="pNav(1)">▶</button><button onclick="window.print()">⬇ PDF</button><button onclick="tFull()">⛶ FULL</button><button id="editBtn" onclick="tEdit()">✎ EDIT</button>`;
+  tb.innerHTML = `<button onclick="pNav(-1)">◀</button><span class="pg" id="pgInd">1 / 1</span><button onclick="pNav(1)">▶</button><button onclick="window.open('curriculum.html','_blank')">📋 CURRICULUM</button><button onclick="window.print()">⬇ PDF</button><button onclick="tFull()">⛶ FULL</button><button id="editBtn" onclick="tEdit()">✎ EDIT</button>`;
   document.body.appendChild(tb);
 })();
 
