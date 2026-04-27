@@ -292,12 +292,12 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
   <div class="hbar"><div class="hbar-l">MODULE 07 · SESSION KEY MESSAGE</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 07</div></div>
   <div class="bd col1"><div class="col hero" style="background:var(--bg);color:var(--ink);padding:60px 90px">
     <div style="font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:3px;font-weight:700;margin-bottom:18px">SESSION 07 · ONE SENTENCE</div>
-    <div style="font-family:var(--serif);font-size:52px;line-height:1.18;font-weight:700;color:var(--ink);letter-spacing:-0.02em">RAG는 <span style="color:var(--acc)">기술자 버전</span>이 아니라<br><span style="color:var(--acc)">기획자 버전</span>으로 이해한다.</div>
+    <div style="font-family:var(--serif);font-size:52px;line-height:1.18;font-weight:700;color:var(--ink);letter-spacing:-0.02em">RAG 파이프라인은 <span style="color:var(--acc)">넣기·쪼개기·<br>찾기·답하기</span> 네 단계다.</div>
     <div style="width:60px;height:3px;background:var(--acc);margin:22px 0 18px"></div>
-    <p style="font-size:17px;color:var(--ink2);line-height:1.75;max-width:1150px;font-style:italic">RAG는 <strong style="color:var(--ink)">내 문서 창고를 AI가 탐색해 응답하게 하는 구조</strong>다. 파이프라인은 네 단계로 기억한다 — 넣기·쪼개기·찾기·답하기. 리랭크·하이브리드·GraphRAG는 정확도 향상 옵션 명칭만 인지한다. 거점리더는 재료로서의 RAG를 감각으로 체득한다.</p>
+    <p style="font-size:17px;color:var(--ink2);line-height:1.75;max-width:1150px;font-style:italic">RAG(Retrieval-Augmented Generation)는 외부 문서 저장소에서 질문과 관련된 청크를 검색해 LLM 프롬프트에 함께 넣어 답을 생성하게 하는 구조입니다. 파이프라인은 네 단계로 구성됩니다 — 넣기·쪼개기·찾기·답하기. 리랭크·하이브리드·GraphRAG는 정확도 향상 옵션의 명칭만 인지하고 구현 판단은 에이전트·IT 팀에 위임합니다.</p>
     <div style="border-left:3px solid var(--acc);padding:16px 24px;margin-top:26px;max-width:1100px;background:var(--bg2)">
-      <div style="font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:700;font-style:italic;line-height:1.5">"RAG는 구현 기법이 아니라 재료다. 넣기·쪼개기·찾기·답하기 네 덩어리만 손에 쥐면 충분하다."</div>
-      <div style="font-size:12px;color:var(--ink3);letter-spacing:2px;margin-top:10px;font-family:var(--mono);font-weight:700">— 거점리더용 RAG 감각</div>
+      <div style="font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:700;font-style:italic;line-height:1.5">"넣기·쪼개기·찾기·답하기 — 네 단계 명칭과 각 단계의 입력·출력만 정확히 익히면 7회차 학습 목표는 충족된다."</div>
+      <div style="font-size:12px;color:var(--ink3);letter-spacing:2px;margin-top:10px;font-family:var(--mono);font-weight:700">— 7회차 학습 목표</div>
     </div>
   </div></div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · RAG 파이프라인과 웹서비스 구축</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">002 / 032</span></div></div>
@@ -310,9 +310,9 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
   <div class="hl-rule"></div>
   <div class="bd col3">
     <div class="col">
-      <div class="sh"><span class="sh-n">01 · 재료 감각</span><span class="sh-t">RAG를 기획자 언어로</span></div><div class="sh-line"></div>
-      <div class="bth">RAG = 내 문서 창고를 AI가 탐색해 응답하게 하는 구조</div>
-      <p class="bt">기술자 버전이 아니라 <strong>기획자 버전</strong>으로 이해한다. Claude·GPT는 인터넷 지식을 알지만 우리 부서 문서는 모른다. RAG는 답변 시점에 내 문서 창고를 옆에 두고 참조하게 하는 재료.</p>
+      <div class="sh"><span class="sh-n">01 · 정의</span><span class="sh-t">RAG가 하는 일</span></div><div class="sh-line"></div>
+      <div class="bth">RAG = 질문 시점에 외부 문서를 검색해 프롬프트에 끼워 답을 생성하는 구조</div>
+      <p class="bt">Claude·GPT는 학습 시점까지의 일반 지식만 안다. 부서 규정·민원 응대 DB·회의록은 학습되지 않은 데이터다. RAG는 질문이 들어올 때마다 부서 문서에서 관련 조각을 검색해 프롬프트에 함께 넣고 답을 생성한다.</p>
       <div class="flow">
         <div class="flow-box"><div class="flow-box-lb">질문</div><div class="flow-box-t">사용자</div></div>
         <div class="flow-arrow">▸</div>
@@ -327,14 +327,14 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
     <div class="col">
       <div class="sh"><span class="sh-n">02 · 4단계</span><span class="sh-t">기획자 언어로 4덩어리</span></div><div class="sh-line"></div>
       <div class="icard"><div class="icard-top"><span class="icard-lb">STEP 01 · 넣기</span><span class="icard-sess">INGEST</span></div><div class="bth">문서를 시스템에 넣는 단계</div><p class="bt">DeepSeek-OCR · 한컴 PDF 파서 · LangChain 로더. PDF·HWP·DOCX에서 텍스트를 꺼내 들인다. 추출 품질이 답변 품질의 상한.</p></div>
-      <div class="icard"><div class="icard-top"><span class="icard-lb">STEP 02 · 쪼개기</span><span class="icard-sess">CHUNK</span></div><div class="bth">의미 단위로 쪼개고 임베딩</div><p class="bt">의미 단위 청킹 — 조항·안건·민원 1건. 임베딩은 <strong>'AI가 이해하는 지문'</strong>. 문서를 AI가 비교 가능한 수치로 바꾼다.</p></div>
+      <div class="icard"><div class="icard-top"><span class="icard-lb">STEP 02 · 쪼개기</span><span class="icard-sess">CHUNK</span></div><div class="bth">의미 단위로 쪼개고 임베딩</div><p class="bt">의미 단위 청킹 — 조항·안건·민원 1건. 임베딩은 텍스트를 수백~수천 차원 벡터로 바꿔 의미 유사도 비교가 가능하게 만드는 변환.</p></div>
       <div class="icard dark"><div class="icard-top"><span class="icard-lb">STEP 03 · 찾기</span><span class="icard-sess">RETRIEVE</span></div><div class="bth">벡터 DB에서 유사 조각 검색</div><p class="bt">Chroma · FAISS 같은 벡터 DB로 질문과 유사한 조각을 뽑는다. 상위 3~5개. 고급 옵션은 명칭만 — 리랭크·하이브리드·GraphRAG.</p></div>
       <div class="icard"><div class="icard-top"><span class="icard-lb">STEP 04 · 답하기</span><span class="icard-sess">GENERATE</span></div><div class="bth">검색된 조각을 AI에 전달해 답 생성</div><p class="bt">찾아온 조각을 프롬프트에 붙여 AI에 전달한다. "이 조각만 참고해 답하라". 근거가 없으면 "규정에 없음"으로 출구.</p></div>
-      <div class="quote"><div class="quote-src">SOURCE · 재료 감각</div><div class="quote-q">"RAG는 네 덩어리의 조립 — 넣기·쪼개기·찾기·답하기."</div><div class="quote-a">— 기획자용 파이프라인</div></div>
+      <div class="quote"><div class="quote-src">SOURCE · 4단계 정의</div><div class="quote-q">"RAG 파이프라인은 넣기·쪼개기·찾기·답하기 네 단계로 구성된다."</div><div class="quote-a">— 7회차 표준 용어</div></div>
     </div>
     <div class="col">
       <div class="sh"><span class="sh-n">03 · 최소 구조</span><span class="sh-t">30줄 RAG 감상</span></div><div class="sh-line"></div>
-      <div class="bth">구현은 에이전트 몫 — 거점리더는 4덩어리의 조립만 읽는다</div>
+      <div class="bth">구현은 에이전트 몫 — 거점리더는 4단계의 입력·출력만 읽는다</div>
       <div class="cblk"><span class="cm"># 1. 넣기 — PDF 10건을 텍스트로</span>
 <span class="kw">import</span> fitz, pathlib
 docs=[]
@@ -361,7 +361,7 @@ chunks=[]
     ctx=<span class="st">"\n\n"</span>.join(h[0][<span class="st">"text"</span>] <span class="kw">for</span> h <span class="kw">in</span> hits)
     <span class="kw">return</span> ollama.chat(
         <span class="st">f"다음만 참고:\n{ctx}\n\n질문:{q}"</span>)</div>
-      <p class="bt">이 30줄이 RAG의 전부다. 벡터 DB·임베딩도 없다. <strong>"진입이 열려 있다"</strong>는 사실이 이 단원의 핵심.</p>
+      <p class="bt">이 30줄에 4단계가 모두 들어있다. 벡터 DB·임베딩 없이 키워드 포함 횟수만으로도 동작한다. 30줄은 학습용 최소 구조이며 운영본은 임베딩·벡터 DB·메타 필터를 더한다.</p>
     </div>
   </div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · RAG 파이프라인과 웹서비스 구축</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">003 / 032</span></div></div>
@@ -527,8 +527,8 @@ col=client.get_or_create_collection(<span class="st">"docs"</span>)
         <div class="flow-box"><div class="flow-box-lb">OPT 3</div><div class="flow-box-t">GraphRAG</div></div>
       </div>
       <div class="fig">FIGURE 02 · ADVANCED OPTIONS · NAMES ONLY</div>
-      <div class="cod"><div class="cod-lb">KEY MESSAGE</div><div class="cod-main">"이름만 알고, 구현은 에이전트에 위임"</div><p>리랭크 = 검색 결과 재정렬. 하이브리드 = 키워드+의미 결합. GraphRAG = 관계 기반 탐색. 이 정도면 거점리더 감각 완결.</p></div>
-      <div class="quote"><div class="quote-src">SOURCE · 재료 감각</div><div class="quote-q">"고급 옵션은 이름만. 파고드는 건 에이전트 몫."</div><div class="quote-a">— 기획자용 RAG 원칙</div></div>
+      <div class="cod"><div class="cod-lb">KEY MESSAGE</div><div class="cod-main">"이름만 알고, 구현은 에이전트에 위임"</div><p>리랭크 = 검색 결과를 별도 모델로 재정렬. 하이브리드 = BM25 키워드 + 임베딩 의미 점수를 가중합. GraphRAG = 청크 간 관계 그래프를 만들어 탐색. 7회차는 이 세 명칭의 한 줄 정의까지가 학습 범위.</p></div>
+      <div class="quote"><div class="quote-src">SOURCE · 학습 범위 구분</div><div class="quote-q">"리랭크·하이브리드·GraphRAG 세 명칭의 정의 한 줄까지가 7회차 학습 범위. 구현 코드는 에이전트에 위임한다."</div><div class="quote-a">— 7회차 학습 범위</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">리랭크 · 하이브리드 · GraphRAG 명칭 인지</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">구현 판단은 에이전트 위임으로 라인 긋기</div></div>
     </div>
@@ -597,10 +597,10 @@ col=client.get_or_create_collection(<span class="st">"docs"</span>)
 <div class="stage"><div class="slide" data-title="Hero 80 Percent">
   <div class="hbar"><div class="hbar-l">MODULE 07 · UNIT 01 · REALITY CHECK</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 07</div></div>
   <div class="bd col1"><div class="col hero" style="background:var(--dk);color:var(--on)">
-    <div class="hero-k">PART A · 재료로서의 RAG</div>
-    <div class="hero-t">RAG는 <span style="color:var(--acc3)">구현 기법</span>이 아니라<br>거점리더가 다루는 <span style="color:var(--acc3)">재료</span>다.</div>
-    <div class="hero-s">거점리더의 임무는 내부 구조를 파고드는 것이 아니다. <strong style="color:var(--on)">넣기·쪼개기·찾기·답하기</strong>의 네 덩어리와 <strong style="color:var(--on)">리랭크·하이브리드·GraphRAG</strong>라는 옵션 명칭을 감각으로 쥐고, 설계와 위임을 하는 것이다. 구현 깊이는 에이전트·IT 팀 영역.</div>
-    <div class="hero-q"><div class="hero-q-q">"재료 감각만 있으면 RAG는 에이전트에 위임해 완성할 수 있다."</div><div class="hero-q-a">— 거점리더용 RAG 원칙</div></div>
+    <div class="hero-k">PART A · 7회차 학습 범위 정리</div>
+    <div class="hero-t">7회차는 RAG <span style="color:var(--acc3)">4단계</span> 정의와<br>3개 <span style="color:var(--acc3)">옵션 명칭</span>까지를 다룬다.</div>
+    <div class="hero-s">7회차에서 거점리더가 익히는 범위는 두 가지다. 첫째, <strong style="color:var(--on)">넣기·쪼개기·찾기·답하기</strong> 4단계의 정의·입력·출력. 둘째, <strong style="color:var(--on)">리랭크·하이브리드·GraphRAG</strong> 3개 정확도 향상 옵션의 한 줄 정의. 구현 코드 작성·튜닝은 에이전트와 IT 팀 영역이며 거점리더는 rag_spec.md 한 장과 정답 20건을 준비한다.</div>
+    <div class="hero-q"><div class="hero-q-q">"4단계 정의 + 3개 옵션 명칭 + rag_spec.md + 정답 20건 — 이 네 가지가 7회차 산출물이다."</div><div class="hero-q-a">— 7회차 산출물 목록</div></div>
   </div></div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · RAG 파이프라인과 웹서비스 구축</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">008 / 032</span></div></div>
 </div></div>
@@ -702,14 +702,14 @@ store = ChromaStore(<span class="st">"./idx"</span>)
       <div class="sh"><span class="sh-n">확장 ①</span><span class="sh-t">법령 RAG</span></div><div class="sh-line"></div>
       <div class="icard"><div class="icard-top"><span class="icard-lb">법령 RAG</span></div><div class="bth">소관 법령·시행령·자치법규 조문</div><p class="bt">쪼개기 <strong>조문 단위</strong>. 답변 끝에 <strong>"초안 — 유권해석은 소관 부처"</strong> 배너 고정. 법령정보센터 Open API 연계 권장.</p></div>
       <div class="icard"><div class="icard-top"><span class="icard-lb">민원 매뉴얼 RAG</span></div><div class="bth">민원 응대 DB + 매뉴얼</div><p class="bt">쪼개기 <strong>민원 1건 단위</strong>. 신규 민원에 유사 3~5건 + 응대 초안 자동 제시. 개인정보 비식별 선행.</p></div>
-      <div class="co"><div class="co-lb">공통 패턴</div><div class="co-main">"쪼개기 단위"가 확장 시나리오 설계값</div><p>법령은 <strong>조문</strong>, 민원은 <strong>1건</strong>, 회의록은 <strong>안건</strong>. 같은 RAG 4단계지만 쪼개기부터 달라진다.</p></div>
+      <div class="co"><div class="co-lb">공통 패턴</div><div class="co-main">"쪼개기 단위"가 사례별 첫 설계값</div><p>법령은 <strong>조문</strong>, 민원은 <strong>1건</strong>, 회의록은 <strong>안건</strong>. 같은 RAG 4단계지만 쪼개기 단위가 사례마다 다르다.</p></div>
       <div class="dstrip"><div class="ds-c"><div class="ds-a">①법령</div><div class="ds-n">조문</div><div class="ds-d">단위</div></div><div class="ds-c"><div class="ds-a">②민원</div><div class="ds-n">1건</div><div class="ds-d">단위</div></div><div class="ds-c"><div class="ds-a">③회의록</div><div class="ds-n">안건</div><div class="ds-d">단위</div></div></div>
     </div>
     <div class="col">
       <div class="sh"><span class="sh-n">확장 ②·③</span><span class="sh-t">회의록 + 추가 과제</span></div><div class="sh-line"></div>
       <div class="icard"><div class="icard-top"><span class="icard-lb">회의록 RAG</span></div><div class="bth">부서 회의록 1~3년치</div><p class="bt">"지난 분기 A안건 결정 경과"를 복원. 쪼개기 <strong>회차+안건 단위</strong>. 출처: 날짜+안건명. 조직의 결정 기억 복원.</p></div>
       <div class="icard dark"><div class="icard-top"><span class="icard-lb">추가 과제 · 연구논문 메타분석</span></div><div class="bth">RAG 방식 연구논문 메타분석</div><p class="bt">거점 미션과 연관된 논문 10~30편을 RAG로 묶고, 공통 주장·한계를 뽑는다. 공공 확장 RAG 패턴을 <strong>읽기 도구</strong>로 전환.</p></div>
-      <div class="quote"><div class="quote-src">SOURCE · 재료 감각</div><div class="quote-q">"RAG는 문답 도구를 넘어 읽기 도구가 될 수 있다. 논문 메타분석이 그 증거."</div><div class="quote-a">— 공공 확장 RAG 원칙</div></div>
+      <div class="quote"><div class="quote-src">SOURCE · 추가 과제 정의</div><div class="quote-q">"논문 메타분석 과제는 같은 4단계 RAG에 쪼개기 단위만 '논문 1편'으로 바꾼 변형이다."</div><div class="quote-a">— 추가 과제 설계 규칙</div></div>
     </div>
     <div class="col">
       <div class="sh"><span class="sh-n">MAP</span><span class="sh-t">사례 비교 매트릭스</span></div><div class="sh-line"></div>
@@ -821,7 +821,7 @@ store = ChromaStore(<span class="st">"./idx"</span>)
 
 [사안] {query}</div>
       <div class="pit"><div class="pit-lb">PITFALL · 공공 법무</div><div class="pit-h">▸ LLM이 "해석"을 단정</div><div class="pit-d">공공에서 가장 위험. 프롬프트·UI 양쪽에서 "초안" 배너 강제.</div><div class="pit-h">▸ 개정 전 조문 인용</div><div class="pit-d">PDF 스냅샷만으로는 한계. Open API가 유일한 해결책.</div></div>
-      <div class="quote"><div class="quote-src">SOURCE · 법무 담당 인터뷰</div><div class="quote-q">"초안이라는 배지가 있어야 AI를 쓸 수 있다. 법무에선 그 배지가 안전벨트다."</div><div class="quote-a">— 법령 RAG 도입 조건</div></div>
+      <div class="quote"><div class="quote-src">SOURCE · 법무 담당 인터뷰</div><div class="quote-q">"답변 끝에 '본 답변은 초안이며, 최종 유권해석은 소관 부처·법무 담당 판단을 따릅니다' 문구가 강제 표시되어야 법무에서 사용 승인이 난다."</div><div class="quote-a">— 법령 RAG 도입 조건</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">"초안" 배너 UI 고정</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">법령 API 주간 갱신 스크립트</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">답변 로그 → 법무 월간 검토</div></div>
@@ -1060,7 +1060,7 @@ app.mount(<span class="st">"/"</span>, StaticFiles(directory=<span class="st">"p
 <!-- 18 Vercel/Netlify 배포 -->
 <div class="stage"><div class="slide" data-title="Vercel Netlify">
   <div class="hbar"><div class="hbar-l">MODULE 07 · UNIT 03 · VERCEL · NETLIFY</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 07</div></div>
-  <div class="hl"><div class="hl-kicker">PART C-2 · 유형 8 · 프론트+백엔드+RAG 결합 · 15:20–16:30</div><div class="hl-title">유형 8 — 프론트+백엔드+RAG 결합 웹서비스</div><div class="hl-sub">유형 8은 유형 7의 로컬 RAG 엔진을 웹서비스 3덩어리(프론트·백엔드·저장소)에 끼워 넣어 부서 단위 웹 도구로 승격하는 구현 유형입니다. 외부망 연습과 내부망 운영 두 경로를 구분합니다. 첫째, 외부망 연습·데모는 Vercel(Next.js 본거지, Python 서버리스 지원)이나 Netlify(정적 + Functions) 중 하나로 git push 한 번에 배포합니다. 둘째, 해커톤·공모전·시민 체험용으로는 유효하지만 실 데이터 업로드는 금지하고 더미·비식별 데이터만 올립니다. 셋째, 공개 URL이면 기관명 도메인 대신 서비스용 도메인을 쓰고 BasicAuth로 1차 접근을 제어합니다. 넷째, 부서 내부용은 곧바로 외부망→내부망 이관 체크리스트 경로를 따르는 것이 원칙입니다.</div><div class="hl-bar"></div></div>
+  <div class="hl"><div class="hl-kicker">PART C-2 · 유형 8 · 프론트+백엔드+RAG 결합 · 15:20–16:30</div><div class="hl-title">유형 8 — 프론트+백엔드+RAG 결합 웹서비스</div><div class="hl-sub">유형 8은 유형 7의 로컬 RAG 엔진(rag.py)에 프론트(index.html)와 백엔드(main.py FastAPI /chat)를 결합해 브라우저로 접근 가능한 부서 웹 도구로 만드는 구현 유형입니다. 외부망 연습과 내부망 운영 두 경로를 구분합니다. 첫째, 외부망 연습·데모는 Vercel(Next.js 본거지, Python 서버리스 지원)이나 Netlify(정적 + Functions) 중 하나로 git push 한 번에 배포합니다. 둘째, 해커톤·공모전·시민 체험용으로는 유효하지만 실 데이터 업로드는 금지하고 더미·비식별 데이터만 올립니다. 셋째, 공개 URL이면 기관명 도메인 대신 서비스용 도메인을 쓰고 BasicAuth로 1차 접근을 제어합니다. 넷째, 부서 내부용은 곧바로 외부망→내부망 이관 체크리스트 경로를 따르는 것이 원칙입니다.</div><div class="hl-bar"></div></div>
   <div class="hl-rule"></div>
   <div class="bd col3">
     <div class="col">
@@ -1105,7 +1105,7 @@ app.mount(<span class="st">"/"</span>, StaticFiles(directory=<span class="st">"p
 <!-- 19 내부망 이관 체크리스트 -->
 <div class="stage"><div class="slide" data-title="Migration Checklist">
   <div class="hbar"><div class="hbar-l">MODULE 07 · UNIT 03 · INTERNAL MIGRATION</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 07</div></div>
-  <div class="hl"><div class="hl-kicker">PART C-3 · 외부망→내부망 이관 체크리스트 · 16:40–17:00</div><div class="hl-title">외부망→내부망 이관 체크리스트 — 거점리더 핵심 산출물</div><div class="hl-sub">외부망에서 에이전트로 만든 결과물을 내부망 기관 PC에서 그대로 돌리려면 네 기술 축과 두 운영 축을 사전 점검해야 합니다. 이 체크리스트 자체가 거점리더의 핵심 산출물입니다. 첫째, <strong>의존성</strong>은 외부망에서 `pip download`로 휠(.whl) 묶음을 받아 USB·보안메일로 이관해 `--no-index`로 오프라인 설치합니다. 둘째, <strong>포트</strong>는 기관 방화벽 허용값으로 맞추고 관례상 8000번, 바인딩은 localhost가 아닌 0.0.0.0으로 고정합니다. 셋째, <strong>경로</strong>는 절대경로·맥 경로·/tmp를 전부 제거하고 DATA_DIR·INDEX_DIR·LOG_DIR 같은 값은 .env로 추출합니다. 넷째, <strong>권한</strong>은 실행 계정·로그 폴더 쓰기·Ollama 모델(.gguf) 준비까지 확인합니다. 다섯째, <strong>결재 라인</strong>은 정보화 부서·보안 담당·소관 부서장의 승인 순서를 체크리스트에 명시합니다. 여섯째, <strong>감사 로그 보존 위치</strong>는 기관 표준 로그 서버 경로·보존 기간·접근 권한을 항목으로 못 박습니다. 부서 과제는 이 여섯 축에서 최소 7개 항목으로 문서화합니다.</div><div class="hl-bar"></div></div>
+  <div class="hl"><div class="hl-kicker">PART C-3 · 외부망→내부망 이관 체크리스트 · 16:40–17:00</div><div class="hl-title">외부망→내부망 이관 체크리스트 — 6축 점검 항목</div><div class="hl-sub">외부망에서 에이전트로 만든 결과물을 내부망 기관 PC에서 그대로 돌리려면 네 기술 축과 두 운영 축을 사전 점검해야 합니다. 첫째, <strong>의존성</strong>은 외부망에서 `pip download`로 휠(.whl) 묶음을 받아 USB·보안메일로 이관해 `--no-index`로 오프라인 설치합니다. 둘째, <strong>포트</strong>는 기관 방화벽 허용값으로 맞추고 관례상 8000번, 바인딩은 localhost가 아닌 0.0.0.0으로 고정합니다. 셋째, <strong>경로</strong>는 절대경로·맥 경로·/tmp를 전부 제거하고 DATA_DIR·INDEX_DIR·LOG_DIR 같은 값은 .env로 추출합니다. 넷째, <strong>권한</strong>은 실행 계정·로그 폴더 쓰기·Ollama 모델(.gguf) 준비까지 확인합니다. 다섯째, <strong>결재 라인</strong>은 정보화 부서·보안 담당·소관 부서장의 승인 순서를 체크리스트에 명시합니다. 여섯째, <strong>감사 로그 보존 위치</strong>는 기관 표준 로그 서버 경로·보존 기간·접근 권한을 항목으로 못 박습니다. 부서 과제는 이 여섯 축에서 최소 7개 항목으로 문서화합니다.</div><div class="hl-bar"></div></div>
   <div class="hl-rule"></div>
   <div class="bd col2w">
     <div class="col">
@@ -1162,7 +1162,7 @@ LOG_DIR=./logs</div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">시범 운영 · 10명 먼저</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">결재 라인 명시 · 정보화·보안·소관 부서장</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">감사 로그 보존 위치 · 경로·보존 기간 고정</div></div>
-      <div class="cod"><div class="cod-lb">HANDOFF PACKAGE</div><div class="cod-main">README + 코드 + wheels + 모델 + 정답세트</div><p>다섯 덩어리가 한 ZIP에 담기면 이관 완료. 체크리스트 16개는 ZIP 뚜껑.</p></div>
+      <div class="cod"><div class="cod-lb">HANDOFF PACKAGE</div><div class="cod-main">README + 코드 + wheels + 모델 + 정답세트</div><p>다섯 항목이 한 ZIP에 담기면 이관 패키지 완성. 좌측 18개 체크 항목은 ZIP 생성 전 점검 목록.</p></div>
     </div>
   </div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · RAG 파이프라인과 웹서비스 구축</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">019 / 032</span></div></div>
@@ -1241,10 +1241,10 @@ ROLES = {
 <div class="stage"><div class="slide" data-title="Hero One Byte">
   <div class="hbar"><div class="hbar-l">MODULE 07 · UNIT 03 · INTERNAL-ONLY</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 07</div></div>
   <div class="bd col1"><div class="col hero" style="background:var(--dk);color:var(--on)">
-    <div class="hero-k">UNIT 03 · INTERNAL-ONLY PRINCIPLE</div>
-    <div class="hero-t">데이터가 밖으로<br><span style="color:var(--acc3)">한 바이트도</span> 나가지 않는다.</div>
-    <div class="hero-s">Ollama로 생성·임베딩을 로컬에서 돌리고, chromadb 파일에 인덱스를 저장하고, FastAPI가 localhost에서 응답한다. <strong style="color:var(--on)">클라우드 API 호출 0건, 외부 HTTP 요청 0건.</strong> 공공 내부망이 AI를 받아들일 수 있는 유일한 문이다.</div>
-    <div class="hero-q"><div class="hero-q-q">"외부망 배포는 실험이고, 내부망 운영은 도구다. 결국 남는 것은 도구다."</div><div class="hero-q-a">— 내부망 완결 원칙</div></div>
+    <div class="hero-k">UNIT 03 · INTERNAL-ONLY 구성</div>
+    <div class="hero-t">내부망 RAG 구성 —<br><span style="color:var(--acc3)">외부 HTTP 호출 0건</span> 유지.</div>
+    <div class="hero-s">내부망 운영 RAG의 기술 구성은 세 부분이다. 첫째, Ollama가 qwen2.5:7b·nomic-embed-text 모델을 로컬에서 실행해 생성·임베딩을 처리한다. 둘째, chromadb가 파일 기반 인덱스를 로컬 디스크에 저장한다. 셋째, FastAPI가 localhost:8000에서 /chat 엔드포인트를 노출한다. <strong style="color:var(--on)">클라우드 API 호출 0건, 외부 HTTP 요청 0건</strong>이 정보화 부서 승인 조건이다.</div>
+    <div class="hero-q"><div class="hero-q-q">"외부망 Vercel·Netlify는 데모·연습용이고, 부서 운영용 RAG는 외부 HTTP 호출 0건의 내부망 구성으로 이관한다."</div><div class="hero-q-a">— 외부망·내부망 용도 구분</div></div>
   </div></div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · RAG 파이프라인과 웹서비스 구축</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">021 / 032</span></div></div>
 </div></div>
@@ -1525,7 +1525,7 @@ report_2026_04.pdf 를 산출한다.
         <tr><td>재현성</td><td>≥ 70%</td></tr>
         <tr><td>안전성 위반</td><td>≤ 1%</td></tr>
       </tbody></table>
-      <div class="co"><div class="co-lb">REPORT</div><div class="co-main">월 1회 4지표 리포트를 부서 회의에 공유</div><p>수치가 있어야 개선 논의가 된다. 감각 토론 금지.</p></div>
+      <div class="co"><div class="co-lb">REPORT</div><div class="co-main">월 1회 4지표 리포트를 부서 회의에 공유</div><p>정확성·Recall@5·재현성·안전성 위반률 네 수치를 표로 적어 회의에 올린다. 인상·체감 기반 토론 금지.</p></div>
       <div class="quote"><div class="quote-src">SOURCE · 운영 원칙</div><div class="quote-q">"측정되지 않는 RAG는 개선되지 않는다."</div><div class="quote-a">— 품질 관리 금언</div></div>
     </div>
   </div>
@@ -1608,13 +1608,13 @@ SYN = {
 <div class="stage"><div class="slide" data-title="Hero Evidence">
   <div class="hbar"><div class="hbar-l">MODULE 07 · CLOSING KEY INSIGHT</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 07</div></div>
   <div class="bd col1"><div class="col hero" style="background:var(--bg2);color:var(--ink);padding:60px 90px">
-    <div style="font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:3px;font-weight:700;margin-bottom:18px">KEY INSIGHT</div>
-    <div style="font-family:var(--serif);font-size:52px;line-height:1.18;font-weight:700;color:var(--ink);letter-spacing:-0.02em">근거가 있는 답변이<br><span style="color:var(--acc)">더 느리지만</span> <span style="color:var(--acc)">더 옳다</span>.</div>
+    <div style="font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:3px;font-weight:700;margin-bottom:18px">KEY POINT</div>
+    <div style="font-family:var(--serif);font-size:52px;line-height:1.18;font-weight:700;color:var(--ink);letter-spacing:-0.02em">RAG 답변은 항상<br><span style="color:var(--acc)">출처 메타</span>를 함께 반환한다.</div>
     <div style="width:60px;height:3px;background:var(--acc);margin:22px 0 18px"></div>
-    <p style="font-size:17px;color:var(--ink2);line-height:1.75;max-width:1200px;font-style:italic">즉답을 그럴듯하게 하는 LLM과 <strong style="color:var(--ink)">"규정 제15조에 따르면…"이라고 답하는 RAG</strong>는 다르다. 공공은 속도보다 근거를 선택한다. 그 선택을 기술로 뒷받침하는 것이 거점리더의 일이다.</p>
+    <p style="font-size:17px;color:var(--ink2);line-height:1.75;max-width:1200px;font-style:italic">RAG 답변 객체는 네 필드로 구조화한다 — <strong style="color:var(--ink)">answer · citations · confidence · abstain</strong>. citations에는 파일명·조항·페이지를 담고, 답변 본문 끝에 "근거: [파일명/조항]"을 강제 표기한다. 근거가 없으면 abstain=true로 두고 "규정에 없음" 또는 "담당자 확인 권장"으로 출구를 만든다. 감사 로그에는 이 네 필드와 hits·latency_ms·feedback을 함께 기록한다.</p>
     <div style="border-left:3px solid var(--acc);padding:18px 24px;margin-top:26px;max-width:1100px;background:var(--bg)">
-      <div style="font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:700;font-style:italic;line-height:1.5">"RAG가 성공하는 부서는 문서가 많아서가 아니라, 근거를 요구하는 문화를 가진 부서다."</div>
-      <div style="font-size:12px;color:var(--ink3);letter-spacing:2px;margin-top:10px;font-family:var(--mono);font-weight:700">— 공공 RAG 도입의 실제 조건</div>
+      <div style="font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:700;font-style:italic;line-height:1.5">"답변 객체 4필드(answer·citations·confidence·abstain) + 감사 로그 7항목 — 공공 RAG 운영의 최소 표준이다."</div>
+      <div style="font-size:12px;color:var(--ink3);letter-spacing:2px;margin-top:10px;font-family:var(--mono);font-weight:700">— 공공 RAG 운영 표준</div>
     </div>
   </div></div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · RAG 파이프라인과 웹서비스 구축</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">029 / 032</span></div></div>
@@ -1623,15 +1623,15 @@ SYN = {
 <!-- 30 CLOSING 요약 -->
 <div class="stage"><div class="slide" data-title="Closing Summary">
   <div class="hbar"><div class="hbar-l">MODULE 07 · CLOSING ①</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 07</div></div>
-  <div class="hl"><div class="hl-kicker">CLOSING ① · 7회차 정리 · 17:00–17:30</div><div class="hl-title">7회차 전체 한 장 정리</div><div class="hl-sub">7회차 하루를 한 장으로 압축하면 여섯 덩어리가 남습니다. 재료 감각으로 연결해 부서에 옮깁니다. 첫째, RAG 4단계 — 넣기·쪼개기·찾기·답하기의 기획자 언어를 체득했습니다. 둘째, 유형 7 로컬 RAG와 공공 확장(법령·민원·회의록·연구논문 메타분석)으로 내부망 Q&A 엔진을 에이전트에 위임하는 감각을 잡았습니다. 셋째, 웹서비스 3덩어리(프론트·백엔드·저장소)와 유형 8 결합으로 RAG를 웹 도구로 승격하는 경로를 확인했습니다. 넷째, 외부망→내부망 이관 체크리스트(의존성·포트·경로·권한)와 운영 3축(비식별·권한·로그)이 거점리더의 핵심 산출물임을 짚었습니다. 다섯째, Remotion·SVG 자동화로 데이터 → 콘텐츠 감각을 처음 체험했습니다.</div><div class="hl-bar"></div></div>
+  <div class="hl"><div class="hl-kicker">CLOSING ① · 7회차 정리 · 17:00–17:30</div><div class="hl-title">7회차 전체 한 장 정리</div><div class="hl-sub">7회차에서 다룬 주제를 다섯 묶음으로 정리합니다. 첫째, RAG 4단계 — 넣기·쪼개기·찾기·답하기의 정의·입력·출력을 정리했습니다. 둘째, 유형 7 로컬 RAG(Ollama + chromadb + FastAPI)와 공공 확장 사례(법령·민원·회의록·연구논문 메타분석)에서 쪼개기 단위가 어떻게 달라지는지 점검했습니다. 셋째, 웹서비스 3덩어리(프론트·백엔드·저장소)와 유형 8 결합 웹서비스의 최소 파일 구성(index.html·main.py·rag.py·./index/)을 확인했습니다. 넷째, 외부망→내부망 이관 체크리스트 6축(의존성·포트·경로·권한·결재 라인·감사 로그 보존 위치)과 운영 3축(비식별·권한·로그)을 짚었습니다. 다섯째, Remotion·SVG 자동화로 데이터 입력 → 영상·차트 출력 파이프라인을 한 사례씩 익혔습니다.</div><div class="hl-bar"></div></div>
   <div class="hl-rule"></div>
   <div class="bd col2">
     <div class="col">
       <div class="sh"><span class="sh-n">SUMMARY</span><span class="sh-t">오늘 다룬 4개 Unit</span></div><div class="sh-line"></div>
-      <div class="icard"><div class="icard-top"><span class="icard-lb">PART A</span><span class="icard-sess">09:30–10:30</span></div><div class="bth">RAG 4단계 · 재료 감각</div><p class="bt">넣기·쪼개기·찾기·답하기. 리랭크·하이브리드·GraphRAG는 명칭만. 기술자 버전이 아닌 기획자 버전.</p></div>
+      <div class="icard"><div class="icard-top"><span class="icard-lb">PART A</span><span class="icard-sess">09:30–10:30</span></div><div class="bth">RAG 4단계 정의</div><p class="bt">넣기·쪼개기·찾기·답하기 4단계의 정의·입력·출력. 리랭크·하이브리드·GraphRAG 3개 옵션은 한 줄 정의까지.</p></div>
       <div class="icard"><div class="icard-top"><span class="icard-lb">PART B</span><span class="icard-sess">10:40–14:00</span></div><div class="bth">유형 7 로컬 RAG + 공공 확장</div><p class="bt">Ollama 기반 내부망 Q&A를 에이전트에 위임. 법령·민원·회의록 RAG로 확장 + 연구논문 메타분석.</p></div>
       <div class="icard dark"><div class="icard-top"><span class="icard-lb">PART C</span><span class="icard-sess">14:10–17:00</span></div><div class="bth">웹서비스 3덩어리 · 유형 8 · 이관 체크리스트</div><p class="bt">프론트+백엔드+저장소 3덩어리. 유형 8 결합 웹서비스. 외부망→내부망 이관 체크리스트 = 거점리더 핵심 산출물.</p></div>
-      <div class="icard"><div class="icard-top"><span class="icard-lb">PART D</span><span class="icard-sess">17:00–17:30</span></div><div class="bth">Remotion · SVG 자동화 맛보기</div><p class="bt">데이터 → 콘텐츠 감각. Remotion 영상, SVG 차트·인포그래픽. 거점리더는 템플릿 감각만 체득.</p></div>
+      <div class="icard"><div class="icard-top"><span class="icard-lb">PART D</span><span class="icard-sess">17:00–17:30</span></div><div class="bth">Remotion · SVG 자동화 맛보기</div><p class="bt">Remotion useCurrentFrame·interpolate로 데이터 props → MP4 일괄 렌더. SVG는 함수 1개(bar_chart 등)로 데이터 → 차트 재생성. 템플릿 작성 1회 후 데이터만 교체.</p></div>
       <div class="dstrip"><div class="ds-c"><div class="ds-a">HOURS</div><div class="ds-n">4.5h</div><div class="ds-d">총 교시</div></div><div class="ds-c"><div class="ds-a">STEPS</div><div class="ds-n">4</div><div class="ds-d">RAG 단계</div></div><div class="ds-c"><div class="ds-a">PARTS</div><div class="ds-n">3</div><div class="ds-d">웹서비스</div></div></div>
     </div>
     <div class="col">
@@ -1648,7 +1648,7 @@ SYN = {
       <div class="chk"><div class="chk-b"></div><div class="chk-t">부서 Q&A 시나리오 3건 검증</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">유형 7 · 유형 8 산출물 정리</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">Remotion·SVG 맛보기 1건</div></div>
-      <div class="co"><div class="co-lb">CORE MESSAGE</div><div class="co-main">"RAG는 재료다. 조립·위임·검수가 거점리더의 일."</div><p>구현 깊이는 에이전트에게. 거점리더는 설계와 검수로 기여.</p></div>
+      <div class="co"><div class="co-lb">CORE MESSAGE</div><div class="co-main">"rag_spec.md 1장 + 정답 20건(eval.csv) + 이관 체크리스트 18항목 = 거점리더 산출물"</div><p>구현 코드는 에이전트가 작성한다. 거점리더는 지시서·정답세트·점검표 세 문서를 직접 작성·검수한다.</p></div>
     </div>
   </div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · RAG 파이프라인과 웹서비스 구축</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">030 / 032</span></div></div>
@@ -1663,7 +1663,7 @@ SYN = {
     <div class="col">
       <div class="sh"><span class="sh-n">NEXT</span><span class="sh-t">8회차 미리보기</span></div><div class="sh-line"></div>
       <div class="icard dark"><div class="icard-top"><span class="icard-lb">SESSION 08</span></div><div class="bth">API · MCP 기반 멀티 에이전트 아키텍처 기획 및 구축</div><p class="bt">API를 재료로 이해하고, MCP로 도구를 엮어 멀티 에이전트 아키텍처를 설계·구현한다. 8회차 워크숍에서 8주 여정을 AI 아키텍처 캔버스로 한 장에 정리하고, 거점리더 액션 플랜을 작성한다.</p></div>
-      <div class="co"><div class="co-lb">8회차 준비물</div><div class="co-main">공공 API 카탈로그 · MCP 공식 서버 · 멀티 에이전트 시나리오</div><p>API를 재료로 다루는 감각 + MCP 공식 서버 설치 감각 + 멀티 에이전트 아키텍처 시나리오 1건. 오늘 Assignment 07 완결이 출발점.</p></div>
+      <div class="co"><div class="co-lb">8회차 준비물</div><div class="co-main">공공 API 카탈로그 · MCP 공식 서버 · 멀티 에이전트 시나리오</div><p>공공데이터포털·법령정보센터·통계청 API 후보 2~3종 조사 + MCP 공식 서버 1종 로컬 설치 + 멀티 에이전트 시나리오 1건 작성. 오늘 Assignment 07 완결이 출발점.</p></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">Assignment 07 · 부서 RAG 구축 완료</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">Assignment 07 · 웹서비스 아키텍처 1장</div></div>
       <div class="chk"><div class="chk-b"></div><div class="chk-t">Assignment 07 · 외부망→내부망 이관 체크리스트 7+</div></div>
@@ -1692,7 +1692,7 @@ SYN = {
 <!-- 32 STAGE MAP -->
 <div class="stage"><div class="slide" data-title="Stage Map">
   <div class="hbar"><div class="hbar-l">MODULE 07 · 8-WEEK STAGE MAP</div><div class="hbar-r">공공 AI 전문인재 양성과정 · Session 07</div></div>
-  <div class="hl"><div class="hl-kicker">8주 로드맵 · 현재 위치 · 17:00–17:30</div><div class="hl-title">8주 여정 현재 위치 — 6~8회차 3구간 정점</div><div class="hl-sub">8주 여정을 세 구간으로 보면 오늘의 좌표가 분명해집니다. 남은 한 회차를 위한 준비 각도가 여기서 정해집니다. 첫째, 1~3회차는 재료 감각 구간으로 기술 지형·도구 50선·프롬프트·워크플로우 설계를 다졌습니다. 둘째, 4~5회차는 외부망 어시스트 → 내부망 실행 구간으로 바이브 코딩·데이터 분석·내부망 자동화를 익혔습니다. 셋째, 6~8회차는 에이전트 풀스택 구간으로 6회차의 에이전트 도구, 오늘 7회차의 RAG + 웹서비스(유형 7·8), 다음 8회차의 API·MCP 멀티 에이전트(유형 9)로 구성됩니다. 넷째, 오늘이 이 마지막 구간의 중간점이므로 지금 만든 로컬 RAG를 부서 동료 3명에게 시연해 실제 피드백을 한 번 받는 것이 8회차 API·MCP 설계의 입력이 됩니다.</div><div class="hl-bar"></div></div>
+  <div class="hl"><div class="hl-kicker">8주 로드맵 · 현재 위치 · 17:00–17:30</div><div class="hl-title">8주 여정 현재 위치 — 6~8회차 3구간 정점</div><div class="hl-sub">8주 여정을 세 구간으로 보면 오늘의 좌표가 분명해집니다. 남은 한 회차를 위한 준비 각도가 여기서 정해집니다. 첫째, 1~3회차는 기술 지형·도구 50선·프롬프트·워크플로우 설계를 다룬 기초 구간이었습니다. 둘째, 4~5회차는 외부망 어시스트 → 내부망 실행 구간으로 바이브 코딩·데이터 분석·내부망 자동화를 익혔습니다. 셋째, 6~8회차는 에이전트 풀스택 구간으로 6회차의 에이전트 도구, 오늘 7회차의 RAG + 웹서비스(유형 7·8), 다음 8회차의 API·MCP 멀티 에이전트(유형 9)로 구성됩니다. 넷째, 오늘이 이 마지막 구간의 중간점이므로 지금 만든 로컬 RAG를 부서 동료 3명에게 시연해 실제 피드백을 한 번 받는 것이 8회차 API·MCP 설계의 입력이 됩니다.</div><div class="hl-bar"></div></div>
   <div class="hl-rule"></div>
   <div class="bd col2w">
     <div class="col">
@@ -1707,7 +1707,7 @@ SYN = {
         <tr><td><strong>S07</strong></td><td><strong>RAG 파이프라인 + 웹서비스 · 유형 7·8</strong></td><td><strong>6~8</strong></td><td><strong>오늘</strong></td></tr>
         <tr><td>S08</td><td>API · MCP 멀티 에이전트 아키텍처 · 유형 9</td><td>6~8</td><td>다음</td></tr>
       </tbody></table>
-      <div class="co"><div class="co-lb">현재 지점</div><div class="co-main">6~8회차 3구간의 중간 · 유형 7·8 구현 회차</div><p>재료 감각(1~3) → 외부망↔내부망(4~5) → 에이전트 풀스택(6~8). 오늘이 풀스택 구간의 중간 관문.</p></div>
+      <div class="co"><div class="co-lb">현재 지점</div><div class="co-main">6~8회차 3구간의 중간 · 유형 7·8 구현 회차</div><p>기초(1~3) → 외부망↔내부망(4~5) → 에이전트 풀스택(6~8). 오늘이 풀스택 구간의 두 번째 회차.</p></div>
       <div class="dstrip"><div class="ds-c"><div class="ds-a">DONE</div><div class="ds-n">6/8</div><div class="ds-d">완료 회차</div></div><div class="ds-c"><div class="ds-a">TODAY</div><div class="ds-n">S07</div><div class="ds-d">유형 7·8</div></div><div class="ds-c"><div class="ds-a">LAST</div><div class="ds-n">S08</div><div class="ds-d">API·MCP·유형 9</div></div></div>
     </div>
     <div class="col">
@@ -1715,7 +1715,7 @@ SYN = {
       <div class="cod"><div class="cod-lb">6~8회차 구간 · 에이전트 풀스택</div><div class="cod-main">6~8회차는 "에이전트로 본격 개발" — RAG·웹서비스·API·MCP 조합</div><p>6회차: 에이전트 도구 마스터리. <strong>7회차: RAG + 웹서비스 — 유형 7·8(오늘).</strong> 8회차: API · MCP 멀티 에이전트 — 유형 9. 3구간이 끝나면 8주 여정 완료.</p></div>
       <div class="dstrip"><div class="ds-c"><div class="ds-a">구간</div><div class="ds-n">6~8/3</div><div class="ds-d">에이전트 풀스택</div></div><div class="ds-c"><div class="ds-a">NEXT</div><div class="ds-n">S08</div><div class="ds-d">API · MCP · 유형 9</div></div><div class="ds-c"><div class="ds-a">마감</div><div class="ds-n">과제</div><div class="ds-d">8회차 전</div></div></div>
       <div class="co"><div class="co-lb">거점리더의 당부</div><div class="co-main">오늘 만든 로컬 RAG를 부서 동료 3명에게 시연</div><p>8회차 전에 현장 피드백을 한 번 받는다. 그 피드백이 API·MCP 설계의 실제 입력이 된다.</p></div>
-      <div class="quote"><div class="quote-src">SOURCE · 8주 여정 설계</div><div class="quote-q">"스스로 만든 RAG에 동료가 첫 질문을 하는 순간이, 이 과정의 실제 출구다."</div><div class="quote-a">— 커리큘럼 철학</div></div>
+      <div class="quote"><div class="quote-src">SOURCE · 8주 여정 설계</div><div class="quote-q">"8회차 전까지 부서 동료 3명이 직접 질문을 입력하고 응답·출처를 확인하는 시연을 1회 수행한다."</div><div class="quote-a">— 8회차 사전 과제</div></div>
     </div>
   </div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · RAG 파이프라인과 웹서비스 구축</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">032 / 032</span></div></div>
