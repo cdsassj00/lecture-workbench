@@ -1500,38 +1500,71 @@ async function dbSaveCurrentSession() {
   if (!sb) return toast('Supabase 연결 안 됨');
   if (!isEditor) { openLoginModal(dbSaveCurrentSession); return; }
   if (!S.slides.length) return toast('저장할 슬라이드 없음');
-  // 저장 전 페이지 번호 일괄 갱신 (순서 변경·삽입·삭제 반영)
   updateAllPageNumbers();
   const sessionNum = S.currentSessionNum;
   if (!sessionNum) return toast('교안 목록에서 회차를 먼저 선택');
   const lecturer = localStorage.getItem('wb_lecturer_name') || '강사';
   const ts = new Date().toISOString();
-  let saved = 0;
-  // Upsert session_meta first
-  await sb.from('session_meta').upsert({
-    session_num: sessionNum,
-    title: document.getElementById('sProg')?.value || `Session ${sessionNum}`,
-    css: S.css,
-    js: S.js,
-    updated_at: ts
-  }, { onConflict: 'session_num' });
-  // Upsert slides one by one
-  for (let idx = 0; idx < S.slides.length; idx++) {
-    const slide = S.slides[idx];
-    const { error } = await sb.from('slides').upsert({
+  const total = S.slides.length;
+
+  // 진행률 표시 (버튼 자체에 그라디언트 + 텍스트)
+  const btn = document.getElementById('btnDBSave');
+  const origText = btn.textContent;
+  const origStyle = btn.style.cssText;
+  const setProgress = (saved, msg) => {
+    const pct = total ? Math.round((saved / total) * 100) : 0;
+    btn.textContent = msg || `⏳ ${saved}/${total} (${pct}%)`;
+    btn.style.background = `linear-gradient(to right, var(--wacc) ${pct}%, rgba(255,255,255,0.08) ${pct}%)`;
+    btn.style.color = '#fff';
+  };
+  const resetButton = (delay) => setTimeout(() => {
+    btn.style.cssText = origStyle;
+    btn.textContent = origText;
+    btn.disabled = false;
+  }, delay || 0);
+  btn.disabled = true;
+  setProgress(0, '⏳ 메타 저장 중...');
+
+  try {
+    // 1) session_meta upsert
+    const metaRes = await sb.from('session_meta').upsert({
+      session_num: sessionNum,
+      title: document.getElementById('sProg')?.value || `Session ${sessionNum}`,
+      css: S.css, js: S.js, updated_at: ts
+    }, { onConflict: 'session_num' });
+    if (metaRes.error) throw metaRes.error;
+
+    // 2) slides 일괄 upsert — 10개씩 배치
+    const allRows = S.slides.map((slide, idx) => ({
       session_num: sessionNum,
       slide_idx: idx,
       data_title: slide.dataTitle || `Slide ${idx+1}`,
       html: slide.html,
       updated_at: ts,
       updated_by: lecturer
-    }, { onConflict: 'session_num,slide_idx' });
-    if (error) { console.error('Save error slide', idx, error); toast(`슬라이드 ${idx+1} 저장 실패`); return; }
-    saved++;
+    }));
+    const batchSize = 10;
+    let saved = 0;
+    for (let start = 0; start < total; start += batchSize) {
+      const batch = allRows.slice(start, start + batchSize);
+      const { error } = await sb.from('slides').upsert(batch, { onConflict: 'session_num,slide_idx' });
+      if (error) throw error;
+      saved = Math.min(start + batchSize, total);
+      setProgress(saved);
+    }
+    setProgress(total, `✓ 저장 완료 ${total}장`);
+    S.dirty = false;
+    document.getElementById('stDirty').textContent = '저장 완료';
+    toast(`Session ${sessionNum} 저장 완료 — ${total}장`);
+    resetButton(1800);
+  } catch (e) {
+    console.error('DB 저장 실패:', e);
+    btn.textContent = '⚠ 저장 실패';
+    btn.style.background = '#c33';
+    btn.style.color = '#fff';
+    toast(`저장 실패: ${(e.message || e).toString().substring(0, 80)}`);
+    resetButton(2500);
   }
-  S.dirty = false;
-  document.getElementById('stDirty').textContent = '저장 완료';
-  toast(`Session ${sessionNum} 저장 완료 — ${saved}장`);
 }
 
 async function openHistoryViewer() {
