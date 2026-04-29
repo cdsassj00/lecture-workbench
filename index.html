@@ -152,13 +152,13 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
     <button class="tb-btn" onclick="redo()" id="btnRedo" disabled>다시</button>
     <span class="tb-sep"></span>
     <button class="tb-btn" onclick="toggleEdit()" id="btnEdit">편집 모드</button>
+    <button class="tb-btn" onclick="dbSaveCurrentSession()" id="btnDBSave" disabled>💾 DB 저장</button>
+    <button class="tb-btn" onclick="aiRewriteFromToolbar()" id="btnAI" disabled>✨ AI 수정</button>
     <button class="tb-btn primary" onclick="presentMode()" id="btnPresent" disabled>프레젠테이션</button>
     <span class="tb-sep"></span>
     <button class="tb-btn" onclick="openSessionList()" id="btnSessions">교안 목록</button>
     <button class="tb-btn" onclick="window.open('curriculum.html','_blank')" id="btnCurriculum">📋 커리큘럼</button>
-    <button class="tb-btn" onclick="dbSaveCurrentSession()" id="btnDBSave" disabled>💾 DB 저장</button>
     <button class="tb-btn" onclick="openHistoryViewer()" id="btnHistory">🕐 이력</button>
-    <button class="tb-btn" onclick="openLoginModal()" id="btnAuth">🔒 잠금해제</button>
     <span class="tb-spacer"></span>
     <span class="tb-info" id="tbInfo">교안 파일을 열어주세요</span>
     <input type="file" id="fileIn" accept=".html" style="display:none">
@@ -185,46 +185,27 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
         <div class="tab" onclick="switchTab('cover')">표지</div>
       </div>
 
-      <!-- TAB: 외관 -->
+      <!-- TAB: 외관 (머리글·바닥글·악센트만) -->
       <div class="tab-body on" id="tabDress">
         <div class="sec">
-          <div class="sec-t">기관·과정</div>
-          <div class="f"><label>주관 기관명</label><input id="sOrg" placeholder="예: 한국정보화진흥원" oninput="markDirty()"></div>
-          <div class="f"><label>과정명</label><input id="sProg" placeholder="예: 공공 AI 전문인재 양성과정" oninput="markDirty()"></div>
-          <div class="f-row">
-            <div class="f"><label>회차</label><input id="sCohort" placeholder="제2기" oninput="markDirty()"></div>
-            <div class="f"><label>차시</label><input id="sSession" placeholder="Session 04" oninput="markDirty()"></div>
-          </div>
-          <div class="f-row">
-            <div class="f"><label>강사명</label><input id="sInstr" placeholder="김○○" oninput="markDirty()"></div>
-            <div class="f"><label>일시</label><input id="sDate" placeholder="2026.05.15" oninput="markDirty()"></div>
-          </div>
-          <div class="f"><label>장소</label><input id="sVenue" placeholder="서울 종로구" oninput="markDirty()"></div>
+          <div class="sec-t">머리글·바닥글 (전 슬라이드 일괄)</div>
+          <div class="hint" style="margin-bottom:8px">아래 두 칸은 본문을 건드리지 않고 모든 슬라이드의 헤더바 오른쪽·바닥글 모듈명만 일괄 교체합니다. 표지 슬라이드는 별도 양식이라 자동으로 제외됩니다. 페이지 번호는 자동.</div>
+          <div class="f"><label>헤더바 우측 (예: 과정명·차시)</label><input id="sHbarR" placeholder="공공 AI 전문인재 양성과정 · Session 04" oninput="markDirty()"></div>
+          <div class="f"><label>바닥글 모듈명</label><input id="sFbar" placeholder="04 · 어시스트 코딩 ①" oninput="markDirty()"></div>
         </div>
         <div class="sec">
-          <div class="sec-t">로고·컬러</div>
+          <div class="sec-t">악센트 컬러</div>
           <div class="f">
-            <label>기관 로고</label>
-            <div style="display:flex;gap:6px;align-items:center">
-              <button class="btn btn-o" onclick="document.getElementById('logoIn').click()" style="font-size:10px;padding:4px 10px">이미지 선택</button>
-              <button class="btn btn-o" onclick="resetLogo()" style="font-size:10px;padding:4px 10px" title="로고 제거">✕ 제거</button>
-            </div>
-            <div class="logo-box" id="logoBox"><span style="font-size:10px;color:var(--wink3)">없음</span></div>
-          </div>
-          <div class="f">
-            <label>악센트 컬러</label>
             <div class="color-pick">
               <input type="color" id="sColor" value="#b8532a" oninput="document.getElementById('sColorHex').textContent=this.value;markDirty()">
               <span id="sColorHex" style="font-family:monospace;font-size:11px">#b8532a</span>
               <button class="btn btn-o" onclick="document.getElementById('sColor').value='#b8532a';document.getElementById('sColorHex').textContent='#b8532a';markDirty()" style="font-size:9px;padding:2px 6px">초기화</button>
             </div>
+            <div class="hint" style="margin-top:4px">CSS의 --acc, --wacc 변수를 일괄 교체. 본문 텍스트는 변경 없음.</div>
           </div>
         </div>
-        <div class="sec">
-          <div class="sec-t">머리글·바닥글</div>
-          <div class="f"><label>헤더바 우측</label><input id="sHbarR" placeholder="자동 생성" oninput="markDirty()"></div>
-          <div class="f"><label>바닥글 모듈명</label><input id="sFbar" placeholder="04 · 어시스트 코딩 ①" oninput="markDirty()"></div>
-        </div>
+        <!-- 호환성을 위해 숨겨진 필드 유지 (다른 코드에서 참조) -->
+        <input type="hidden" id="sOrg"><input type="hidden" id="sProg"><input type="hidden" id="sCohort"><input type="hidden" id="sSession"><input type="hidden" id="sInstr"><input type="hidden" id="sDate"><input type="hidden" id="sVenue">
         <div class="btn-row">
           <button class="btn btn-p" onclick="applyDress()" id="btnApply" disabled>전체 적용</button>
           <button class="btn btn-s" onclick="exportHtml()" id="btnExport2" disabled>내보내기</button>
@@ -650,7 +631,11 @@ function makeEditable(iframe) {
       el.style.outline = '1px dashed rgba(184,83,42,0.25)';
       el.style.cursor = 'text';
       el.addEventListener('input', () => saveSlideState(doc));
-      el.addEventListener('focus', () => { el.style.outline = '2px solid rgba(184,83,42,0.6)'; });
+      el.addEventListener('focus', () => {
+        el.style.outline = '2px solid rgba(184,83,42,0.6)';
+        // 부모 윈도우에 현재 선택된 텍스트 박스 알림 (AI 수정 대상 추적)
+        try { if (window.parent && window.parent !== window) window.parent.setAITarget && window.parent.setAITarget(el); } catch(e) {}
+      });
       el.addEventListener('blur', () => { el.style.outline = '1px dashed rgba(184,83,42,0.25)'; saveSlideState(doc); });
     });
     
@@ -676,7 +661,6 @@ function makeEditable(iframe) {
       };
       
       bar.appendChild(mkBtn('◎', '여기 아래에 컴포넌트 삽입', setInsertAnchor));
-      bar.appendChild(mkBtn('✨', 'AI로 수정', (b) => window.parent.openAIRewriteFromIframe ? window.parent.openAIRewriteFromIframe(b) : openAIRewriteFromIframe(b)));
       bar.appendChild(mkBtn('←', '왼쪽 칼럼으로', (b)=>moveBlockToCol(b,'left')));
       bar.appendChild(mkBtn('↑', '위로', moveBlockUp));
       bar.appendChild(mkBtn('↓', '아래로', moveBlockDown));
@@ -832,107 +816,40 @@ function closeModal() { document.getElementById('modalBg').classList.remove('sho
 // DRESS (외관 적용)
 // ============================================================
 function applyDress() {
-  const org = document.getElementById('sOrg').value.trim();
-  const prog = document.getElementById('sProg').value.trim();
-  const cohort = document.getElementById('sCohort').value.trim();
-  const session = document.getElementById('sSession').value.trim();
-  const instr = document.getElementById('sInstr').value.trim();
-  const date = document.getElementById('sDate').value.trim();
-  const venue = document.getElementById('sVenue').value.trim();
-  const hbarR = document.getElementById('sHbarR').value.trim() ||
-    ((prog || '') + ' · ' + (session || '')).replace(/^ · | · $/g,'');
+  if (!S.slides.length) { toast('교안을 먼저 열어주세요'); return; }
+  const hbarR = document.getElementById('sHbarR').value.trim();
   const fbarMod = document.getElementById('sFbar').value.trim();
   const accent = document.getElementById('sColor').value;
-  const logo = S.logoBase64;
 
-  // Apply accent color
+  // Accent color: CSS 변수만 교체
   if (accent && accent !== '#b8532a') {
     S.css = S.css.replace(/--acc:\s*#[0-9a-fA-F]{6}/g, `--acc:${accent}`);
     S.css = S.css.replace(/--wacc:\s*#[0-9a-fA-F]{6}/g, `--wacc:${accent}`);
   }
 
-  // Apply to each slide
+  // 본문은 일체 건드리지 않고 hbar 우측·fbar 모듈명만 교체. 표지 슬라이드는 제외.
+  let touched = 0;
   S.slides.forEach((slide, idx) => {
     let h = slide.html;
-
-    // 1) 헤더바·바닥글 (전 슬라이드)
+    const isCover = idx === 0 || /data-title="Cover"/i.test(h);
+    if (isCover) return;
+    let changed = false;
     if (hbarR) {
+      const before = h;
       h = h.replace(/(class="hbar-r"[^>]*>)[^<]*/g, `$1${hbarR}`);
+      if (h !== before) changed = true;
     }
     if (fbarMod) {
+      const before = h;
       h = h.replace(/(class="fbar-title">)[^<]*(?=<\/span><\/div><div class="fbar-r">)/g, `$1${fbarMod}`);
+      if (h !== before) changed = true;
     }
-
-    // 2) Cover 슬라이드 전용 — 첫 슬라이드 또는 data-title="Cover"
-    const isCover = idx === 0 || /data-title="Cover"/i.test(h);
-    if (isCover) {
-      // 기존 워크벤치 주입물 제거 (재적용 대비)
-      h = h.replace(/<img[^>]*data-wb-logo[^>]*>/g, '');
-      h = h.replace(/<div data-wb-meta[\s\S]*?<\/div>/g, '');
-
-      // 주관 기관명 → hbar-l 앞에 prefix
-      if (org) {
-        h = h.replace(/(class="hbar-l"[^>]*>)([^<]*)/, (m, p1, p2) => {
-          // 기존에 같은 기관명이 이미 있으면 중복 방지
-          return p2.startsWith(org) ? m : `${p1}${org} · ${p2}`;
-        });
-      }
-
-      // 과정명 → pc-title 또는 첫 h1 치환
-      if (prog) {
-        if (/class="pc-title"/.test(h)) {
-          h = h.replace(/(class="pc-title"[^>]*>)[\s\S]*?(<\/h1>)/, `$1${prog}$2`);
-        } else if (/<h1[^>]*>/.test(h)) {
-          h = h.replace(/(<h1[^>]*>)[\s\S]*?(<\/h1>)/, `$1${prog}$2`);
-        }
-      }
-
-      // 회차/차시 → 메타박스 SESSION 행이 있으면 치환
-      if (cohort || session) {
-        const sessionVal = [cohort, session].filter(Boolean).join(' · ');
-        // METADATA 표 SESSION 행 치환 시도
-        h = h.replace(/(<span[^>]*>SESSION<\/span>\s*<span[^>]*>)[^<]*(<\/span>)/i, `$1${sessionVal}$2`);
-      }
-
-      // 기관 로고 → 우상단 absolute 삽입
-      if (logo) {
-        const logoTag = `<img data-wb-logo src="${logo}" alt="기관 로고" style="position:absolute;top:64px;right:72px;max-width:130px;max-height:64px;object-fit:contain;z-index:6">`;
-        h = h.replace(/(<div class="slide"[^>]*>)/, `$1${logoTag}`);
-      }
-
-      // 강사·일시·장소 → 하단 메타 줄 삽입
-      const bits = [];
-      if (instr) bits.push(`강사 ${instr}`);
-      if (date)  bits.push(`일시 ${date}`);
-      if (venue) bits.push(`장소 ${venue}`);
-      if (bits.length) {
-        const metaBox = `<div data-wb-meta style="position:absolute;bottom:78px;left:80px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#8a7659;letter-spacing:1.5px;font-weight:600;z-index:5">${bits.join('  ·  ')}</div>`;
-        // slide 닫는 태그 직전 삽입
-        h = h.replace(/(<\/div>\s*<\/div>\s*$)/, `${metaBox}$1`);
-      }
-    }
-
-    slide.html = h;
+    if (changed) { slide.html = h; touched++; }
   });
-
   S.dirty = true;
   renderStrip();
   selectSlide(S.selectedIdx >= 0 ? S.selectedIdx : 0);
-  toast('외관 적용 완료 (Cover 메타·로고 포함)');
-}
-
-// 로고 제거
-function resetLogo() {
-  S.logoBase64 = '';
-  document.getElementById('logoBox').innerHTML = '<span style="font-size:10px;color:var(--wink3)">없음</span>';
-  // 이미 슬라이드에 주입된 로고도 제거
-  S.slides.forEach(s => {
-    s.html = s.html.replace(/<img[^>]*data-wb-logo[^>]*>/g, '');
-  });
-  S.dirty = true;
-  renderStrip();
-  if (S.selectedIdx >= 0) selectSlide(S.selectedIdx);
-  toast('로고 제거 완료');
+  toast(`외관 적용 — 본문 영향 없음 · 머리글/바닥글 ${touched}장 갱신`);
 }
 
 // ============================================================
@@ -990,6 +907,8 @@ ${S.js}
 // EDIT MODE
 // ============================================================
 function toggleEdit() {
+  // 학생이 편집 모드 누르면 비번 모달 자동 호출
+  if (!isEditor) { openLoginModal(toggleEdit); return; }
   S.editMode = !S.editMode;
   const btn = document.getElementById('btnEdit');
   btn.textContent = S.editMode ? '편집 중 ✎' : '편집 모드';
@@ -1422,27 +1341,44 @@ if (window.supabase && window.supabase.createClient) {
   });
 }
 
+// 학생도 버튼은 보이되 누르면 비번 모달 자동 호출 (학생→강사 전환 자동)
 function updateAuthUI() {
-  const btnAuth = document.getElementById('btnAuth');
   const btnEdit = document.getElementById('btnEdit');
   const btnExport = document.getElementById('btnExport');
   const btnExport2 = document.getElementById('btnExport2');
   const btnApply = document.getElementById('btnApply');
   const btnDBSave = document.getElementById('btnDBSave');
-  if (btnAuth) {
-    btnAuth.textContent = isEditor ? '🔓 잠금 (강사)' : '🔒 잠금해제';
-    btnAuth.title = isEditor ? '클릭하여 로그아웃' : '강사 비밀번호로 잠금 해제';
-    btnAuth.onclick = isEditor ? doLogout : openLoginModal;
+  const btnAI = document.getElementById('btnAI');
+  const tbInfo = document.getElementById('tbInfo');
+  // 편집 모드 버튼: 학생도 누를 수 있되 잠금 표시
+  if (btnEdit) {
+    btnEdit.disabled = false;
+    btnEdit.textContent = isEditor ? '편집 모드' : '🔒 편집 모드';
   }
-  if (btnEdit) btnEdit.disabled = !isEditor;
+  // 저장 / AI: 슬라이드 로드 후에만 활성, 학생도 누를 수 있음 (누르면 비번 모달)
+  if (btnDBSave) {
+    btnDBSave.disabled = !S.slides.length;
+    btnDBSave.textContent = isEditor ? '💾 DB 저장' : '🔒 DB 저장';
+  }
+  if (btnAI) {
+    btnAI.disabled = !S.slides.length;
+    btnAI.textContent = isEditor ? '✨ AI 수정' : '🔒 ✨ AI 수정';
+  }
   if (btnExport) btnExport.style.display = isEditor ? '' : 'none';
   if (btnExport2) btnExport2.style.display = isEditor ? '' : 'none';
   if (btnApply) btnApply.style.display = isEditor ? '' : 'none';
-  if (btnDBSave) btnDBSave.disabled = !(isEditor && S.slides.length);
-  // 학생 모드: 외관·컴포넌트·표지 탭은 비활성 안 하고 보여만 줌. 저장 버튼만 잠김.
+  // 강사면 우상단 정보 영역에 "강사: 이름 [로그아웃]" 표시
+  if (tbInfo && isEditor) {
+    const name = localStorage.getItem('wb_lecturer_name') || '강사';
+    const sid = S.currentSessionNum ? ` · Session ${S.currentSessionNum}${S.slides.length ? ' · ' + S.slides.length + '장' : ''}` : '';
+    tbInfo.innerHTML = `🔓 ${name}${sid} <a href="#" onclick="event.preventDefault();doLogout()" style="margin-left:8px;color:rgba(255,255,255,0.5);text-decoration:underline;font-size:10px">로그아웃</a>`;
+  }
 }
 
-function openLoginModal() {
+// 로그인 후 자동 실행할 액션 (예: 편집 모드 클릭 → 로그인 → 자동으로 편집 모드 진입)
+let pendingAfterLogin = null;
+function openLoginModal(afterLoginFn) {
+  if (typeof afterLoginFn === 'function') pendingAfterLogin = afterLoginFn;
   document.getElementById('loginModalBg').classList.add('show');
   setTimeout(() => { const el = document.getElementById('loginPwd'); if (el) el.focus(); }, 100);
 }
@@ -1461,6 +1397,12 @@ async function doLogin() {
   document.getElementById('loginModalBg').classList.remove('show');
   document.getElementById('loginPwd').value = '';
   toast('편집 권한 활성화');
+  // 대기 중인 액션 실행 (예: 편집 모드 켜기 / DB 저장 / AI 수정)
+  if (typeof pendingAfterLogin === 'function') {
+    const fn = pendingAfterLogin;
+    pendingAfterLogin = null;
+    setTimeout(fn, 100);
+  }
 }
 
 async function doLogout() {
@@ -1482,7 +1424,7 @@ async function dbLoadSession(sessionNum) {
 
 async function dbSaveCurrentSession() {
   if (!sb) return toast('Supabase 연결 안 됨');
-  if (!isEditor) return toast('잠금 해제 후 저장 가능');
+  if (!isEditor) { openLoginModal(dbSaveCurrentSession); return; }
   if (!S.slides.length) return toast('저장할 슬라이드 없음');
   const sessionNum = S.currentSessionNum;
   if (!sessionNum) return toast('교안 목록에서 회차를 먼저 선택');
@@ -1664,8 +1606,23 @@ loadFile = function(file) {
 let aiTarget = null;
 let aiResult = null;
 
+// 텍스트 박스에 포커스되면 부모가 호출 — AI 수정 대상으로 기억
+window.setAITarget = function(el) {
+  window._aiCurrentTarget = el;
+};
+
+// 툴바의 ✨ AI 수정 — 현재 포커스된 텍스트 박스를 대상으로
+function aiRewriteFromToolbar() {
+  if (!isEditor) { openLoginModal(aiRewriteFromToolbar); return; }
+  const tgt = window._aiCurrentTarget;
+  if (!tgt || !tgt.isConnected) {
+    return toast('편집 모드에서 텍스트 박스를 클릭한 뒤 다시 시도하세요');
+  }
+  openAIRewriteFromIframe(tgt);
+}
+
 window.openAIRewriteFromIframe = function(blockEl) {
-  if (!isEditor) return toast('잠금 해제 후 사용 가능');
+  if (!isEditor) { openLoginModal(() => openAIRewriteFromIframe(blockEl)); return; }
   aiTarget = blockEl;
   aiResult = null;
   const orig = (blockEl.innerHTML || '').trim();
