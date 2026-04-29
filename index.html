@@ -906,14 +906,16 @@ function insertSlide(idx, tpl) {
 }
 
 // 모든 슬라이드의 fbar PAGE 번호를 현재 순서·총수에 맞게 일괄 갱신
+// 어떤 placeholder(--- / ---, 숫자, 빈 문자열)이 있어도 모두 갱신됨
 function updateAllPageNumbers() {
   const total = S.slides.length;
   if (!total) return;
   S.slides.forEach((slide, i) => {
     const txt = `${String(i+1).padStart(3,'0')} / ${String(total).padStart(3,'0')}`;
+    // .fbar-r 안의 마지막 fbar-title을 통째로 교체 (텍스트 무엇이든)
     slide.html = slide.html.replace(
-      /(<div class="fbar-r">[\s\S]*?<span class="fbar-title">)[\d\s\/]+/g,
-      `$1${txt}`
+      /(<div class="fbar-r">[\s\S]*?<span class="fbar-title">)[^<]*(<\/span>)/g,
+      `$1${txt}$2`
     );
   });
 }
@@ -1023,8 +1025,8 @@ function exportHtml() {
     // Update page numbers in fbar
     let h = slide.html;
     h = h.replace(
-      /(<span class="fbar-title">)\d+\s*\/\s*\d+/,
-      `$1${String(i+1).padStart(3,'0')} / ${String(S.slides.length).padStart(3,'0')}`
+      /(<div class="fbar-r">[\s\S]*?<span class="fbar-title">)[^<]*(<\/span>)/,
+      `$1${String(i+1).padStart(3,'0')} / ${String(S.slides.length).padStart(3,'0')}$2`
     );
     slidesHtml += `<div class="stage">${h}</div>\n\n`;
   });
@@ -1089,7 +1091,8 @@ function presentMode() {
   let slidesHtml = '';
   S.slides.forEach((slide, i) => {
     let h = slide.html;
-    h = h.replace(/(<span class="fbar-title">)\d+\s*\/\s*\d+/, `$1${String(i+1).padStart(3,'0')} / ${String(S.slides.length).padStart(3,'0')}`);
+    // 마지막 fbar-title (페이지 번호 슬롯)만 교체 — placeholder든 숫자든 무엇이든
+    h = h.replace(/(<div class="fbar-r">[\s\S]*?<span class="fbar-title">)[^<]*(<\/span>)/, `$1${String(i+1).padStart(3,'0')} / ${String(S.slides.length).padStart(3,'0')}$2`);
     slidesHtml += `<div class="stage">${h}</div>\n`;
   });
   // 인쇄/PDF 전용 CSS — 단면, 슬라이드 1장당 정확히 1페이지, 빈 페이지 방지
