@@ -459,6 +459,8 @@ function parseHtml(html) {
       dataTitle: slide ? slide.getAttribute('data-title') || `Slide ${i+1}` : `Slide ${i+1}`,
     });
   });
+  // 표지 프리셋 재적용 대비: 첫 슬라이드의 원본 HTML 보관
+  S.coverOriginal = S.slides.length ? S.slides[0].html : null;
 }
 
 // ============================================================
@@ -1197,35 +1199,27 @@ function renderCoverPresets() {
 
 function applyCoverPreset(cv) {
   if (S.slides.length === 0) { toast('교안을 먼저 열어주세요'); return; }
-  
-  // 커버 슬라이드(첫 번째)만 변경 — CSS 전역은 건드리지 않음
+
   const coverSlide = S.slides[0];
-  
-  // 커버 전체를 감싸는 inline style 주입
-  // 기존 커버 slide div에 배경색·텍스트색 override
-  let h = coverSlide.html;
-  
-  // slide div에 data-cover-theme 속성 + style 주입
-  const coverStyle = `background:${cv.bg};color:${cv.ink};--cv-bg:${cv.bg};--cv-ink:${cv.ink};--cv-acc:${cv.acc};--cv-dk:${cv.hbar};--cv-on:${cv.hbarText}`;
-  
-  // slide div의 기존 style이 있으면 교체, 없으면 추가
-  if (h.includes('data-cover-theme')) {
-    h = h.replace(/data-cover-theme="[^"]*"/, `data-cover-theme="${cv.id}"`);
-    h = h.replace(/style="[^"]*"/, `style="${coverStyle}"`);
-  } else {
-    h = h.replace('<div class="slide"', `<div class="slide" data-cover-theme="${cv.id}" style="${coverStyle}"`);
-  }
-  
-  // hbar 배경색 변경 (커버만)
+
+  // 원본 HTML 스냅샷이 없으면 현재 상태를 원본으로 보관 (첫 적용 시)
+  if (!S.coverOriginal) S.coverOriginal = coverSlide.html;
+
+  // 항상 원본에서 다시 시작 — 누적 치환으로 인한 색상 잔존 방지
+  let h = S.coverOriginal;
+
+  // slide div에 data-cover-theme + style 추가 (CSS 변수도 같이 주입해 자식 inherit)
+  const coverStyle = `background:${cv.bg};color:${cv.ink};--cv-bg:${cv.bg};--cv-ink:${cv.ink};--cv-acc:${cv.acc};--cv-dk:${cv.hbar};--cv-on:${cv.hbarText};--ink:${cv.ink};--ink2:${cv.ink}cc;--ink3:${cv.ink}88;--acc:${cv.acc};--bg:${cv.bg}`;
+  h = h.replace('<div class="slide"', `<div class="slide" data-cover-theme="${cv.id}" style="${coverStyle}"`);
+
+  // hbar 배경·텍스트 색상 (커버만)
   h = h.replace(
     /(<div class="hbar"[^>]*)(>)/,
     `$1 style="background:${cv.hbar};color:${cv.hbarText}"$2`
   );
-  // hbar 내 텍스트 색상
   h = h.replace(/(class="hbar-l"[^>]*>)/g, `$1<span style="color:${cv.hbarText}">`);
-  
-  // 커버 내 주요 텍스트 색상 override (inline style 내 color 교체)
-  // font-size가 있는 inline div/span의 color를 cv.ink로
+
+  // CSS 변수 형태 inline color → 직접 색상 치환 (1차)
   h = h.replace(/color:var\(--ink\)/g, `color:${cv.ink}`);
   h = h.replace(/color:var\(--ink2\)/g, `color:${cv.ink}cc`);
   h = h.replace(/color:var\(--ink3\)/g, `color:${cv.ink}88`);
@@ -1235,7 +1229,15 @@ function applyCoverPreset(cv) {
   h = h.replace(/border-top:2px solid var\(--acc\)/g, `border-top:2px solid ${cv.acc}`);
   h = h.replace(/border-top:1px solid var\(--ink\)/g, `border-top:1px solid ${cv.ink}44`);
   h = h.replace(/border-bottom:1px solid var\(--ln\)/g, `border-bottom:1px solid ${cv.ink}22`);
-  
+
+  // 하드코딩된 어두운/밝은 색상도 명도 충돌 방지로 함께 치환 (cover 전용)
+  // 원본 cover에서 자주 쓰이는 ink 계열 hex
+  const darkInks = ['#1a1612','#2b2015','#1a1410','#0e0a06','#0a0806','#3a2e20','#5a554e','#9a9490'];
+  darkInks.forEach(c => {
+    h = h.replace(new RegExp(`color:${c}\\b`,'gi'), `color:${cv.ink}`);
+    h = h.replace(new RegExp(`background:${c}\\b`,'gi'), `background:${cv.ink}`);
+  });
+
   coverSlide.html = h;
   S.dirty = true;
   renderStrip();
