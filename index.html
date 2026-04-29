@@ -233,8 +233,9 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
             <button class="btn btn-o" onclick="addFreeText()" style="flex:1;font-size:11px">+ 텍스트</button>
             <button class="btn btn-o" onclick="document.getElementById('freeImgIn').click()" style="flex:1;font-size:11px">+ 이미지</button>
           </div>
+          <button class="btn btn-o" onclick="clearAllFreeElements()" style="width:100%;font-size:11px;margin-top:6px;color:#c33;border-color:#f3c0c0">🧹 자유 개체 모두 삭제</button>
           <input type="file" id="freeImgIn" accept="image/*" style="display:none">
-          <div class="hint" style="margin-top:8px">추가한 요소는 비편집 상태에서 드래그로 이동, 더블클릭으로 텍스트 편집, Delete 키로 삭제.</div>
+          <div class="hint" style="margin-top:8px">드래그=이동 · 더블클릭=텍스트편집 · Del=삭제 · Ctrl+D=복제 · Ctrl+C/V=복사붙여넣기 · 외부 이미지/텍스트도 Ctrl+V로 직접 붙여넣기 가능</div>
         </div>
         <div class="sec" style="margin-top:12px">
           <div class="sec-t">사용법</div>
@@ -416,10 +417,24 @@ const TEMPLATES = [
 ];
 
 function getTemplateHtml(tpl) {
-  const moduleText = document.getElementById('sFbar').value || 'MODULE';
-  const hbarR = document.getElementById('sHbarR').value || document.getElementById('sProg').value || '교안';
-  
-  const hbar = `<div class="hbar"><div class="hbar-l">NEW SLIDE</div><div class="hbar-r">${hbarR}</div></div>`;
+  // 현재 슬라이드의 머리글·바닥글 상속 (없으면 기본값)
+  let inhHbarL = 'SECTION', inhHbarR = '교안', inhModule = 'MODULE';
+  const cur = (S.selectedIdx >= 0) ? S.slides[S.selectedIdx] : null;
+  if (cur && cur.html) {
+    const ml = cur.html.match(/<div class="hbar-l"[^>]*>([\s\S]*?)<\/div>/);
+    const mr = cur.html.match(/<div class="hbar-r"[^>]*>([\s\S]*?)<\/div>/);
+    // fbar 좌측의 fbar-title이 모듈명 (좌측: MODULE 라벨 + 모듈명, 우측: PAGE 라벨 + 페이지번호)
+    const fbarLeft = cur.html.match(/<div class="fbar-l">[\s\S]*?<span class="fbar-title">([^<]*)<\/span>/);
+    if (ml) inhHbarL = ml[1].replace(/<[^>]+>/g,'').trim() || inhHbarL;
+    if (mr) inhHbarR = mr[1].replace(/<[^>]+>/g,'').trim() || inhHbarR;
+    if (fbarLeft) inhModule = fbarLeft[1].trim() || inhModule;
+  }
+  const moduleText = (document.getElementById('sFbar') && document.getElementById('sFbar').value) || inhModule;
+  const hbarR = (document.getElementById('sHbarR') && document.getElementById('sHbarR').value)
+              || (document.getElementById('sProg') && document.getElementById('sProg').value)
+              || inhHbarR;
+
+  const hbar = `<div class="hbar"><div class="hbar-l">${inhHbarL}</div><div class="hbar-r">${hbarR}</div></div>`;
   const hl = `<div class="hl"><div class="hl-kicker">SECTION · TOPIC</div><div class="hl-title">슬라이드 제목을 입력하세요</div><div class="hl-sub">부제 또는 설명을 입력하세요.</div><div class="hl-bar"></div></div><div class="hl-rule"></div>`;
   const fbar = `<div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">${moduleText}</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">--- / ---</span></div></div>`;
   
@@ -1077,7 +1092,26 @@ function presentMode() {
     h = h.replace(/(<span class="fbar-title">)\d+\s*\/\s*\d+/, `$1${String(i+1).padStart(3,'0')} / ${String(S.slides.length).padStart(3,'0')}`);
     slidesHtml += `<div class="stage">${h}</div>\n`;
   });
-  const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><style>${S.css}</style></head><body><div class="deck" id="deck">${slidesHtml}</div><script>${S.js}<\/script></body></html>`;
+  // 인쇄/PDF 전용 CSS — 단면, 슬라이드 1장당 정확히 1페이지, 빈 페이지 방지
+  const PRINT_CSS = `
+@page { size: 1600px 900px; margin: 0; }
+@media print {
+  html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .deck { display: block !important; height: auto !important; padding: 0 !important; margin: 0 !important; }
+  .stage {
+    width: 1600px !important; height: 900px !important;
+    margin: 0 !important; padding: 0 !important;
+    box-sizing: border-box !important; overflow: hidden !important;
+    break-inside: avoid !important; page-break-inside: avoid !important;
+    break-after: page !important;  page-break-after: always !important;
+    break-before: auto !important; page-break-before: auto !important;
+  }
+  .stage:last-of-type { break-after: auto !important; page-break-after: auto !important; }
+  .palette-fix, .free-handle, #wb-free-toolbar, #wb-ai-popup, .wb-handle-bar { display: none !important; }
+}
+`;
+  const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><style>${S.css}\n${PRINT_CSS}</style></head><body><div class="deck" id="deck">${slidesHtml}</div><script>${S.js}<\/script></body></html>`;
   const blob = new Blob([fullHtml], {type:'text/html'});
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank');
@@ -1196,6 +1230,34 @@ const COMPONENTS = [
    html:'<div class="quote"><div class="quote-src">출처 · 연도</div><div class="quote-q">인용문을 입력하세요.</div><div class="quote-a">— 출처</div></div>'},
   {id:'bth-bt', icon:'¶', name:'본문 블록', desc:'제목+본문',
    html:'<div class="bth">소제목을 입력하세요</div><p class="bt">본문 텍스트를 입력하세요. 편집 모드에서 클릭하면 수정할 수 있습니다.</p>'},
+  {id:'big-num', icon:'#', name:'Big Number', desc:'거대 숫자 강조',
+   html:'<div style="text-align:center;padding:20px"><div style="font-family:\'Nanum Myeongjo\',serif;font-weight:800;font-size:120px;line-height:1;color:var(--acc,#b8532a);letter-spacing:-0.04em">85<span style="font-size:48px;color:var(--ink2,#4a4540)">%</span></div><div style="font-size:14px;color:var(--ink2,#4a4540);margin-top:8px;letter-spacing:1px">설명 라벨</div></div>'},
+  {id:'stat-card', icon:'📊', name:'Stat Card', desc:'숫자+라벨+증감',
+   html:'<div style="border:1px solid var(--ln,#e8e0d4);background:var(--bg,#fff);padding:16px 20px"><div style="font-family:monospace;font-size:10px;color:var(--ink3,#8a8078);letter-spacing:2px;font-weight:700;margin-bottom:6px">METRIC</div><div style="display:flex;align-items:baseline;gap:10px"><div style="font-family:\'Nanum Myeongjo\',serif;font-weight:800;font-size:42px;color:var(--ink,#1a1612)">1,250</div><div style="color:#2a8a2a;font-size:13px;font-weight:700">▲ +12%</div></div><div style="font-size:11px;color:var(--ink2,#4a4540);margin-top:4px">전년 동기 대비 증가</div></div>'},
+  {id:'title-banner', icon:'T', name:'Title Banner', desc:'대형 제목 (Serif)',
+   html:'<div style="padding:30px 20px"><div style="font-family:monospace;font-size:11px;color:var(--acc,#b8532a);letter-spacing:3px;font-weight:700;margin-bottom:14px">SECTION · 01</div><div style="font-family:\'Nanum Myeongjo\',serif;font-weight:700;font-size:54px;line-height:1.18;color:var(--ink,#1a1612);letter-spacing:-0.02em">큰 제목을 입력하세요</div><div style="width:60px;height:3px;background:var(--acc,#b8532a);margin:18px 0"></div><div style="font-size:15px;color:var(--ink2,#4a4540);line-height:1.6">부제 또는 핵심 메시지를 입력하세요.</div></div>'},
+  {id:'divider', icon:'━', name:'Section Divider', desc:'섹션 구분선',
+   html:'<div style="display:flex;align-items:center;gap:14px;margin:14px 0"><div style="width:40px;height:2px;background:var(--acc,#b8532a)"></div><span style="font-family:monospace;font-size:11px;color:var(--ink3,#8a8078);letter-spacing:3px;font-weight:700">SECTION 라벨</span><div style="flex:1;height:1px;background:var(--ln,#e8e0d4)"></div></div>'},
+  {id:'box-empty', icon:'▢', name:'Empty Box', desc:'빈 사각 박스',
+   html:'<div style="border:1px dashed var(--ln,#c8c0b0);background:var(--bg2,#f3efe9);padding:24px;text-align:center;color:var(--ink3,#8a8078);font-size:13px">여기에 콘텐츠를 입력하거나 박스를 그래픽 영역으로 활용하세요.</div>'},
+  {id:'bullet-list', icon:'•••', name:'Bullet List', desc:'3개 항목',
+   html:'<ul style="list-style:none;padding:0;margin:0"><li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--ln,#e8e0d4);color:var(--ink,#1a1612);font-size:13.5px"><span style="color:var(--acc,#b8532a);font-weight:800">●</span><span>첫째 항목 — 핵심 내용을 간결하게.</span></li><li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--ln,#e8e0d4);color:var(--ink,#1a1612);font-size:13.5px"><span style="color:var(--acc,#b8532a);font-weight:800">●</span><span>둘째 항목 — 구체 도구·숫자 포함.</span></li><li style="display:flex;gap:10px;padding:7px 0;color:var(--ink,#1a1612);font-size:13.5px"><span style="color:var(--acc,#b8532a);font-weight:800">●</span><span>셋째 항목 — 실무 예시.</span></li></ul>'},
+  {id:'steps', icon:'1·2·3', name:'Numbered Steps', desc:'순서 단계 3',
+   html:'<div style="display:flex;gap:10px;margin:8px 0">' +
+        '<div style="flex:1;padding:14px 12px;border:1px solid var(--ln,#e8e0d4);background:var(--bg2,#f3efe9)"><div style="font-family:\'Nanum Myeongjo\',serif;font-weight:800;font-size:32px;color:var(--acc,#b8532a);line-height:1">01</div><div style="font-weight:700;font-size:13px;margin-top:6px;color:var(--ink,#1a1612)">단계 제목</div><div style="font-size:11.5px;color:var(--ink2,#4a4540);line-height:1.55;margin-top:3px">설명을 입력하세요.</div></div>' +
+        '<div style="flex:1;padding:14px 12px;border:1px solid var(--ln,#e8e0d4);background:var(--bg2,#f3efe9)"><div style="font-family:\'Nanum Myeongjo\',serif;font-weight:800;font-size:32px;color:var(--acc,#b8532a);line-height:1">02</div><div style="font-weight:700;font-size:13px;margin-top:6px;color:var(--ink,#1a1612)">단계 제목</div><div style="font-size:11.5px;color:var(--ink2,#4a4540);line-height:1.55;margin-top:3px">설명을 입력하세요.</div></div>' +
+        '<div style="flex:1;padding:14px 12px;border:1px solid var(--ln,#e8e0d4);background:var(--bg2,#f3efe9)"><div style="font-family:\'Nanum Myeongjo\',serif;font-weight:800;font-size:32px;color:var(--acc,#b8532a);line-height:1">03</div><div style="font-weight:700;font-size:13px;margin-top:6px;color:var(--ink,#1a1612)">단계 제목</div><div style="font-size:11.5px;color:var(--ink2,#4a4540);line-height:1.55;margin-top:3px">설명을 입력하세요.</div></div>' +
+        '</div>'},
+  {id:'timeline', icon:'━●━', name:'Timeline', desc:'수평 타임라인',
+   html:'<div style="position:relative;padding:30px 0 10px"><div style="position:absolute;left:5%;right:5%;top:36px;height:2px;background:var(--acc,#b8532a)"></div><div style="display:flex;justify-content:space-between;position:relative">' +
+        '<div style="text-align:center;width:30%"><div style="width:14px;height:14px;border-radius:50%;background:var(--acc,#b8532a);margin:0 auto 8px"></div><div style="font-family:monospace;font-size:10px;color:var(--ink3,#8a8078);letter-spacing:2px;font-weight:700">1주차</div><div style="font-weight:700;font-size:12px;color:var(--ink,#1a1612);margin-top:4px">시작</div></div>' +
+        '<div style="text-align:center;width:30%"><div style="width:14px;height:14px;border-radius:50%;background:var(--acc,#b8532a);margin:0 auto 8px"></div><div style="font-family:monospace;font-size:10px;color:var(--ink3,#8a8078);letter-spacing:2px;font-weight:700">4주차</div><div style="font-weight:700;font-size:12px;color:var(--ink,#1a1612);margin-top:4px">중간 점검</div></div>' +
+        '<div style="text-align:center;width:30%"><div style="width:14px;height:14px;border-radius:50%;background:var(--acc,#b8532a);margin:0 auto 8px"></div><div style="font-family:monospace;font-size:10px;color:var(--ink3,#8a8078);letter-spacing:2px;font-weight:700">8주차</div><div style="font-weight:700;font-size:12px;color:var(--ink,#1a1612);margin-top:4px">완료</div></div>' +
+        '</div></div>'},
+  {id:'img-cap', icon:'🖼', name:'Image+Caption', desc:'이미지 자리+캡션',
+   html:'<figure style="margin:0;padding:0"><div style="width:100%;height:240px;background:var(--bg2,#f3efe9);border:1px dashed var(--ln,#c8c0b0);display:flex;align-items:center;justify-content:center;color:var(--ink3,#8a8078);font-size:13px;letter-spacing:1px">[ 이미지 영역 — 더블클릭으로 교체 ]</div><figcaption style="font-size:11px;color:var(--ink3,#8a8078);margin-top:6px;letter-spacing:0.5px;font-style:italic">캡션을 입력하세요.</figcaption></figure>'},
+  {id:'hero-card', icon:'★', name:'Hero Card', desc:'중앙 영웅 카드',
+   html:'<div style="text-align:center;padding:40px 30px;background:var(--bg2,#f3efe9);border-top:3px solid var(--acc,#b8532a);border-bottom:3px solid var(--acc,#b8532a)"><div style="font-family:monospace;font-size:11px;color:var(--acc,#b8532a);letter-spacing:3px;font-weight:700;margin-bottom:14px">KEY MESSAGE</div><div style="font-family:\'Nanum Myeongjo\',serif;font-weight:800;font-size:36px;line-height:1.25;color:var(--ink,#1a1612);max-width:700px;margin:0 auto">핵심 메시지를 입력하세요.</div><div style="font-size:14px;color:var(--ink2,#4a4540);margin-top:14px">부연 설명을 입력하세요.</div></div>'},
 ];
 
 function renderCompPalette() {
@@ -1924,8 +1986,17 @@ ${sep}
     const el = _freeSelected;
     if (!el) return;
     const act = btn.dataset.act;
-    if (act === 'ff-serif') { el.classList.remove('ff-sans'); el.classList.add('ff-serif'); }
-    else if (act === 'ff-sans')  { el.classList.remove('ff-serif'); el.classList.add('ff-sans'); }
+    if (act === 'ff-serif') {
+      el.classList.remove('ff-sans'); el.classList.add('ff-serif');
+      // inline 스타일로도 박아 두기 — class만으로는 다른 코드가 덮을 수 있음
+      el.style.fontFamily = "'Nanum Myeongjo','Times New Roman',serif";
+      el.style.fontWeight = '700';
+    }
+    else if (act === 'ff-sans') {
+      el.classList.remove('ff-serif'); el.classList.add('ff-sans');
+      el.style.fontFamily = "'Pretendard','Noto Sans KR',sans-serif";
+      el.style.fontWeight = '400';
+    }
     else if (act === 'size-down') { const cur = parseInt(getComputedStyle(el).fontSize) || 24; el.style.fontSize = Math.max(8,  cur - 2) + 'px'; }
     else if (act === 'size-up')   { const cur = parseInt(getComputedStyle(el).fontSize) || 24; el.style.fontSize = Math.min(200, cur + 2) + 'px'; }
     else if (act === 'align-l') { el.style.textAlign = 'left'; }
@@ -2245,6 +2316,78 @@ function bindFreeCanvasDeselect(doc) {
     if (t.closest && t.closest('.free-text, .free-image, .free-comp, .free-handle, #wb-free-toolbar')) return;
     deselectFreeElement(doc);
   }, true);
+  // 외부 클립보드 → 자유 캔버스 붙여넣기 (이미지·텍스트)
+  doc.addEventListener('paste', (e) => {
+    const canvas = doc.querySelector('.free-canvas');
+    if (!canvas) return; // 자유 캔버스에서만
+    // 텍스트 contentEditable 안에서 paste 중이면 그대로 두기 (텍스트 삽입)
+    if (doc.activeElement && doc.activeElement.contentEditable === 'true') return;
+    const cd = e.clipboardData;
+    if (!cd) return;
+    // 1) 파일(이미지) 우선
+    if (cd.files && cd.files.length) {
+      for (const file of cd.files) {
+        if (file.type && file.type.indexOf('image') === 0) {
+          e.preventDefault();
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = doc.createElement('img');
+            img.src = ev.target.result;
+            img.className = 'free-image';
+            img.dataset.free = 'image';
+            img.style.cssText = 'position:absolute;left:200px;top:200px;width:600px;height:auto;cursor:move;user-select:none';
+            img.draggable = false;
+            canvas.appendChild(img);
+            attachFreeBehavior(img);
+            img._wbBound = true;
+            selectFreeElement(img);
+            saveSlideState(doc);
+          };
+          reader.readAsDataURL(file);
+          return;
+        }
+      }
+    }
+    // 2) 내부 클립보드(_freeClipboard) 우선
+    if (_freeClipboard) {
+      e.preventDefault();
+      pasteFreeFromClipboard(doc);
+      return;
+    }
+    // 3) 외부 텍스트 → 자유 텍스트 박스 생성
+    const text = cd.getData && cd.getData('text/plain');
+    if (text && text.trim()) {
+      e.preventDefault();
+      const el = doc.createElement('div');
+      el.className = 'free-text ff-sans';
+      el.contentEditable = 'false';
+      el.dataset.free = 'text';
+      el.style.cssText = 'position:absolute;left:200px;top:200px;width:520px;font-size:24px;color:#1a1612;padding:10px 14px;outline:none;background:transparent;line-height:1.4;cursor:move;user-select:none';
+      el.textContent = text.trim().substring(0, 5000);
+      canvas.appendChild(el);
+      attachFreeBehavior(el);
+      el._wbBound = true;
+      selectFreeElement(el);
+      saveSlideState(doc);
+    }
+  });
+}
+
+// 현재 슬라이드의 자유 캔버스 안 모든 개체 삭제
+function clearAllFreeElements() {
+  const iframe = document.getElementById('canvasIframe');
+  if (!iframe || !iframe.contentDocument) return toast('슬라이드를 먼저 선택');
+  if (!S.editMode) return toast('편집 모드를 켜세요');
+  const doc = iframe.contentDocument;
+  const canvas = doc.querySelector('.free-canvas');
+  if (!canvas) return toast('빈 슬라이드(자유 구성)에서만 사용');
+  const list = canvas.querySelectorAll('.free-text, .free-image, .free-comp');
+  if (!list.length) return toast('지울 자유 개체가 없습니다');
+  if (!confirm(`자유 개체 ${list.length}개를 모두 삭제할까요? 되돌릴 수 없습니다.`)) return;
+  list.forEach(el => el.remove());
+  deselectFreeElement(doc);
+  saveSlideState(doc);
+  toast(`자유 개체 ${list.length}개 삭제됨`);
 }
 
 // makeEditable 호출 시 기존 free 요소에도 행동 부여
