@@ -319,6 +319,53 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
   </div>
 </div>
 
+<!-- AI REWRITE MODAL -->
+<div class="modal-bg" id="aiModalBg" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="position:relative;width:780px;max-height:88vh;overflow-y:auto">
+    <button class="modal-close" onclick="document.getElementById('aiModalBg').classList.remove('show')">×</button>
+    <h2>✨ AI 수정 <span style="font-size:11px;color:var(--wink3);font-weight:400;letter-spacing:0">Claude Sonnet 4.5</span></h2>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:4px;letter-spacing:1px">원본</label>
+      <div id="aiOriginal" style="max-height:140px;overflow-y:auto;background:var(--wb2);padding:8px 10px;border:1px solid var(--wln);border-radius:3px;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-all"></div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:6px;letter-spacing:1px">빠른 옵션</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <button class="btn btn-o" onclick="runAIRewrite('이 텍스트를 더 짧고 간결하게 다시 써주세요. 핵심만 남기고 불필요한 수식어를 제거.')" style="font-size:11px;padding:6px">더 짧게</button>
+        <button class="btn btn-o" onclick="runAIRewrite('이 텍스트를 더 자세하게, 첫째·둘째·셋째 열거로 구체화해서 다시 써주세요. 도구명·숫자·일정 같은 구체 정보를 추가.')" style="font-size:11px;padding:6px">더 자세히</button>
+        <button class="btn btn-o" onclick="runAIRewrite('이 텍스트를 비개발자도 이해할 수 있도록 더 쉽게 풀어 써주세요. 전문 용어가 등장하면 괄호로 짧은 정의 첨부.')" style="font-size:11px;padding:6px">더 쉽게</button>
+        <button class="btn btn-o" onclick="runAIRewrite('이 텍스트에 구체 도구명·버전·숫자·일정·파일명을 추가해 다시 써주세요. 추상 표현은 사실 진술로 교체.')" style="font-size:11px;padding:6px">숫자·도구 추가</button>
+        <button class="btn btn-o" onclick="runAIRewrite('이 텍스트에 구체적 실무 예시 1개를 자연스럽게 포함해 다시 써주세요. 공공 부서 맥락(민원·보고서·통계·회의록 등) 권장.')" style="font-size:11px;padding:6px">예시 추가</button>
+        <button class="btn btn-o" onclick="runAIRewrite('이 텍스트에서 메거진 어조·비유·은유·vision casting·추상 역할 라벨을 모두 제거하고 사실 진술로 다시 써주세요. 강의 voice 유지.')" style="font-size:11px;padding:6px">메거진 톤 제거</button>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:4px;letter-spacing:1px">또는 직접 지시</label>
+      <textarea id="aiInstruction" rows="2" placeholder="예: 이 부분을 빠른 파악 루틴 관점으로 풀어줘" style="width:100%;padding:8px 10px;border:1px solid var(--wln);border-radius:3px;font-family:inherit;font-size:12px;resize:vertical"></textarea>
+      <button class="btn btn-p" onclick="runAIRewrite()" id="aiRunBtn" style="margin-top:8px;width:100%">수정안 받기</button>
+    </div>
+    <div id="aiLoading" style="display:none;text-align:center;padding:20px;color:var(--wink3);font-size:12px">⏳ Claude가 작성 중…</div>
+    <div id="aiResultArea" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:4px;letter-spacing:1px">원본</label>
+          <div id="aiCompareOrig" style="max-height:300px;overflow-y:auto;background:var(--wb2);padding:8px 10px;border:1px solid var(--wln);border-radius:3px;font-size:11.5px;line-height:1.55;white-space:pre-wrap;word-break:break-all"></div>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--wacc);margin-bottom:4px;letter-spacing:1px">수정안</label>
+          <div id="aiCompareNew" style="max-height:300px;overflow-y:auto;background:#fff;padding:8px 10px;border:2px solid var(--wacc);border-radius:3px;font-size:11.5px;line-height:1.55;white-space:pre-wrap;word-break:break-all"></div>
+        </div>
+      </div>
+      <div id="aiUsage" style="font-size:10px;color:var(--wink3);margin-bottom:10px;text-align:right"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <button class="btn btn-p" onclick="applyAIResult()">✓ 적용</button>
+        <button class="btn btn-o" onclick="document.getElementById('aiResultArea').style.display='none'">↻ 다시 시도</button>
+        <button class="btn btn-o" onclick="document.getElementById('aiModalBg').classList.remove('show')">취소</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- HISTORY MODAL -->
 <div class="modal-bg" id="historyModalBg" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal" style="position:relative;width:720px;max-height:80vh;overflow-y:auto">
@@ -629,6 +676,7 @@ function makeEditable(iframe) {
       };
       
       bar.appendChild(mkBtn('◎', '여기 아래에 컴포넌트 삽입', setInsertAnchor));
+      bar.appendChild(mkBtn('✨', 'AI로 수정', (b) => window.parent.openAIRewriteFromIframe ? window.parent.openAIRewriteFromIframe(b) : openAIRewriteFromIframe(b)));
       bar.appendChild(mkBtn('←', '왼쪽 칼럼으로', (b)=>moveBlockToCol(b,'left')));
       bar.appendChild(mkBtn('↑', '위로', moveBlockUp));
       bar.appendChild(mkBtn('↓', '아래로', moveBlockDown));
@@ -1610,6 +1658,96 @@ const _originalLoadFile = loadFile;
 loadFile = function(file) {
   S.currentSessionNum = null;
   return _originalLoadFile(file);
+};
+
+// === AI REWRITE ===
+let aiTarget = null;
+let aiResult = null;
+
+window.openAIRewriteFromIframe = function(blockEl) {
+  if (!isEditor) return toast('잠금 해제 후 사용 가능');
+  aiTarget = blockEl;
+  aiResult = null;
+  const orig = (blockEl.innerHTML || '').trim();
+  const origText = (blockEl.textContent || '').trim();
+  document.getElementById('aiOriginal').textContent = origText.substring(0, 1500) || '(빈 블록)';
+  document.getElementById('aiInstruction').value = '';
+  document.getElementById('aiResultArea').style.display = 'none';
+  document.getElementById('aiLoading').style.display = 'none';
+  document.getElementById('aiModalBg').classList.add('show');
+};
+
+window.runAIRewrite = async function(quickInstruction) {
+  if (!sb) return toast('Supabase 연결 안 됨');
+  if (!isEditor) return toast('잠금 해제 후 사용 가능');
+  if (!aiTarget) return toast('대상 블록 없음');
+  const instruction = quickInstruction || document.getElementById('aiInstruction').value.trim();
+  if (!instruction) return toast('수정 지시 입력 또는 빠른 옵션 선택');
+
+  const original = aiTarget.innerHTML;
+  document.getElementById('aiLoading').style.display = '';
+  document.getElementById('aiResultArea').style.display = 'none';
+  document.getElementById('aiRunBtn').disabled = true;
+
+  try {
+    const { data: sessData } = await sb.auth.getSession();
+    if (!sessData || !sessData.session) {
+      toast('인증 만료 — 다시 잠금해제');
+      document.getElementById('aiLoading').style.display = 'none';
+      document.getElementById('aiRunBtn').disabled = false;
+      return;
+    }
+    const slideTitle = (S.slides[S.selectedIdx] && S.slides[S.selectedIdx].dataTitle) || '';
+    const ctx = `슬라이드 제목: ${slideTitle}. 8주 행정안전부 AI·데이터기반행정 전문인재 양성과정. 한국어 강의안. 첫째·둘째·셋째 열거. 비유·은유·메거진 어조 금지.`;
+    const resp = await fetch(`${SB_URL}/functions/v1/rewrite-text`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${sessData.session.access_token}`,
+        'apikey': SB_ANON,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        current_text: original,
+        instruction: instruction,
+        context_hint: ctx,
+        max_tokens: 2048
+      })
+    });
+    const data = await resp.json();
+    document.getElementById('aiLoading').style.display = 'none';
+    document.getElementById('aiRunBtn').disabled = false;
+    if (!resp.ok) {
+      toast(`AI 호출 실패 (${resp.status}): ${(data.error || '').substring(0,80)}`);
+      console.error('AI rewrite error:', data);
+      return;
+    }
+    aiResult = data.rewritten;
+    document.getElementById('aiCompareOrig').textContent = (aiTarget.textContent || '').trim();
+    document.getElementById('aiCompareNew').textContent = aiResult;
+    if (data.usage) {
+      const inT = data.usage.input_tokens || 0;
+      const outT = data.usage.output_tokens || 0;
+      const cost = (inT * 3 / 1e6 + outT * 15 / 1e6).toFixed(4);
+      document.getElementById('aiUsage').textContent = `토큰: ${inT} in / ${outT} out · 약 $${cost} (≈${Math.round(cost * 1380)}원)`;
+    }
+    document.getElementById('aiResultArea').style.display = '';
+  } catch (e) {
+    document.getElementById('aiLoading').style.display = 'none';
+    document.getElementById('aiRunBtn').disabled = false;
+    toast(`네트워크 에러: ${e.message}`);
+    console.error(e);
+  }
+};
+
+window.applyAIResult = function() {
+  if (!aiTarget || aiResult === null) return toast('적용할 결과가 없음');
+  aiTarget.innerHTML = aiResult;
+  const iframe = document.getElementById('canvasIframe');
+  if (iframe && iframe.contentDocument) {
+    if (typeof saveSlideState === 'function') saveSlideState(iframe.contentDocument);
+  }
+  document.getElementById('aiModalBg').classList.remove('show');
+  toast('AI 수정 적용 — 변경 사항 [💾 DB 저장]으로 확정');
 };
 
 // Initial UI
