@@ -1205,38 +1205,40 @@ function applyCoverPreset(cv) {
   // 원본 HTML 스냅샷이 없으면 현재 상태를 원본으로 보관 (첫 적용 시)
   if (!S.coverOriginal) S.coverOriginal = coverSlide.html;
 
-  // 항상 원본에서 다시 시작 — 누적 치환으로 인한 색상 잔존 방지
+  // 항상 원본에서 다시 시작 — 매번 깨끗하게 재적용
   let h = S.coverOriginal;
 
-  // slide div에 data-cover-theme + style 추가 (CSS 변수도 같이 주입해 자식 inherit)
-  const coverStyle = `background:${cv.bg};color:${cv.ink};--cv-bg:${cv.bg};--cv-ink:${cv.ink};--cv-acc:${cv.acc};--cv-dk:${cv.hbar};--cv-on:${cv.hbarText};--ink:${cv.ink};--ink2:${cv.ink}cc;--ink3:${cv.ink}88;--acc:${cv.acc};--bg:${cv.bg}`;
-  h = h.replace('<div class="slide"', `<div class="slide" data-cover-theme="${cv.id}" style="${coverStyle}"`);
+  // CSS 변수를 slide div의 inline style에 주입하면 자식의 var(--ink) 등이
+  // cascade로 자동 반영됨. background-color만 사용해 .slide의 noise
+  // background-image는 그대로 유지.
+  const overrides = [
+    `background-color:${cv.bg}`,
+    `color:${cv.ink}`,
+    `--bg:${cv.bg}`,
+    `--bg2:${cv.bg}`,
+    `--ink:${cv.ink}`,
+    `--ink2:${cv.ink}cc`,
+    `--ink3:${cv.ink}88`,
+    `--acc:${cv.acc}`,
+    `--ln:${cv.ink}22`,
+    `--ln2:${cv.ink}11`,
+    `--dk:${cv.hbar}`,
+    `--dk2:${cv.hbar}`,
+    `--on:${cv.hbarText}`,
+    `--on2:${cv.hbarText}cc`,
+    // workbench(편집기) 변수 동시 처리
+    `--wb:${cv.bg}`,
+    `--wb2:${cv.bg}`,
+    `--wink:${cv.ink}`,
+    `--wink2:${cv.ink}cc`,
+    `--wink3:${cv.ink}88`,
+    `--wacc:${cv.acc}`,
+    `--wln:${cv.ink}22`,
+    `--wdk:${cv.hbar}`,
+    `--won:${cv.hbarText}`,
+  ].join(';');
 
-  // hbar 배경·텍스트 색상 (커버만)
-  h = h.replace(
-    /(<div class="hbar"[^>]*)(>)/,
-    `$1 style="background:${cv.hbar};color:${cv.hbarText}"$2`
-  );
-  h = h.replace(/(class="hbar-l"[^>]*>)/g, `$1<span style="color:${cv.hbarText}">`);
-
-  // CSS 변수 형태 inline color → 직접 색상 치환 (1차)
-  h = h.replace(/color:var\(--ink\)/g, `color:${cv.ink}`);
-  h = h.replace(/color:var\(--ink2\)/g, `color:${cv.ink}cc`);
-  h = h.replace(/color:var\(--ink3\)/g, `color:${cv.ink}88`);
-  h = h.replace(/color:var\(--acc\)/g, `color:${cv.acc}`);
-  h = h.replace(/background:var\(--ink\)/g, `background:${cv.ink}`);
-  h = h.replace(/background:var\(--acc\)/g, `background:${cv.acc}`);
-  h = h.replace(/border-top:2px solid var\(--acc\)/g, `border-top:2px solid ${cv.acc}`);
-  h = h.replace(/border-top:1px solid var\(--ink\)/g, `border-top:1px solid ${cv.ink}44`);
-  h = h.replace(/border-bottom:1px solid var\(--ln\)/g, `border-bottom:1px solid ${cv.ink}22`);
-
-  // 하드코딩된 어두운/밝은 색상도 명도 충돌 방지로 함께 치환 (cover 전용)
-  // 원본 cover에서 자주 쓰이는 ink 계열 hex
-  const darkInks = ['#1a1612','#2b2015','#1a1410','#0e0a06','#0a0806','#3a2e20','#5a554e','#9a9490'];
-  darkInks.forEach(c => {
-    h = h.replace(new RegExp(`color:${c}\\b`,'gi'), `color:${cv.ink}`);
-    h = h.replace(new RegExp(`background:${c}\\b`,'gi'), `background:${cv.ink}`);
-  });
+  h = h.replace('<div class="slide"', `<div class="slide" data-cover-theme="${cv.id}" style="${overrides}"`);
 
   coverSlide.html = h;
   S.dirty = true;
