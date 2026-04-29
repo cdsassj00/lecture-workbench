@@ -390,9 +390,9 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
     </div>
     <div style="background:var(--bg);padding:22px 30px;display:grid;grid-template-columns:1.5fr 1fr;gap:24px;align-items:center">
       <div class="hybrid">
-        <div class="hybrid-k">KEY MESSAGE · 거점리더 관점</div>
-        <div class="hybrid-h">원리는 개념 수준까지만 · Part B에서 MicroGPT로 체감</div>
-        <div class="hybrid-d">수식은 외우지 않는다. Q·K·V와 멀티헤드가 "문맥 중요도를 어떻게 계산하는가"만 감각으로 잡으면 충분하다. 심층 구현은 에이전트가 담당하되, 거점리더는 검증·판단·설명에 필요한 최소 원리를 보유한다.</div>
+        <div class="hybrid-k">학습 범위 · 본 회차에서 잡을 만큼</div>
+        <div class="hybrid-h">트랜스포머 수식 암기 X · Q·K·V·멀티헤드 작동 원리만 감각화</div>
+        <div class="hybrid-d">트랜스포머의 핵심 수식 <strong>Attention(Q,K,V) = softmax(QK<sup>T</sup>/√d)V</strong>는 외울 필요가 없습니다. 다음 두 가지만 잡고 가면 됩니다. <strong>첫째</strong>, 문맥 중요도가 어떻게 계산되는가 — Q와 K를 곱해 가중치를 만들고, softmax로 확률화한 뒤, V를 그 확률로 가중합. <strong>둘째</strong>, 멀티헤드가 왜 필요한가 — 한 번의 계산으로는 한 가지 관점만 보지만, 여러 헤드를 병렬로 두면 문법·의미·위치 같은 다른 관점을 동시에 본다. 이 두 가지면 본 과정 후반의 RAG·프롬프트·하네스 설계의 근거를 이해하고 동료에게 설명하기 충분합니다.</div>
       </div>
       <div>
         <div class="sh"><span class="sh-n">TOOLS · 2회차 연결</span></div>
@@ -486,8 +486,8 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
   <div class="hbar"><div class="hbar-l">PART B · MicroGPT · 10:40</div><div class="hbar-r">AI·데이터기반행정 전문인재 양성과정 · Session 01</div></div>
   <div class="hl">
     <div class="hl-kicker">PART B · MicroGPT 투어 ① · 4단계 루프 · 5MIN</div>
-    <div class="hl-title">MicroGPT 4단계 루프 — 토큰화 · Attention · 예측 · 반복</div>
-    <div class="hl-sub">GPT 같은 LLM이 내부에서 문장을 어떻게 만드는지 한 번 눈으로 보고 지나갑니다. 실습 도구는 <strong>MicroGPT</strong>(Karpathy의 교육용 nanoGPT 리포를 가리키는 커리큘럼 용어로, 약 300줄의 파이썬으로 축약된 미니 GPT)입니다. 내부 동작은 네 단계 루프입니다. 첫째, 문장을 토큰(모델이 다루기 쉬운 작은 조각)으로 쪼갭니다. 둘째, Attention 계산으로 지금 위치에서 어떤 토큰이 중요한지 가중치를 매깁니다. 셋째, 다음에 올 토큰의 확률을 계산해 하나를 뽑습니다. 넷째, 이 과정을 문장 끝까지 반복합니다. 수식을 외우려는 게 아니라 LLM을 '반복되는 계산 루프'로 재프레임하는 것이 목표입니다.</div>
+    <div class="hl-title">트랜스포머의 한 사이클 — 토큰을 받아 다음 토큰을 만드는 4단계</div>
+    <div class="hl-sub">GPT·Claude·Gemini 같은 LLM이 답을 만드는 과정은, 결국 <strong>한 토큰씩 다음을 예측해 이어 붙이는 사이클의 반복</strong>입니다. Andrej Karpathy가 공개한 <strong>nanoGPT</strong>(약 300줄 파이썬, <code>github.com/karpathy/nanoGPT</code>)를 한 번 실행해 보면 이 사이클이 LOAD → ATTEND → PREDICT → REPEAT 네 단계로 깔끔하게 분해됩니다. 본 회차의 목적은 트랜스포머 수식을 외우는 것이 아니라, 이 4단계가 실무 프롬프트 설계·컨텍스트 한도·환각 발생과 어떻게 연결되는지 한 번 잡고 가는 것입니다.</div>
     <div class="hl-bar"></div>
   </div>
   <div class="hl-rule"></div>
@@ -504,33 +504,31 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
         <div class="flow-arrow">→</div>
         <div class="flow-box dk"><div class="flow-box-k">STEP 04</div><div class="flow-box-t">REPEAT<br>루프</div></div>
       </div>
-      <div class="card-body" style="margin-top:14px">네 단계는 다음과 같이 작동합니다. 첫째 토큰화 단계에서 "민원 접수" 같은 문장을 [민원, 접수] 같은 조각으로 쪼갭니다. 둘째 Attention 단계에서 문맥 중요도를 가중치로 계산합니다. 셋째 예측 단계에서 확률이 가장 높은 토큰을 다음 단어로 선택합니다. 넷째 반복 단계에서 문장 끝까지 같은 과정을 반복합니다. 답변·요약·코드 생성 같은 모든 출력이 이 네 단계 루프의 결과입니다.</div>
+      <div class="card-body" style="margin-top:14px">네 단계의 작동을 한 문장씩 풀어 봅니다. <strong>첫째 LOAD</strong>는 입력 문장을 모델이 다루는 단위인 <strong>토큰</strong>으로 쪼개는 단계입니다. 영어 'public service'는 GPT-4 토크나이저에서 2 토큰, 한국어 '민원 접수 처리'는 같은 토크나이저에서 약 6~8 토큰으로 분해됩니다. <strong>둘째 ATTEND</strong>는 각 토큰이 문맥 안의 다른 토큰을 얼마나 참고할지 <strong>Self-Attention</strong>으로 가중치를 계산합니다(Q·K·V 행렬 곱 + softmax). <strong>셋째 PREDICT</strong>는 어휘집(GPT-4 약 10만 단위) 전체에 대한 확률 분포를 만들고 거기서 하나를 샘플링합니다. <strong>넷째 REPEAT</strong>는 뽑은 토큰을 입력 끝에 붙여 같은 사이클을 다음 토큰을 위해 다시 돕니다. 답변이 길수록 이 사이클이 그만큼 반복되며, 토큰 수가 곧 비용·속도·컨텍스트 한도와 직결됩니다.</div>
       <div class="grow">
         <div class="pit">
-          <div class="pit-lb">KEY MESSAGE · 거점리더 개입점</div>
-          <div class="pit-h">Attention과 예측은 수정 불가 · 입력 구조만 설계 가능</div>
-          <div class="pit-d">모델 가중치는 조직이 바꿀 수 없다. 거점리더가 품질에 영향을 주는 유일한 레버는 ① 어떤 문서를 ② 어떤 순서로 ③ 어떤 포맷으로 넣느냐. 이것이 프롬프트·컨텍스트·하네스 설계의 출발점.</div>
+          <div class="pit-lb">WHY IT MATTERS · 4단계가 실무에 남기는 흔적</div>
+          <div class="pit-h">컨텍스트 한도·환각·재현성 모두 이 사이클에서 비롯됩니다</div>
+          <div class="pit-d"><strong>첫째</strong>, 컨텍스트 한도(GPT-4 Turbo 128K · Claude Sonnet 4.5 200K · Gemini 1.5 Pro 1M 토큰)가 존재하는 이유 — ATTEND 단계의 계산량이 입력 길이의 <strong>제곱</strong>에 비례하기 때문입니다. <strong>둘째</strong>, 환각(hallucination)이 발생하는 이유 — PREDICT는 사실 검색이 아니라 확률 분포에서의 샘플링이며, 어휘집에 없는 외부 사실을 만들어내지 못합니다. RAG가 필요한 근본 원인입니다. <strong>셋째</strong>, 같은 질문에 다른 답이 나오는 이유 — temperature가 0이 아니면 PREDICT 단계에 무작위성이 개입합니다. 재현이 필요한 작업은 temperature=0 또는 seed 고정이 출발점입니다.</div>
         </div>
       </div>
     </div>
     <div class="col">
-      <div class="sh"><span class="sh-n">MICROGPT 실습</span><span class="sh-t">브라우저에서 돌리는 300줄 GPT</span></div>
+      <div class="sh"><span class="sh-n">NLP 3세대</span><span class="sh-t">다음 단어 예측 모델의 진화</span></div>
       <div class="sh-line"></div>
       <table class="mtbl">
-        <thead><tr><th style="width:110px">구성 요소</th><th>MicroGPT에서 보이는 것</th></tr></thead>
+        <thead><tr><th style="width:130px">세대</th><th>작동 방식</th><th style="width:160px">결정적 한계</th></tr></thead>
         <tbody>
-          <tr><td>VOCAB</td><td class="q">문자 단위 토큰 65개 (셰익스피어 샘플)</td></tr>
-          <tr><td>EMBED</td><td class="q">각 토큰을 384차원 벡터로 변환</td></tr>
-          <tr><td>ATTENTION</td><td class="q">Q·K·V 행렬 계산 · 6개 헤드 병렬</td></tr>
-          <tr><td>FFN</td><td class="q">Feed-Forward · 토큰별 판단</td></tr>
-          <tr><td>OUTPUT</td><td class="q">다음 토큰 확률 분포 · softmax</td></tr>
+          <tr><td>n-gram<br><span style="font-weight:400;font-size:9.5px;color:var(--ink3)">1990년대~</span></td><td class="q">직전 n-1개 단어로 다음 단어의 조건부 확률을 계산. 통계 기반.</td><td class="q">긴 문맥 학습 불가, 확률표가 어휘 수의 거듭제곱으로 폭증</td></tr>
+          <tr><td>RNN · LSTM<br><span style="font-weight:400;font-size:9.5px;color:var(--ink3)">1997 LSTM, 2014 seq2seq</span></td><td class="q">은닉 상태(hidden state)에 문맥을 누적하며 순차 처리. 구글 번역 1세대 엔진.</td><td class="q">긴 문장에서 정보 소실, 병렬 처리 불가, 학습 느림</td></tr>
+          <tr><td>Transformer<br><span style="font-weight:400;font-size:9.5px;color:var(--ink3)">2017 'Attention Is All You Need'</span></td><td class="q">문장 전체를 행렬로 병렬 처리, Self-Attention으로 모든 토큰 관계를 동시에 계산</td><td class="q">입력 길이 제곱 비용, 컨텍스트 한도</td></tr>
         </tbody>
       </table>
       <div class="grow">
         <div class="co">
-          <div class="co-lb">TOOLS</div>
-          <div class="co-main">Karpathy의 nanoGPT 리포 · Transformer Explainer</div>
-          <p>Karpathy의 대표 교육 리포 이름은 정확히 <strong>nanoGPT</strong>입니다. 본 커리큘럼에서는 이를 MicroGPT라는 이름으로 부릅니다. 오늘 실습 도구는 poloclub.github.io/transformer-explainer입니다. 브라우저에서 Q·K·V와 멀티헤드가 실시간으로 시각화되므로 코드를 쓰지 않고도 내부 동작을 눈으로 따라갈 수 있습니다.</p>
+          <div class="co-lb">TAKEAWAY · 한 줄 정리</div>
+          <div class="co-main">LLM은 다음 토큰의 확률을 예측하는 기계입니다 — 검색 엔진도 데이터베이스도 사실 저장소도 아닙니다.</div>
+          <p>이 한 줄을 잡고 있으면 본 과정 후반에 다루는 RAG·메타 프롬프트·하네스가 모두 이 4단계 루프 어디를 보강하는 기술인지로 분류됩니다. RAG는 LOAD에 외부 검색 결과를 끼워 넣는 기술, 메타 프롬프트는 LOAD의 양식을 표준화하는 기술, 하네스는 LOAD·도구·승인을 한 묶음으로 운영하는 실행 환경입니다. 본 슬라이드의 실습 도구는 두 가지입니다. 첫째, Karpathy의 nanoGPT 리포(<code>github.com/karpathy/nanoGPT</code>) — 약 300줄 파이썬으로 4단계 루프를 직접 따라갈 수 있습니다. 둘째, Transformer Explainer(<code>poloclub.github.io/transformer-explainer</code>) — 브라우저에서 Q·K·V와 멀티헤드 동작을 실시간 시각화로 봅니다.</p>
         </div>
       </div>
     </div>
@@ -585,8 +583,8 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </table>
       <div class="grow">
         <div class="next">
-          <div class="next-k">TOOLS · 실습</div>
-          <div class="next-t">Transformer Explainer에서 "버스 노선 증설"을 입력하면 Attention 맵이 실시간 표시. 각 토큰이 어떤 토큰을 참조하는지 선으로 연결. 다음 슬라이드의 Q·K·V가 이 계산의 실체다.</div>
+          <div class="next-k">TOOLS · 실습 도구</div>
+          <div class="next-t">Transformer Explainer(<code>poloclub.github.io/transformer-explainer</code>)에 "버스 노선 증설 민원" 같은 문장을 입력하면 Attention 맵이 실시간 표시됩니다. 각 토큰이 어떤 토큰을 얼마나 참조하는지 선의 굵기로 시각화되며, 헤드 번호를 바꾸면 같은 문장에 대해 다른 헤드가 어떤 단서에 주목하는지 비교할 수 있습니다.</div>
         </div>
       </div>
     </div>
@@ -602,7 +600,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
   <div class="hl">
     <div class="hl-kicker">PART B · MicroGPT 투어 ③ · Q·K·V · 4MIN</div>
     <div class="hl-title">Q·K·V 세 가지 벡터로 Attention이 계산된다</div>
-    <div class="hl-sub">Attention은 세 가지 벡터의 상호작용으로 계산됩니다. 첫째, Q(Query)는 지금 알고 싶은 질문입니다. 둘째, K(Key)는 문장 속 단서들이 자기가 무엇을 담고 있는지 표시하는 주소입니다. 셋째, V(Value)는 그 단서가 실제로 제공하는 내용입니다. Q와 K의 매칭 정도로 가중치를 매겨 V를 섞는 것이 한 번의 Attention입니다. 수식을 외우는 것이 목표가 아니라 세 벡터의 역할을 감각으로 잡는 것이 목표입니다.</div>
+    <div class="hl-sub">Attention은 세 가지 벡터의 상호작용으로 계산됩니다. <strong>첫째 Q(Query)</strong>는 현재 토큰이 던지는 "내가 지금 무엇을 알고 싶은가" 질문입니다. <strong>둘째 K(Key)</strong>는 문장 속 다른 토큰들이 자기가 어떤 정보를 담고 있는지 알리는 주소입니다. <strong>셋째 V(Value)</strong>는 그 토큰이 실제로 제공하는 내용입니다. 한 번의 Attention은 <strong>Q와 K를 곱해 매칭 점수를 만들고 → 점수를 √d로 나눠 안정화 → softmax로 확률로 변환 → 그 확률로 V를 가중합</strong>하는 4단계 계산입니다. 수식 자체보다 "Q와 K가 잘 맞으면 V가 많이 섞여 답변에 반영된다"는 골격을 잡는 것이 목표입니다.</div>
     <div class="hl-bar"></div>
   </div>
   <div class="hl-rule"></div>
@@ -610,23 +608,23 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
     <div class="card">
       <div class="card-k">Q · QUERY</div>
       <div class="card-anchor">지금 알고 싶은 <em>질문</em></div>
-      <div class="card-body">현재 토큰이 다른 문장 속에서 어떤 정보를 찾고 있는지에 해당한다. 민원 답변을 생성할 때는 "이 민원의 핵심 요구가 무엇인가"라는 질문이 Q의 역할을 한다.</div>
+      <div class="card-body">현재 토큰이 다른 토큰들에게 던지는 "나에게 필요한 정보를 가진 토큰은 누구인가" 질문 벡터입니다. 민원 답변을 생성하는 시점의 Q는 "이 민원에서 시장이 답해야 할 핵심 요구는 무엇인가" 같은 질문입니다. 입력 토큰별로 학습된 가중치 행렬 W<sub>Q</sub>를 곱해 만들어집니다.</div>
       <div class="card-spacer"></div>
-      <div class="card-note">좋은 프롬프트가 좋은 답변을 만드는 이유 — 프롬프트가 모델의 Q를 명확히 설정하기 때문이다.</div>
+      <div class="card-note">좋은 프롬프트가 좋은 답변을 만드는 이유 — 프롬프트가 모델의 Q를 명확히 설정하기 때문입니다.</div>
     </div>
     <div class="card dk">
       <div class="card-k">K · KEY</div>
       <div class="card-anchor">문장 속 <em>단서</em>의 주소</div>
-      <div class="card-body">다른 토큰들이 각자 무엇을 담고 있는지 표시하는 표식이다. 법령 조문 해석에서는 <strong>조건 · 예외 · 적용 범위</strong>를 담은 단어들이 강한 K가 되고, Q(질문)와 매칭될 때 활성화된다.</div>
+      <div class="card-body">다른 토큰들이 자기가 어떤 정보를 담고 있는지 알리는 라벨 벡터입니다. 가중치 행렬 W<sub>K</sub>로 만들어집니다. 법령 조문에서는 <strong>조건절·예외 조항·시행일</strong>을 담은 토큰의 K가 두드러지며, 민원의 경우 "2024년에도 제출"·"반영되지 않았다" 같은 반복성 토큰의 K가 강합니다.</div>
       <div class="card-spacer"></div>
-      <div class="card-note">검색 엔진의 키워드 매칭과 유사한 원리다. Q와 K가 잘 맞을수록 다음 단계(V)가 정확해진다.</div>
+      <div class="card-note">검색 엔진 키워드 매칭과 비슷합니다 — Q·K 점수(QK<sup>T</sup>/√d)를 softmax에 통과시켜 가중치 분포를 만듭니다.</div>
     </div>
     <div class="card">
       <div class="card-k">V · VALUE</div>
       <div class="card-anchor">실제로 가져올 <em>내용</em></div>
-      <div class="card-body">중요한 단서로 판단된 토큰의 정보를 얼마나 섞어 답변에 반영할지 정한다. 최종적으로 답변의 근거 밀도와 정확도를 좌우하는 값이다.</div>
+      <div class="card-body">각 토큰이 실제로 제공하는 의미 내용 벡터입니다. 가중치 행렬 W<sub>V</sub>로 만들어집니다. softmax로 산출된 가중치 분포에 V를 곱해 합산한 결과가 현재 토큰의 새 표현(다음 층으로 전달되는 값)이 됩니다. 즉 "어떤 K가 강하게 활성화됐는가"가 곧 "그 K의 V를 답변에 얼마나 섞을 것인가"를 결정합니다.</div>
       <div class="card-spacer"></div>
-      <div class="card-note">문맥을 잘못 읽으면 잘못된 근거가 "자연스럽게" 생성되는 이유 — V가 엉뚱한 K를 반영했기 때문이다.</div>
+      <div class="card-note">환각이 자연스럽게 생기는 이유 — softmax가 항상 확률을 만들어 V를 합산하므로 모델은 결코 "모릅니다"를 출력하지 않고 가장 그럴듯한 V 조합을 만들어냅니다.</div>
     </div>
   </div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">008 / 054</span></div></div>
