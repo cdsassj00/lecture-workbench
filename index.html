@@ -1846,12 +1846,11 @@ function injectAIPopup(doc) {
   const hide = () => { popup.style.display = 'none'; stage(1); savedRange = null; savedText = ''; };
   const inputEl = popup.querySelector('[data-input]');
 
-  // 버튼 클릭 시 selection 사라지지 않도록 mousedown 차단
-  popup.querySelectorAll('button, [data-input]').forEach(b => {
+  // 버튼만 mousedown preventDefault (selection 보호용)
+  // input·textarea는 절대 preventDefault하지 말 것 — 포커스/커서 동작이 막힘
+  popup.querySelectorAll('button').forEach(b => {
     b.addEventListener('mousedown', e => e.preventDefault());
   });
-  // input은 click 가능하게 다시
-  inputEl.addEventListener('mousedown', e => { e.stopPropagation(); });
 
   const callAI = async (instruction) => {
     if (!savedText || !savedRange) return;
