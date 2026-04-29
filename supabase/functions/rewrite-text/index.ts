@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { current_text, instruction, context_hint, max_tokens } = await req.json();
+    const { current_text, instruction, context_hint, max_tokens, stream } = await req.json();
 
     if (!current_text || typeof current_text !== "string") {
       return new Response(JSON.stringify({ error: "current_text required" }), {
@@ -74,6 +74,8 @@ Deno.serve(async (req) => {
     ].filter(Boolean);
     const userMsg = userParts.join("\n\n");
 
+    const wantStream = stream === true;
+
     const claudeResp = await fetch(ANTHROPIC_URL, {
       method: "POST",
       headers: {
@@ -85,6 +87,7 @@ Deno.serve(async (req) => {
         model: MODEL,
         max_tokens: max_tokens ?? 2048,
         system: SYSTEM_PROMPT,
+        stream: wantStream,
         messages: [{ role: "user", content: userMsg }],
       }),
     });
@@ -102,6 +105,19 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
+    }
+
+    if (wantStream) {
+      // Anthropic의 SSE 스트림을 그대로 클라이언트로 패스스루
+      return new Response(claudeResp.body, {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+          "X-Accel-Buffering": "no",
+        },
+      });
     }
 
     const data = await claudeResp.json();

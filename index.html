@@ -667,6 +667,9 @@ function makeEditable(iframe) {
     // 1. 텍스트 편집 가능 요소
     const SEL = '.hl-kicker,.hl-title,.hl-sub,.bth,.bt,.co-lb,.co-main,.co p,.pit-lb,.pit-h,.pit-d,.cod-lb,.cod-main,.cod p,.sh-n,.sh-t,.hero-k,.hero-t,.hero-s,.hero-q-q,.hero-q-a,.icard-lb,.icard-sess,.icard .bth,.icard .bt,.quote-q,.quote-a,.quote-src,.hbar-l,.hbar-r,.fbar-title,.mtbl td,.mtbl th,.ds-a,.ds-n,.ds-d,.fig,.cblk,.chk-t,.step-t,.step-d,.netbox-lb,.ladder-h,.ladder-d,.ladder-tag,.card-k,.card-anchor,.card-body,.card-note,.next-k,.next-t,.draft-k,.draft-t,.draft-note,h1,p,div[style*="font-size"],span[style*="font-size"]';
     doc.querySelectorAll(SEL).forEach(el => {
+      // 자유 wrapper 자체(.free-text/.free-image/.free-comp)는 SEL 처리에서 제외
+      // 단, .free-comp 안의 내부 텍스트는 편집 가능 유지 — 빠짐없이
+      if (el.classList && (el.classList.contains('free-text') || el.classList.contains('free-image') || el.classList.contains('free-comp'))) return;
       el.contentEditable = 'true';
       el.style.outline = '1px dashed rgba(184,83,42,0.25)';
       el.style.cursor = 'text';
@@ -737,8 +740,11 @@ function saveSlideState(doc) {
     const clone = stage.cloneNode(true);
     clone.querySelectorAll('.wb-handle-bar').forEach(h => h.remove());
     clone.querySelectorAll('.wb-anchor').forEach(el => el.classList.remove('wb-anchor'));
-    const style = clone.querySelector('#wb-handle-css');
-    if (style) style.remove();
+    // 자유 캔버스 UI 잔여물 제거
+    clone.querySelectorAll('.free-handle').forEach(h => h.remove());
+    clone.querySelectorAll('.free-selected').forEach(el => el.classList.remove('free-selected'));
+    clone.querySelectorAll('[data-bound]').forEach(el => el.removeAttribute('data-bound'));
+    const style = clone.querySelector('#wb-handle-css'); if (style) style.remove();
     S.slides[S.selectedIdx].html = clone.innerHTML;
     markDirty();
   }
@@ -1161,6 +1167,26 @@ function insertComponent(comp) {
     doc.head.appendChild(style);
   }
   
+  // 자유 캔버스(빈 슬라이드)인 경우: 절대좌표 wrapper로 감싸 free 요소로 삽입
+  const freeCanvas = doc.querySelector('.free-canvas');
+  if (freeCanvas) {
+    const wrap = doc.createElement('div');
+    wrap.className = 'free-comp';
+    wrap.dataset.free = 'comp';
+    const existing = freeCanvas.querySelectorAll('.free-text, .free-image, .free-comp').length;
+    const off = 80 + (existing % 6) * 24;
+    wrap.style.cssText = `position:absolute;left:${off}px;top:${off}px;width:560px;padding:6px;cursor:move;user-select:none;background:transparent`;
+    wrap.innerHTML = comp.html;
+    freeCanvas.appendChild(wrap);
+    attachFreeBehavior(wrap);
+    saveSlideState(doc);
+    makeEditable(iframe);
+    renderStrip();
+    toast(`"${comp.name}" 자유 배치 삽입 — 드래그·리사이즈·내부 텍스트 편집 가능`);
+    return;
+  }
+
+  // 기존 구조형 슬라이드: 흐름대로 삽입
   const wrapper = doc.createElement('div');
   wrapper.innerHTML = comp.html;
   const newNodes = Array.from(wrapper.children);
@@ -1189,7 +1215,7 @@ function insertComponent(comp) {
     }
     toast('앵커 없음 — 기본 위치에 삽입 (블록 ◎ 클릭 시 원하는 위치 지정 가능)');
   }
-  
+
   // 4. 저장 + 편집 핸들 재적용
   saveSlideState(doc);
   makeEditable(iframe);
@@ -1724,11 +1750,11 @@ function addFreeText() {
   const canvas = doc.querySelector('.free-canvas');
   if (!canvas) return toast('빈 슬라이드(자유 구성)에서만 사용 — "+" 버튼으로 빈 슬라이드 추가');
   const el = doc.createElement('div');
-  el.className = 'free-text';
+  el.className = 'free-text ff-sans';
   el.contentEditable = 'false';
   el.dataset.free = 'text';
-  el.style.cssText = 'position:absolute;left:120px;top:120px;min-width:240px;max-width:1200px;font-family:\'Pretendard\',\'Noto Sans KR\',sans-serif;font-size:24px;color:#1a1612;padding:10px 14px;border:1px dashed rgba(184,83,42,0.4);outline:none;background:transparent;line-height:1.5;cursor:move;user-select:none';
-  el.textContent = '여기에 텍스트를 입력하세요 (더블클릭하여 편집)';
+  el.style.cssText = 'position:absolute;left:120px;top:120px;width:520px;font-size:32px;color:#1a1612;padding:10px 14px;outline:none;background:transparent;line-height:1.4;cursor:move;user-select:none';
+  el.textContent = '텍스트 (더블클릭 편집 · 코너 드래그=폰트 스케일 · 변 드래그=박스만)';
   canvas.appendChild(el);
   attachFreeBehavior(el);
   saveSlideState(doc);
@@ -1750,7 +1776,7 @@ document.getElementById('freeImgIn') && document.getElementById('freeImgIn').add
     img.src = ev.target.result;
     img.className = 'free-image';
     img.dataset.free = 'image';
-    img.style.cssText = 'position:absolute;left:120px;top:120px;max-width:600px;max-height:600px;border:1px dashed rgba(184,83,42,0.4);cursor:move;user-select:none';
+    img.style.cssText = 'position:absolute;left:120px;top:120px;width:600px;height:auto;cursor:move;user-select:none';
     img.draggable = false;
     canvas.appendChild(img);
     attachFreeBehavior(img);
@@ -1761,69 +1787,322 @@ document.getElementById('freeImgIn') && document.getElementById('freeImgIn').add
   e.target.value = '';
 });
 
+// ============================================================
+// Phase 1A — 자유 캔버스: 8방향 리사이즈 + 폰트 시스템 + 속성 툴바
+// ============================================================
+
+let _freeSelected = null; // 현재 선택된 free 요소 (iframe doc 내부)
+
+function injectFreeStyles(doc) {
+  if (doc.getElementById('wb-free-css')) return;
+  const style = doc.createElement('style');
+  style.id = 'wb-free-css';
+  style.textContent = `
+.free-text, .free-image { box-sizing: border-box; position: absolute; }
+.free-text.ff-serif { font-family: 'Nanum Myeongjo', var(--serif), 'Times New Roman', serif !important; font-weight: 700 !important; }
+.free-text.ff-sans  { font-family: 'Pretendard', 'Noto Sans KR', sans-serif !important; font-weight: 400 !important; }
+.free-selected { outline: 2px solid #b8532a !important; outline-offset: 0 !important; }
+.free-handle { display: none; position: absolute; width: 14px; height: 14px;
+  background: #fff !important; border: 2px solid #b8532a !important;
+  border-radius: 2px; z-index: 999 !important; user-select: none; pointer-events: auto; }
+.free-selected > .free-handle { display: block !important; }
+.free-handle-nw { left: -7px;  top: -7px;     cursor: nwse-resize; }
+.free-handle-ne { right: -7px; top: -7px;     cursor: nesw-resize; }
+.free-handle-sw { left: -7px;  bottom: -7px;  cursor: nesw-resize; }
+.free-handle-se { right: -7px; bottom: -7px;  cursor: nwse-resize; }
+.free-handle-n  { left: 50%;   top: -7px;     transform: translateX(-50%); cursor: ns-resize; }
+.free-handle-s  { left: 50%;   bottom: -7px;  transform: translateX(-50%); cursor: ns-resize; }
+.free-handle-w  { left: -7px;  top: 50%;      transform: translateY(-50%); cursor: ew-resize; }
+.free-handle-e  { right: -7px; top: 50%;      transform: translateY(-50%); cursor: ew-resize; }
+`;
+  doc.head.appendChild(style);
+}
+
+function injectFreeToolbar(doc) {
+  if (doc.getElementById('wb-free-toolbar')) return;
+  const tb = doc.createElement('div');
+  tb.id = 'wb-free-toolbar';
+  tb.style.cssText = 'position:absolute;display:none;z-index:9998;background:#fff;border:2px solid #b8532a;border-radius:6px;padding:6px 8px;box-shadow:0 6px 18px rgba(0,0,0,0.2);font-family:Pretendard,system-ui,sans-serif;font-size:11px;line-height:1;white-space:nowrap';
+  const btnCss = 'padding:4px 8px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit';
+  const sep = '<span style="display:inline-block;width:1px;height:18px;background:#ddd;margin:0 6px;vertical-align:middle"></span>';
+  tb.innerHTML = `
+<button data-act="ff-serif" title="제목용 (Serif Bold)" style="${btnCss};font-family:'Nanum Myeongjo',serif;font-weight:700;font-size:14px">Aa</button>
+<button data-act="ff-sans"  title="본문 (Sans)"          style="${btnCss};font-family:Pretendard,sans-serif;font-size:13px;margin-left:2px">Aa</button>
+${sep}
+<button data-act="size-down" style="${btnCss}">A−</button>
+<input  data-act="size-num" type="number" min="8" max="200" style="width:42px;padding:3px 4px;border:1px solid #ccc;border-radius:3px;margin:0 3px;text-align:center;font-family:inherit">
+<button data-act="size-up"   style="${btnCss}">A+</button>
+${sep}
+<input data-act="color" type="color" style="width:28px;height:24px;padding:0;border:1px solid #ccc;border-radius:3px;cursor:pointer;vertical-align:middle">
+${sep}
+<button data-act="align-l" style="${btnCss}">⬅</button>
+<button data-act="align-c" style="${btnCss}">⬌</button>
+<button data-act="align-r" style="${btnCss}">➡</button>
+${sep}
+<button data-act="bold"   style="${btnCss};font-weight:800">B</button>
+<button data-act="italic" style="${btnCss};font-style:italic">I</button>
+${sep}
+<button data-act="layer-front" title="맨 앞으로" style="${btnCss}">⬆</button>
+<button data-act="layer-back"  title="맨 뒤로"   style="${btnCss}">⬇</button>
+${sep}
+<button data-act="delete" style="padding:4px 8px;background:#fee;color:#c33;border:1px solid #f3c0c0;border-radius:3px;cursor:pointer">🗑</button>
+`;
+  doc.body.appendChild(tb);
+  tb.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => e.preventDefault()));
+  tb.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-act]');
+    if (!btn || btn.tagName === 'INPUT') return;
+    const el = _freeSelected;
+    if (!el) return;
+    const act = btn.dataset.act;
+    if (act === 'ff-serif') { el.classList.remove('ff-sans'); el.classList.add('ff-serif'); }
+    else if (act === 'ff-sans')  { el.classList.remove('ff-serif'); el.classList.add('ff-sans'); }
+    else if (act === 'size-down') { const cur = parseInt(getComputedStyle(el).fontSize) || 24; el.style.fontSize = Math.max(8,  cur - 2) + 'px'; }
+    else if (act === 'size-up')   { const cur = parseInt(getComputedStyle(el).fontSize) || 24; el.style.fontSize = Math.min(200, cur + 2) + 'px'; }
+    else if (act === 'align-l') { el.style.textAlign = 'left'; }
+    else if (act === 'align-c') { el.style.textAlign = 'center'; }
+    else if (act === 'align-r') { el.style.textAlign = 'right'; }
+    else if (act === 'bold')    { const w = el.style.fontWeight; el.style.fontWeight = (w === '700' || w === 'bold') ? '' : '700'; }
+    else if (act === 'italic')  { el.style.fontStyle = el.style.fontStyle === 'italic' ? '' : 'italic'; }
+    else if (act === 'layer-front') { el.parentNode && el.parentNode.appendChild(el); }
+    else if (act === 'layer-back')  { el.parentNode && el.parentNode.insertBefore(el, el.parentNode.firstChild); }
+    else if (act === 'delete') { el.remove(); deselectFreeElement(doc); saveSlideState(doc); return; }
+    saveSlideState(doc);
+    if (_freeSelected) positionFreeToolbar(_freeSelected);
+  });
+  tb.querySelector('[data-act="color"]').addEventListener('input', (e) => {
+    if (_freeSelected) { _freeSelected.style.color = e.target.value; saveSlideState(doc); }
+  });
+  tb.querySelector('[data-act="size-num"]').addEventListener('input', (e) => {
+    if (_freeSelected) {
+      const v = Math.max(8, Math.min(200, parseInt(e.target.value) || 24));
+      _freeSelected.style.fontSize = v + 'px';
+      saveSlideState(doc);
+    }
+  });
+}
+
+function rgbToHex(rgb) {
+  const m = (rgb || '').match(/(\d+)\D+(\d+)\D+(\d+)/);
+  if (!m) return null;
+  return '#' + [1,2,3].map(i => parseInt(m[i]).toString(16).padStart(2,'0')).join('');
+}
+
+function positionFreeToolbar(el) {
+  const doc = el.ownerDocument;
+  const tb = doc.getElementById('wb-free-toolbar');
+  if (!tb) return;
+  const docEl = doc.documentElement;
+  const sH = docEl.clientHeight || 900;
+  const sW = docEl.clientWidth || 1600;
+  tb.style.visibility = 'hidden';
+  tb.style.display = 'block';
+  const tbW = tb.offsetWidth, tbH = tb.offsetHeight;
+  const scrollTop = docEl.scrollTop || 0;
+  const scrollLeft = docEl.scrollLeft || 0;
+  const r = el.getBoundingClientRect();
+  let top = r.top + scrollTop - tbH - 10;
+  if (top < 8) top = r.bottom + scrollTop + 10;
+  if (top + tbH > sH - 8) top = Math.max(8, sH - tbH - 8);
+  let left = r.left + scrollLeft + r.width/2 - tbW/2;
+  if (left < 8) left = 8;
+  if (left + tbW > sW - 8) left = sW - tbW - 8;
+  tb.style.top = top + 'px';
+  tb.style.left = left + 'px';
+  tb.style.visibility = '';
+  // 폰트 크기/색 input 동기화
+  const sz = parseInt(getComputedStyle(el).fontSize) || 24;
+  const inp = tb.querySelector('[data-act="size-num"]'); if (inp) inp.value = sz;
+  const col = rgbToHex(getComputedStyle(el).color);
+  const cI  = tb.querySelector('[data-act="color"]'); if (cI && col) cI.value = col;
+  // 이미지면 텍스트 관련 버튼 비활성
+  const isText = el.dataset.free === 'text';
+  tb.querySelectorAll('[data-act^="ff-"],[data-act^="size-"],[data-act^="align-"],[data-act="bold"],[data-act="italic"],[data-act="color"]').forEach(b => {
+    b.style.opacity = isText ? '' : '0.4';
+    b.style.pointerEvents = isText ? '' : 'none';
+  });
+}
+
+function selectFreeElement(el) {
+  const doc = el.ownerDocument;
+  console.log('[FREE] select', el.dataset.free, el);
+  if (_freeSelected && _freeSelected !== el) _freeSelected.classList.remove('free-selected');
+  _freeSelected = el;
+  el.classList.add('free-selected');
+  ensureFreeHandles(el);
+  positionFreeToolbar(el);
+  const tb = doc.getElementById('wb-free-toolbar');
+  if (tb) tb.style.display = 'block';
+  else console.warn('[FREE] toolbar not found in iframe doc');
+  console.log('[FREE] handles count:', el.querySelectorAll('.free-handle').length);
+}
+
+function deselectFreeElement(doc) {
+  if (_freeSelected) _freeSelected.classList.remove('free-selected');
+  _freeSelected = null;
+  const tb = doc.getElementById('wb-free-toolbar');
+  if (tb) tb.style.display = 'none';
+}
+
+function ensureFreeHandles(el) {
+  if (el._handlesInjected) return;
+  const doc = el.ownerDocument;
+  ['nw','n','ne','e','se','s','sw','w'].forEach(pos => {
+    const h = doc.createElement('div');
+    h.className = 'free-handle free-handle-' + pos;
+    h.dataset.handle = pos;
+    h.contentEditable = 'false';
+    el.appendChild(h);
+    attachResizeHandler(el, h, pos);
+  });
+  el._handlesInjected = true;
+}
+
+function attachResizeHandler(el, handle, pos) {
+  const doc = el.ownerDocument;
+  handle.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const startX = e.clientX, startY = e.clientY;
+    const startW = el.offsetWidth, startH = el.offsetHeight;
+    const startL = parseInt(el.style.left) || 0;
+    const startT = parseInt(el.style.top) || 0;
+    const startFS = parseFloat(getComputedStyle(el).fontSize) || 24;
+    const isCorner = pos.length === 2;
+    const isText = el.dataset.free === 'text';
+    const onMove = (ev) => {
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      let newW = startW, newH = startH, newL = startL, newT = startT;
+      if (pos.includes('e')) newW = Math.max(40, startW + dx);
+      if (pos.includes('w')) { newW = Math.max(40, startW - dx); newL = startL + (startW - newW); }
+      if (pos.includes('s')) newH = Math.max(20, startH + dy);
+      if (pos.includes('n')) { newH = Math.max(20, startH - dy); newT = startT + (startH - newH); }
+      if (isCorner) {
+        // 코너 = 비율 유지 + 폰트 비례 스케일
+        const wScale = newW / startW;
+        const hScale = newH / startH;
+        const scale  = Math.max(wScale, hScale);
+        const finalW = startW * scale;
+        const finalH = startH * scale;
+        if (pos.includes('w')) newL = startL + (startW - finalW);
+        if (pos.includes('n')) newT = startT + (startH - finalH);
+        newW = finalW; newH = finalH;
+        if (isText) el.style.fontSize = (startFS * scale) + 'px';
+      }
+      // 변 = 박스만, 텍스트 줄바꿈
+      el.style.width  = newW + 'px';
+      el.style.height = newH + 'px';
+      el.style.left   = newL + 'px';
+      el.style.top    = newT + 'px';
+      if (_freeSelected === el) positionFreeToolbar(el);
+    };
+    const onUp = () => {
+      doc.removeEventListener('mousemove', onMove);
+      doc.removeEventListener('mouseup', onUp);
+      saveSlideState(doc);
+    };
+    doc.addEventListener('mousemove', onMove);
+    doc.addEventListener('mouseup', onUp);
+  });
+}
+
 function attachFreeBehavior(el) {
+  const doc = el.ownerDocument;
+  injectFreeStyles(doc);
+  injectFreeToolbar(doc);
+  bindFreeCanvasDeselect(doc);
+  if (el.dataset.free === 'text' && !el.classList.contains('ff-serif') && !el.classList.contains('ff-sans')) {
+    el.classList.add('ff-sans');
+  }
   let dragging = false, sx, sy, ol, ot;
   el.addEventListener('mousedown', (e) => {
-    if (el.contentEditable === 'true' && document.activeElement === el) return;
     if (e.target !== el) return;
+    if (el.contentEditable === 'true' && doc.activeElement === el) return;
+    selectFreeElement(el);
     dragging = true;
     sx = e.clientX; sy = e.clientY;
     ol = parseInt(el.style.left) || 0;
     ot = parseInt(el.style.top) || 0;
-    el.style.opacity = '0.7';
+    el.style.opacity = '0.85';
     e.preventDefault();
   });
   const onMove = (e) => {
     if (!dragging) return;
     el.style.left = (ol + (e.clientX - sx)) + 'px';
     el.style.top  = (ot + (e.clientY - sy)) + 'px';
+    if (_freeSelected === el) positionFreeToolbar(el);
   };
   const onUp = () => {
     if (!dragging) return;
     dragging = false;
     el.style.opacity = '';
-    saveSlideState(el.ownerDocument);
+    saveSlideState(doc);
   };
-  el.ownerDocument.addEventListener('mousemove', onMove);
-  el.ownerDocument.addEventListener('mouseup', onUp);
-  // 텍스트는 더블클릭으로 편집 모드
+  doc.addEventListener('mousemove', onMove);
+  doc.addEventListener('mouseup', onUp);
   if (el.dataset.free === 'text') {
     el.addEventListener('dblclick', () => {
       el.contentEditable = 'true';
       el.style.cursor = 'text';
       el.style.userSelect = 'text';
       el.style.background = 'rgba(255,255,255,0.6)';
+      el.classList.remove('free-selected'); // 편집 중에는 핸들 숨김
       el.focus();
-      // 텍스트 전체 선택
-      const r = el.ownerDocument.createRange();
+      const r = doc.createRange();
       r.selectNodeContents(el);
-      el.ownerDocument.getSelection().removeAllRanges();
-      el.ownerDocument.getSelection().addRange(r);
+      doc.getSelection().removeAllRanges();
+      doc.getSelection().addRange(r);
     });
     el.addEventListener('blur', () => {
       el.contentEditable = 'false';
       el.style.cursor = 'move';
       el.style.userSelect = 'none';
       el.style.background = 'transparent';
-      saveSlideState(el.ownerDocument);
+      if (_freeSelected === el) el.classList.add('free-selected');
+      saveSlideState(doc);
     });
   }
-  // Delete 키로 삭제 (선택된 상태)
   el.tabIndex = 0;
   el.addEventListener('keydown', (e) => {
     if ((e.key === 'Delete' || e.key === 'Backspace') && el.contentEditable !== 'true') {
       el.remove();
-      saveSlideState(el.ownerDocument);
+      if (_freeSelected === el) deselectFreeElement(doc);
+      saveSlideState(doc);
     }
   });
-  // 클릭 시 포커스
-  el.addEventListener('click', (e) => { if (e.target === el && el.contentEditable !== 'true') el.focus(); });
+}
+
+function bindFreeCanvasDeselect(doc) {
+  if (doc._freeDeselectBound) return;
+  doc._freeDeselectBound = true;
+  doc.addEventListener('mousedown', (e) => {
+    const t = e.target;
+    if (t.closest && t.closest('.free-text, .free-image, .free-comp, .free-handle, #wb-free-toolbar')) return;
+    deselectFreeElement(doc);
+  }, true);
 }
 
 // makeEditable 호출 시 기존 free 요소에도 행동 부여
 function rebindFreeElements(doc) {
-  doc.querySelectorAll('.free-text, .free-image').forEach(el => {
-    if (!el.dataset.bound) { attachFreeBehavior(el); el.dataset.bound = '1'; }
+  injectFreeStyles(doc);
+  injectFreeToolbar(doc);
+  bindFreeCanvasDeselect(doc);
+  const list = doc.querySelectorAll('.free-text, .free-image, .free-comp');
+  console.log('[FREE] rebind', list.length, 'elements in doc');
+  list.forEach(el => {
+    // 직렬화로 살아남은 stale data-bound 속성 강제 제거 (새 doc에는 listener 없음)
+    el.removeAttribute('data-bound');
+    // SEL 강제 등 다른 코드가 건드린 흔적 정화
+    el.contentEditable = 'false';
+    el.style.outline = '';
+    el.style.border = ''; // 기존 인라인 dashed border도 제거
+    if (el.dataset.free === 'text') { el.style.cursor = 'move'; el.style.userSelect = 'none'; }
+    // JS 프로퍼티로 바인딩 추적 (HTML로 직렬화되지 않음)
+    if (!el._wbBound) { attachFreeBehavior(el); el._wbBound = true; }
+    if (el.dataset.free === 'text' && !el.classList.contains('ff-serif') && !el.classList.contains('ff-sans')) {
+      el.classList.add('ff-sans');
+    }
   });
 }
 
@@ -1854,24 +2133,36 @@ function injectAIPopup(doc) {
 
   const callAI = async (instruction) => {
     if (!savedText || !savedRange) return;
-    stage(2);
+    // 즉시 stage 3 진입 — 수정안 영역에 토큰 단위로 스트리밍
+    popup.querySelector('[data-orig]').textContent = savedText;
+    const newEl = popup.querySelector('[data-new]');
+    const usageEl = popup.querySelector('[data-usage]');
+    newEl.textContent = '';
+    usageEl.textContent = '⏳ Claude Sonnet 4.5 작성 중...';
+    popup.dataset.newText = '';
+    stage(3);
     const par = (window.parent && window.parent !== window) ? window.parent : window;
-    const result = await par.aiRewriteSelection(savedText, instruction);
+    const result = await par.aiRewriteSelection(savedText, instruction, (delta, full) => {
+      newEl.textContent = full;
+      newEl.scrollTop = newEl.scrollHeight;
+    });
     if (result.error) {
-      popup.querySelector('[data-stage="2"]').innerHTML = `<div style="color:#c33;font-size:11px;padding:10px">에러: ${result.error}</div>`;
-      setTimeout(() => { stage(1); }, 2500);
+      newEl.textContent = `에러: ${result.error}`;
+      newEl.style.color = '#c33';
+      usageEl.textContent = '';
+      setTimeout(() => { newEl.style.color = ''; stage(1); }, 2500);
       return;
     }
-    popup.querySelector('[data-orig]').textContent = savedText;
-    popup.querySelector('[data-new]').textContent = result.rewritten;
+    newEl.textContent = result.rewritten;
     popup.dataset.newText = result.rewritten;
     if (result.usage) {
       const inT = result.usage.input_tokens || 0;
       const outT = result.usage.output_tokens || 0;
       const cost = (inT * 3 / 1e6 + outT * 15 / 1e6);
-      popup.querySelector('[data-usage]').textContent = `토큰 ${inT} in / ${outT} out · 약 ${Math.round(cost * 1380)}원`;
+      usageEl.textContent = `토큰 ${inT} in / ${outT} out · 약 ${Math.round(cost * 1380)}원`;
+    } else {
+      usageEl.textContent = '';
     }
-    stage(3);
   };
 
   popup.querySelectorAll('[data-q]').forEach(btn => {
@@ -1956,11 +2247,11 @@ function injectAIPopup(doc) {
 }
 
 // 팝업이 부모를 통해 호출하는 함수 — Edge Function 호출 후 결과 반환
-window.aiRewriteSelection = async function(selectedText, instruction) {
+window.aiRewriteSelection = async function(selectedText, instruction, onDelta) {
   if (!isEditor) {
     return new Promise(resolve => {
       pendingAfterLogin = async () => {
-        const r = await window.aiRewriteSelection(selectedText, instruction);
+        const r = await window.aiRewriteSelection(selectedText, instruction, onDelta);
         resolve(r);
       };
       openLoginModal();
@@ -1972,6 +2263,7 @@ window.aiRewriteSelection = async function(selectedText, instruction) {
     if (!sessData || !sessData.session) return { error: '인증 만료 — 다시 로그인' };
     const slideTitle = (S.slides[S.selectedIdx] && S.slides[S.selectedIdx].dataTitle) || '';
     const ctx = `슬라이드 제목: ${slideTitle}. 한국 공공 강의안. 비유·메거진 어조 금지. 첫째·둘째·셋째 열거 권장.`;
+    const useStream = typeof onDelta === 'function';
     const resp = await fetch(`${SB_URL}/functions/v1/rewrite-text`, {
       method: 'POST',
       headers: {
@@ -1983,12 +2275,50 @@ window.aiRewriteSelection = async function(selectedText, instruction) {
         current_text: selectedText,
         instruction: instruction,
         context_hint: ctx,
-        max_tokens: 1024
+        max_tokens: 1024,
+        stream: useStream
       })
     });
-    const data = await resp.json();
-    if (!resp.ok) return { error: (data.error || `HTTP ${resp.status}`).substring(0, 80) };
-    return { rewritten: data.rewritten, usage: data.usage };
+    if (!resp.ok) {
+      let errMsg = `HTTP ${resp.status}`;
+      try { const d = await resp.json(); errMsg = (d.error || errMsg).substring(0, 80); } catch (_) {}
+      return { error: errMsg };
+    }
+    if (!useStream) {
+      const data = await resp.json();
+      return { rewritten: data.rewritten, usage: data.usage };
+    }
+    // SSE 스트림 파싱 (Anthropic 표준 이벤트)
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let fullText = '';
+    let usage = null;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let nl;
+      while ((nl = buffer.indexOf('\n')) >= 0) {
+        const line = buffer.slice(0, nl).trim();
+        buffer = buffer.slice(nl + 1);
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === '[DONE]') continue;
+        try {
+          const ev = JSON.parse(payload);
+          if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') {
+            const t = ev.delta.text || '';
+            if (t) { fullText += t; try { onDelta(t, fullText); } catch (_) {} }
+          } else if (ev.type === 'message_delta' && ev.usage) {
+            usage = Object.assign(usage || {}, ev.usage);
+          } else if (ev.type === 'message_start' && ev.message && ev.message.usage) {
+            usage = Object.assign(usage || {}, ev.message.usage);
+          }
+        } catch (_) {}
+      }
+    }
+    return { rewritten: fullText.trim(), usage };
   } catch (e) {
     return { error: e.message };
   }
@@ -2030,16 +2360,27 @@ window.runAIRewrite = async function(quickInstruction) {
   if (!instruction) return toast('수정 지시 입력 또는 빠른 옵션 선택');
 
   const original = aiTarget.innerHTML;
-  document.getElementById('aiLoading').style.display = '';
-  document.getElementById('aiResultArea').style.display = 'none';
-  document.getElementById('aiRunBtn').disabled = true;
+  // 스트리밍: 로딩 영역 대신 결과 영역을 즉시 열어 실시간 텍스트 표시
+  document.getElementById('aiLoading').style.display = 'none';
+  document.getElementById('aiResultArea').style.display = '';
+  const runBtn = document.getElementById('aiRunBtn');
+  runBtn.disabled = true;
+  runBtn.textContent = '⏳ Claude Sonnet 4.5 작성 중... (스트리밍)';
+  document.getElementById('aiCompareOrig').textContent = (aiTarget.textContent || '').trim();
+  const newEl = document.getElementById('aiCompareNew');
+  const usageEl = document.getElementById('aiUsage');
+  newEl.textContent = '⏳ Claude가 응답 중입니다... 첫 토큰 도착하면 여기에 글자가 한 자씩 흐르며 채워집니다.';
+  newEl.style.color = '#888';
+  usageEl.textContent = '⏳ 스트리밍 시작 대기...';
+  aiResult = null;
+  let firstDelta = true;
 
   try {
     const { data: sessData } = await sb.auth.getSession();
     if (!sessData || !sessData.session) {
       toast('인증 만료 — 다시 잠금해제');
-      document.getElementById('aiLoading').style.display = 'none';
-      document.getElementById('aiRunBtn').disabled = false;
+      runBtn.disabled = false; runBtn.textContent = '수정안 받기';
+      usageEl.textContent = '';
       return;
     }
     const slideTitle = (S.slides[S.selectedIdx] && S.slides[S.selectedIdx].dataTitle) || '';
@@ -2055,30 +2396,68 @@ window.runAIRewrite = async function(quickInstruction) {
         current_text: original,
         instruction: instruction,
         context_hint: ctx,
-        max_tokens: 2048
+        max_tokens: 2048,
+        stream: true
       })
     });
-    const data = await resp.json();
-    document.getElementById('aiLoading').style.display = 'none';
-    document.getElementById('aiRunBtn').disabled = false;
     if (!resp.ok) {
-      toast(`AI 호출 실패 (${resp.status}): ${(data.error || '').substring(0,80)}`);
-      console.error('AI rewrite error:', data);
+      let errMsg = `HTTP ${resp.status}`;
+      try { const d = await resp.json(); errMsg = (d.error || errMsg).substring(0,80); } catch (_) {}
+      toast(`AI 호출 실패: ${errMsg}`);
+      runBtn.disabled = false; runBtn.textContent = '수정안 받기';
+      usageEl.textContent = '';
       return;
     }
-    aiResult = data.rewritten;
-    document.getElementById('aiCompareOrig').textContent = (aiTarget.textContent || '').trim();
-    document.getElementById('aiCompareNew').textContent = aiResult;
-    if (data.usage) {
-      const inT = data.usage.input_tokens || 0;
-      const outT = data.usage.output_tokens || 0;
-      const cost = (inT * 3 / 1e6 + outT * 15 / 1e6).toFixed(4);
-      document.getElementById('aiUsage').textContent = `토큰: ${inT} in / ${outT} out · 약 $${cost} (≈${Math.round(cost * 1380)}원)`;
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let fullText = '';
+    let usage = null;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let nl;
+      while ((nl = buffer.indexOf('\n')) >= 0) {
+        const line = buffer.slice(0, nl).trim();
+        buffer = buffer.slice(nl + 1);
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === '[DONE]') continue;
+        try {
+          const ev = JSON.parse(payload);
+          if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') {
+            const t = ev.delta.text || '';
+            if (t) {
+              if (firstDelta) { newEl.style.color = ''; firstDelta = false; usageEl.textContent = '✍️ 작성 중...'; }
+              fullText += t; newEl.textContent = fullText; newEl.scrollTop = newEl.scrollHeight;
+            }
+          } else if (ev.type === 'message_delta' && ev.usage) {
+            usage = Object.assign(usage || {}, ev.usage);
+          } else if (ev.type === 'message_start' && ev.message && ev.message.usage) {
+            usage = Object.assign(usage || {}, ev.message.usage);
+          }
+        } catch (_) {}
+      }
     }
-    document.getElementById('aiResultArea').style.display = '';
+    aiResult = fullText.trim();
+    newEl.textContent = aiResult;
+    newEl.style.color = '';
+    runBtn.disabled = false;
+    runBtn.textContent = '수정안 받기';
+    if (usage) {
+      const inT = usage.input_tokens || 0;
+      const outT = usage.output_tokens || 0;
+      const cost = (inT * 3 / 1e6 + outT * 15 / 1e6).toFixed(4);
+      usageEl.textContent = `토큰: ${inT} in / ${outT} out · 약 $${cost} (≈${Math.round(cost * 1380)}원)`;
+    } else {
+      usageEl.textContent = '';
+    }
   } catch (e) {
-    document.getElementById('aiLoading').style.display = 'none';
-    document.getElementById('aiRunBtn').disabled = false;
+    runBtn.disabled = false; runBtn.textContent = '수정안 받기';
+    usageEl.textContent = '';
+    newEl.textContent = `네트워크 에러: ${e.message}`;
+    newEl.style.color = '#c33';
     toast(`네트워크 에러: ${e.message}`);
     console.error(e);
   }
