@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slide Workbench — 교안 조립 도구</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css');
 :root{--wb:#faf8f5;--wb2:#f0ece6;--wink:#1a1612;--wink2:#5a554e;--wink3:#9a9490;--wacc:#b8532a;--wln:#ddd6cc;--wdk:#1a1612;--won:#ede4d3;--rad:5px}
@@ -155,6 +156,9 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
     <span class="tb-sep"></span>
     <button class="tb-btn" onclick="openSessionList()" id="btnSessions">교안 목록</button>
     <button class="tb-btn" onclick="window.open('curriculum.html','_blank')" id="btnCurriculum">📋 커리큘럼</button>
+    <button class="tb-btn" onclick="dbSaveCurrentSession()" id="btnDBSave" disabled>💾 DB 저장</button>
+    <button class="tb-btn" onclick="openHistoryViewer()" id="btnHistory">🕐 이력</button>
+    <button class="tb-btn" onclick="openLoginModal()" id="btnAuth">🔒 잠금해제</button>
     <span class="tb-spacer"></span>
     <span class="tb-info" id="tbInfo">교안 파일을 열어주세요</span>
     <input type="file" id="fileIn" accept=".html" style="display:none">
@@ -296,6 +300,34 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
+<!-- LOGIN MODAL -->
+<div class="modal-bg" id="loginModalBg" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="position:relative;width:380px">
+    <button class="modal-close" onclick="document.getElementById('loginModalBg').classList.remove('show')">×</button>
+    <h2>🔒 강사 잠금해제</h2>
+    <p style="margin-bottom:14px;color:var(--wink2);font-size:12px">비밀번호 입력 시 편집 권한이 활성화됩니다. 학생은 비밀번호 없이 슬라이드 열람·이력 조회만 가능합니다.</p>
+    <div style="margin-bottom:10px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:4px;letter-spacing:1px">비밀번호</label>
+      <input type="password" id="loginPwd" placeholder="••••" style="width:100%;padding:8px 10px;border:1px solid var(--wln);border-radius:3px;font-family:inherit;font-size:13px" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:4px;letter-spacing:1px">강사 이름 (선택, 이력에 표시)</label>
+      <input type="text" id="loginName" placeholder="예: 홍길동" style="width:100%;padding:8px 10px;border:1px solid var(--wln);border-radius:3px;font-family:inherit;font-size:13px">
+    </div>
+    <button class="btn btn-p" onclick="doLogin()" style="width:100%">잠금해제</button>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="modal-bg" id="historyModalBg" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="position:relative;width:720px;max-height:80vh;overflow-y:auto">
+    <button class="modal-close" onclick="document.getElementById('historyModalBg').classList.remove('show')">×</button>
+    <h2>🕐 수정 이력</h2>
+    <p style="margin-bottom:14px;color:var(--wink2);font-size:12px" id="historyHint">현재 선택한 슬라이드의 최근 수정 이력입니다.</p>
+    <div id="historyList"></div>
+  </div>
+</div>
 
 <script>
 // ============================================================
@@ -1312,6 +1344,282 @@ async function fetchSession(s) {
 // Init palettes
 renderCompPalette();
 renderCoverPresets();
+
+// ============================================================
+// SUPABASE INTEGRATION
+// ============================================================
+const SB_URL = 'https://uykrzkhnlxozsbllvffk.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5a3J6a2hubHhvenNibGx2ZmZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0Njk3OTcsImV4cCI6MjA5MzA0NTc5N30.WCa03afmAdooSglFLdMMMLYW8_tjy7HXopJI03zV2E4';
+const SHARED_EMAIL = 'editor@workbench.local';
+let sb = null;
+let isEditor = false;
+
+if (window.supabase && window.supabase.createClient) {
+  sb = window.supabase.createClient(SB_URL, SB_ANON, {
+    auth: { persistSession: true, autoRefreshToken: true }
+  });
+  // Restore lecturer name from localStorage if present
+  const savedName = localStorage.getItem('wb_lecturer_name');
+  if (savedName) {
+    setTimeout(() => { const el = document.getElementById('loginName'); if (el) el.value = savedName; }, 200);
+  }
+  // Initial auth check
+  sb.auth.getSession().then(({ data }) => {
+    isEditor = !!(data && data.session);
+    updateAuthUI();
+  });
+  sb.auth.onAuthStateChange((_event, session) => {
+    isEditor = !!session;
+    updateAuthUI();
+  });
+}
+
+function updateAuthUI() {
+  const btnAuth = document.getElementById('btnAuth');
+  const btnEdit = document.getElementById('btnEdit');
+  const btnExport = document.getElementById('btnExport');
+  const btnExport2 = document.getElementById('btnExport2');
+  const btnApply = document.getElementById('btnApply');
+  const btnDBSave = document.getElementById('btnDBSave');
+  if (btnAuth) {
+    btnAuth.textContent = isEditor ? '🔓 잠금 (강사)' : '🔒 잠금해제';
+    btnAuth.title = isEditor ? '클릭하여 로그아웃' : '강사 비밀번호로 잠금 해제';
+    btnAuth.onclick = isEditor ? doLogout : openLoginModal;
+  }
+  if (btnEdit) btnEdit.disabled = !isEditor;
+  if (btnExport) btnExport.style.display = isEditor ? '' : 'none';
+  if (btnExport2) btnExport2.style.display = isEditor ? '' : 'none';
+  if (btnApply) btnApply.style.display = isEditor ? '' : 'none';
+  if (btnDBSave) btnDBSave.disabled = !(isEditor && S.slides.length);
+  // 학생 모드: 외관·컴포넌트·표지 탭은 비활성 안 하고 보여만 줌. 저장 버튼만 잠김.
+}
+
+function openLoginModal() {
+  document.getElementById('loginModalBg').classList.add('show');
+  setTimeout(() => { const el = document.getElementById('loginPwd'); if (el) el.focus(); }, 100);
+}
+
+async function doLogin() {
+  if (!sb) return toast('Supabase 연결 안 됨');
+  const pwd = document.getElementById('loginPwd').value;
+  const name = document.getElementById('loginName').value.trim();
+  if (!pwd) return toast('비밀번호 입력');
+  const { error } = await sb.auth.signInWithPassword({ email: SHARED_EMAIL, password: pwd });
+  if (error) {
+    toast('비밀번호 틀림 또는 계정 미생성');
+    return;
+  }
+  if (name) localStorage.setItem('wb_lecturer_name', name);
+  document.getElementById('loginModalBg').classList.remove('show');
+  document.getElementById('loginPwd').value = '';
+  toast('편집 권한 활성화');
+}
+
+async function doLogout() {
+  if (!sb) return;
+  await sb.auth.signOut();
+  toast('로그아웃');
+}
+
+// === DB OPS ===
+async function dbLoadSession(sessionNum) {
+  if (!sb) return null;
+  const { data: slides, error } = await sb.from('slides')
+    .select('*').eq('session_num', sessionNum).order('slide_idx', { ascending: true });
+  if (error) { console.warn('DB load error:', error); return null; }
+  if (!slides || !slides.length) return null;
+  const { data: meta } = await sb.from('session_meta').select('*').eq('session_num', sessionNum).maybeSingle();
+  return { slides, meta };
+}
+
+async function dbSaveCurrentSession() {
+  if (!sb) return toast('Supabase 연결 안 됨');
+  if (!isEditor) return toast('잠금 해제 후 저장 가능');
+  if (!S.slides.length) return toast('저장할 슬라이드 없음');
+  const sessionNum = S.currentSessionNum;
+  if (!sessionNum) return toast('교안 목록에서 회차를 먼저 선택');
+  const lecturer = localStorage.getItem('wb_lecturer_name') || '강사';
+  const ts = new Date().toISOString();
+  let saved = 0;
+  // Upsert session_meta first
+  await sb.from('session_meta').upsert({
+    session_num: sessionNum,
+    title: document.getElementById('sProg')?.value || `Session ${sessionNum}`,
+    css: S.css,
+    js: S.js,
+    updated_at: ts
+  }, { onConflict: 'session_num' });
+  // Upsert slides one by one
+  for (let idx = 0; idx < S.slides.length; idx++) {
+    const slide = S.slides[idx];
+    const { error } = await sb.from('slides').upsert({
+      session_num: sessionNum,
+      slide_idx: idx,
+      data_title: slide.dataTitle || `Slide ${idx+1}`,
+      html: slide.html,
+      updated_at: ts,
+      updated_by: lecturer
+    }, { onConflict: 'session_num,slide_idx' });
+    if (error) { console.error('Save error slide', idx, error); toast(`슬라이드 ${idx+1} 저장 실패`); return; }
+    saved++;
+  }
+  S.dirty = false;
+  document.getElementById('stDirty').textContent = '저장 완료';
+  toast(`Session ${sessionNum} 저장 완료 — ${saved}장`);
+}
+
+async function openHistoryViewer() {
+  if (!sb) return toast('Supabase 연결 안 됨');
+  if (!S.slides.length || S.selectedIdx < 0) return toast('슬라이드를 먼저 선택');
+  if (!S.currentSessionNum) return toast('교안 목록에서 회차를 먼저 선택');
+  const sessionNum = S.currentSessionNum;
+  const slideIdx = S.selectedIdx;
+  const hint = document.getElementById('historyHint');
+  const list = document.getElementById('historyList');
+  hint.textContent = `Session ${sessionNum} · 슬라이드 ${slideIdx+1} 수정 이력 (최근 20건)`;
+  list.innerHTML = '<div style="color:var(--wink3);font-size:12px;padding:20px;text-align:center">로딩 중…</div>';
+  document.getElementById('historyModalBg').classList.add('show');
+  const { data: revs, error } = await sb.from('revisions')
+    .select('*').eq('session_num', sessionNum).eq('slide_idx', slideIdx)
+    .order('changed_at', { ascending: false }).limit(20);
+  if (error) { list.innerHTML = `<div style="color:#c33">에러: ${error.message}</div>`; return; }
+  if (!revs || !revs.length) { list.innerHTML = '<div style="color:var(--wink3);font-size:12px;padding:20px;text-align:center">이력 없음 (한 번도 수정되지 않은 슬라이드)</div>'; return; }
+  list.innerHTML = revs.map((r, i) => {
+    const dt = new Date(r.changed_at).toLocaleString('ko-KR');
+    const by = r.changed_by || '강사';
+    const note = r.note || '';
+    return `
+      <div style="border:1px solid var(--wln);border-radius:3px;padding:10px 12px;margin-bottom:6px;background:#fff">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div><strong style="color:var(--wink)">${by}</strong> <span style="color:var(--wink3);font-size:11px">${dt}</span></div>
+          <button class="btn btn-o" style="font-size:10px;padding:3px 8px" onclick='restoreRevision(${r.id})'>이 시점으로 복원</button>
+        </div>
+        <div style="font-size:11px;color:var(--wink3)">${note}</div>
+        <details style="margin-top:6px"><summary style="cursor:pointer;font-size:11px;color:var(--wacc)">미리보기</summary>
+          <div style="font-family:monospace;font-size:10px;color:var(--wink2);background:var(--wb2);padding:8px;margin-top:4px;max-height:140px;overflow-y:auto;white-space:pre-wrap;word-break:break-all">${(r.html || '').substring(0, 800).replace(/</g,'&lt;')}…</div>
+        </details>
+      </div>
+    `;
+  }).join('');
+}
+
+async function restoreRevision(revId) {
+  if (!isEditor) return toast('잠금 해제 후 복원 가능');
+  if (!confirm('해당 시점으로 복원하시겠습니까? 현재 슬라이드 내용이 덮어씌워집니다.')) return;
+  const { data: rev, error } = await sb.from('revisions').select('*').eq('id', revId).single();
+  if (error || !rev) return toast('복원 실패');
+  S.slides[S.selectedIdx].html = rev.html;
+  S.slides[S.selectedIdx].dataTitle = S.slides[S.selectedIdx].dataTitle;
+  S.dirty = true;
+  renderStrip();
+  selectSlide(S.selectedIdx);
+  document.getElementById('historyModalBg').classList.remove('show');
+  toast('복원 완료 — DB 저장 버튼으로 확정');
+}
+
+// === MIGRATION ===
+async function dbMigrateAllStaticFiles() {
+  if (!sb) return toast('Supabase 연결 안 됨');
+  if (!isEditor) return toast('잠금 해제 후 가능');
+  if (!confirm('현재 8개 정적 HTML을 Supabase DB로 일괄 시드합니다. 약 30초~1분. 진행?')) return;
+  const sessions = SESSION_FILES;
+  let totalSlides = 0;
+  for (const s of sessions) {
+    try {
+      const resp = await fetch(s.file);
+      if (!resp.ok) { toast(`Session ${s.num} 파일 못 읽음 — 건너뜀`); continue; }
+      const html = await resp.text();
+      const cssMatch = html.match(/<style>([\s\S]*?)<\/style>/);
+      const jsMatch = html.match(/<script>([\s\S]*?)<\/script>/);
+      const titleMatch = html.match(/<title>([^<]*)<\/title>/);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const stages = doc.querySelectorAll('.stage');
+      // Upsert meta
+      await sb.from('session_meta').upsert({
+        session_num: s.num,
+        title: (titleMatch ? titleMatch[1] : `Session ${s.num}`),
+        css: cssMatch ? cssMatch[1] : '',
+        js: jsMatch ? jsMatch[1] : ''
+      }, { onConflict: 'session_num' });
+      // Upsert slides
+      for (let idx = 0; idx < stages.length; idx++) {
+        const stage = stages[idx];
+        const slide = stage.querySelector('.slide');
+        const dataTitle = slide ? slide.getAttribute('data-title') : `Slide ${idx+1}`;
+        await sb.from('slides').upsert({
+          session_num: s.num,
+          slide_idx: idx,
+          data_title: dataTitle,
+          html: stage.innerHTML,
+          updated_by: 'migration'
+        }, { onConflict: 'session_num,slide_idx' });
+        totalSlides++;
+      }
+      toast(`Session ${s.num} 시드 ${stages.length}장`);
+    } catch (e) {
+      console.error('Migration error session', s.num, e);
+      toast(`Session ${s.num} 시드 실패`);
+    }
+  }
+  toast(`✓ 마이그레이션 완료 — 총 ${totalSlides}장`);
+}
+window.dbMigrateAllStaticFiles = dbMigrateAllStaticFiles;
+
+// === Hook into existing fetchSession to prefer DB ===
+const _originalFetchSession = fetchSession;
+fetchSession = async function(s) {
+  document.getElementById('sessionModalBg').classList.remove('show');
+  if (sb) {
+    const result = await dbLoadSession(s.num);
+    if (result && result.slides && result.slides.length) {
+      S.css = (result.meta && result.meta.css) || '';
+      S.js = (result.meta && result.meta.js) || '';
+      S.slides = result.slides.map((row, i) => ({
+        id: 'slide-' + Date.now() + '-' + i,
+        html: row.html,
+        source: 'original',
+        dataTitle: row.data_title || `Slide ${i+1}`
+      }));
+      S.coverOriginal = S.slides.length ? S.slides[0].html : null;
+      S.filename = s.file;
+      S.currentSessionNum = s.num;
+      S.dirty = false;
+      S.undoStack = []; S.redoStack = [];
+      renderStrip();
+      selectSlide(0);
+      document.getElementById('btnExport').disabled = false;
+      const btn2 = document.getElementById('btnExport2'); if (btn2) btn2.disabled = false;
+      const btnAp = document.getElementById('btnApply'); if (btnAp) btnAp.disabled = false;
+      document.getElementById('btnPresent').disabled = false;
+      document.getElementById('tbInfo').textContent = `Session ${s.num} · DB · ${S.slides.length}장`;
+      const stf = document.getElementById('stFile'); if (stf) stf.textContent = `Session ${s.num} (DB)`;
+      updateAuthUI();
+      toast(`Session ${s.num} DB에서 로드 — ${S.slides.length}장`);
+      return;
+    }
+  }
+  // Fallback: original file fetch
+  await _originalFetchSession(s);
+  S.currentSessionNum = s.num;
+  updateAuthUI();
+};
+
+// === Wrap loadFile to clear sessionNum (file-loaded sessions don't have a num) ===
+const _originalLoadFile = loadFile;
+loadFile = function(file) {
+  S.currentSessionNum = null;
+  return _originalLoadFile(file);
+};
+
+// Initial UI
+updateAuthUI();
+window.addEventListener('beforeunload', e => {
+  if (S.dirty && isEditor) {
+    e.preventDefault();
+    e.returnValue = 'DB에 저장되지 않은 변경이 있습니다.';
+  }
+});
 
 </script>
 </body>
