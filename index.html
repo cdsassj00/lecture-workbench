@@ -680,6 +680,9 @@ function makeEditable(iframe) {
       style.textContent = '.wb-handle-bar button:hover{background:rgba(154,68,32,1)!important}.wb-anchor{outline:2px solid #b8532a!important;outline-offset:3px!important;box-shadow:0 0 0 1px rgba(184,83,42,0.15)!important}';
       doc.head.appendChild(style);
     }
+
+    // 텍스트 드래그 선택 시 AI 수정 팝업 주입 (한 번만)
+    injectAIPopup(doc);
     
   } catch(e) { console.warn('makeEditable error:', e); }
 }
@@ -1605,6 +1608,155 @@ loadFile = function(file) {
 // === AI REWRITE ===
 let aiTarget = null;
 let aiResult = null;
+
+// 인라인 팝업 (드래그 선택 텍스트 옆에 떠서 즉시 수정)
+function injectAIPopup(doc) {
+  if (doc.getElementById('wb-ai-popup')) return;
+  const popup = doc.createElement('div');
+  popup.id = 'wb-ai-popup';
+  popup.style.cssText = 'position:absolute;display:none;z-index:9999;background:#fff;border:2px solid #b8532a;border-radius:6px;padding:10px;box-shadow:0 6px 24px rgba(0,0,0,0.25);font-family:Pretendard,system-ui,sans-serif;font-size:12px;min-width:340px;max-width:520px;line-height:1.5';
+  popup.innerHTML = '\n<div data-stage="1">\n  <div style="font-size:10px;color:#888;margin-bottom:6px">선택 텍스트: "<span data-orig-preview style="color:#1a1612"></span>"</div>\n  <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">\n    <button data-q="이 문장을 더 짧고 간결하게 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">짧게</button>\n    <button data-q="이 문장을 더 자세하게, 구체 도구·숫자·일정 추가해 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">자세히</button>\n    <button data-q="이 문장을 비개발자도 이해할 수 있도록 더 쉽게 풀어주세요. 전문용어는 괄호로 짧은 정의 첨부" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">쉽게</button>\n    <button data-q="이 문장에서 메거진 어조·비유·은유·vision casting을 모두 제거하고 사실 진술로 다시 써주세요. 강의 voice 유지" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">정화</button>\n    <button data-q="이 문장에 공공 부서 실무 예시 1개를 자연스럽게 추가해 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">예시</button>\n    <button data-q="첫째·둘째·셋째 열거 구조로 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">열거</button>\n  </div>\n  <div style="display:flex;gap:4px">\n    <input type="text" data-input placeholder="자유 지시 (Enter)" style="flex:1;padding:6px 9px;border:1px solid #ccc;border-radius:3px;font-family:inherit;font-size:11.5px">\n    <button data-submit style="background:#b8532a;color:#fff;border:0;padding:6px 14px;border-radius:3px;cursor:pointer;font-weight:700;font-family:inherit">✨</button>\n  </div>\n</div>\n<div data-stage="2" style="display:none">\n  <div style="font-size:12px;color:#888;text-align:center;padding:14px">⏳ Claude Sonnet 4.5 작성 중...</div>\n</div>\n<div data-stage="3" style="display:none">\n  <div style="font-size:10px;color:#888;margin-bottom:3px">원본:</div>\n  <div data-orig style="font-size:11.5px;background:#f5f0e8;padding:7px 9px;border-radius:3px;margin-bottom:7px;color:#1a1612;max-height:120px;overflow-y:auto;white-space:pre-wrap"></div>\n  <div style="font-size:10px;color:#b8532a;margin-bottom:3px">수정안:</div>\n  <div data-new style="font-size:11.5px;background:#fff8f0;padding:7px 9px;border:1px solid #b8532a;border-radius:3px;margin-bottom:6px;color:#1a1612;max-height:200px;overflow-y:auto;white-space:pre-wrap"></div>\n  <div data-usage style="font-size:9.5px;color:#888;text-align:right;margin-bottom:6px"></div>\n  <div style="display:flex;gap:4px">\n    <button data-apply style="flex:2;background:#b8532a;color:#fff;border:0;padding:6px 0;border-radius:3px;cursor:pointer;font-weight:700;font-family:inherit">✓ 적용</button>\n    <button data-redo style="flex:1;background:#f5f0e8;color:#1a1612;border:1px solid #ddd6cc;padding:6px 0;border-radius:3px;cursor:pointer;font-family:inherit">↻ 다시</button>\n    <button data-cancel style="flex:1;background:#fff;color:#888;border:1px solid #ddd;padding:6px 0;border-radius:3px;cursor:pointer;font-family:inherit">취소</button>\n  </div>\n</div>\n';
+  doc.body.appendChild(popup);
+
+  let savedRange = null;
+  let savedText = '';
+  const stage = (n) => {
+    popup.querySelectorAll('[data-stage]').forEach(el => {
+      el.style.display = el.dataset.stage === String(n) ? '' : 'none';
+    });
+  };
+  const hide = () => { popup.style.display = 'none'; stage(1); savedRange = null; savedText = ''; };
+  const inputEl = popup.querySelector('[data-input]');
+
+  // 버튼 클릭 시 selection 사라지지 않도록 mousedown 차단
+  popup.querySelectorAll('button, [data-input]').forEach(b => {
+    b.addEventListener('mousedown', e => e.preventDefault());
+  });
+  // input은 click 가능하게 다시
+  inputEl.addEventListener('mousedown', e => { e.stopPropagation(); });
+
+  const callAI = async (instruction) => {
+    if (!savedText || !savedRange) return;
+    stage(2);
+    const par = (window.parent && window.parent !== window) ? window.parent : window;
+    const result = await par.aiRewriteSelection(savedText, instruction);
+    if (result.error) {
+      popup.querySelector('[data-stage="2"]').innerHTML = `<div style="color:#c33;font-size:11px;padding:10px">에러: ${result.error}</div>`;
+      setTimeout(() => { stage(1); }, 2500);
+      return;
+    }
+    popup.querySelector('[data-orig]').textContent = savedText;
+    popup.querySelector('[data-new]').textContent = result.rewritten;
+    popup.dataset.newText = result.rewritten;
+    if (result.usage) {
+      const inT = result.usage.input_tokens || 0;
+      const outT = result.usage.output_tokens || 0;
+      const cost = (inT * 3 / 1e6 + outT * 15 / 1e6);
+      popup.querySelector('[data-usage]').textContent = `토큰 ${inT} in / ${outT} out · 약 ${Math.round(cost * 1380)}원`;
+    }
+    stage(3);
+  };
+
+  popup.querySelectorAll('[data-q]').forEach(btn => {
+    btn.addEventListener('click', () => callAI(btn.dataset.q));
+  });
+  popup.querySelector('[data-submit]').addEventListener('click', () => {
+    const v = inputEl.value.trim();
+    if (v) callAI(v);
+  });
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); const v = inputEl.value.trim(); if (v) callAI(v); }
+  });
+  popup.querySelector('[data-apply]').addEventListener('click', () => {
+    if (!savedRange) return hide();
+    const newText = popup.dataset.newText || '';
+    if (!newText) return hide();
+    try {
+      savedRange.deleteContents();
+      savedRange.insertNode(doc.createTextNode(newText));
+    } catch (e) { console.error('Replace failed', e); }
+    saveSlideState(doc);
+    hide();
+    const par = (window.parent && window.parent !== window) ? window.parent : window;
+    if (par.toast) par.toast('AI 수정 적용 — [💾 DB 저장]으로 확정');
+  });
+  popup.querySelector('[data-redo]').addEventListener('click', () => stage(1));
+  popup.querySelector('[data-cancel]').addEventListener('click', hide);
+
+  // 드래그 선택 종료 시 팝업 표시
+  doc.addEventListener('mouseup', () => {
+    setTimeout(() => {
+      const sel = doc.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+      const text = sel.toString().trim();
+      if (text.length < 2) return;
+      const range = sel.getRangeAt(0);
+      let parent = range.commonAncestorContainer;
+      if (parent.nodeType === 3) parent = parent.parentNode;
+      if (!parent.closest || !parent.closest('[contenteditable="true"]')) return;
+      savedRange = range.cloneRange();
+      savedText = text;
+      const rect = range.getBoundingClientRect();
+      const docEl = doc.documentElement;
+      const top = rect.bottom + (docEl.scrollTop || 0) + 8;
+      const left = Math.max(8, Math.min(rect.left + (docEl.scrollLeft || 0), (docEl.clientWidth || 1600) - 540));
+      popup.style.top = top + 'px';
+      popup.style.left = left + 'px';
+      const previewLen = Math.min(text.length, 60);
+      popup.querySelector('[data-orig-preview]').textContent = text.substring(0, previewLen) + (text.length > previewLen ? '…' : '');
+      stage(1);
+      inputEl.value = '';
+      popup.style.display = 'block';
+    }, 30);
+  });
+  // 빈 선택이거나 외부 클릭 시 숨김 (팝업 내부 클릭은 제외)
+  doc.addEventListener('mousedown', (e) => {
+    if (popup.contains(e.target)) return;
+    setTimeout(() => {
+      const sel = doc.getSelection();
+      if (!sel || sel.isCollapsed) hide();
+    }, 100);
+  });
+}
+
+// 팝업이 부모를 통해 호출하는 함수 — Edge Function 호출 후 결과 반환
+window.aiRewriteSelection = async function(selectedText, instruction) {
+  if (!isEditor) {
+    return new Promise(resolve => {
+      pendingAfterLogin = async () => {
+        const r = await window.aiRewriteSelection(selectedText, instruction);
+        resolve(r);
+      };
+      openLoginModal();
+    });
+  }
+  if (!sb) return { error: 'Supabase 미연결' };
+  try {
+    const { data: sessData } = await sb.auth.getSession();
+    if (!sessData || !sessData.session) return { error: '인증 만료 — 다시 로그인' };
+    const slideTitle = (S.slides[S.selectedIdx] && S.slides[S.selectedIdx].dataTitle) || '';
+    const ctx = `슬라이드 제목: ${slideTitle}. 한국 공공 강의안. 비유·메거진 어조 금지. 첫째·둘째·셋째 열거 권장.`;
+    const resp = await fetch(`${SB_URL}/functions/v1/rewrite-text`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${sessData.session.access_token}`,
+        'apikey': SB_ANON,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        current_text: selectedText,
+        instruction: instruction,
+        context_hint: ctx,
+        max_tokens: 1024
+      })
+    });
+    const data = await resp.json();
+    if (!resp.ok) return { error: (data.error || `HTTP ${resp.status}`).substring(0, 80) };
+    return { rewritten: data.rewritten, usage: data.usage };
+  } catch (e) {
+    return { error: e.message };
+  }
+};
 
 // 텍스트 박스에 포커스되면 부모가 호출 — AI 수정 대상으로 기억
 window.setAITarget = function(el) {
