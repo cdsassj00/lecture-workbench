@@ -220,8 +220,18 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
           <div class="comp-grid" id="compGrid"></div>
         </div>
         <div class="sec" style="margin-top:12px">
+          <div class="sec-t">자유 요소 (빈 슬라이드)</div>
+          <div class="hint">빈 슬라이드(템플릿 + 빈 슬라이드)를 추가하면 머리글·바닥글만 남고 본문이 자유 캔버스가 됩니다. 아래 버튼으로 텍스트·이미지를 자유 위치에 추가할 수 있습니다.</div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="btn btn-o" onclick="addFreeText()" style="flex:1;font-size:11px">+ 텍스트</button>
+            <button class="btn btn-o" onclick="document.getElementById('freeImgIn').click()" style="flex:1;font-size:11px">+ 이미지</button>
+          </div>
+          <input type="file" id="freeImgIn" accept="image/*" style="display:none">
+          <div class="hint" style="margin-top:8px">추가한 요소는 비편집 상태에서 드래그로 이동, 더블클릭으로 텍스트 편집, Delete 키로 삭제.</div>
+        </div>
+        <div class="sec" style="margin-top:12px">
           <div class="sec-t">사용법</div>
-          <div class="hint">1. 편집 모드를 켜세요<br>2. 슬라이드 블록 위에 마우스를 올리면 핸들바(◎ ← ↑ ↓ → ×) 표시<br>3. <b>◎</b>로 삽입 앵커 지정(주황 아웃라인) → 컴포넌트 클릭 시 그 아래에 삽입<br>4. 삽입된 블록의 텍스트를 클릭해 수정</div>
+          <div class="hint">1. 편집 모드를 켜세요<br>2. 슬라이드 블록 위에 마우스를 올리면 핸들바(◎ ← ↑ ↓ → ×) 표시<br>3. <b>◎</b>로 삽입 앵커 지정(주황 아웃라인) → 컴포넌트 클릭 시 그 아래에 삽입<br>4. 텍스트 드래그 선택 시 ✨ AI 수정 팝업 자동 등장</div>
         </div>
       </div>
 
@@ -436,7 +446,9 @@ function getTemplateHtml(tpl) {
       body = `<div class="bd col2">${col(`<div class="bth">실습 시나리오</div><p class="bt">강사가 수강생 환경에 맞게 교체할 수 있는 예시입니다.</p>${coBlock}`)}<div class="col"><div class="sh"><span class="sh-n">PRACTICE</span><span class="sh-t">수강생 기록란</span></div><div class="sh-line"></div>${tableBlock}${pitBlock}</div></div>`;
       break;
     case 'blank':
-      body = `<div class="bd col2">${col('<div class="bth">내용을 자유롭게 구성하세요</div>')}${col('')}</div>`;
+      // 자유 구성 슬라이드 — hbar/fbar는 그대로, 본문은 비어 있는 자유 캔버스
+      // 컴포넌트 탭 "자유 요소" 섹션의 [+ 텍스트] [+ 이미지] 버튼으로 추가
+      body = `<div class="bd" style="position:absolute;left:0;right:0;top:52px;bottom:52px;background:var(--bg);display:block;gap:0"><div class="free-canvas" data-free-canvas="1" style="position:absolute;inset:0;font-family:'Pretendard',var(--sans),sans-serif"></div></div>`;
       break;
   }
   
@@ -560,8 +572,36 @@ function renderStrip() {
     thumb.appendChild(inner);
     thumb.appendChild(num);
     thumb.appendChild(badge);
+
+    // 드래그 드롭 정렬
+    thumb.draggable = true;
+    thumb.dataset.idx = String(i);
+    thumb.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', String(i));
+      e.dataTransfer.effectAllowed = 'move';
+      thumb.style.opacity = '0.4';
+    });
+    thumb.addEventListener('dragend', () => { thumb.style.opacity = ''; });
+    thumb.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      thumb.style.borderTopColor = 'var(--wacc)';
+      thumb.style.borderTopWidth = '3px';
+    });
+    thumb.addEventListener('dragleave', () => {
+      thumb.style.borderTopColor = '';
+      thumb.style.borderTopWidth = '';
+    });
+    thumb.addEventListener('drop', (e) => {
+      e.preventDefault();
+      thumb.style.borderTopColor = '';
+      thumb.style.borderTopWidth = '';
+      const from = parseInt(e.dataTransfer.getData('text/plain'));
+      if (!Number.isNaN(from)) reorderSlides(from, i);
+    });
+
     strip.appendChild(thumb);
-    
+
     // Insert button AFTER
     const ins = mkInsert(i + 1);
     strip.appendChild(ins);
@@ -683,6 +723,9 @@ function makeEditable(iframe) {
 
     // 텍스트 드래그 선택 시 AI 수정 팝업 주입 (한 번만)
     injectAIPopup(doc);
+
+    // 자유 캔버스 요소 행동 재연결
+    rebindFreeElements(doc);
     
   } catch(e) { console.warn('makeEditable error:', e); }
 }
@@ -769,13 +812,40 @@ function insertSlide(idx, tpl) {
     source: 'added',
     dataTitle: `New ${tpl.name}`,
   };
-  
+
   pushUndo({type:'insert', idx, slide});
   S.slides.splice(idx, 0, slide);
+  updateAllPageNumbers();
   S.dirty = true;
   renderStrip();
   selectSlide(idx);
-  toast(`"${tpl.name}" 삽입 — ${idx+1}번 위치`);
+  toast(`"${tpl.name}" 삽입 — ${idx+1}번 위치 · 페이지 번호 자동 갱신`);
+}
+
+// 모든 슬라이드의 fbar PAGE 번호를 현재 순서·총수에 맞게 일괄 갱신
+function updateAllPageNumbers() {
+  const total = S.slides.length;
+  if (!total) return;
+  S.slides.forEach((slide, i) => {
+    const txt = `${String(i+1).padStart(3,'0')} / ${String(total).padStart(3,'0')}`;
+    slide.html = slide.html.replace(
+      /(<div class="fbar-r">[\s\S]*?<span class="fbar-title">)[\d\s\/]+/g,
+      `$1${txt}`
+    );
+  });
+}
+
+// 슬라이드 순서 이동 (썸네일 드래그 드롭)
+function reorderSlides(fromIdx, toIdx) {
+  if (fromIdx === toIdx || fromIdx < 0 || fromIdx >= S.slides.length) return;
+  if (toIdx < 0 || toIdx >= S.slides.length) return;
+  const slide = S.slides.splice(fromIdx, 1)[0];
+  S.slides.splice(toIdx, 0, slide);
+  updateAllPageNumbers();
+  S.dirty = true;
+  renderStrip();
+  selectSlide(toIdx);
+  toast(`슬라이드 ${fromIdx+1} → ${toIdx+1} · 페이지 번호 자동 갱신`);
 }
 
 let deleteIdx = -1;
@@ -790,11 +860,12 @@ function confirmDelete() {
   if (deleteIdx < 0) return;
   const removed = S.slides.splice(deleteIdx, 1)[0];
   pushUndo({type:'delete', idx:deleteIdx, slide:removed});
+  updateAllPageNumbers();
   S.dirty = true;
   closeConfirm();
   renderStrip();
   selectSlide(Math.min(deleteIdx, S.slides.length - 1));
-  toast(`슬라이드 ${deleteIdx+1} 삭제`);
+  toast(`슬라이드 ${deleteIdx+1} 삭제 · 페이지 번호 자동 갱신`);
 }
 
 // ============================================================
@@ -1429,6 +1500,8 @@ async function dbSaveCurrentSession() {
   if (!sb) return toast('Supabase 연결 안 됨');
   if (!isEditor) { openLoginModal(dbSaveCurrentSession); return; }
   if (!S.slides.length) return toast('저장할 슬라이드 없음');
+  // 저장 전 페이지 번호 일괄 갱신 (순서 변경·삽입·삭제 반영)
+  updateAllPageNumbers();
   const sessionNum = S.currentSessionNum;
   if (!sessionNum) return toast('교안 목록에서 회차를 먼저 선택');
   const lecturer = localStorage.getItem('wb_lecturer_name') || '강사';
@@ -1608,6 +1681,118 @@ loadFile = function(file) {
 // === AI REWRITE ===
 let aiTarget = null;
 let aiResult = null;
+
+// === 자유 캔버스 (빈 슬라이드) ===
+function addFreeText() {
+  const iframe = document.getElementById('canvasIframe');
+  if (!iframe || !iframe.contentDocument) return toast('슬라이드를 먼저 선택');
+  if (!S.editMode) return toast('편집 모드를 켜세요');
+  const doc = iframe.contentDocument;
+  const canvas = doc.querySelector('.free-canvas');
+  if (!canvas) return toast('빈 슬라이드(자유 구성)에서만 사용 — "+" 버튼으로 빈 슬라이드 추가');
+  const el = doc.createElement('div');
+  el.className = 'free-text';
+  el.contentEditable = 'false';
+  el.dataset.free = 'text';
+  el.style.cssText = 'position:absolute;left:120px;top:120px;min-width:240px;max-width:1200px;font-family:\'Pretendard\',\'Noto Sans KR\',sans-serif;font-size:24px;color:#1a1612;padding:10px 14px;border:1px dashed rgba(184,83,42,0.4);outline:none;background:transparent;line-height:1.5;cursor:move;user-select:none';
+  el.textContent = '여기에 텍스트를 입력하세요 (더블클릭하여 편집)';
+  canvas.appendChild(el);
+  attachFreeBehavior(el);
+  saveSlideState(doc);
+  toast('텍스트 추가 — 더블클릭해 편집, 드래그로 이동, Delete로 삭제');
+}
+
+document.getElementById('freeImgIn') && document.getElementById('freeImgIn').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const iframe = document.getElementById('canvasIframe');
+  if (!iframe || !iframe.contentDocument) return;
+  if (!S.editMode) { toast('편집 모드를 켜세요'); e.target.value=''; return; }
+  const doc = iframe.contentDocument;
+  const canvas = doc.querySelector('.free-canvas');
+  if (!canvas) { toast('빈 슬라이드에서만 이미지 추가 가능'); e.target.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = doc.createElement('img');
+    img.src = ev.target.result;
+    img.className = 'free-image';
+    img.dataset.free = 'image';
+    img.style.cssText = 'position:absolute;left:120px;top:120px;max-width:600px;max-height:600px;border:1px dashed rgba(184,83,42,0.4);cursor:move;user-select:none';
+    img.draggable = false;
+    canvas.appendChild(img);
+    attachFreeBehavior(img);
+    saveSlideState(doc);
+    toast('이미지 추가 — 드래그로 이동, Delete로 삭제');
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+function attachFreeBehavior(el) {
+  let dragging = false, sx, sy, ol, ot;
+  el.addEventListener('mousedown', (e) => {
+    if (el.contentEditable === 'true' && document.activeElement === el) return;
+    if (e.target !== el) return;
+    dragging = true;
+    sx = e.clientX; sy = e.clientY;
+    ol = parseInt(el.style.left) || 0;
+    ot = parseInt(el.style.top) || 0;
+    el.style.opacity = '0.7';
+    e.preventDefault();
+  });
+  const onMove = (e) => {
+    if (!dragging) return;
+    el.style.left = (ol + (e.clientX - sx)) + 'px';
+    el.style.top  = (ot + (e.clientY - sy)) + 'px';
+  };
+  const onUp = () => {
+    if (!dragging) return;
+    dragging = false;
+    el.style.opacity = '';
+    saveSlideState(el.ownerDocument);
+  };
+  el.ownerDocument.addEventListener('mousemove', onMove);
+  el.ownerDocument.addEventListener('mouseup', onUp);
+  // 텍스트는 더블클릭으로 편집 모드
+  if (el.dataset.free === 'text') {
+    el.addEventListener('dblclick', () => {
+      el.contentEditable = 'true';
+      el.style.cursor = 'text';
+      el.style.userSelect = 'text';
+      el.style.background = 'rgba(255,255,255,0.6)';
+      el.focus();
+      // 텍스트 전체 선택
+      const r = el.ownerDocument.createRange();
+      r.selectNodeContents(el);
+      el.ownerDocument.getSelection().removeAllRanges();
+      el.ownerDocument.getSelection().addRange(r);
+    });
+    el.addEventListener('blur', () => {
+      el.contentEditable = 'false';
+      el.style.cursor = 'move';
+      el.style.userSelect = 'none';
+      el.style.background = 'transparent';
+      saveSlideState(el.ownerDocument);
+    });
+  }
+  // Delete 키로 삭제 (선택된 상태)
+  el.tabIndex = 0;
+  el.addEventListener('keydown', (e) => {
+    if ((e.key === 'Delete' || e.key === 'Backspace') && el.contentEditable !== 'true') {
+      el.remove();
+      saveSlideState(el.ownerDocument);
+    }
+  });
+  // 클릭 시 포커스
+  el.addEventListener('click', (e) => { if (e.target === el && el.contentEditable !== 'true') el.focus(); });
+}
+
+// makeEditable 호출 시 기존 free 요소에도 행동 부여
+function rebindFreeElements(doc) {
+  doc.querySelectorAll('.free-text, .free-image').forEach(el => {
+    if (!el.dataset.bound) { attachFreeBehavior(el); el.dataset.bound = '1'; }
+  });
+}
 
 // 인라인 팝업 (드래그 선택 텍스트 옆에 떠서 즉시 수정)
 function injectAIPopup(doc) {
