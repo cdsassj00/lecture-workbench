@@ -1698,15 +1698,34 @@ function injectAIPopup(doc) {
       savedText = text;
       const rect = range.getBoundingClientRect();
       const docEl = doc.documentElement;
-      const top = rect.bottom + (docEl.scrollTop || 0) + 8;
-      const left = Math.max(8, Math.min(rect.left + (docEl.scrollLeft || 0), (docEl.clientWidth || 1600) - 540));
-      popup.style.top = top + 'px';
-      popup.style.left = left + 'px';
+      const scrollTop = docEl.scrollTop || 0;
+      const scrollLeft = docEl.scrollLeft || 0;
+      const slideHeight = docEl.clientHeight || 900;
+      const slideWidth = docEl.clientWidth || 1600;
       const previewLen = Math.min(text.length, 60);
       popup.querySelector('[data-orig-preview]').textContent = text.substring(0, previewLen) + (text.length > previewLen ? '…' : '');
       stage(1);
       inputEl.value = '';
+      // 측정용으로 임시 표시
+      popup.style.visibility = 'hidden';
       popup.style.display = 'block';
+      popup.style.top = '0px';
+      popup.style.left = '0px';
+      const popupH = popup.offsetHeight;
+      const popupW = popup.offsetWidth;
+      // 수직: 기본 아래쪽, 슬라이드 하단 넘치면 위로 뒤집기
+      let top = rect.bottom + scrollTop + 8;
+      if (top + popupH > slideHeight - 10) {
+        top = rect.top + scrollTop - popupH - 8;
+        if (top < 10) top = Math.max(10, slideHeight - popupH - 10);
+      }
+      // 수평: 우측 넘치면 좌측으로 클램프
+      let left = rect.left + scrollLeft;
+      if (left + popupW > slideWidth - 10) left = slideWidth - popupW - 10;
+      if (left < 10) left = 10;
+      popup.style.top = top + 'px';
+      popup.style.left = left + 'px';
+      popup.style.visibility = '';
     }, 30);
   });
   // 빈 선택이거나 외부 클릭 시 숨김 (팝업 내부 클릭은 제외)
