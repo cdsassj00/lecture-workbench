@@ -159,6 +159,13 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
     <button class="tb-btn" onclick="openSessionList()" id="btnSessions">교안 목록</button>
     <button class="tb-btn" onclick="window.open('curriculum.html','_blank')" id="btnCurriculum">📋 커리큘럼</button>
     <button class="tb-btn" onclick="openHistoryViewer()" id="btnHistory">🕐 이력</button>
+    <span class="tb-sep"></span>
+    <select id="paletteSelect" onchange="applySlidePalette(this.value)" title="현재 슬라이드 팔레트" style="font-family:inherit;font-size:11px;padding:5px 8px;border:1px solid var(--wln);border-radius:3px;background:#fff;cursor:pointer">
+      <option value="">팔레트 (기본)</option>
+      <option value="vintage">🟫 Vintage</option>
+      <option value="dark">⬛ Dark</option>
+      <option value="light-brown">🟤 Light Brown</option>
+    </select>
     <span class="tb-spacer"></span>
     <span class="tb-info" id="tbInfo">교안 파일을 열어주세요</span>
     <input type="file" id="fileIn" accept=".html" style="display:none">
@@ -621,7 +628,13 @@ function mkInsert(idx) {
 }
 
 function buildSlidePreview(slide) {
-  return `<!DOCTYPE html><html><head><style>${S.css}\nbody{margin:0;overflow:hidden}\n.stage{width:1600px;height:900px;position:relative}\n.slide{position:absolute;inset:0}\n.deck{}\n.fbar{position:absolute;bottom:0;left:0;right:0}</style></head><body><div class="stage">${slide.html}</div></body></html>`;
+  const PALETTE_INLINE = `
+.slide[data-palette="vintage"]{--bg:#f5ecd9!important;--bg2:#ebe0c8!important;--ink:#3a2d1d!important;--ink2:#5a4a35!important;--ink3:#8a7a60!important;--acc:#b8532a!important;--acc2:#9a4420!important;--acc3:#d4a574!important;--ln:#d8c8a8!important;--dk:#2a1d10!important;--on:#f5ecd9!important;background:#f5ecd9!important}
+.slide[data-palette="dark"]{--bg:#1a1612!important;--bg2:#2a241e!important;--ink:#ede4d3!important;--ink2:#c5b89e!important;--ink3:#8a7e68!important;--acc:#d4a574!important;--acc2:#b8532a!important;--acc3:#f0d090!important;--ln:#3a3228!important;--dk:#0e0a06!important;--on:#ede4d3!important;background:#1a1612!important;color:#ede4d3}
+.slide[data-palette="dark"] *{color:inherit}
+.slide[data-palette="light-brown"]{--bg:#f0e6d2!important;--bg2:#e0d0b0!important;--ink:#4a3520!important;--ink2:#6a553a!important;--ink3:#9a8060!important;--acc:#a06030!important;--acc2:#804820!important;--acc3:#c08850!important;--ln:#d0b890!important;--dk:#2a1a08!important;--on:#f0e6d2!important;background:#f0e6d2!important}
+`;
+  return `<!DOCTYPE html><html><head><style>${S.css}\nbody{margin:0;overflow:hidden}\n.stage{width:1600px;height:900px;position:relative}\n.slide{position:absolute;inset:0}\n.deck{}\n.fbar{position:absolute;bottom:0;left:0;right:0}\n${PALETTE_INLINE}</style></head><body><div class="stage">${slide.html}</div></body></html>`;
 }
 
 function selectSlide(idx) {
@@ -658,6 +671,55 @@ function selectSlide(idx) {
   // Status
   document.getElementById('stSlide').textContent = `슬라이드 ${idx+1} / ${S.slides.length}`;
   updateButtons();
+  // 팔레트 dropdown 동기화 — slide.html 안 .slide의 data-palette 추출
+  const ps = document.getElementById('paletteSelect');
+  if (ps) {
+    const m = (slide.html || '').match(/<div class="slide"[^>]*data-palette="([^"]*)"/);
+    ps.value = m ? m[1] : '';
+  }
+}
+
+// ============================================================
+// 슬라이드 팔레트 (Vintage / Dark / Light Brown)
+// ============================================================
+const PALETTE_CSS = `
+.stage[data-palette="vintage"] {
+  --bg: #f5ecd9 !important; --bg2: #ebe0c8 !important;
+  --ink: #3a2d1d !important; --ink2: #5a4a35 !important; --ink3: #8a7a60 !important;
+  --acc: #b8532a !important; --acc2: #9a4420 !important; --acc3: #d4a574 !important;
+  --ln: #d8c8a8 !important; --dk: #2a1d10 !important; --on: #f5ecd9 !important;
+}
+.stage[data-palette="dark"] {
+  --bg: #1a1612 !important; --bg2: #2a241e !important;
+  --ink: #ede4d3 !important; --ink2: #c5b89e !important; --ink3: #8a7e68 !important;
+  --acc: #d4a574 !important; --acc2: #b8532a !important; --acc3: #f0d090 !important;
+  --ln: #3a3228 !important; --dk: #0e0a06 !important; --on: #ede4d3 !important;
+  background: #1a1612;
+}
+.stage[data-palette="dark"] * { color: inherit; }
+.stage[data-palette="light-brown"] {
+  --bg: #f0e6d2 !important; --bg2: #e0d0b0 !important;
+  --ink: #4a3520 !important; --ink2: #6a553a !important; --ink3: #9a8060 !important;
+  --acc: #a06030 !important; --acc2: #804820 !important; --acc3: #c08850 !important;
+  --ln: #d0b890 !important; --dk: #2a1a08 !important; --on: #f0e6d2 !important;
+}
+`;
+
+function applySlidePalette(value) {
+  if (S.selectedIdx < 0) return toast('슬라이드를 먼저 선택');
+  const slide = S.slides[S.selectedIdx];
+  if (!slide) return;
+  // 즉시 반영 — iframe 안 .slide의 data-palette 갱신
+  const iframe = document.getElementById('canvasIframe');
+  if (iframe && iframe.contentDocument) {
+    const slideEl = iframe.contentDocument.querySelector('.slide');
+    if (slideEl) {
+      if (value) slideEl.setAttribute('data-palette', value);
+      else slideEl.removeAttribute('data-palette');
+      saveSlideState(iframe.contentDocument); // .slide의 data-palette가 stage.innerHTML에 직렬화돼 저장됨
+    }
+  }
+  toast(`팔레트 적용: ${value || '기본'} — 💾 DB 저장으로 영구 보존`);
 }
 
 function makeEditable(iframe) {
@@ -1706,6 +1768,8 @@ fetchSession = async function(s) {
         source: 'original',
         dataTitle: row.data_title || `Slide ${i+1}`
       }));
+      // 로드 직후 페이지 번호 자동 정렬 (DB 저장 당시 번호와 무관)
+      updateAllPageNumbers();
       S.coverOriginal = S.slides.length ? S.slides[0].html : null;
       S.filename = s.file;
       S.currentSessionNum = s.num;
@@ -1833,19 +1897,24 @@ ${sep}
 <input  data-act="size-num" type="number" min="8" max="200" style="width:42px;padding:3px 4px;border:1px solid #ccc;border-radius:3px;margin:0 3px;text-align:center;font-family:inherit">
 <button data-act="size-up"   style="${btnCss}">A+</button>
 ${sep}
-<input data-act="color" type="color" style="width:28px;height:24px;padding:0;border:1px solid #ccc;border-radius:3px;cursor:pointer;vertical-align:middle">
+<span title="글자색"><input data-act="color" type="color" style="width:28px;height:24px;padding:0;border:1px solid #ccc;border-radius:3px;cursor:pointer;vertical-align:middle"></span>
+<span title="배경색" style="margin-left:3px">🎨<input data-act="bg" type="color" style="width:24px;height:24px;padding:0;border:1px solid #ccc;border-radius:3px;cursor:pointer;vertical-align:middle;margin-left:1px"></span>
 ${sep}
-<button data-act="align-l" style="${btnCss}">⬅</button>
-<button data-act="align-c" style="${btnCss}">⬌</button>
-<button data-act="align-r" style="${btnCss}">➡</button>
+<button data-act="align-l" title="좌측 정렬"     style="${btnCss}">⬅</button>
+<button data-act="align-c" title="중앙 정렬"     style="${btnCss}">⬌</button>
+<button data-act="align-r" title="우측 정렬"     style="${btnCss}">➡</button>
+<button data-act="vcenter" title="세로 가운데 (토글)" style="${btnCss}">⫯</button>
 ${sep}
-<button data-act="bold"   style="${btnCss};font-weight:800">B</button>
-<button data-act="italic" style="${btnCss};font-style:italic">I</button>
+<button data-act="bold"   title="굵게"     style="${btnCss};font-weight:800">B</button>
+<button data-act="italic" title="이탤릭"   style="${btnCss};font-style:italic">I</button>
+${sep}
+<span title="불투명도"><input data-act="opacity" type="range" min="10" max="100" value="100" style="width:60px;vertical-align:middle"></span>
 ${sep}
 <button data-act="layer-front" title="맨 앞으로" style="${btnCss}">⬆</button>
 <button data-act="layer-back"  title="맨 뒤로"   style="${btnCss}">⬇</button>
+<button data-act="duplicate"   title="복제 (Ctrl+D)" style="${btnCss}">⎘</button>
 ${sep}
-<button data-act="delete" style="padding:4px 8px;background:#fee;color:#c33;border:1px solid #f3c0c0;border-radius:3px;cursor:pointer">🗑</button>
+<button data-act="delete" title="삭제 (Del)" style="padding:4px 8px;background:#fee;color:#c33;border:1px solid #f3c0c0;border-radius:3px;cursor:pointer">🗑</button>
 `;
   doc.body.appendChild(tb);
   tb.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => e.preventDefault()));
@@ -1864,14 +1933,22 @@ ${sep}
     else if (act === 'align-r') { el.style.textAlign = 'right'; }
     else if (act === 'bold')    { const w = el.style.fontWeight; el.style.fontWeight = (w === '700' || w === 'bold') ? '' : '700'; }
     else if (act === 'italic')  { el.style.fontStyle = el.style.fontStyle === 'italic' ? '' : 'italic'; }
+    else if (act === 'vcenter') { duplicateOrToggleVCenter(el); }
     else if (act === 'layer-front') { el.parentNode && el.parentNode.appendChild(el); }
     else if (act === 'layer-back')  { el.parentNode && el.parentNode.insertBefore(el, el.parentNode.firstChild); }
+    else if (act === 'duplicate') { duplicateFreeElement(el); saveSlideState(doc); return; }
     else if (act === 'delete') { el.remove(); deselectFreeElement(doc); saveSlideState(doc); return; }
     saveSlideState(doc);
     if (_freeSelected) positionFreeToolbar(_freeSelected);
   });
   tb.querySelector('[data-act="color"]').addEventListener('input', (e) => {
     if (_freeSelected) { _freeSelected.style.color = e.target.value; saveSlideState(doc); }
+  });
+  tb.querySelector('[data-act="bg"]').addEventListener('input', (e) => {
+    if (_freeSelected) { _freeSelected.style.background = e.target.value; saveSlideState(doc); }
+  });
+  tb.querySelector('[data-act="opacity"]').addEventListener('input', (e) => {
+    if (_freeSelected) { _freeSelected.style.opacity = (parseInt(e.target.value) / 100); saveSlideState(doc); }
   });
   tb.querySelector('[data-act="size-num"]').addEventListener('input', (e) => {
     if (_freeSelected) {
@@ -1881,6 +1958,45 @@ ${sep}
     }
   });
 }
+
+// 자유 요소 복제: +20,+20 오프셋으로 클론, 즉시 선택
+function duplicateFreeElement(el) {
+  const doc = el.ownerDocument;
+  const clone = el.cloneNode(true);
+  // 핸들·선택상태 잔여물 제거
+  clone.querySelectorAll('.free-handle').forEach(h => h.remove());
+  clone.classList.remove('free-selected');
+  clone.removeAttribute('data-bound');
+  delete clone._wbBound;
+  const oldL = parseInt(el.style.left) || 0;
+  const oldT = parseInt(el.style.top) || 0;
+  clone.style.left = (oldL + 24) + 'px';
+  clone.style.top  = (oldT + 24) + 'px';
+  el.parentNode.appendChild(clone);
+  attachFreeBehavior(clone);
+  clone._wbBound = true;
+  selectFreeElement(clone);
+}
+
+// 세로 가운데 정렬 토글: 박스 안 텍스트를 flex로 수직·수평 가운데
+function duplicateOrToggleVCenter(el) {
+  const isOn = el.dataset.vcenter === '1';
+  if (isOn) {
+    el.dataset.vcenter = '';
+    el.style.display = '';
+    el.style.alignItems = '';
+    el.style.justifyContent = '';
+  } else {
+    el.dataset.vcenter = '1';
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.justifyContent = 'center';
+    if (!el.style.height || el.offsetHeight < 80) el.style.height = '120px';
+  }
+}
+
+// 클립보드 (내부) — 자유 요소 outerHTML
+let _freeClipboard = null;
 
 function rgbToHex(rgb) {
   const m = (rgb || '').match(/(\d+)\D+(\d+)\D+(\d+)/);
@@ -1910,11 +2026,15 @@ function positionFreeToolbar(el) {
   tb.style.top = top + 'px';
   tb.style.left = left + 'px';
   tb.style.visibility = '';
-  // 폰트 크기/색 input 동기화
+  // 폰트 크기/색/배경/불투명도 input 동기화
   const sz = parseInt(getComputedStyle(el).fontSize) || 24;
   const inp = tb.querySelector('[data-act="size-num"]'); if (inp) inp.value = sz;
   const col = rgbToHex(getComputedStyle(el).color);
   const cI  = tb.querySelector('[data-act="color"]'); if (cI && col) cI.value = col;
+  const bg = rgbToHex(getComputedStyle(el).backgroundColor);
+  const bI = tb.querySelector('[data-act="bg"]'); if (bI && bg) bI.value = bg;
+  const op = parseFloat(getComputedStyle(el).opacity) || 1;
+  const oI = tb.querySelector('[data-act="opacity"]'); if (oI) oI.value = Math.round(op * 100);
   // 이미지면 텍스트 관련 버튼 비활성
   const isText = el.dataset.free === 'text';
   tb.querySelectorAll('[data-act^="ff-"],[data-act^="size-"],[data-act^="align-"],[data-act="bold"],[data-act="italic"],[data-act="color"]').forEach(b => {
@@ -1970,6 +2090,12 @@ function attachResizeHandler(el, handle, pos) {
     const startFS = parseFloat(getComputedStyle(el).fontSize) || 24;
     const isCorner = pos.length === 2;
     const isText = el.dataset.free === 'text';
+    const isComp = el.dataset.free === 'comp';
+    // 컴포넌트 내부 텍스트 노드들의 시작 폰트 사이즈 스냅샷
+    const compInnerFonts = isComp ? Array.from(el.querySelectorAll('*')).map(node => ({
+      node,
+      startFS: parseFloat(getComputedStyle(node).fontSize) || 0
+    })).filter(o => o.startFS > 0) : null;
     const onMove = (ev) => {
       const dx = ev.clientX - startX;
       const dy = ev.clientY - startY;
@@ -1989,6 +2115,9 @@ function attachResizeHandler(el, handle, pos) {
         if (pos.includes('n')) newT = startT + (startH - finalH);
         newW = finalW; newH = finalH;
         if (isText) el.style.fontSize = (startFS * scale) + 'px';
+        if (isComp && compInnerFonts) {
+          compInnerFonts.forEach(o => { o.node.style.fontSize = (o.startFS * scale) + 'px'; });
+        }
       }
       // 변 = 박스만, 텍스트 줄바꿈
       el.style.width  = newW + 'px';
@@ -2065,12 +2194,47 @@ function attachFreeBehavior(el) {
   }
   el.tabIndex = 0;
   el.addEventListener('keydown', (e) => {
-    if ((e.key === 'Delete' || e.key === 'Backspace') && el.contentEditable !== 'true') {
+    if (el.contentEditable === 'true') return;
+    if (e.key === 'Delete' || e.key === 'Backspace') {
       el.remove();
       if (_freeSelected === el) deselectFreeElement(doc);
       saveSlideState(doc);
+    } else if ((e.ctrlKey || e.metaKey) && (e.key === 'd' || e.key === 'D')) {
+      e.preventDefault();
+      duplicateFreeElement(el);
+      saveSlideState(doc);
+    } else if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C')) {
+      e.preventDefault();
+      const clone = el.cloneNode(true);
+      clone.querySelectorAll('.free-handle').forEach(h => h.remove());
+      clone.classList.remove('free-selected');
+      clone.removeAttribute('data-bound');
+      _freeClipboard = clone.outerHTML;
+    } else if ((e.ctrlKey || e.metaKey) && (e.key === 'v' || e.key === 'V')) {
+      e.preventDefault();
+      pasteFreeFromClipboard(doc);
     }
   });
+}
+
+// 클립보드 → 자유 캔버스에 붙여넣기
+function pasteFreeFromClipboard(doc) {
+  if (!_freeClipboard) return;
+  const canvas = doc.querySelector('.free-canvas');
+  if (!canvas) return;
+  const tmp = doc.createElement('div');
+  tmp.innerHTML = _freeClipboard;
+  const newEl = tmp.firstElementChild;
+  if (!newEl) return;
+  const oldL = parseInt(newEl.style.left) || 100;
+  const oldT = parseInt(newEl.style.top)  || 100;
+  newEl.style.left = (oldL + 24) + 'px';
+  newEl.style.top  = (oldT + 24) + 'px';
+  canvas.appendChild(newEl);
+  attachFreeBehavior(newEl);
+  newEl._wbBound = true;
+  selectFreeElement(newEl);
+  saveSlideState(doc);
 }
 
 function bindFreeCanvasDeselect(doc) {
