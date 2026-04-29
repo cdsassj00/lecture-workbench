@@ -3,3 +3,10 @@ Thumbs.db
 *.log
 .vscode/
 .idea/
+
+# Supabase local secrets — NEVER commit
+_supabase.local.json
+*.local.json
+.env
+.env.*
+
