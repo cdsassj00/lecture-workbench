@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slide Workbench — 교안 조립 도구</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@4.0.1/dist/pptxgen.bundle.js"></script>
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css');
 :root{--wb:#faf8f5;--wb2:#f0ece6;--wink:#1a1612;--wink2:#5a554e;--wink3:#9a9490;--wacc:#b8532a;--wln:#ddd6cc;--wdk:#1a1612;--won:#ede4d3;--rad:5px}
@@ -147,6 +148,7 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
     <span class="tb-sep"></span>
     <button class="tb-btn" onclick="openFile()" id="btnOpen">열기</button>
     <button class="tb-btn" onclick="exportHtml()" id="btnExport" disabled>내보내기</button>
+    <button class="tb-btn" onclick="exportPPTX()" id="btnPPTX" disabled>⬇ PPTX</button>
     <span class="tb-sep"></span>
     <button class="tb-btn" onclick="undo()" id="btnUndo" disabled>되돌리기</button>
     <button class="tb-btn" onclick="redo()" id="btnRedo" disabled>다시</button>
@@ -522,6 +524,7 @@ function loadFile(file) {
     document.getElementById('btnExport2').disabled = false;
     document.getElementById('btnApply').disabled = false;
     document.getElementById('btnPresent').disabled = false;
+    document.getElementById('btnPPTX').disabled = false;
     document.getElementById('tbInfo').textContent = `${file.name} · ${S.slides.length}장`;
     document.getElementById('stFile').textContent = file.name;
     toast(`${file.name} 로드 — ${S.slides.length}장`);
@@ -1146,6 +1149,423 @@ function toggleEdit() {
 }
 
 // ============================================================
+// PPTX EXPORT (전 슬라이드 일괄 변환 → 단일 .pptx 다운로드)
+// 측정 기반: 각 슬라이드를 임시 iframe에 1600x900px로 렌더 →
+// getBoundingClientRect로 좌표 측정 → PPTX inch 좌표로 환산.
+// 텍스트는 모두 진짜 텍스트박스로 들어가 PowerPoint에서 자유 편집 가능.
+// 페이지 번호는 마스터 슬라이드의 slideNumber placeholder가 자동 갱신.
+// ============================================================
+const PPTX_C = {
+  bg:  'F5EFE4', bg2: 'EDE4D3',
+  ink: '2B2015', ink2:'5A4A38', ink3:'8A7659',
+  acc: 'B8532A', ln:  'D8C8AE',
+  dk:  '1A1612', on:  'EDE4D3', on2: 'A89172',
+};
+const PPTX_F = {
+  serif: 'Noto Serif KR',
+  sans:  'Pretendard',
+  label: 'Noto Sans KR',
+};
+
+// 1600x900 픽셀 → 13.333 x 7.5 inch
+function _pxToInchRect(r) {
+  return {
+    x: (r.left   / 1600) * 13.333,
+    y: (r.top    /  900) * 7.5,
+    w: (r.width  / 1600) * 13.333,
+    h: (r.height /  900) * 7.5,
+  };
+}
+
+function _renderSlideForExport(iframe, slide) {
+  return new Promise((resolve) => {
+    const css = S.css || '';
+    const palette = (S.css && S.css.includes('data-palette')) ? '' : '';
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+${css}
+body{margin:0;overflow:hidden;background:#F5EFE4;font-family:Pretendard,'Noto Sans KR',sans-serif}
+.stage{width:1600px;height:900px;position:relative;overflow:hidden}
+</style></head><body><div class="stage">${slide.html}</div></body></html>`;
+    iframe.srcdoc = html;
+    iframe.onload = () => setTimeout(resolve, 120);
+  });
+}
+
+async function exportPPTX() {
+  if (!S.slides || !S.slides.length) return toast('슬라이드 없음');
+  if (typeof PptxGenJS === 'undefined') return toast('pptxgenjs 로드 안 됨 — 새로고침 후 재시도');
+
+  toast(`PPTX 생성 중... ${S.slides.length}장 (수 초~수십 초)`);
+
+  const pres = new PptxGenJS();
+  pres.layout = 'LAYOUT_WIDE';
+  pres.title  = '공공 AI 전문인재 양성과정';
+  pres.author = 'Lecture Workbench';
+
+  // 마스터 슬라이드: 자동 페이지 번호 placeholder
+  pres.defineSlideMaster({
+    title: 'WB_MASTER',
+    background: { color: PPTX_C.bg },
+    slideNumber: {
+      x: 11.65, y: 7.07, w: 0.5, h: 0.43,
+      fontFace: PPTX_F.label, fontSize: 9, color: PPTX_C.ink, bold: true,
+      align: 'center', valign: 'middle',
+    },
+  });
+
+  // 임시 iframe (오프스크린)
+  const tmp = document.createElement('iframe');
+  tmp.style.cssText = 'width:1600px;height:900px;position:absolute;left:-99999px;top:0;border:none';
+  document.body.appendChild(tmp);
+
+  try {
+    for (let i = 0; i < S.slides.length; i++) {
+      await _renderSlideForExport(tmp, S.slides[i]);
+      _addSlideToPPTX(pres, tmp, i);
+      if ((i + 1) % 10 === 0) toast(`PPTX 생성 중... ${i+1} / ${S.slides.length}`);
+    }
+  } finally {
+    document.body.removeChild(tmp);
+  }
+
+  const fileName = `lecture-deck-${new Date().toISOString().slice(0,10)}.pptx`;
+  await pres.writeFile({ fileName });
+  toast(`✓ PPTX 다운로드 완료 — ${S.slides.length}장`);
+}
+
+function _addSlideToPPTX(pres, iframe, idx) {
+  const slide = pres.addSlide({ masterName: 'WB_MASTER' });
+  slide.background = { color: PPTX_C.bg };
+
+  const doc = iframe.contentDocument;
+  const stage = doc && doc.querySelector('.stage');
+  if (!stage) return;
+
+  // === HBAR (다크 헤더) ===
+  const hbar = stage.querySelector('.hbar');
+  if (hbar) {
+    const r = _pxToInchRect(hbar.getBoundingClientRect());
+    slide.addShape(pres.ShapeType.rect, {
+      x: r.x, y: r.y, w: r.w, h: r.h,
+      fill: { color: PPTX_C.dk }, line: { color: PPTX_C.dk, width: 0 },
+    });
+    const hL = hbar.querySelector('.hbar-l');
+    const hR = hbar.querySelector('.hbar-r');
+    if (hL) { const lr = _pxToInchRect(hL.getBoundingClientRect());
+      slide.addText(hL.textContent.trim(), {
+        x: lr.x + 0.1, y: lr.y, w: lr.w - 0.2, h: lr.h,
+        fontFace: PPTX_F.label, fontSize: 9.5, color: PPTX_C.on,
+        charSpacing: 3, bold: true, valign: 'middle',
+      });
+    }
+    if (hR) { const rr = _pxToInchRect(hR.getBoundingClientRect());
+      slide.addText(hR.textContent.trim(), {
+        x: rr.x, y: rr.y, w: rr.w - 0.1, h: rr.h,
+        fontFace: PPTX_F.label, fontSize: 9.5, color: PPTX_C.on2,
+        charSpacing: 1, valign: 'middle', align: 'right',
+      });
+    }
+  }
+
+  // === HL (헤드라인 영역) ===
+  const hl = stage.querySelector('.hl');
+  if (hl) {
+    const k = hl.querySelector('.hl-kicker');
+    const t = hl.querySelector('.hl-title');
+    const s = hl.querySelector('.hl-sub');
+    if (k) { const r = _pxToInchRect(k.getBoundingClientRect());
+      slide.addText(k.textContent.trim(), {
+        x: r.x, y: r.y, w: r.w, h: r.h,
+        fontFace: PPTX_F.label, fontSize: 11, color: PPTX_C.ink3,
+        charSpacing: 4, bold: true,
+      });
+    }
+    if (t) { const r = _pxToInchRect(t.getBoundingClientRect());
+      slide.addText(t.textContent.trim(), {
+        x: r.x, y: r.y, w: r.w, h: r.h,
+        fontFace: PPTX_F.serif, fontSize: 26, color: PPTX_C.ink, bold: true,
+      });
+    }
+    if (s) { const r = _pxToInchRect(s.getBoundingClientRect());
+      slide.addText(s.textContent.trim(), {
+        x: r.x, y: r.y, w: r.w, h: r.h,
+        fontFace: PPTX_F.sans, fontSize: 10.5, color: PPTX_C.ink2, italic: true,
+        lineSpacingMultiple: 1.4,
+      });
+    }
+  }
+
+  // === BD 영역 컴포넌트 ===
+  const bd = stage.querySelector('.bd');
+  if (bd) {
+    // .card (.dk = 다크 변형)
+    bd.querySelectorAll('.card').forEach(card => {
+      const r = _pxToInchRect(card.getBoundingClientRect());
+      const dk = card.classList.contains('dk');
+      slide.addShape(pres.ShapeType.rect, {
+        x: r.x, y: r.y, w: r.w, h: r.h,
+        fill: { color: dk ? PPTX_C.dk : PPTX_C.bg2 },
+        line: { color: dk ? PPTX_C.dk : PPTX_C.ln, width: 0.5 },
+      });
+      const k = card.querySelector('.card-k');
+      const a = card.querySelector('.card-anchor');
+      const b = card.querySelector('.card-body');
+      const n = card.querySelector('.card-note');
+      if (k) { const rr = _pxToInchRect(k.getBoundingClientRect());
+        slide.addText(k.textContent.trim(), {
+          x: rr.x, y: rr.y, w: rr.w, h: rr.h,
+          fontFace: PPTX_F.label, fontSize: 9, color: dk ? PPTX_C.on2 : PPTX_C.acc,
+          charSpacing: 3, bold: true,
+        });
+      }
+      if (a) { const rr = _pxToInchRect(a.getBoundingClientRect());
+        slide.addText(a.textContent.trim(), {
+          x: rr.x, y: rr.y, w: rr.w, h: rr.h,
+          fontFace: PPTX_F.serif, fontSize: 14, color: dk ? PPTX_C.on : PPTX_C.ink, bold: true,
+          lineSpacingMultiple: 1.15,
+        });
+      }
+      if (b) { const rr = _pxToInchRect(b.getBoundingClientRect());
+        slide.addText(b.textContent.trim(), {
+          x: rr.x, y: rr.y, w: rr.w, h: rr.h,
+          fontFace: PPTX_F.sans, fontSize: 10, color: dk ? PPTX_C.bg : PPTX_C.ink2,
+          lineSpacingMultiple: 1.4,
+        });
+      }
+      if (n) { const rr = _pxToInchRect(n.getBoundingClientRect());
+        slide.addText(n.textContent.trim(), {
+          x: rr.x, y: rr.y, w: rr.w, h: rr.h,
+          fontFace: PPTX_F.sans, fontSize: 8.5, color: dk ? PPTX_C.on2 : PPTX_C.ink3,
+          italic: true, lineSpacingMultiple: 1.35,
+        });
+      }
+    });
+
+    // .co / .cod / .pit (콜아웃)
+    bd.querySelectorAll('.co, .cod, .pit').forEach(el => {
+      if (el.closest('.card')) return;
+      const r = _pxToInchRect(el.getBoundingClientRect());
+      const dk = el.classList.contains('cod');
+      const pt = el.classList.contains('pit');
+      slide.addShape(pres.ShapeType.rect, {
+        x: r.x, y: r.y, w: r.w, h: r.h,
+        fill: { color: dk ? PPTX_C.dk : (pt ? 'F4DBB9' : PPTX_C.bg2) },
+        line: { color: dk ? PPTX_C.dk : PPTX_C.ln, width: 0.5 },
+      });
+      const lb = el.querySelector('.co-lb, .cod-lb, .pit-lb');
+      const main = el.querySelector('.co-main, .cod-main, .pit-h');
+      const desc = el.querySelector('p, .pit-d');
+      let yOff = 0.18;
+      if (lb) { slide.addText(lb.textContent.trim(), {
+        x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: 0.25,
+        fontFace: PPTX_F.label, fontSize: 9, color: dk ? PPTX_C.on2 : PPTX_C.acc,
+        charSpacing: 4, bold: true,
+      }); yOff += 0.32; }
+      if (main) { slide.addText(main.textContent.trim(), {
+        x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: 0.5,
+        fontFace: PPTX_F.serif, fontSize: 14, color: dk ? PPTX_C.on : PPTX_C.ink, bold: true,
+      }); yOff += 0.55; }
+      if (desc && desc.textContent.trim()) { slide.addText(desc.textContent.trim(), {
+        x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: Math.max(r.h - yOff - 0.18, 0.3),
+        fontFace: PPTX_F.sans, fontSize: 10, color: dk ? PPTX_C.bg : PPTX_C.ink2,
+        lineSpacingMultiple: 1.4,
+      }); }
+    });
+
+    // .dstrip (3칸 다크 통계)
+    bd.querySelectorAll('.dstrip').forEach(strip => {
+      const sr = _pxToInchRect(strip.getBoundingClientRect());
+      slide.addShape(pres.ShapeType.rect, {
+        x: sr.x, y: sr.y, w: sr.w, h: sr.h,
+        fill: { color: PPTX_C.dk }, line: { color: PPTX_C.dk, width: 0 },
+      });
+      strip.querySelectorAll('.ds-c').forEach(cell => {
+        const cr = _pxToInchRect(cell.getBoundingClientRect());
+        const a = cell.querySelector('.ds-a');
+        const n = cell.querySelector('.ds-n');
+        const d = cell.querySelector('.ds-d');
+        if (a) slide.addText(a.textContent.trim(), {
+          x: cr.x + 0.15, y: cr.y + 0.12, w: cr.w - 0.3, h: 0.25,
+          fontFace: PPTX_F.label, fontSize: 8, color: PPTX_C.on2,
+          charSpacing: 4, bold: true, align: 'center',
+        });
+        if (n) slide.addText(n.textContent.trim(), {
+          x: cr.x + 0.15, y: cr.y + 0.4, w: cr.w - 0.3, h: 0.55,
+          fontFace: PPTX_F.serif, fontSize: 22, color: PPTX_C.on, bold: true, align: 'center',
+        });
+        if (d) slide.addText(d.textContent.trim(), {
+          x: cr.x + 0.15, y: cr.y + 0.98, w: cr.w - 0.3, h: 0.3,
+          fontFace: PPTX_F.sans, fontSize: 9, color: PPTX_C.on2, align: 'center',
+        });
+      });
+    });
+
+    // .icard (인포 카드)
+    bd.querySelectorAll('.icard').forEach(ic => {
+      if (ic.closest('.card')) return;
+      const r = _pxToInchRect(ic.getBoundingClientRect());
+      const dk = ic.classList.contains('dark');
+      slide.addShape(pres.ShapeType.rect, {
+        x: r.x, y: r.y, w: r.w, h: r.h,
+        fill: { color: dk ? PPTX_C.dk : PPTX_C.bg2 },
+        line: { color: dk ? PPTX_C.dk : PPTX_C.ln, width: 0.5 },
+      });
+      const lb = ic.querySelector('.icard-lb');
+      const sess = ic.querySelector('.icard-sess');
+      const head = ic.querySelector('.bth');
+      const body = ic.querySelector('.bt');
+      let yOff = 0.18;
+      if (lb || sess) {
+        const labelText = (lb ? lb.textContent.trim() : '') + (sess ? '   ' + sess.textContent.trim() : '');
+        slide.addText(labelText, {
+          x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: 0.25,
+          fontFace: PPTX_F.label, fontSize: 8.5, color: dk ? PPTX_C.on2 : PPTX_C.ink3,
+          charSpacing: 3, bold: true,
+        });
+        yOff += 0.32;
+      }
+      if (head) { slide.addText(head.textContent.trim(), {
+        x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: 0.45,
+        fontFace: PPTX_F.serif, fontSize: 14, color: dk ? PPTX_C.on : PPTX_C.ink, bold: true,
+      }); yOff += 0.55; }
+      if (body) { slide.addText(body.textContent.trim(), {
+        x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: Math.max(r.h - yOff - 0.18, 0.3),
+        fontFace: PPTX_F.sans, fontSize: 10, color: dk ? PPTX_C.bg : PPTX_C.ink2,
+        lineSpacingMultiple: 1.4,
+      }); }
+    });
+
+    // .quote (인용)
+    bd.querySelectorAll('.quote').forEach(q => {
+      const r = _pxToInchRect(q.getBoundingClientRect());
+      slide.addShape(pres.ShapeType.rect, {
+        x: r.x, y: r.y, w: r.w, h: r.h,
+        fill: { color: PPTX_C.bg2 }, line: { color: PPTX_C.ln, width: 0.5 },
+      });
+      const src = q.querySelector('.quote-src');
+      const main = q.querySelector('.quote-q');
+      const author = q.querySelector('.quote-a');
+      let yOff = 0.2;
+      if (src) { slide.addText(src.textContent.trim(), {
+        x: r.x + 0.25, y: r.y + yOff, w: r.w - 0.5, h: 0.25,
+        fontFace: PPTX_F.label, fontSize: 8, color: PPTX_C.ink3, charSpacing: 4, bold: true,
+      }); yOff += 0.32; }
+      if (main) { slide.addText(main.textContent.trim(), {
+        x: r.x + 0.25, y: r.y + yOff, w: r.w - 0.5, h: r.h - yOff - 0.5,
+        fontFace: PPTX_F.serif, fontSize: 14, color: PPTX_C.ink, italic: true,
+        lineSpacingMultiple: 1.4,
+      }); }
+      if (author) { slide.addText(author.textContent.trim(), {
+        x: r.x + 0.25, y: r.y + r.h - 0.4, w: r.w - 0.5, h: 0.3,
+        fontFace: PPTX_F.sans, fontSize: 9, color: PPTX_C.ink3, align: 'right',
+      }); }
+    });
+
+    // .mtbl (미니 테이블)
+    bd.querySelectorAll('table.mtbl, .mtbl').forEach(tbl => {
+      if (tbl.tagName !== 'TABLE') return;
+      const tr = _pxToInchRect(tbl.getBoundingClientRect());
+      const rows = [];
+      tbl.querySelectorAll('tr').forEach(rowEl => {
+        const row = [];
+        rowEl.querySelectorAll('th, td').forEach(cell => {
+          const isHead = cell.tagName === 'TH';
+          row.push({
+            text: cell.textContent.trim(),
+            options: {
+              fontFace: isHead ? PPTX_F.label : PPTX_F.sans,
+              fontSize: isHead ? 9 : 9.5,
+              bold: isHead, italic: false,
+              color: isHead ? PPTX_C.ink3 : PPTX_C.ink2,
+              charSpacing: isHead ? 3 : 0,
+              fill: { color: isHead ? PPTX_C.bg2 : 'FFFFFF' },
+              align: 'left', valign: 'middle',
+            },
+          });
+        });
+        if (row.length) rows.push(row);
+      });
+      if (rows.length) {
+        slide.addTable(rows, {
+          x: tr.x, y: tr.y, w: tr.w,
+          colW: Array(rows[0].length).fill(tr.w / rows[0].length),
+          border: { type: 'solid', pt: 0.5, color: PPTX_C.ln },
+        });
+      }
+    });
+
+    // .cblk (다크 코드블록)
+    bd.querySelectorAll('.cblk').forEach(blk => {
+      const r = _pxToInchRect(blk.getBoundingClientRect());
+      slide.addShape(pres.ShapeType.rect, {
+        x: r.x, y: r.y, w: r.w, h: r.h,
+        fill: { color: PPTX_C.dk }, line: { color: PPTX_C.dk, width: 0 },
+      });
+      slide.addText(blk.textContent.trim(), {
+        x: r.x + 0.18, y: r.y + 0.15, w: r.w - 0.36, h: r.h - 0.3,
+        fontFace: 'Consolas', fontSize: 10, color: PPTX_C.on,
+        lineSpacingMultiple: 1.3,
+      });
+    });
+
+    // 기타: bd 직계의 자유 텍스트(.bth, .bt 등 — card/icard 등에 포함되지 않은 것)
+    bd.querySelectorAll('.bth, .bt').forEach(el => {
+      if (el.closest('.card, .co, .cod, .pit, .icard, .quote, .next, .draft, .step, .ladder, .chk, .netbox, .hybrid, .flow-box')) return;
+      const r = _pxToInchRect(el.getBoundingClientRect());
+      const isHead = el.classList.contains('bth');
+      slide.addText(el.textContent.trim(), {
+        x: r.x, y: r.y, w: r.w, h: r.h,
+        fontFace: isHead ? PPTX_F.serif : PPTX_F.sans,
+        fontSize: isHead ? 14 : 10.5,
+        color: isHead ? PPTX_C.ink : PPTX_C.ink2,
+        bold: isHead,
+        lineSpacingMultiple: 1.4,
+      });
+    });
+  }
+
+  // === FBAR (cream 푸터) ===
+  const fbar = stage.querySelector('.fbar');
+  if (fbar) {
+    const fr = _pxToInchRect(fbar.getBoundingClientRect());
+    slide.addShape(pres.ShapeType.rect, {
+      x: fr.x, y: fr.y, w: fr.w, h: fr.h,
+      fill: { color: PPTX_C.bg2 }, line: { color: PPTX_C.ln, width: 0.5 },
+    });
+    const fL = fbar.querySelector('.fbar-l');
+    if (fL) {
+      const lr = _pxToInchRect(fL.getBoundingClientRect());
+      const lb = fL.querySelector('.fbar-label');
+      const ti = fL.querySelector('.fbar-title');
+      slide.addText([
+        { text: (lb ? lb.textContent.trim() : 'MODULE') + '  ', options: {
+          fontFace: PPTX_F.label, fontSize: 8, color: PPTX_C.ink3, charSpacing: 3, bold: true,
+        } },
+        { text: ti ? ti.textContent.trim() : '', options: {
+          fontFace: PPTX_F.label, fontSize: 9, color: PPTX_C.ink, charSpacing: 1,
+        } },
+      ], {
+        x: lr.x + 0.1, y: lr.y, w: lr.w - 0.2, h: lr.h, valign: 'middle',
+      });
+    }
+    const fR = fbar.querySelector('.fbar-r');
+    if (fR) {
+      // PAGE 라벨만 표시. 실제 번호는 마스터 슬라이드의 slideNumber placeholder가 자동 갱신
+      const lb = fR.querySelector('.fbar-label');
+      if (lb) {
+        const rr = _pxToInchRect(fR.getBoundingClientRect());
+        slide.addText('PAGE', {
+          x: rr.x + 0.1, y: rr.y, w: rr.w * 0.5, h: rr.h,
+          fontFace: PPTX_F.label, fontSize: 8, color: PPTX_C.ink3,
+          charSpacing: 3, bold: true,
+          align: 'right', valign: 'middle',
+        });
+      }
+    }
+  }
+}
+
+// ============================================================
 // PRESENTATION MODE
 // ============================================================
 function presentMode() {
@@ -1590,6 +2010,7 @@ async function fetchSession(s) {
     document.getElementById('btnExport2').disabled = false;
     document.getElementById('btnApply').disabled = false;
     document.getElementById('btnPresent').disabled = false;
+    document.getElementById('btnPPTX').disabled = false;
     document.getElementById('tbInfo').textContent = `${s.file} · ${S.slides.length}장`;
     document.getElementById('stFile').textContent = s.file;
     toast(`Session ${s.num} 로드 — ${S.slides.length}장`);
@@ -1914,6 +2335,7 @@ fetchSession = async function(s) {
       const btn2 = document.getElementById('btnExport2'); if (btn2) btn2.disabled = false;
       const btnAp = document.getElementById('btnApply'); if (btnAp) btnAp.disabled = false;
       document.getElementById('btnPresent').disabled = false;
+      document.getElementById('btnPPTX').disabled = false;
       document.getElementById('tbInfo').textContent = `Session ${s.num} · DB · ${S.slides.length}장`;
       const stf = document.getElementById('stFile'); if (stf) stf.textContent = `Session ${s.num} (DB)`;
       updateAuthUI();
