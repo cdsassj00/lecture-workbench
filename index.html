@@ -717,11 +717,25 @@ function selectSlide(idx) {
   
   const iframe = document.getElementById('canvasIframe');
   iframe.srcdoc = buildSlidePreview(slide);
-  
-  // If edit mode, make editable after load
-  if (S.editMode) {
-    iframe.onload = () => makeEditable(iframe);
-  }
+
+  iframe.onload = () => {
+    // 페이지 번호를 iframe DOM에 직접 set
+    // (정규식 의존 X — 어떤 fbar-title 클래스 변형도 100% 갱신)
+    try {
+      const doc = iframe.contentDocument;
+      if (doc) {
+        const total = S.slides.length;
+        const txt = `${String(idx+1).padStart(3,'0')} / ${String(total).padStart(3,'0')}`;
+        // .fbar-r 안의 마지막 .fbar-title (페이지 번호 슬롯)
+        const fbarR = doc.querySelector('.fbar-r');
+        if (fbarR) {
+          const titles = fbarR.querySelectorAll('.fbar-title');
+          if (titles.length) titles[titles.length - 1].textContent = txt;
+        }
+      }
+    } catch (e) {}
+    if (S.editMode) makeEditable(iframe);
+  };
   
   // Status
   document.getElementById('stSlide').textContent = `슬라이드 ${idx+1} / ${S.slides.length}`;
@@ -1190,6 +1204,7 @@ function undo() {
   }
   S.redoStack.push(a);
   S.dirty = true;
+  updateAllPageNumbers();
   renderStrip();
   selectSlide(Math.min(S.selectedIdx, S.slides.length - 1));
   updateButtons();
@@ -1204,6 +1219,7 @@ function redo() {
   }
   S.undoStack.push(a);
   S.dirty = true;
+  updateAllPageNumbers();
   renderStrip();
   selectSlide(Math.min(S.selectedIdx, S.slides.length - 1));
   updateButtons();
