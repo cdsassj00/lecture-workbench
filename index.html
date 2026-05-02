@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -1177,6 +1177,15 @@ function _pxToInchRect(r) {
   };
 }
 
+// 텍스트 박스 안전 마진 — HTML 렌더와 PPTX 폰트 메트릭이 미묘하게 달라
+// 측정값 그대로 박으면 마지막 줄이 잘리는 케이스가 있음. 1.18배 + autoFit으로 방어.
+function _safeText(slide, text, opts) {
+  const safe = Object.assign({}, opts);
+  if (safe.h) safe.h = safe.h * 1.18;
+  if (safe.autoFit === undefined) safe.autoFit = true;
+  return slide.addText(text, safe);
+}
+
 function _renderSlideForExport(iframe, slide) {
   return new Promise((resolve) => {
     const css = S.css || '';
@@ -1252,14 +1261,14 @@ function _addSlideToPPTX(pres, iframe, idx) {
     const hL = hbar.querySelector('.hbar-l');
     const hR = hbar.querySelector('.hbar-r');
     if (hL) { const lr = _pxToInchRect(hL.getBoundingClientRect());
-      slide.addText(hL.textContent.trim(), {
+      _safeText(slide, hL.textContent.trim(), {
         x: lr.x + 0.1, y: lr.y, w: lr.w - 0.2, h: lr.h,
         fontFace: PPTX_F.label, fontSize: 9.5, color: PPTX_C.on,
         charSpacing: 3, bold: true, valign: 'middle',
       });
     }
     if (hR) { const rr = _pxToInchRect(hR.getBoundingClientRect());
-      slide.addText(hR.textContent.trim(), {
+      _safeText(slide, hR.textContent.trim(), {
         x: rr.x, y: rr.y, w: rr.w - 0.1, h: rr.h,
         fontFace: PPTX_F.label, fontSize: 9.5, color: PPTX_C.on2,
         charSpacing: 1, valign: 'middle', align: 'right',
@@ -1274,20 +1283,20 @@ function _addSlideToPPTX(pres, iframe, idx) {
     const t = hl.querySelector('.hl-title');
     const s = hl.querySelector('.hl-sub');
     if (k) { const r = _pxToInchRect(k.getBoundingClientRect());
-      slide.addText(k.textContent.trim(), {
+      _safeText(slide, k.textContent.trim(), {
         x: r.x, y: r.y, w: r.w, h: r.h,
         fontFace: PPTX_F.label, fontSize: 11, color: PPTX_C.ink3,
         charSpacing: 4, bold: true,
       });
     }
     if (t) { const r = _pxToInchRect(t.getBoundingClientRect());
-      slide.addText(t.textContent.trim(), {
+      _safeText(slide, t.textContent.trim(), {
         x: r.x, y: r.y, w: r.w, h: r.h,
         fontFace: PPTX_F.serif, fontSize: 26, color: PPTX_C.ink, bold: true,
       });
     }
     if (s) { const r = _pxToInchRect(s.getBoundingClientRect());
-      slide.addText(s.textContent.trim(), {
+      _safeText(slide, s.textContent.trim(), {
         x: r.x, y: r.y, w: r.w, h: r.h,
         fontFace: PPTX_F.sans, fontSize: 10.5, color: PPTX_C.ink2, italic: true,
         lineSpacingMultiple: 1.4,
@@ -1312,28 +1321,28 @@ function _addSlideToPPTX(pres, iframe, idx) {
       const b = card.querySelector('.card-body');
       const n = card.querySelector('.card-note');
       if (k) { const rr = _pxToInchRect(k.getBoundingClientRect());
-        slide.addText(k.textContent.trim(), {
+        _safeText(slide, k.textContent.trim(), {
           x: rr.x, y: rr.y, w: rr.w, h: rr.h,
           fontFace: PPTX_F.label, fontSize: 9, color: dk ? PPTX_C.on2 : PPTX_C.acc,
           charSpacing: 3, bold: true,
         });
       }
       if (a) { const rr = _pxToInchRect(a.getBoundingClientRect());
-        slide.addText(a.textContent.trim(), {
+        _safeText(slide, a.textContent.trim(), {
           x: rr.x, y: rr.y, w: rr.w, h: rr.h,
           fontFace: PPTX_F.serif, fontSize: 14, color: dk ? PPTX_C.on : PPTX_C.ink, bold: true,
           lineSpacingMultiple: 1.15,
         });
       }
       if (b) { const rr = _pxToInchRect(b.getBoundingClientRect());
-        slide.addText(b.textContent.trim(), {
+        _safeText(slide, b.textContent.trim(), {
           x: rr.x, y: rr.y, w: rr.w, h: rr.h,
           fontFace: PPTX_F.sans, fontSize: 10, color: dk ? PPTX_C.bg : PPTX_C.ink2,
           lineSpacingMultiple: 1.4,
         });
       }
       if (n) { const rr = _pxToInchRect(n.getBoundingClientRect());
-        slide.addText(n.textContent.trim(), {
+        _safeText(slide, n.textContent.trim(), {
           x: rr.x, y: rr.y, w: rr.w, h: rr.h,
           fontFace: PPTX_F.sans, fontSize: 8.5, color: dk ? PPTX_C.on2 : PPTX_C.ink3,
           italic: true, lineSpacingMultiple: 1.35,
@@ -1356,16 +1365,16 @@ function _addSlideToPPTX(pres, iframe, idx) {
       const main = el.querySelector('.co-main, .cod-main, .pit-h');
       const desc = el.querySelector('p, .pit-d');
       let yOff = 0.18;
-      if (lb) { slide.addText(lb.textContent.trim(), {
+      if (lb) { _safeText(slide, lb.textContent.trim(), {
         x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: 0.25,
         fontFace: PPTX_F.label, fontSize: 9, color: dk ? PPTX_C.on2 : PPTX_C.acc,
         charSpacing: 4, bold: true,
       }); yOff += 0.32; }
-      if (main) { slide.addText(main.textContent.trim(), {
+      if (main) { _safeText(slide, main.textContent.trim(), {
         x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: 0.5,
         fontFace: PPTX_F.serif, fontSize: 14, color: dk ? PPTX_C.on : PPTX_C.ink, bold: true,
       }); yOff += 0.55; }
-      if (desc && desc.textContent.trim()) { slide.addText(desc.textContent.trim(), {
+      if (desc && desc.textContent.trim()) { _safeText(slide, desc.textContent.trim(), {
         x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: Math.max(r.h - yOff - 0.18, 0.3),
         fontFace: PPTX_F.sans, fontSize: 10, color: dk ? PPTX_C.bg : PPTX_C.ink2,
         lineSpacingMultiple: 1.4,
@@ -1384,16 +1393,16 @@ function _addSlideToPPTX(pres, iframe, idx) {
         const a = cell.querySelector('.ds-a');
         const n = cell.querySelector('.ds-n');
         const d = cell.querySelector('.ds-d');
-        if (a) slide.addText(a.textContent.trim(), {
+        if (a) _safeText(slide, a.textContent.trim(), {
           x: cr.x + 0.15, y: cr.y + 0.12, w: cr.w - 0.3, h: 0.25,
           fontFace: PPTX_F.label, fontSize: 8, color: PPTX_C.on2,
           charSpacing: 4, bold: true, align: 'center',
         });
-        if (n) slide.addText(n.textContent.trim(), {
+        if (n) _safeText(slide, n.textContent.trim(), {
           x: cr.x + 0.15, y: cr.y + 0.4, w: cr.w - 0.3, h: 0.55,
           fontFace: PPTX_F.serif, fontSize: 22, color: PPTX_C.on, bold: true, align: 'center',
         });
-        if (d) slide.addText(d.textContent.trim(), {
+        if (d) _safeText(slide, d.textContent.trim(), {
           x: cr.x + 0.15, y: cr.y + 0.98, w: cr.w - 0.3, h: 0.3,
           fontFace: PPTX_F.sans, fontSize: 9, color: PPTX_C.on2, align: 'center',
         });
@@ -1417,18 +1426,18 @@ function _addSlideToPPTX(pres, iframe, idx) {
       let yOff = 0.18;
       if (lb || sess) {
         const labelText = (lb ? lb.textContent.trim() : '') + (sess ? '   ' + sess.textContent.trim() : '');
-        slide.addText(labelText, {
+        _safeText(slide, labelText, {
           x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: 0.25,
           fontFace: PPTX_F.label, fontSize: 8.5, color: dk ? PPTX_C.on2 : PPTX_C.ink3,
           charSpacing: 3, bold: true,
         });
         yOff += 0.32;
       }
-      if (head) { slide.addText(head.textContent.trim(), {
+      if (head) { _safeText(slide, head.textContent.trim(), {
         x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: 0.45,
         fontFace: PPTX_F.serif, fontSize: 14, color: dk ? PPTX_C.on : PPTX_C.ink, bold: true,
       }); yOff += 0.55; }
-      if (body) { slide.addText(body.textContent.trim(), {
+      if (body) { _safeText(slide, body.textContent.trim(), {
         x: r.x + 0.22, y: r.y + yOff, w: r.w - 0.44, h: Math.max(r.h - yOff - 0.18, 0.3),
         fontFace: PPTX_F.sans, fontSize: 10, color: dk ? PPTX_C.bg : PPTX_C.ink2,
         lineSpacingMultiple: 1.4,
@@ -1446,16 +1455,16 @@ function _addSlideToPPTX(pres, iframe, idx) {
       const main = q.querySelector('.quote-q');
       const author = q.querySelector('.quote-a');
       let yOff = 0.2;
-      if (src) { slide.addText(src.textContent.trim(), {
+      if (src) { _safeText(slide, src.textContent.trim(), {
         x: r.x + 0.25, y: r.y + yOff, w: r.w - 0.5, h: 0.25,
         fontFace: PPTX_F.label, fontSize: 8, color: PPTX_C.ink3, charSpacing: 4, bold: true,
       }); yOff += 0.32; }
-      if (main) { slide.addText(main.textContent.trim(), {
+      if (main) { _safeText(slide, main.textContent.trim(), {
         x: r.x + 0.25, y: r.y + yOff, w: r.w - 0.5, h: r.h - yOff - 0.5,
         fontFace: PPTX_F.serif, fontSize: 14, color: PPTX_C.ink, italic: true,
         lineSpacingMultiple: 1.4,
       }); }
-      if (author) { slide.addText(author.textContent.trim(), {
+      if (author) { _safeText(slide, author.textContent.trim(), {
         x: r.x + 0.25, y: r.y + r.h - 0.4, w: r.w - 0.5, h: 0.3,
         fontFace: PPTX_F.sans, fontSize: 9, color: PPTX_C.ink3, align: 'right',
       }); }
@@ -1501,7 +1510,7 @@ function _addSlideToPPTX(pres, iframe, idx) {
         x: r.x, y: r.y, w: r.w, h: r.h,
         fill: { color: PPTX_C.dk }, line: { color: PPTX_C.dk, width: 0 },
       });
-      slide.addText(blk.textContent.trim(), {
+      _safeText(slide, blk.textContent.trim(), {
         x: r.x + 0.18, y: r.y + 0.15, w: r.w - 0.36, h: r.h - 0.3,
         fontFace: 'Consolas', fontSize: 10, color: PPTX_C.on,
         lineSpacingMultiple: 1.3,
@@ -1513,7 +1522,7 @@ function _addSlideToPPTX(pres, iframe, idx) {
       if (el.closest('.card, .co, .cod, .pit, .icard, .quote, .next, .draft, .step, .ladder, .chk, .netbox, .hybrid, .flow-box')) return;
       const r = _pxToInchRect(el.getBoundingClientRect());
       const isHead = el.classList.contains('bth');
-      slide.addText(el.textContent.trim(), {
+      _safeText(slide, el.textContent.trim(), {
         x: r.x, y: r.y, w: r.w, h: r.h,
         fontFace: isHead ? PPTX_F.serif : PPTX_F.sans,
         fontSize: isHead ? 14 : 10.5,
@@ -1537,7 +1546,7 @@ function _addSlideToPPTX(pres, iframe, idx) {
       const lr = _pxToInchRect(fL.getBoundingClientRect());
       const lb = fL.querySelector('.fbar-label');
       const ti = fL.querySelector('.fbar-title');
-      slide.addText([
+      _safeText(slide, [
         { text: (lb ? lb.textContent.trim() : 'MODULE') + '  ', options: {
           fontFace: PPTX_F.label, fontSize: 8, color: PPTX_C.ink3, charSpacing: 3, bold: true,
         } },
@@ -1548,20 +1557,14 @@ function _addSlideToPPTX(pres, iframe, idx) {
         x: lr.x + 0.1, y: lr.y, w: lr.w - 0.2, h: lr.h, valign: 'middle',
       });
     }
-    const fR = fbar.querySelector('.fbar-r');
-    if (fR) {
-      // PAGE 라벨만 표시. 실제 번호는 마스터 슬라이드의 slideNumber placeholder가 자동 갱신
-      const lb = fR.querySelector('.fbar-label');
-      if (lb) {
-        const rr = _pxToInchRect(fR.getBoundingClientRect());
-        slide.addText('PAGE', {
-          x: rr.x + 0.1, y: rr.y, w: rr.w * 0.5, h: rr.h,
-          fontFace: PPTX_F.label, fontSize: 8, color: PPTX_C.ink3,
-          charSpacing: 3, bold: true,
-          align: 'right', valign: 'middle',
-        });
-      }
-    }
+    // PAGE 라벨은 자동 슬라이드 번호(마스터의 slideNumber: x=11.65) 직전 고정 좌표로 박는다
+    // (fbar-r flex의 좁은 측정값을 쓰면 라벨이 자동 번호의 우측으로 밀려 "2  PAGE"처럼 보이는 문제 회피)
+    _safeText(slide, 'PAGE', {
+      x: 10.95, y: 7.07, w: 0.65, h: 0.43,
+      fontFace: PPTX_F.label, fontSize: 8, color: PPTX_C.ink3,
+      charSpacing: 3, bold: true,
+      align: 'right', valign: 'middle',
+    });
   }
 }
 
