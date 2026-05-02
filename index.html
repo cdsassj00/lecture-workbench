@@ -663,17 +663,36 @@ function cleanTimeLabels(html) {
     .replace(/\s*·\s*\d+(?:~\d+)?\s*MIN/g, '');
 }
 
+// 슬라이드 HTML에서 이전 편집 세션이 남긴 잔여물 정리
+// (DB에 영구 박혀버린 contenteditable 속성·outline 인라인 스타일을 표시 시점에 제거)
+//   - contenteditable 속성 (편집모드 OFF에도 편집되는 버그 차단)
+//   - style 안의 outline·cursor:text (점선 박스 잔존 차단)
+function cleanEditModeArtifacts(html) {
+  if (!html) return html;
+  return html
+    .replace(/\s+contenteditable=(?:"[^"]*"|'[^']*'|[A-Za-z]+)/gi, '')
+    .replace(/style=(["'])([^"']*)\1/gi, (m, q, styles) => {
+      const cleaned = styles
+        .split(';')
+        .map(s => s.trim())
+        .filter(s => s && !/^outline\s*:/i.test(s) && !/^cursor\s*:\s*text\b/i.test(s))
+        .join('; ');
+      return cleaned ? `style=${q}${cleaned}${q}` : '';
+    });
+}
+
 function selectSlide(idx) {
   if (idx < 0 || idx >= S.slides.length) return;
-  // 시간 라벨 자동 제거 (슬라이드별 1회만 — 처리됨 표시)
-  if (!S.slides[idx]._timeCleaned) {
+  // 슬라이드별 1회 자동 정리 (시간 라벨 + 편집 잔여물)
+  if (!S.slides[idx]._cleaned) {
     const before = S.slides[idx].html || '';
-    const after = cleanTimeLabels(before);
+    let after = cleanTimeLabels(before);
+    after = cleanEditModeArtifacts(after);
     if (after !== before) {
       S.slides[idx].html = after;
       S.dirty = true;
     }
-    S.slides[idx]._timeCleaned = true;
+    S.slides[idx]._cleaned = true;
   }
   S.selectedIdx = idx;
   
