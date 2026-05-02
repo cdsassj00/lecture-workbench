@@ -652,8 +652,29 @@ function buildSlidePreview(slide) {
   return `<!DOCTYPE html><html><head><style>${S.css}\nbody{margin:0;overflow:hidden}\n.stage{width:1600px;height:900px;position:relative}\n.slide{position:absolute;inset:0}\n.deck{}\n.fbar{position:absolute;bottom:0;left:0;right:0}\n${PALETTE_INLINE}</style></head><body><div class="stage">${slide.html}</div></body></html>`;
 }
 
+// 슬라이드 HTML에서 강의 운영용 시간 라벨 제거 (공유 강의안 톤 일관)
+//   · 09:30 / · 14:10 같은 시각 표시
+//   · 5MIN / · 5~7MIN 같은 분 단위 표시
+// hbar(헤더), hl-kicker(키커) 등 어디에 박혀 있어도 일괄 제거
+function cleanTimeLabels(html) {
+  if (!html) return html;
+  return html
+    .replace(/\s*·\s*\d{1,2}:\d{2}/g, '')
+    .replace(/\s*·\s*\d+(?:~\d+)?\s*MIN/g, '');
+}
+
 function selectSlide(idx) {
   if (idx < 0 || idx >= S.slides.length) return;
+  // 시간 라벨 자동 제거 (슬라이드별 1회만 — 처리됨 표시)
+  if (!S.slides[idx]._timeCleaned) {
+    const before = S.slides[idx].html || '';
+    const after = cleanTimeLabels(before);
+    if (after !== before) {
+      S.slides[idx].html = after;
+      S.dirty = true;
+    }
+    S.slides[idx]._timeCleaned = true;
+  }
   S.selectedIdx = idx;
   
   // Update strip active
@@ -742,21 +763,22 @@ function makeEditable(iframe) {
     const doc = iframe.contentDocument;
     
     // 1. 텍스트 편집 가능 요소
-    const SEL = '.hl-kicker,.hl-title,.hl-sub,.bth,.bt,.co-lb,.co-main,.co p,.pit-lb,.pit-h,.pit-d,.cod-lb,.cod-main,.cod p,.sh-n,.sh-t,.hero-k,.hero-t,.hero-s,.hero-q-q,.hero-q-a,.icard-lb,.icard-sess,.icard .bth,.icard .bt,.quote-q,.quote-a,.quote-src,.hbar-l,.hbar-r,.fbar-title,.mtbl td,.mtbl th,.ds-a,.ds-n,.ds-d,.fig,.cblk,.chk-t,.step-t,.step-d,.netbox-lb,.ladder-h,.ladder-d,.ladder-tag,.card-k,.card-anchor,.card-body,.card-note,.next-k,.next-t,.draft-k,.draft-t,.draft-note,h1,p,div[style*="font-size"],span[style*="font-size"]';
+    // 주의: .fbar-title 제외 (페이지 번호·모듈명 직접 클릭 편집 차단)
+    //   페이지 번호 = updateAllPageNumbers()가 자동 갱신
+    //   모듈명     = 우측 패널 "바닥글 모듈명" 입력으로만 변경
+    const SEL = '.hl-kicker,.hl-title,.hl-sub,.bth,.bt,.co-lb,.co-main,.co p,.pit-lb,.pit-h,.pit-d,.cod-lb,.cod-main,.cod p,.sh-n,.sh-t,.hero-k,.hero-t,.hero-s,.hero-q-q,.hero-q-a,.icard-lb,.icard-sess,.icard .bth,.icard .bt,.quote-q,.quote-a,.quote-src,.hbar-l,.hbar-r,.mtbl td,.mtbl th,.ds-a,.ds-n,.ds-d,.fig,.cblk,.chk-t,.step-t,.step-d,.netbox-lb,.ladder-h,.ladder-d,.ladder-tag,.card-k,.card-anchor,.card-body,.card-note,.next-k,.next-t,.draft-k,.draft-t,.draft-note,h1,p,div[style*="font-size"],span[style*="font-size"]';
     doc.querySelectorAll(SEL).forEach(el => {
       // 자유 wrapper 자체(.free-text/.free-image/.free-comp)는 SEL 처리에서 제외
       // 단, .free-comp 안의 내부 텍스트는 편집 가능 유지 — 빠짐없이
       if (el.classList && (el.classList.contains('free-text') || el.classList.contains('free-image') || el.classList.contains('free-comp'))) return;
       el.contentEditable = 'true';
-      el.style.outline = '1px dashed rgba(184,83,42,0.25)';
-      el.style.cursor = 'text';
+      // outline·cursor는 인라인 대신 CSS class로 처리 (편집모드 종료 시 잔존 방지)
       el.addEventListener('input', () => saveSlideState(doc));
       el.addEventListener('focus', () => {
-        el.style.outline = '2px solid rgba(184,83,42,0.6)';
         // 부모 윈도우에 현재 선택된 텍스트 박스 알림 (AI 수정 대상 추적)
         try { if (window.parent && window.parent !== window) window.parent.setAITarget && window.parent.setAITarget(el); } catch(e) {}
       });
-      el.addEventListener('blur', () => { el.style.outline = '1px dashed rgba(184,83,42,0.25)'; saveSlideState(doc); });
+      el.addEventListener('blur', () => { saveSlideState(doc); });
     });
     
     // 2. 블록 컴포넌트에 조작 핸들 추가 (삭제 + 위/아래 이동)
@@ -797,7 +819,7 @@ function makeEditable(iframe) {
     if (!doc.getElementById('wb-handle-css')) {
       const style = doc.createElement('style');
       style.id = 'wb-handle-css';
-      style.textContent = '.wb-handle-bar button:hover{background:rgba(154,68,32,1)!important}.wb-anchor{outline:2px solid #b8532a!important;outline-offset:3px!important;box-shadow:0 0 0 1px rgba(184,83,42,0.15)!important}';
+      style.textContent = '.wb-handle-bar button:hover{background:rgba(154,68,32,1)!important}.wb-anchor{outline:2px solid #b8532a!important;outline-offset:3px!important;box-shadow:0 0 0 1px rgba(184,83,42,0.15)!important}[contenteditable="true"]{outline:1px dashed rgba(184,83,42,0.25);cursor:text}[contenteditable="true"]:focus{outline:2px solid rgba(184,83,42,0.6)}';
       doc.head.appendChild(style);
     }
 
@@ -821,6 +843,17 @@ function saveSlideState(doc) {
     clone.querySelectorAll('.free-handle').forEach(h => h.remove());
     clone.querySelectorAll('.free-selected').forEach(el => el.classList.remove('free-selected'));
     clone.querySelectorAll('[data-bound]').forEach(el => el.removeAttribute('data-bound'));
+    // 편집 모드 잔여물 정리: contenteditable 속성 + outline·cursor 인라인 스타일 제거
+    // (편집모드 종료 후에도 점선 박스가 남는 버그 차단)
+    clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    clone.querySelectorAll('[style*="outline"]').forEach(el => {
+      el.style.outline = '';
+    });
+    clone.querySelectorAll('[style*="cursor"]').forEach(el => {
+      if (el.style.cursor === 'text') el.style.cursor = '';
+    });
+    // 빈 style 속성 제거
+    clone.querySelectorAll('[style=""]').forEach(el => el.removeAttribute('style'));
     const style = clone.querySelector('#wb-handle-css'); if (style) style.remove();
     S.slides[S.selectedIdx].html = clone.innerHTML;
     markDirty();
