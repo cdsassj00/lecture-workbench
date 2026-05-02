@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -242,12 +242,110 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
     <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART G · 16:40</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">거점 미션 선언</div><div style="font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5">선언서 + 공용 저장소</div></div>
   </div>
 
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">001 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">001 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
 <!-- SLIDE 002 · HUB LEADER                                        -->
 <!-- ============================================================ -->
+<!-- ============================================================ -->
+<!-- SLIDE 002 · 거점리더의 세 정체성 (신규)                    -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="3 Identities">
+  <div class="hbar"><div class="hbar-l">OPENING · 거점리더 정체성 · 09:36</div><div class="hbar-r">AI·데이터기반행정 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">OPENING · 거점리더는 누구인가 · 7MIN</div>
+    <div class="hl-title">거점리더의 세 정체성 — 문제해결자·공유확산자·검증자</div>
+    <div class="hl-sub">본 과정 수강생을 거점리더라 부른다. 거점리더는 개발자도 아니고 분석자도 아니다. 부서·기관의 결핍을 정확히 정의하는 문제해결자, 자기 활용 사례를 동료에게 재현 가능한 형태로 넘기는 공유확산자, 에이전트가 만든 결과를 도메인 지식으로 검증·수정·설명하는 검증자. 세 정체성이 거점리더의 자리를 정의한다. 심층 구현은 에이전트가 한다. 거점리더는 정확한 문제 정의와 결과 확산과 검증을 한다. 8주 동안 배우는 모든 도구·기법·실습은 이 세 정체성을 떠받치는 수단으로 학습한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">정체성 ① · PROBLEM SOLVER</div>
+      <div class="card-anchor"><em>문제해결자</em> — 어떤 문제를 풀지 정의하는 사람</div>
+      <div class="card-body">거점리더는 코드를 짜는 사람이 아니라 어떤 문제를 풀어야 하는지를 정의하는 사람이다. 자기 부서가 매일·매주 반복하는 작업 중에서 시민·국민·동료의 결핍을 가장 정확히 짚어내는 일이 본업이다. 도구·모델·프롬프트는 그 다음 순서이고, 페인포인트가 흐릿하면 어떤 도구를 붙여도 결과는 안 쓰이는 산출물로 끝난다. 본인이 가진 도메인 지식이 가장 큰 무기다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">실패 패턴 — 화려한 도구부터 고른다 → 페인포인트가 뒤이어 끼워 맞춰진다 → 결과는 멋지지만 아무도 안 쓴다. 공공 AI 도입 실패의 다수가 여기서 시작된다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">정체성 ② · SHARER</div>
+      <div class="card-anchor"><em>공유확산자</em> — 자기 책상의 결과를 부서·기관 자산으로 옮기는 사람</div>
+      <div class="card-body">자신이 먼저 써본 AI 활용 사례·결과물·프롬프트·실패 기록을 동료가 그대로 따라할 수 있는 형태로 정리해 공용 저장소에 넘긴다. 본인 PC에만 머무는 단발성 도구는 거점리더의 산출물이 아니다. 산출물 4종(프롬프트 .md · 도구 체인 README · 실제 결과물 · 1페이지 가이드)이 모두 갖춰져야 다른 부서·기관도 같은 결과를 재현할 수 있다. 공유는 결과물만이 아니라 과정과 실패까지 포함한다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">최소 묶음 — ① 사용한 프롬프트 .md ② 도구 체인을 적은 README ③ 실제 결과물 파일 ④ 동료용 1페이지 가이드. 4종이 모두 GitHub Org에 올라가야 산출물이 완성된다.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">정체성 ③ · VERIFIER</div>
+      <div class="card-anchor"><em>검증자</em> — 도메인 지식으로 결과를 검증·수정·설명하는 사람</div>
+      <div class="card-body">에이전트가 빠르게 만든 결과를 그대로 내보내지 않는다. 공공 도메인의 법령·관행·이해관계를 알기에 무엇이 틀렸는지, 어디를 고쳐야 하는지, 동료에게 어떻게 설명해야 하는지 판단할 수 있어야 한다. 검증은 두 층이다. 첫째 결과의 사실·법령 부합 여부, 둘째 동료가 같은 입력으로 같은 결과를 다시 만들 수 있는 재현 가능성. 둘째 층이 빠지면 본인 1회용 도구에 그친다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">필수 보유 원리 — REST API · 벡터DB · 프롬프트 구조 · 토큰·컨텍스트 한계 · 권한·로그 기본기. 깊이 있을 필요는 없으나 있어야 검증·수정·설명이 가능하다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">002 / 056</span></div></div>
+</div></div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 003 · 고객 페인포인트 캡처 5질문 (신규)             -->
+<!-- ============================================================ -->
+<div class="stage"><div class="slide" data-title="Painpoint 5Q">
+  <div class="hbar"><div class="hbar-l">OPENING · 페인포인트 캡처 · 09:43</div><div class="hbar-r">AI·데이터기반행정 전문인재 양성과정 · Session 01</div></div>
+  <div class="hl">
+    <div class="hl-kicker">OPENING · 출발점은 고객의 결핍 · 8MIN</div>
+    <div class="hl-title">고객 결핍·페인포인트 캡처 5질문</div>
+    <div class="hl-sub">모든 거점 미션은 고객의 결핍에서 출발한다. 고객은 시민·국민일 수도 있고, 같은 부서·다른 부서의 동료 공무원일 수도 있다. 페인포인트가 정확하지 않으면 어떤 AI를 붙여도 가치를 만들지 못한다. 다섯 질문으로 결핍을 구체화한다. 각 질문에 1~3문장으로 답할 수 있어야 거점 미션 선언서의 첫 필드(배경)가 채워진다. 페인포인트가 1문장으로 안 적히면 미션을 시작하지 않는 것이 거점리더의 첫 절제다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">Q1 · WHO</div>
+      <div class="card-anchor">누가 겪는가 — <em>고객 한 명을 좁힌다</em></div>
+      <div class="card-body">시민·민원인 / 동료 공무원 / 본인 부서 중 누구의 결핍인가. 한 명의 구체 인물(주차과 김주무관 20년차, 8단지 민원인 등)로 좁힐 수 있어야 미션이 흔들리지 않는다. "전 시민" 같은 광범위 대상은 페인포인트로 잡히지 않는다. 좁히면 산출물 형식(엑셀? 메일? 대시보드?)도 자동으로 결정되고, 검증 시 누구에게 결과를 보여줘야 하는지도 같이 따라온다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">예시 — "주차과 김주무관(20년차)이 매일 처리하는 8~10건의 주차 민원" / "민원포털 답변을 기다리는 시민 1명" / "보고서 마감 직전 검토하는 김팀장 1명".</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">Q2 · WHEN</div>
+      <div class="card-anchor">언제 일어나는가 — <em>트리거를 명시한다</em></div>
+      <div class="card-body">민원 접수 · 기한 도래 · 정기 회의 · 매월 말일 09:00 등 무엇이 이 작업을 시작시키는가. 트리거를 잡아야 자동화 가능 여부가 보인다. 정기적이면 cron·스케줄로, 이벤트성이면 webhook·수동 실행으로 풀린다. 트리거가 모호하면 실행 시점도 모호해지고, 결국 동료에게 "언제 이 도구를 쓰면 되는가"를 설명할 수 없다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">예시 — "매월 1일 09:00 자동" / "민원 포털에 신규 접수 등록되는 즉시" / "팀장 결재 요청 메일 수신 시" / "주간 정례회의 1시간 전".</div>
+    </div>
+    <div class="card">
+      <div class="card-k">Q3 · WHAT BLOCKS</div>
+      <div class="card-anchor">무엇이 막혀 있나 — <em>막힌 지점이 AI의 자리</em></div>
+      <div class="card-body">결정 지연 / 재작업 / 반복 입력 / 이중 입력 / 다부서 확인 / 양식 변환 중 어디가 막혀 있는가. 막힌 지점이 곧 AI가 들어갈 자리다. 한 작업에 막히는 지점이 여러 개라면 그중 가장 시간을 많이 잡아먹는 1개를 먼저 푼다. 모든 막힘을 한 번에 풀려고 하면 어떤 것도 풀지 못한다. 우선순위는 시간 × 빈도로 결정한다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">예시 — "민원 분류에 매번 조례를 검색하는 데 10분" / "보고서 양식을 매번 다시 만드는 데 20분" / "다부서 회신 취합에 1일".</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">Q4 · HOW LONG</div>
+      <div class="card-anchor">시간이 얼마나 드는가 — <em>1건·1주·1년 정량화</em></div>
+      <div class="card-body">1건 처리 시간 / 1주 누적 / 1년 누적을 숫자로 적는다. "1건 30분, 월 200건, 연 2,400건"처럼 정량화한 페인포인트만 선언서의 성공 기준을 가질 수 있다. 정량 숫자가 있어야 어시스트와 에이전트의 절감 효과를 비교할 수 있고, 동료에게 도입 효과를 한 줄로 설명할 수 있다. 처리 시간뿐 아니라 담당자 수·재작업 비율도 함께 적으면 운영 효과까지 보인다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">정량 양식 — "현재 1건 N분 · 월 N건 · 연 N건 · 담당자 N명 · 재작업률 N%". 4~5개 숫자가 빠지면 미션은 출발선이 흐릿하다.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">Q5 · WORKAROUND</div>
+      <div class="card-anchor">현재 어떻게 우회하나 — <em>우회법의 빈자리가 산출물 자리</em></div>
+      <div class="card-body">수기 작성 / 복붙 / 이메일·메신저 다중 채널 / 엑셀 매크로 / 다른 부서 전화 / 직접 출장 등 현재의 우회법을 그대로 적는다. 우회법이 무엇이냐가 곧 AI 산출물이 들어갈 빈자리를 보여준다. 우회법이 견고하다면 AI는 보조 역할이고, 우회법이 위태롭다면 AI는 표준 도구가 된다. 우회법 없이 그냥 미뤄지고 있는 작업이라면 AI 도입의 우선순위가 가장 높다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">예시 — "현재는 매번 조례집 PDF를 Ctrl+F로 검색해 답변에 복붙. 1건당 5~10분 소요. 신참은 더 오래 걸리고 인용 누락도 잦음."</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">PITFALL · 부정확한 페인포인트</div>
+      <div class="card-anchor"><em>5질문이 비어 있으면</em> 어떤 AI도 가치를 만들지 못한다</div>
+      <div class="card-body">대규모 AI 도입 실패 사례의 공통점은 페인포인트가 1문장으로 안 적힌 채 시작했다는 것이다. "AI로 부서 업무 효율화" 같은 추상 목표는 5질문 어디에도 답이 없다. 산출물은 멋질 수 있어도 누가, 언제, 무엇을 위해 쓸지가 없으니 동료가 안 쓴다. 거점리더의 첫 절제는 5질문이 비어 있는 미션을 시작하지 않는 것이다. 페인포인트 캡처가 끝나야 캔버스 6칸으로 넘어간다.</div>
+      <div class="card-spacer"></div>
+      <div class="card-note">자기 진단 — 5질문에 1문장씩 답이 안 나오면 페인포인트 다시 캡처. 캔버스 6칸·9유형 매핑은 5질문 통과 후에 시작한다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">003 / 056</span></div></div>
+</div></div>
+
 <div class="stage"><div class="slide" data-title="Hub Leader">
   <div class="hbar"><div class="hbar-l">OPENING · 거점리더</div><div class="hbar-r">AI·데이터기반행정 전문인재 양성과정 · Session 01</div></div>
   <div class="hl">
@@ -280,7 +378,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-note">개인 생산성은 부수 효과이고, 평가는 동료가 같은 결과를 재현하는지로 판정한다.</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">002 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">004 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -337,7 +435,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">003 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">005 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -405,7 +503,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">004 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">006 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -476,7 +574,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">005 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">007 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -533,7 +631,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">006 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">008 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -589,7 +687,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">007 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">009 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -627,7 +725,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-note">환각이 자연스럽게 생기는 이유 — softmax가 항상 확률을 만들어 V를 합산하므로 모델은 결코 "모릅니다"를 출력하지 않고 가장 그럴듯한 V 조합을 만들어냅니다.</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">008 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">010 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -665,7 +763,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-body" style="color:var(--ink3);font-size:12.5px">KEY MESSAGE · 멀티헤드 개수보다 어떤 축을 보는가가 중요.</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">009 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">011 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -725,7 +823,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">010 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">012 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -772,7 +870,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">011 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">013 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -822,7 +920,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">012 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">014 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -867,7 +965,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">013 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">015 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -905,7 +1003,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-note">사전 준비: 개인 유료 플랜 1종 권장 (ChatGPT/Claude/Gemini 중 택).</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">014 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">016 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -963,7 +1061,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">015 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">017 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1025,7 +1123,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">016 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">018 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1091,7 +1189,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">017 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">019 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1153,7 +1251,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">018 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">020 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1191,7 +1289,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-note">5·7회차 실습 필수 구성 요소.</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">019 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">021 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1256,7 +1354,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">020 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">022 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1294,7 +1392,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-note">진입 난이도 최저 · 거점 미션 선언서의 첫 목표 유형으로 자주 선택.</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">021 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">023 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1352,7 +1450,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">022 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">024 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1419,7 +1517,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">023 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">025 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1457,7 +1555,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-note">용량 150MB+ · 내부망 반입 시 승인 절차 고려.</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">024 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">026 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1506,7 +1604,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">025 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">027 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1556,7 +1654,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">026 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">028 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1614,7 +1712,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">027 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">029 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1662,7 +1760,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">028 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">030 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1734,7 +1832,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">029 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">031 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1798,7 +1896,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">030 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">032 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1914,7 +2012,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">031 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">033 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1963,7 +2061,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">032 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">034 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -1993,7 +2091,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">033 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">035 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2059,7 +2157,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">034 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">036 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2097,7 +2195,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-note">비식별화 원칙은 배포 전에도 적용.</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">035 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">037 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2153,7 +2251,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">036 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">038 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2191,7 +2289,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-note">Part G 끝까지 해결 못 하면 조교와 1:1 지원.</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">037 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">039 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2250,7 +2348,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">038 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">040 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2308,7 +2406,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">039 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">041 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2346,7 +2444,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       <div class="card-note">KEY MESSAGE · 유형 매핑이 선언서의 차별점.</div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">040 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">042 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2408,7 +2506,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">041 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">043 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2470,7 +2568,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">042 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">044 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2553,7 +2651,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">043 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">045 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2585,7 +2683,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">044 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">046 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2642,7 +2740,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">045 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">047 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2695,7 +2793,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">046 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">048 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2748,7 +2846,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">047 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">049 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2810,7 +2908,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">048 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">050 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2876,7 +2974,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">049 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">051 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -2965,7 +3063,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">050 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">052 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -3043,7 +3141,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">051 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">053 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -3099,7 +3197,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">052 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">054 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -3173,7 +3271,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">053 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">055 / 056</span></div></div>
 </div></div>
 
 <!-- ============================================================ -->
@@ -3214,7 +3312,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
     </div>
   </div>
 
-  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">054 / 054</span></div></div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">01 · AI 에이전트 시대의 개막과 공공 구현 지형도</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">056 / 056</span></div></div>
 </div></div>
 
 </div>
