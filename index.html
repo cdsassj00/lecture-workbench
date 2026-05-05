@@ -1891,7 +1891,9 @@ function applyCoverPreset(cv) {
 // SESSION LIST (같은 폴더 교안 바로 열기)
 // ============================================================
 const SESSION_FILES = [
-  {file:'session-01-complete.html', num:'01', title:'AI 에이전트 시대 · 지형도'},
+  {file:'session-01-complete.html', num:'01', title:'AI 에이전트 시대 · 지형도', refs:[
+    {label:'신경망 행렬 시각화 (인터랙티브)', href:'references/01-neural-net-matrix-viz.html', desc:'Attention·Q·K·V 행렬 연산을 인터랙티브로 체험'},
+  ]},
   {file:'session-02-complete.html', num:'02', title:'프론티어 모델과 AI 도구 50선'},
   {file:'session-03-complete.html', num:'03', title:'메타 프롬프트와 워크플로우'},
   {file:'session-04-complete.html', num:'04', title:'어시스트 코딩 ① 시각화·분석'},
@@ -1906,11 +1908,34 @@ function openSessionList() {
   grid.innerHTML = '';
   SESSION_FILES.forEach(s => {
     const card = document.createElement('div');
-    card.style.cssText = 'border:1px solid var(--wln);border-radius:var(--rad);padding:10px 12px;cursor:pointer;background:#fff;transition:all 0.12s';
-    card.innerHTML = `<div style="font-size:10px;font-weight:700;color:var(--wacc);letter-spacing:1px;margin-bottom:3px">SESSION ${s.num}</div><div style="font-size:12px;font-weight:600;color:var(--wink);line-height:1.3">${s.title}</div>`;
-    card.onmouseenter = () => { card.style.borderColor = 'var(--wacc)'; card.style.background = 'rgba(184,83,42,0.03)'; };
-    card.onmouseleave = () => { card.style.borderColor = 'var(--wln)'; card.style.background = '#fff'; };
-    card.onclick = () => fetchSession(s);
+    card.style.cssText = 'border:1px solid var(--wln);border-radius:var(--rad);padding:10px 12px;background:#fff;transition:all 0.12s;display:flex;flex-direction:column;gap:6px';
+    const main = document.createElement('div');
+    main.style.cssText = 'cursor:pointer';
+    main.innerHTML = `<div style="font-size:10px;font-weight:700;color:var(--wacc);letter-spacing:1px;margin-bottom:3px">SESSION ${s.num}</div><div style="font-size:12px;font-weight:600;color:var(--wink);line-height:1.3">${s.title}</div>`;
+    main.onclick = () => fetchSession(s);
+    card.appendChild(main);
+    // 참고자료 영역 (있을 때만)
+    if (s.refs && s.refs.length) {
+      const refBox = document.createElement('div');
+      refBox.style.cssText = 'border-top:1px dashed var(--wln);padding-top:6px;margin-top:2px;display:flex;flex-direction:column;gap:4px';
+      const refLbl = document.createElement('div');
+      refLbl.style.cssText = 'font-family:monospace;font-size:9px;color:var(--wink3);letter-spacing:2px;font-weight:700';
+      refLbl.textContent = '📎 참고자료 ' + s.refs.length + '건';
+      refBox.appendChild(refLbl);
+      s.refs.forEach(r => {
+        const a = document.createElement('a');
+        a.href = r.href; a.target = '_blank'; a.rel = 'noopener';
+        a.style.cssText = 'display:block;font-size:11px;color:var(--wacc);text-decoration:none;padding:4px 6px;border:1px solid rgba(184,83,42,0.25);border-radius:3px;background:rgba(184,83,42,0.04)';
+        a.innerHTML = '🔗 ' + r.label + (r.desc ? `<div style="font-size:9.5px;color:var(--wink3);font-weight:400;margin-top:1px;line-height:1.4">${r.desc}</div>` : '');
+        a.onclick = (e) => e.stopPropagation(); // 카드 클릭(세션 열기)과 분리
+        a.onmouseenter = () => { a.style.background = 'rgba(184,83,42,0.12)'; };
+        a.onmouseleave = () => { a.style.background = 'rgba(184,83,42,0.04)'; };
+        refBox.appendChild(a);
+      });
+      card.appendChild(refBox);
+    }
+    card.onmouseenter = () => { card.style.borderColor = 'var(--wacc)'; };
+    card.onmouseleave = () => { card.style.borderColor = 'var(--wln)'; };
     grid.appendChild(card);
   });
   document.getElementById('sessionModalBg').classList.add('show');

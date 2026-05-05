@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>신경망 = 행렬 곱셈 · 숫자로 보는 시뮬레이터 v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --border: #e5e0d6;
+  --text: #1f1f1c;
+  --text-soft: #5d5a52;
+  --text-mute: #8b8676;
+  --accent: #cc785c;
+  --accent-soft: #f0d4c8;
+  --accent-bg: #fbf2ec;
+  --neg: #5b7a9a;
+  --neg-soft: #d4dfeb;
+  --code-bg: #f5f3ed;
+}
+
+body {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-weight: 300;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+header {
+  margin-bottom: 72px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 56px;
+}
+
+header .eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+header h1 {
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+
+header .subtitle {
+  color: var(--text-soft);
+  font-size: 17px;
+  max-width: 660px;
+  margin: 0 auto;
+}
+
+section { margin-bottom: 72px; }
+
+.section-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+
+.section-title {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+
+.section-desc {
+  color: var(--text-soft);
+  margin-bottom: 32px;
+  max-width: 720px;
+}
+
+.input-section {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.input-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 50px);
+  gap: 4px;
+  background: var(--border);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.pixel {
+  width: 50px;
+  height: 50px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text-mute);
+  font-weight: 500;
+  user-select: none;
+}
+
+.pixel.active {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.preset-controls { display: flex; flex-direction: column; gap: 12px; }
+
+.preset-label {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.1em;
+}
+
+.preset-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.preset-btn {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+
+.preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+.preset-btn.clear { color: var(--text-mute); }
+
+.neuron-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+@media (min-width: 920px) {
+  .neuron-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.neuron-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 22px;
+}
+
+.neuron-card.zero { background: var(--bg); opacity: 0.85; }
+
+.neuron-header {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.neuron-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.neuron-desc { font-size: 13px; color: var(--text-soft); margin-left: 10px; }
+
+.matrix-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.matrix-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.matrix-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.05em;
+}
+
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 26px);
+  gap: 2px;
+  background: var(--border);
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.mini-cell {
+  width: 26px;
+  height: 26px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-mute);
+  font-weight: 500;
+  border-radius: 2px;
+}
+
+.mini-cell.weight-on { background: var(--accent-bg); color: var(--accent); font-weight: 700; }
+.mini-cell.input-on { background: var(--text); color: var(--bg); font-weight: 600; }
+.mini-cell.match { background: var(--accent); color: white; font-weight: 700; }
+
+.op-symbol {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  color: var(--text-mute);
+  font-weight: 400;
+  margin-top: 28px;
+  padding: 0 4px;
+}
+
+.calc-line {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-soft);
+  background: var(--code-bg);
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-top: 10px;
+  line-height: 1.8;
+}
+
+.calc-line .num { color: var(--text); font-weight: 600; }
+.calc-line .pos { color: var(--accent); font-weight: 700; }
+.calc-line .neg { color: var(--neg); font-weight: 700; }
+.calc-line .clipped { color: var(--text-mute); text-decoration: line-through; }
+.calc-line .mute { color: var(--text-mute); }
+
+.h-result {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--accent-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 4px 4px 0;
+  color: var(--accent);
+}
+
+.h-result.zero {
+  border-left-color: var(--text-mute);
+  color: var(--text-mute);
+  background: var(--bg);
+}
+
+.class-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+@media (min-width: 920px) { .class-grid { grid-template-columns: 1fr 1fr; } }
+
+.class-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 22px;
+}
+
+.class-card.winner {
+  border-color: var(--accent);
+  border-width: 2px;
+  padding: 21px;
+  background: linear-gradient(180deg, #fefcfa 0%, var(--bg-card) 100%);
+}
+
+.class-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.class-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.class-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.class-score.pos { color: var(--accent); }
+.class-score.neg { color: var(--neg); }
+
+.dot-product-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+
+.dot-product-table th, .dot-product-table td {
+  padding: 7px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.dot-product-table th {
+  font-weight: 500;
+  color: var(--text-mute);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.dot-product-table .h-name {
+  text-align: left;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.dot-product-table tr:last-child td { border-bottom: none; }
+
+.dot-product-table .total-row td {
+  border-top: 2px solid var(--text);
+  border-bottom: none;
+  padding-top: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.val-pos { color: var(--accent); font-weight: 700; }
+.val-neg { color: var(--neg); font-weight: 700; }
+.val-zero { color: var(--text-mute); }
+
+.softmax-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.softmax-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: var(--code-bg);
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  color: var(--text-soft);
+}
+
+.softmax-bars { display: flex; flex-direction: column; gap: 14px; }
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 90px;
+  align-items: center;
+  gap: 16px;
+}
+
+.bar-class {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.bar-track {
+  background: var(--code-bg);
+  height: 28px;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+
+.bar-fill.loser { background: var(--text-mute); opacity: 0.4; }
+
+.bar-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  text-align: right;
+  font-size: 14px;
+}
+
+.prediction-result {
+  margin-top: 28px;
+  padding: 22px;
+  background: var(--accent-bg);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.prediction-result .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.prediction-result .answer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.qkv-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 36px;
+}
+
+.qkv-section h3 {
+  font-size: 19px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  margin-top: 28px;
+  letter-spacing: -0.005em;
+}
+
+.qkv-section h3:first-child { margin-top: 0; }
+
+.qkv-section p { color: var(--text-soft); margin-bottom: 14px; }
+.qkv-section p:last-child { margin-bottom: 0; }
+
+.qkv-section .formula {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--code-bg);
+  padding: 14px 18px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin: 14px 0;
+  color: var(--text);
+  line-height: 2;
+}
+
+.qkv-section strong { color: var(--text); font-weight: 600; }
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+  font-size: 13.5px;
+}
+
+.compare-table th, .compare-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.compare-table thead th {
+  border-bottom: 1.5px solid var(--text);
+  font-weight: 500;
+  color: var(--text);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.compare-table tbody tr:first-child td { padding-top: 16px; }
+
+.compare-table .label-col {
+  font-weight: 500;
+  color: var(--text);
+  width: 22%;
+}
+
+.compare-table code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.callout {
+  border-left: 3px solid var(--accent);
+  padding: 14px 18px;
+  background: var(--bg);
+  margin: 18px 0;
+  border-radius: 0 4px 4px 0;
+  color: var(--text);
+}
+
+.callout strong { color: var(--accent); font-weight: 600; }
+
+footer {
+  margin-top: 72px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-mute);
+  font-size: 13px;
+}
+
+footer code { font-family: 'JetBrains Mono', monospace; }
+
+@media (max-width: 720px) {
+  header h1 { font-size: 28px; }
+  .section-title { font-size: 22px; }
+  .container { padding: 40px 16px 60px; }
+  .input-grid { grid-template-columns: repeat(5, 44px); }
+  .pixel { width: 44px; height: 44px; }
+  .qkv-section, .softmax-section { padding: 22px; }
+  .op-symbol { display: none; }
+  .compare-table { font-size: 12.5px; }
+  .compare-table th, .compare-table td { padding: 10px 8px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="eyebrow">v2 · numbers in</div>
+  <h1>신경망 = 행렬 곱셈</h1>
+  <p class="subtitle">5×5 픽셀이 가중치 행렬을 만나 어떻게 X·O·+·T로 분류되는가 — 모든 숫자를 보여주는 시뮬레이터</p>
+</header>
+
+<section>
+  <div class="section-num">01 / 입력</div>
+  <h2 class="section-title">5×5 픽셀, 25개의 숫자</h2>
+  <p class="section-desc">픽셀을 클릭해 직접 그려보거나, 프리셋을 눌러 보세요. 켜진 픽셀은 1, 꺼진 픽셀은 0. 이 25개 숫자가 입력 벡터 x입니다.</p>
+  <div class="input-section">
+    <div class="input-grid" id="inputGrid"></div>
+    <div class="preset-controls">
+      <span class="preset-label">PRESETS</span>
+      <div class="preset-buttons">
+        <button class="preset-btn" data-preset="X">X</button>
+        <button class="preset-btn" data-preset="O">O</button>
+        <button class="preset-btn" data-preset="+">+</button>
+        <button class="preset-btn" data-preset="T">T</button>
+        <button class="preset-btn clear" data-preset="clear">지우기</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-num">02 / 레이어 1 · 패턴 검출</div>
+  <h2 class="section-title">h = ReLU(x · W₁ + b)</h2>
+  <p class="section-desc">6개의 뉴런이 각자 다른 패턴을 찾습니다. 각 뉴런마다 5×5 가중치 행렬 W가 있고, 같은 위치끼리 곱한 후(W ⊙ x) 25개를 다 더해서 합을 냅니다. 거기에 bias(-2)를 더하고 ReLU(음수면 0)를 씌우면 활성화 값 h가 나옵니다. 곱이 1인 칸은 진한 주황으로 표시 — "패턴이 매치된 곳"입니다.</p>
+  <div class="neuron-grid" id="neuronGrid"></div>
+</section>
+
+<section>
+  <div class="section-num">03 / 레이어 2 · 점수 계산</div>
+  <h2 class="section-title">score = h · W₂ + b₂</h2>
+  <p class="section-desc">앞에서 만든 h(6차원)가 이번엔 입력입니다. 4개 클래스 각각이 자기 가중치(6개씩)와 h를 곱해서 점수를 냅니다. 양의 가중치는 "이 패턴이 있으면 좋다", 음의 가중치는 "이 패턴이 있으면 다른 클래스다".</p>
+  <div class="class-grid" id="classGrid"></div>
+</section>
+
+<section>
+  <div class="section-num">04 / Softmax</div>
+  <h2 class="section-title">점수 → 확률 → 예측</h2>
+  <p class="section-desc">Softmax가 4개 점수를 모두 양수로 만들고 합이 1이 되도록 정규화합니다. 가장 높은 확률을 가진 게 예측.</p>
+  <div class="softmax-section">
+    <div class="softmax-formula">P(class<sub>i</sub>) = exp(score<sub>i</sub>) / Σ exp(score<sub>j</sub>)</div>
+    <div class="softmax-bars" id="softmaxBars"></div>
+    <div class="prediction-result">
+      <div class="label">PREDICTION</div>
+      <div class="answer" id="predicted">·</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-num">05 / 트랜스포머 연결</div>
+  <h2 class="section-title">Q, K, V는 무엇이고, 멀티헤드는 무엇인가</h2>
+  <p class="section-desc">방금 우리가 본 "입력 × 행렬 + bias → 활성화" 구조는 트랜스포머 어텐션의 Q/K/V를 만드는 과정과 정확히 동일합니다. 다만 그 결과를 어디에 쓰는지가 다를 뿐입니다.</p>
+
+  <div class="qkv-section">
+
+    <h3>① Q는 뉴런 한 개가 아닙니다 — Q는 벡터입니다</h3>
+    <p>"Q value가 뉴런 한 개냐"는 질문에 답하자면 <strong>아닙니다</strong>. Q는 <strong>벡터</strong>예요. 숫자 여러 개의 묶음.</p>
+    <p>우리 모델에서 뉴런 1개(예: h₁)는 출력으로 숫자 1개만 냅니다. 그런데 트랜스포머의 Q 벡터는 보통 64개 숫자입니다. 그러니까 비유하자면 <strong>Q 벡터 ≈ 우리 모델의 h 벡터</strong>예요. h가 [h₁, h₂, ..., h₆] 6개 묶음이듯, Q도 [q₀, q₁, ..., q₆₃] 64개 묶음.</p>
+    <div class="callout">
+      <strong>한 줄 요약:</strong> 우리 모델의 <code>h = ReLU(x · W₁ + b)</code> 한 줄이, 트랜스포머에서는 <code>Q = x · W_Q</code>, <code>K = x · W_K</code>, <code>V = x · W_V</code> 세 줄로 나뉩니다. 곱셈 구조는 똑같고, 결과를 무엇에 쓰느냐가 다릅니다.
+    </div>
+
+    <h3>② Q, K, V는 각자 무슨 역할인가</h3>
+    <p>토큰(단어) 하나가 들어오면 임베딩 벡터 x가 됩니다. 거기에 세 개의 가중치 행렬을 곱해서 세 벡터를 만듭니다.</p>
+    <div class="formula">
+      Q = x · W_Q   <span style="color: var(--text-mute)">// "내가 무엇을 찾고 싶은지"</span><br>
+      K = x · W_K   <span style="color: var(--text-mute)">// "내가 무엇을 가지고 있는지"</span><br>
+      V = x · W_V   <span style="color: var(--text-mute)">// "실제로 전달할 정보"</span>
+    </div>
+    <p>그 다음 어텐션은 <strong>다른 토큰의 K와 내 Q를 dot product</strong>해서 "얼마나 관련 있는지" 점수를 매깁니다. 그 점수로 V들을 가중평균해서 출력을 냅니다. dot product도 결국 <strong>같은 위치끼리 곱해서 다 더하는</strong> 행렬 곱셈 — 우리가 위에서 본 그것과 동일한 연산.</p>
+
+    <h3>③ 그러면 멀티헤드(multi-head)란?</h3>
+    <p>위의 W_Q, W_K, W_V <strong>한 세트</strong>를 "한 헤드"라고 부릅니다. 멀티헤드는 이걸 <strong>8개~16개 평행하게</strong> 두는 겁니다. 각 헤드가 다른 가중치를 학습하기 때문에, 어떤 헤드는 문법 관계, 어떤 헤드는 의미 유사성, 어떤 헤드는 위치 관계를 잡아냅니다.</p>
+    <p>우리 모델로 비유하면 — 우리 Layer 1은 6개 뉴런이 각자 다른 시각 패턴(↘, ↙, —, |, □, ⊤)을 찾습니다. 멀티헤드는 이런 "검출기 6개 묶음"을 8벌, 16벌 평행으로 두고 결과를 이어붙이는 셈입니다. 한 묶음은 모서리 검출, 한 묶음은 곡선 검출, 한 묶음은 색상 검출 — 이런 식.</p>
+    <div class="callout">
+      <strong>그래서 우리 레이어 = 멀티헤드?</strong> 정확히는 아닙니다. 우리 Layer 1은 <strong>한 헤드의 W_Q 한 개</strong>에 가깝습니다. 멀티헤드가 되려면 같은 입력 x에 대해 W_Q를 8벌 평행하게 두고 각각 Q를 8개 만들어야 합니다.
+    </div>
+
+    <h3>④ 한눈에 비교</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>항목</th><th>우리 모델 (이 시뮬레이터)</th><th>트랜스포머 어텐션</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label-col">입력</td>
+          <td>5×5 픽셀 → 25차원 벡터 x</td>
+          <td>토큰 임베딩 → 보통 512차원 벡터 x</td>
+        </tr>
+        <tr>
+          <td class="label-col">가중치 행렬</td>
+          <td>W₁ (25 × 6) — 1개</td>
+          <td>W_Q, W_K, W_V (각 512 × 64) — 3개</td>
+        </tr>
+        <tr>
+          <td class="label-col">한 번 곱셈으로 나오는 것</td>
+          <td>h_pre 6차원 → ReLU → h</td>
+          <td>Q 64차원 / K 64차원 / V 64차원</td>
+        </tr>
+        <tr>
+          <td class="label-col">"뉴런 1개"란?</td>
+          <td>출력 스칼라 1개 — h₁부터 h₆까지 6개</td>
+          <td>벡터의 한 칸 — Q[0], Q[1], ..., Q[63]</td>
+        </tr>
+        <tr>
+          <td class="label-col">레이어 한 개의 의미</td>
+          <td>패턴 검출기 6개 묶음</td>
+          <td>한 헤드 = (W_Q + W_K + W_V) 묶음.<br>멀티헤드 = 이런 묶음 8~16개</td>
+        </tr>
+        <tr>
+          <td class="label-col">결과를 어디에 쓰나</td>
+          <td>다음 레이어 → Softmax → 분류</td>
+          <td>Q·K로 attention score → V를 가중평균 → 다음 레이어</td>
+        </tr>
+        <tr>
+          <td class="label-col">활성화 함수</td>
+          <td>ReLU (음수면 0)</td>
+          <td>Softmax (어텐션 score 정규화) + GELU (FFN)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>최종 결론:</strong> "행렬 곱셈 + 활성화" 한 토막이 신경망의 기본 단위입니다. 분류 모델은 이걸 직선으로 쌓고, 트랜스포머는 같은 단위를 Q/K/V 세 갈래로 만든 뒤 토큰 간 관계 계산에 씁니다. 구조가 어려운 게 아니라, <strong>같은 구조를 어떻게 조합하느냐</strong>가 어려운 겁니다.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <code>v2 · with weight numbers</code> · 단일 HTML · 망분리 사용 가능
+</footer>
+
+</div>
+
+<script>
+const W1 = [
+  [1,0,0,0,0, 0,1,0,0,0, 0,0,1,0,0, 0,0,0,1,0, 0,0,0,0,1],
+  [0,0,0,0,1, 0,0,0,1,0, 0,0,1,0,0, 0,1,0,0,0, 1,0,0,0,0],
+  [0,0,0,0,0, 0,0,0,0,0, 1,1,1,1,1, 0,0,0,0,0, 0,0,0,0,0],
+  [0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0],
+  [1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,1],
+  [1,1,1,1,1, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0]
+];
+
+const NEURONS = [
+  { name: 'h₁', desc: '↘ 대각선 검출' },
+  { name: 'h₂', desc: '↙ 대각선 검출' },
+  { name: 'h₃', desc: '— 가로 중앙' },
+  { name: 'h₄', desc: '| 세로 중앙' },
+  { name: 'h₅', desc: '□ 외곽선 (사각형)' },
+  { name: 'h₆', desc: '⊤ 상단 가로' }
+];
+
+const BIAS1 = -2;
+
+const W2 = [
+  [ 2.0, -1.0, -1.0, -1.0],
+  [ 2.0, -1.0, -1.0, -1.0],
+  [-1.0, -0.5,  2.0,  1.0],
+  [-1.0, -0.5,  2.0,  0.5],
+  [-1.0,  1.5, -1.0,  0.5],
+  [-1.0,  0.5, -1.0,  2.0]
+];
+
+const CLASSES = ['X', 'O', '+', 'T'];
+const BIAS2 = [0, 0, 0, 0];
+
+const PRESETS = {
+  X: [1,0,0,0,1, 0,1,0,1,0, 0,0,1,0,0, 0,1,0,1,0, 1,0,0,0,1],
+  O: [1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,1],
+  '+': [0,0,1,0,0, 0,0,1,0,0, 1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0],
+  T: [1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0]
+};
+
+let input = new Array(25).fill(0);
+
+function renderInputGrid() {
+  const grid = document.getElementById('inputGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 25; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'pixel' + (input[i] ? ' active' : '');
+    cell.textContent = input[i];
+    cell.addEventListener('click', () => {
+      input[i] = input[i] ? 0 : 1;
+      renderAll();
+    });
+    grid.appendChild(cell);
+  }
+}
+
+function makeMiniGrid(values, type) {
+  const div = document.createElement('div');
+  div.className = 'mini-grid';
+  for (let i = 0; i < 25; i++) {
+    const cell = document.createElement('div');
+    let cls = 'mini-cell';
+    if (values[i] === 1) {
+      if (type === 'weight') cls += ' weight-on';
+      else if (type === 'input') cls += ' input-on';
+      else if (type === 'product') cls += ' match';
+    }
+    cell.className = cls;
+    cell.textContent = values[i];
+    div.appendChild(cell);
+  }
+  return div;
+}
+
+function renderNeurons() {
+  const container = document.getElementById('neuronGrid');
+  container.innerHTML = '';
+
+  NEURONS.forEach((n, idx) => {
+    const w = W1[idx];
+    const prod = w.map((wv, i) => wv * input[i]);
+    const sum = prod.reduce((a, b) => a + b, 0);
+    const preReLU = sum + BIAS1;
+    const h = Math.max(0, preReLU);
+
+    const card = document.createElement('div');
+    card.className = 'neuron-card' + (h === 0 ? ' zero' : '');
+
+    const header = document.createElement('div');
+    header.className = 'neuron-header';
+    header.innerHTML = `
+      <span class="neuron-label">${n.name}</span>
+      <span class="neuron-desc">· ${n.desc}</span>
+    `;
+    card.appendChild(header);
+
+    const row = document.createElement('div');
+    row.className = 'matrix-row';
+
+    const b1 = document.createElement('div');
+    b1.className = 'matrix-block';
+    const c1 = document.createElement('div');
+    c1.className = 'matrix-caption';
+    c1.textContent = `W (${n.name})`;
+    b1.appendChild(c1);
+    b1.appendChild(makeMiniGrid(w, 'weight'));
+    row.appendChild(b1);
+
+    const op1 = document.createElement('div');
+    op1.className = 'op-symbol';
+    op1.textContent = '⊙';
+    row.appendChild(op1);
+
+    const b2 = document.createElement('div');
+    b2.className = 'matrix-block';
+    const c2 = document.createElement('div');
+    c2.className = 'matrix-caption';
+    c2.textContent = '입력 x';
+    b2.appendChild(c2);
+    b2.appendChild(makeMiniGrid(input, 'input'));
+    row.appendChild(b2);
+
+    const op2 = document.createElement('div');
+    op2.className = 'op-symbol';
+    op2.textContent = '=';
+    row.appendChild(op2);
+
+    const b3 = document.createElement('div');
+    b3.className = 'matrix-block';
+    const c3 = document.createElement('div');
+    c3.className = 'matrix-caption';
+    c3.textContent = 'W ⊙ x (곱)';
+    b3.appendChild(c3);
+    b3.appendChild(makeMiniGrid(prod, 'product'));
+    row.appendChild(b3);
+
+    card.appendChild(row);
+
+    const calc = document.createElement('div');
+    calc.className = 'calc-line';
+    let preStr;
+    if (preReLU >= 0) {
+      preStr = `<span class="num">${sum}</span> + (<span class="neg">${BIAS1}</span>) = <span class="num">${preReLU}</span>`;
+    } else {
+      preStr = `<span class="num">${sum}</span> + (<span class="neg">${BIAS1}</span>) = <span class="clipped">${preReLU}</span>`;
+    }
+    let reluStr;
+    if (preReLU >= 0) {
+      reluStr = `ReLU(${preReLU}) = <span class="pos">${h}</span>`;
+    } else {
+      reluStr = `ReLU(${preReLU}) → <span class="num">0</span>  <span class="mute">(음수 → 0으로 클립)</span>`;
+    }
+    calc.innerHTML = `
+      ① 곱의 합 Σ(W ⊙ x) = <span class="num">${sum}</span><br>
+      ② + bias: ${preStr}<br>
+      ③ ${reluStr}
+    `;
+    card.appendChild(calc);
+
+    const res = document.createElement('div');
+    res.className = 'h-result' + (h === 0 ? ' zero' : '');
+    res.textContent = `${n.name} = ${h}`;
+    card.appendChild(res);
+
+    container.appendChild(card);
+  });
+}
+
+function computeHidden() {
+  return NEURONS.map((_, idx) => {
+    const w = W1[idx];
+    const sum = w.reduce((acc, wv, i) => acc + wv * input[i], 0);
+    return Math.max(0, sum + BIAS1);
+  });
+}
+
+function renderClasses(h) {
+  const scores = CLASSES.map((_, c) => {
+    let s = BIAS2[c];
+    for (let i = 0; i < 6; i++) s += h[i] * W2[i][c];
+    return s;
+  });
+
+  const maxScore = Math.max(...scores);
+  const winnerIdx = scores.indexOf(maxScore);
+
+  const container = document.getElementById('classGrid');
+  container.innerHTML = '';
+
+  CLASSES.forEach((cname, c) => {
+    const card = document.createElement('div');
+    card.className = 'class-card' + (c === winnerIdx ? ' winner' : '');
+
+    const header = document.createElement('div');
+    header.className = 'class-header';
+    const scoreClass = scores[c] >= 0 ? 'pos' : 'neg';
+    const scoreText = scores[c] >= 0 ? '+' + scores[c].toFixed(1) : scores[c].toFixed(1);
+    header.innerHTML = `
+      <span class="class-name">${cname}</span>
+      <span class="class-score ${scoreClass}">${scoreText}</span>
+    `;
+    card.appendChild(header);
+
+    const table = document.createElement('table');
+    table.className = 'dot-product-table';
+    let html = `
+      <thead><tr>
+        <th>뉴런</th><th>h</th><th>W₂</th><th>h × W₂</th>
+      </tr></thead><tbody>
+    `;
+    let runningSum = BIAS2[c];
+    for (let i = 0; i < 6; i++) {
+      const wv = W2[i][c];
+      const product = h[i] * wv;
+      runningSum += product;
+      const wClass = wv > 0 ? 'val-pos' : (wv < 0 ? 'val-neg' : 'val-zero');
+      const pClass = product > 0 ? 'val-pos' : (product < 0 ? 'val-neg' : 'val-zero');
+      const wStr = wv > 0 ? '+' + wv.toFixed(1) : wv.toFixed(1);
+      const pStr = product === 0 ? '0.0' : (product > 0 ? '+' + product.toFixed(1) : product.toFixed(1));
+      const hClass = h[i] === 0 ? 'val-zero' : '';
+      html += `<tr>
+        <td class="h-name">${NEURONS[i].name}</td>
+        <td class="${hClass}">${h[i]}</td>
+        <td class="${wClass}">${wStr}</td>
+        <td class="${pClass}">${pStr}</td>
+      </tr>`;
+    }
+    const totalClass = runningSum >= 0 ? 'val-pos' : 'val-neg';
+    const totalStr = runningSum >= 0 ? '+' + runningSum.toFixed(1) : runningSum.toFixed(1);
+    html += `<tr class="total-row">
+      <td class="h-name">합 (score)</td>
+      <td></td>
+      <td></td>
+      <td class="${totalClass}">${totalStr}</td>
+    </tr>`;
+    html += '</tbody>';
+    table.innerHTML = html;
+    card.appendChild(table);
+
+    container.appendChild(card);
+  });
+
+  return { scores, winnerIdx };
+}
+
+function softmax(arr) {
+  const m = Math.max(...arr);
+  const exps = arr.map(v => Math.exp(v - m));
+  const sum = exps.reduce((a, b) => a + b, 0);
+  return exps.map(e => e / sum);
+}
+
+function renderSoftmax(scores, winnerIdx) {
+  const probs = softmax(scores);
+  const container = document.getElementById('softmaxBars');
+  container.innerHTML = '';
+  CLASSES.forEach((cname, c) => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    const isWin = c === winnerIdx;
+    const pct = (probs[c] * 100).toFixed(1);
+    const displayWidth = Math.max(probs[c] * 100, 1.5);
+    row.innerHTML = `
+      <div class="bar-class">${cname}</div>
+      <div class="bar-track">
+        <div class="bar-fill ${isWin ? 'winner' : 'loser'}" style="width: ${displayWidth}%"></div>
+      </div>
+      <div class="bar-pct">${pct}%</div>
+    `;
+    container.appendChild(row);
+  });
+
+  const allZero = input.every(v => v === 0);
+  document.getElementById('predicted').textContent = allZero ? '·' : CLASSES[winnerIdx];
+}
+
+function renderAll() {
+  renderInputGrid();
+  renderNeurons();
+  const h = computeHidden();
+  const { scores, winnerIdx } = renderClasses(h);
+  renderSoftmax(scores, winnerIdx);
+}
+
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const p = btn.dataset.preset;
+    if (p === 'clear') {
+      input = new Array(25).fill(0);
+    } else {
+      input = [...PRESETS[p]];
+    }
+    renderAll();
+  });
+});
+
+input = [...PRESETS['X']];
+renderAll();
+</script>
+</body>
+</html>
