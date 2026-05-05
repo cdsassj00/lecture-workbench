@@ -162,6 +162,7 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
     <button class="tb-btn" onclick="openSessionList()" id="btnSessions">교안 목록</button>
     <button class="tb-btn" onclick="window.open('curriculum.html','_blank')" id="btnCurriculum">📋 커리큘럼</button>
     <button class="tb-btn" onclick="openHistoryViewer()" id="btnHistory">🕐 이력</button>
+    <button class="tb-btn" onclick="openAssignmentMenu()" id="btnAssign">📝 과제</button>
     <span class="tb-sep"></span>
     <select id="paletteSelect" onchange="applySlidePalette(this.value)" title="현재 슬라이드 팔레트" style="font-family:inherit;font-size:11px;padding:5px 8px;border:1px solid var(--wln);border-radius:3px;background:#fff;cursor:pointer">
       <option value="">팔레트 (기본)</option>
@@ -378,7 +379,229 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
   </div>
 </div>
 
+<!-- ASSIGNMENT MENU MODAL — 회차별 실습과제 후보 80개 -->
+<div class="modal-bg" id="assignModalBg" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="position:relative;width:1080px;max-width:95vw;max-height:90vh;overflow:hidden;display:flex;flex-direction:column">
+    <button class="modal-close" onclick="document.getElementById('assignModalBg').classList.remove('show')">×</button>
+    <h2 style="margin-bottom:6px">📝 회차별 실습과제 후보 <span style="font-size:11px;color:var(--wink3);font-weight:400;letter-spacing:0">강사가 수강생 수준·진도에 맞춰 선택 가능 · 8회 × 10개 = 80개</span></h2>
+    <div style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap" id="assignTabs"></div>
+    <div style="font-size:11px;color:var(--wink3);margin-bottom:8px;padding:6px 10px;background:#f5f0e8;border-radius:3px">
+      🎯 난이도 ★(입문) ~ ★★★★★(도전) · 배점은 강사 재량 조정 · 산출물 형식·분량 명시 · 클릭 시 본 슬라이드 또는 새 슬라이드에 자동 삽입
+    </div>
+    <div id="assignList" style="overflow-y:auto;flex:1;padding-right:6px"></div>
+  </div>
+</div>
+
 <script>
+// ============================================================
+// 회차별 실습과제 후보군 (80개)
+// 8회 × 10개 — 강사가 수강생 수준·진도에 맞춰 선택
+// 각 항목: { num, title, desc, output, level, weight }
+//   level 1=★입문, 2=★★기초, 3=★★★중급, 4=★★★★고급, 5=★★★★★도전
+//   weight = 평가 배점 비중 권장값(점)
+// ============================================================
+const ASSIGNMENTS = {
+  1: { name:'AI 에이전트 시대 · 공공 구현 지형도', items:[
+    {num:1, title:'소속기관 Pain Point 진단 + AI 해법 기획서', desc:'자기 부서의 반복·비효율 업무 5가지를 도출하고 각각에 어떤 AI를 어떻게 적용할지 슬라이드 10페이지로 제출. 현 상태·문제·AI 해법·기대효과·1주 시범안 5단 구성.', output:'슬라이드 10p · PDF', level:2, weight:15},
+    {num:2, title:'공공 AI 적용 사례 5건 큐레이션', desc:'국내외 공공기관 AI 도입 사례 5건 조사. 기관·도입 도구·효과·예산·교훈 5열 비교표.', output:'A4 1p 표', level:1, weight:8},
+    {num:3, title:'나만의 AI 환경 세팅 스크린샷 보고서', desc:'Claude·ChatGPT·Gemini·Perplexity·NotebookLM 5개 가입·로그인·1차 사용 스크린샷 + 1장 사용소감.', output:'PDF 5~7p', level:1, weight:5},
+    {num:4, title:'부서 업무 AI 도입 우선순위 매트릭스', desc:'영향도×난이도 2x2 매트릭스에 자기 기관 업무 10개 매핑. 1순위 3개에 대해 사유 1줄.', output:'A4 1p', level:2, weight:10},
+    {num:5, title:'거점리더 자기 정의서 + 12개월 KPI', desc:'1년 후 자기 부서에서 어떤 거점리더가 되어 있을지 1페이지 비전 + 월별 KPI 12개.', output:'A4 2p', level:2, weight:12},
+    {num:6, title:'자기 기관 AI 거버넌스 체크리스트 30항목', desc:'사용 규칙·보안·윤리·책임·로깅·이의 처리 등 30개 체크 항목. 각 항목에 위반 시 조치 방안 1줄.', output:'A4 3p', level:3, weight:15},
+    {num:7, title:'공공 AI 용어집 50개 정리', desc:'강의 듣고 모르는 용어 50개 자체 정의. 한 항목당 한국어·영어·30자 이내 설명.', output:'A4 3~4p', level:1, weight:8},
+    {num:8, title:'온프레미스 vs 클라우드 vs 하이브리드 의사결정표', desc:'자기 기관의 보안·예산·인력·민감도 4기준으로 평가. 최종 권고 1개 + 사유 5줄.', output:'A4 2p', level:3, weight:12},
+    {num:9, title:'AI 도입 12주 마스터플랜', desc:'1주·4주·12주 마일스톤 + 위험요소 3개 + 대응안. 간트 차트 1장 포함.', output:'슬라이드 8p', level:3, weight:15},
+    {num:10, title:'자기 부서 데이터 자산 인벤토리', desc:'보유 데이터 종류·양·민감도(공개/내부/제한)·활용도 4열 표. 최소 20행.', output:'엑셀 1매', level:2, weight:10},
+  ]},
+  2: { name:'프론티어 모델 + AI 도구 50선', items:[
+    {num:1, title:'자기 분야 AI 도구 큐레이션 30선', desc:'문서·번역·회의·데이터·이미지·음성 등 카테고리별 30개 도구 표 + 1줄 소감.', output:'A4 4~5p', level:2, weight:12},
+    {num:2, title:'3대 플래그십 모델 비교 보고서', desc:'Claude·GPT·Gemini를 동일 프롬프트 5개로 테스트. 정확도·창의성·한국어·속도·가격 5축 비교.', output:'A4 3p', level:2, weight:10},
+    {num:3, title:'동료 추천용 AI 도구 카탈로그 12선', desc:'신입직원·동료 강사용. 도구명·기능·요금·실무 적용 예 3가지·주의점 5열.', output:'PDF 6p', level:2, weight:10},
+    {num:4, title:'Ollama 로컬 LLM 시도 보고서', desc:'Ollama 설치 + 모델 1개 (Llama 3 / Qwen 등) 로컬 실행 + 한글 응답 품질 평가 5건.', output:'스크린샷 + A4 2p', level:3, weight:12},
+    {num:5, title:'NotebookLM 부서 문서 활용 보고서', desc:'자기 부서 문서 5개(보고서·매뉴얼·법령) 업로드 → 팟캐스트·요약·Q&A 결과 캡처.', output:'PDF 5p', level:2, weight:10},
+    {num:6, title:'AI 멀티모달 도구 4종 실험', desc:'이미지(Claude/Gemini)·음성(Whisper)·비디오(Sora/Veo)·PDF 추출 각 1건씩 결과물.', output:'PDF 6~8p', level:2, weight:12},
+    {num:7, title:'AI 요금제 ROI 분석표', desc:'Claude Pro·ChatGPT Plus·Gemini Pro·Perplexity Pro 4개 결제 후 월 사용 시간·절감 효과 ROI 표.', output:'A4 2p', level:2, weight:10},
+    {num:8, title:'AI 도구 보안·개인정보 평가', desc:'5개 도구의 약관·데이터 수집 정책 분석 + 공공 사용 적합성 등급(A~E).', output:'A4 3p', level:3, weight:14},
+    {num:9, title:'AI 검색 엔진 4종 비교', desc:'Perplexity·SearchGPT·NotebookLM·ChatGPT Search에 동일 질문 5개 → 출처 정확도·심층성 비교.', output:'A4 3p', level:2, weight:10},
+    {num:10, title:'동료에게 추천할 AI 도구 5분 발표', desc:'AI 도구 1개를 5분 슬라이드 + 라이브 데모. 동료가 그 자리에서 가입할 수 있도록 단계 명확히.', output:'슬라이드 8~10p + 5분 발표', level:2, weight:10},
+  ]},
+  3: { name:'메타 프롬프트 + 6가지 워크플로우', items:[
+    {num:1, title:'메타 프롬프트 5개 라이브러리 구축', desc:'요약·분석·생성·검토·번역 5개 메타 프롬프트. 각 프롬프트 + 사용 예시 3건씩.', output:'Markdown 또는 Notion', level:2, weight:12},
+    {num:2, title:'워크플로우 6타입 자기 업무 매핑', desc:'6타입 각각에 자기 업무 1건 매핑 + 어떻게 자동화할지 흐름도(Mermaid 또는 그림).', output:'A4 6p', level:3, weight:15},
+    {num:3, title:'회의록 자동화 파이프라인 구축', desc:'회의 녹음→Whisper STT→메타 프롬프트→정리된 회의록 5분 안에 생성. 시연 영상 첨부.', output:'스크립트 + 시연 영상 3분', level:3, weight:15},
+    {num:4, title:'민원답변 초안 자동 생성기', desc:'자기 부서 민원 유형 5개를 메타 프롬프트화 → 응답 초안 자동 생성 시스템. 5건 테스트 결과.', output:'A4 4p + 스크린샷', level:2, weight:12},
+    {num:5, title:'보고서 자동 검토 메타 프롬프트', desc:'자기 부서 보고서 1건 검토용 메타 프롬프트 1개. 오탈자·논리·표현·일관성 모두 점검.', output:'A4 2p', level:2, weight:10},
+    {num:6, title:'프롬프트 vs 메타 프롬프트 ROI 측정', desc:'동일 작업 10건을 양쪽으로 처리 후 시간·품질 비교표. 통계적 차이 산출.', output:'A4 3p', level:3, weight:14},
+    {num:7, title:'부서 공용 프롬프트 라이브러리 v1', desc:'Notion/Markdown 형식 30개 프롬프트 모음. 카테고리·태그·예시 결과 포함.', output:'Notion DB 또는 GitHub repo', level:2, weight:12},
+    {num:8, title:'다중 AI 모델 워크플로우 설계', desc:'Claude(분석)→GPT(생성)→Gemini(검토) 식 멀티 모델 파이프라인. Make/Zapier/n8n 활용.', output:'시각 흐름도 + 데모', level:4, weight:18},
+    {num:9, title:'자기 업무 프로세스 10단계 분해 + AI 매핑', desc:'매일 하는 업무 1건을 10단계로 쪼개고 각 단계에 AI 매핑 가능성 평가(◎○△×).', output:'A4 2p 표', level:2, weight:10},
+    {num:10, title:'메타 프롬프트 A/B 테스트 보고서', desc:'같은 메타 프롬프트의 2가지 변형을 만들고 각 5회 테스트. 결과 차이 통계 + 인사이트.', output:'A4 4p', level:3, weight:14},
+  ]},
+  4: { name:'데이터 시각화 · 분석 바이브 코딩', items:[
+    {num:1, title:'공공데이터포털 자료 1건 시각화', desc:'data.go.kr에서 자기 분야 데이터 1건 다운로드 → Plotly로 인터랙티브 차트 5개 + 발견점 보고서.', output:'HTML 1매 + A4 2p', level:3, weight:14},
+    {num:2, title:'자기 부서 엑셀 1건 종합 분석 리포트', desc:'pandas로 통계 분석 + 시각화 + 인사이트 3가지. Claude로 코드 작성 → 내부망 실행.', output:'Jupyter Notebook + PDF 5p', level:3, weight:15},
+    {num:3, title:'외부망↔내부망 코드 이전 SOP', desc:'Claude로 코드 작성 → 내부망 검토·실행 절차 SOP 작성. 보안 체크 + 실수 방지 체크리스트.', output:'A4 3p', level:2, weight:10},
+    {num:4, title:'CSV→대시보드 자동화 스크립트', desc:'매주 받는 데이터 CSV 1건을 dashboard.html 한 장으로 자동 변환. 차트 5종 + 필터.', output:'스크립트 + 결과 HTML', level:3, weight:15},
+    {num:5, title:'연간 통계 1장 인포그래픽', desc:'자기 부서 연간 통계를 A3 1장 인포그래픽으로. 핵심 숫자 5개 + 트렌드 + 메시지.', output:'PDF A3 1매', level:3, weight:12},
+    {num:6, title:'Streamlit 미니 대시보드', desc:'자기 업무 KPI를 보여주는 Streamlit 앱. 사이드바 필터·실시간 차트 3종.', output:'스크립트 + 시연 영상', level:4, weight:18},
+    {num:7, title:'데이터 클리닝 자동화', desc:'지저분한 엑셀 1건(결측·중복·형식 불일치)을 Claude 코드로 클린징. before/after 비교.', output:'스크립트 + A4 2p', level:3, weight:13},
+    {num:8, title:'시각화 before-after 포트폴리오', desc:'동일 데이터 5건을 엑셀 기본 차트 vs Plotly로. 가독성·정보량·미감 비교평.', output:'PDF 8p', level:2, weight:10},
+    {num:9, title:'공공 API 호출 + 시각화 웹페이지', desc:'open API 1건 호출 → 차트 → HTML 페이지. 실시간 갱신 옵션.', output:'정적 HTML + 코드', level:4, weight:18},
+    {num:10, title:'자주 쓰는 차트 5종 함수 라이브러리', desc:'부서 보고용 차트(트렌드·비율·비교·분포·랭킹) 5종을 함수화. 1줄 호출로 그릴 수 있게.', output:'Python 모듈', level:3, weight:13},
+  ]},
+  5: { name:'업무 자동화 · 로컬 AI 연동', items:[
+    {num:1, title:'반복 업무 1건 파이썬 자동화', desc:'자기 부서 반복 업무 1건을 파이썬 스크립트로 자동화. before/after 시간 측정 + ROI.', output:'스크립트 + A4 2p', level:3, weight:15},
+    {num:2, title:'HWP 양식 → 100건 일괄 생성', desc:'양식 1개 + 데이터 100건 → HWP 100개 자동 생성. 시연 영상 1분.', output:'스크립트 + 결과물', level:4, weight:18},
+    {num:3, title:'엑셀 AI 함수 + Ollama 연동', desc:'VBA + Ollama 로컬 LLM으로 엑셀 셀 안에서 AI 호출. 실무 적용 사례 1건.', output:'엑셀 + 스크린샷', level:4, weight:18},
+    {num:4, title:'Outlook/메일 자동 분류 스크립트', desc:'받은 메일을 카테고리별 폴더로 자동 분류. 1주 데이터로 정확도 측정.', output:'스크립트 + A4 2p', level:3, weight:13},
+    {num:5, title:'Ollama 로컬 LLM 설치 + 한글 평가', desc:'자기 PC에 Ollama 설치 + 모델 2~3개 로드 + 한글 응답 품질 5건 평가.', output:'스크린샷 + A4 2p', level:2, weight:10},
+    {num:6, title:'PDF 일괄 처리 자동화', desc:'폴더 안 PDF 100개 텍스트 추출 + 요약 + 키워드 추출. 결과 엑셀 1매.', output:'스크립트 + 엑셀', level:3, weight:13},
+    {num:7, title:'반복 보고서 템플릿 자동 채움', desc:'데이터 → 템플릿 → 완성된 보고서 자동 생성. 매주 보고서 1건 자동화.', output:'스크립트 + 시연 영상', level:3, weight:14},
+    {num:8, title:'Node.js 미니 사내 도구 1개', desc:'사내용 미니 도구(공휴일 계산기·일정 알림·메모 등) 1개를 Node.js로 구현.', output:'코드 + 사용 매뉴얼', level:3, weight:13},
+    {num:9, title:'자기 부서 자동화 우선순위 ROI 표', desc:'10개 자동화 후보의 시간 절감·난이도·효과 평가. 1순위 3건 시범안.', output:'A4 2p', level:2, weight:10},
+    {num:10, title:'연말 리캡 자동 생성기', desc:'자기 부서 연간 자료 10건을 종합한 연말 리캡 1장 자동 생성. 핵심 숫자 + 사진 + 메시지.', output:'스크립트 + 결과 PDF', level:4, weight:18},
+  ]},
+  6: { name:'AI 에이전트 툴 마스터리', items:[
+    {num:1, title:'Claude Code/Cursor 1주일 사용 일지', desc:'매일 1개 작업을 에이전트로 처리. 7일치 일지 + 회고(잘 된 것·실패·개선).', output:'Markdown 일지', level:3, weight:14},
+    {num:2, title:'에이전트로 미니 웹사이트 제작', desc:'정적 1페이지 자기소개 또는 부서 소개 사이트. GitHub Pages 배포.', output:'배포 URL + 코드', level:3, weight:14},
+    {num:3, title:'에이전트 지시문 5종 라이브러리', desc:'분석·정리·생성·검토·번역용 에이전트 지시문(System Prompt 또는 Task) 5개.', output:'Markdown + 사용 예', level:2, weight:11},
+    {num:4, title:'자기 부서 업무 봇 시제품', desc:'특정 업무를 처리하는 에이전트 1개 시제품. 5건 테스트 결과 + 한계점.', output:'코드 + 시연 영상', level:4, weight:20},
+    {num:5, title:'에이전트 도구 비교 보고서', desc:'Claude Code vs Cursor vs GitHub Copilot vs Continue.dev 등 4종 비교.', output:'A4 4p', level:3, weight:13},
+    {num:6, title:'MCP 서버 1개 설치 + 자기 업무 적용', desc:'공식 MCP 서버 1개 설치(예: filesystem·sequential-thinking) + 자기 업무 적용 사례 1건.', output:'설정 + A4 2p', level:3, weight:14},
+    {num:7, title:'에이전트 안전 사용 체크리스트 30항목', desc:'위험·실수 방지용 30개 체크 항목 + 각 항목에 위반 시 영향 1줄.', output:'A4 3p', level:2, weight:11},
+    {num:8, title:'에이전트 산출물 before/after', desc:'에이전트 도움 전·후 같은 작업 5건 결과물. 시간·품질 차이 정량화.', output:'PDF 6~8p', level:2, weight:11},
+    {num:9, title:'공공 도메인 에이전트 시나리오 5선', desc:'민원·통계·문서·교육·보고 각 1개 시나리오. 입력→처리→출력 흐름 + 위험 평가.', output:'A4 5p', level:3, weight:13},
+    {num:10, title:'에이전트 활용 ROI 측정 보고서', desc:'1주간 작업 시간 감소량 측정. 시간·비용·실수율·만족도 4축.', output:'A4 3p + 그래프', level:3, weight:13},
+  ]},
+  7: { name:'RAG 파이프라인 · 웹서비스 구축', items:[
+    {num:1, title:'Claude Projects 활용 자기 부서 RAG 시제품', desc:'부서 문서 30개 업로드 + 시스템 프롬프트 작성 + Q&A 봇. 10건 테스트 결과.', output:'Project 링크 + A4 2p', level:3, weight:15},
+    {num:2, title:'RAG 4단계 자기 업무 매핑', desc:'인덱싱·검색·생성·평가 단계를 자기 업무로 풀이. 각 단계 도구 추천 + 위험요소.', output:'A4 4p', level:3, weight:13},
+    {num:3, title:'사내 매뉴얼 RAG 봇 시제품', desc:'신입 직원용 사내 매뉴얼 봇. 50건 이상 매뉴얼 + 10건 테스트 + 답변 정확도.', output:'코드 + 시연 영상', level:4, weight:18},
+    {num:4, title:'에이전트로 RAG 풀스택 1건 구현', desc:'Claude Code로 RAG 백엔드+UI까지 풀스택 구현. 임베딩 + 벡터DB + LLM 호출.', output:'GitHub repo + 배포 URL', level:5, weight:22},
+    {num:5, title:'백엔드 결합 웹서비스 1개', desc:'사용자 입력 → DB 저장 → AI 응답 흐름. SQLite + Flask/Express + LLM.', output:'코드 + 시연', level:4, weight:18},
+    {num:6, title:'RAG vs 일반 LLM 비교 보고서', desc:'동일 질문 30개에 RAG 봇과 ChatGPT 응답 비교. 정확도·출처·환각률.', output:'A4 4p', level:3, weight:14},
+    {num:7, title:'RAG 파이프라인 평가 지표 5종', desc:'정확도·속도·비용·신뢰도·사용성을 측정 가능한 지표로 정의 + 실측 결과.', output:'A4 3p + 측정 스크립트', level:3, weight:14},
+    {num:8, title:'공공 정보공개 시스템용 RAG 시안', desc:'정보공개 청구를 줄일 수 있는 사내 봇 시안. 데이터 출처·검증·안내문 포함.', output:'슬라이드 12p + 흐름도', level:4, weight:18},
+    {num:9, title:'RAG 데이터 클렌징 + 청크 파이프라인', desc:'PDF/HWP→텍스트→청크→벡터화 코드. 청크 크기·overlap 실험 5종 비교.', output:'GitHub repo', level:4, weight:18},
+    {num:10, title:'사용자 매뉴얼 + 시연 영상 5분', desc:'자기 RAG 봇의 사용자 매뉴얼(시작·자주 묻는 질문·한계) + 5분 시연 영상.', output:'PDF 매뉴얼 + 영상', level:3, weight:13},
+  ]},
+  8: { name:'API · MCP · 멀티 에이전트', items:[
+    {num:1, title:'공공 API 1건 활용 미니 서비스', desc:'data.go.kr API 1건 호출 + 가공 + 출력 인터페이스. 사용자 입력 → API → 결과.', output:'코드 + 배포 URL', level:4, weight:18},
+    {num:2, title:'자체 MCP 서버 1개 제작', desc:'자기 업무용 미니 MCP 서버(예: 부서 문서 검색·일정 조회 등) + Claude Desktop 연동.', output:'GitHub repo + 시연', level:5, weight:22},
+    {num:3, title:'3개 에이전트 협업 워크플로우', desc:'분석·검토·생성 3개 에이전트 파이프라인. 한 입력에서 단계별 출력 5건 비교.', output:'코드 + A4 3p', level:4, weight:18},
+    {num:4, title:'API + MCP + Agent 통합 데모', desc:'8주 학습 종합. 미니 통합 시스템 1개 + 3분 시연 영상.', output:'GitHub + 영상', level:5, weight:25},
+    {num:5, title:'공공 API 카탈로그 12선', desc:'자기 업무 분야 12개 API + 활용 가능성·인증 방식·요청 한도 평가.', output:'A4 3p 표', level:2, weight:10},
+    {num:6, title:'최종 발표 슬라이드 20p + 5분 발표', desc:'8주 학습 종합 + 거점리더 계획 + 현업 적용 로드맵. 동기 앞에서 발표.', output:'슬라이드 20p + 발표', level:4, weight:20},
+    {num:7, title:'자기 기관 AI 도입 1년 마스터플랜', desc:'8주 배운 내용 종합한 마스터 플랜. 분기별 목표 + 예산 + 인력 + 위험 + 평가.', output:'슬라이드 15p', level:4, weight:18},
+    {num:8, title:'동료 교육 30분 자료', desc:'동료들에게 30분간 가르칠 자료(개요·시연·실습·Q&A). 실제 사내 발표 권장.', output:'슬라이드 + 핸드아웃', level:3, weight:14},
+    {num:9, title:'AI 도구 6개월 사용 로드맵', desc:'8주 후 6개월간 어떻게 발전시킬지 계획서. 월별 학습·실습·산출물.', output:'A4 3p', level:3, weight:13},
+    {num:10, title:'개인 AI 포트폴리오 1식', desc:'8주간 만든 모든 산출물을 모은 개인 포트폴리오. 자기소개·산출물 8건·회고.', output:'PDF 또는 Notion 페이지', level:2, weight:11},
+  ]},
+};
+
+let _assignActiveSession = 1;
+function openAssignmentMenu() {
+  document.getElementById('assignModalBg').classList.add('show');
+  // 탭 그리기
+  const tabs = document.getElementById('assignTabs');
+  tabs.innerHTML = '';
+  Object.keys(ASSIGNMENTS).forEach(n => {
+    const k = parseInt(n);
+    const b = document.createElement('button');
+    b.textContent = `${k}회차`;
+    b.style.cssText = `padding:7px 14px;border:1px solid var(--wln);border-radius:3px;background:${k===_assignActiveSession?'#b8532a':'#fff'};color:${k===_assignActiveSession?'#fff':'#1a1612'};font-family:inherit;font-size:11.5px;font-weight:${k===_assignActiveSession?'700':'500'};cursor:pointer`;
+    b.onclick = () => { _assignActiveSession = k; openAssignmentMenu(); };
+    tabs.appendChild(b);
+  });
+  renderAssignmentList();
+}
+
+function renderAssignmentList() {
+  const container = document.getElementById('assignList');
+  const sess = ASSIGNMENTS[_assignActiveSession];
+  if (!sess) { container.innerHTML = ''; return; }
+  const stars = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
+  container.innerHTML = `
+    <div style="font-size:13px;font-weight:700;color:#1a1612;margin:6px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--wacc)">
+      ${_assignActiveSession}회차 · ${sess.name}
+      <span style="float:right;font-size:10px;color:var(--wink3);font-weight:400">총 10개 · 합산 ${sess.items.reduce((s,i)=>s+i.weight,0)}점</span>
+    </div>
+    <div style="display:grid;gap:8px">
+      ${sess.items.map(it => `
+        <div style="border:1px solid var(--wln);border-radius:4px;padding:11px 13px;background:#fff;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start">
+          <div style="font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:22px;color:var(--wacc);min-width:30px;text-align:center;line-height:1">${String(it.num).padStart(2,'0')}</div>
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:#1a1612;margin-bottom:3px">${it.title}</div>
+            <div style="font-size:11px;color:var(--wink2);line-height:1.55;margin-bottom:5px">${it.desc}</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--wink3)">
+              <span><b>📦 산출물:</b> ${it.output}</span>
+              <span><b>🎯 난이도:</b> <span style="color:#b8532a">${stars(it.level)}</span></span>
+              <span><b>📊 배점:</b> ${it.weight}점</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <button onclick='copyAssignment(${_assignActiveSession},${it.num})' style="padding:5px 10px;font-size:10px;border:1px solid #ccc;border-radius:3px;background:#fff;cursor:pointer;font-family:inherit">📋 복사</button>
+            <button onclick='insertAssignmentAsSlide(${_assignActiveSession},${it.num})' style="padding:5px 10px;font-size:10px;border:1px solid var(--wacc);border-radius:3px;background:var(--wacc);color:#fff;cursor:pointer;font-family:inherit;font-weight:700">+ 슬라이드</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function copyAssignment(sess, num) {
+  const item = ASSIGNMENTS[sess].items.find(i => i.num === num);
+  if (!item) return;
+  const stars = '★'.repeat(item.level) + '☆'.repeat(5 - item.level);
+  const text = `[${sess}회차 과제 ${String(num).padStart(2,'0')}] ${item.title}\n\n${item.desc}\n\n📦 산출물: ${item.output}\n🎯 난이도: ${stars}\n📊 배점: ${item.weight}점`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => toast('과제 내용 복사됨'));
+  } else {
+    const ta = document.createElement('textarea'); ta.value = text;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    toast('과제 내용 복사됨');
+  }
+}
+
+function insertAssignmentAsSlide(sess, num) {
+  const item = ASSIGNMENTS[sess].items.find(i => i.num === num);
+  if (!item) return;
+  if (S.selectedIdx < 0) return toast('슬라이드를 먼저 선택하세요');
+  const stars = '★'.repeat(item.level) + '☆'.repeat(5 - item.level);
+  // 새 슬라이드 HTML — 과제 슬라이드 전용 레이아웃
+  const slideHtml = `<div class="slide" data-title="${sess}회차 과제 ${num}: ${item.title.replace(/"/g,'&quot;')}">
+<div class="hbar"><div class="hbar-l">${sess}회차 실습과제</div><div class="hbar-r">과제 ${String(num).padStart(2,'0')}</div></div>
+<div class="bd" style="position:absolute;left:60px;right:60px;top:80px;bottom:60px;display:flex;flex-direction:column;justify-content:center;gap:24px">
+  <div>
+    <div style="font-family:monospace;font-size:12px;color:var(--acc,#b8532a);letter-spacing:3px;font-weight:700;margin-bottom:14px">ASSIGNMENT · ${sess}-${String(num).padStart(2,'0')}</div>
+    <div style="font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:42px;line-height:1.22;color:var(--ink,#1a1612);letter-spacing:-0.02em">${item.title}</div>
+    <div style="width:60px;height:3px;background:var(--acc,#b8532a);margin:18px 0"></div>
+    <p style="font-size:18px;color:var(--ink2,#4a4540);line-height:1.7;max-width:1300px">${item.desc}</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px">
+    <div style="border:1px solid var(--ln,#e8e0d4);background:var(--bg2,#f3efe9);padding:14px 16px"><div style="font-family:monospace;font-size:10px;color:var(--ink3,#8a8078);letter-spacing:2px;font-weight:700;margin-bottom:6px">📦 산출물</div><div style="font-size:14px;font-weight:700;color:var(--ink,#1a1612)">${item.output}</div></div>
+    <div style="border:1px solid var(--ln,#e8e0d4);background:var(--bg2,#f3efe9);padding:14px 16px"><div style="font-family:monospace;font-size:10px;color:var(--ink3,#8a8078);letter-spacing:2px;font-weight:700;margin-bottom:6px">🎯 난이도</div><div style="font-size:18px;color:var(--acc,#b8532a);font-weight:700">${stars}</div></div>
+    <div style="border:1px solid var(--ln,#e8e0d4);background:var(--bg2,#f3efe9);padding:14px 16px"><div style="font-family:monospace;font-size:10px;color:var(--ink3,#8a8078);letter-spacing:2px;font-weight:700;margin-bottom:6px">📊 배점</div><div style="font-size:24px;font-family:'Nanum Myeongjo',serif;font-weight:800;color:var(--ink,#1a1612);line-height:1">${item.weight}<span style="font-size:13px;color:var(--ink2,#4a4540);margin-left:3px">점</span></div></div>
+  </div>
+</div>
+<div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">실습과제</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">--- / ---</span></div></div>
+</div>`;
+  const slide = {
+    id: 'slide-' + Date.now(),
+    html: slideHtml,
+    source: 'added',
+    dataTitle: `${sess}회차 과제 ${num}: ${item.title}`,
+  };
+  pushUndo({type:'insert', idx:S.selectedIdx + 1, slide});
+  S.slides.splice(S.selectedIdx + 1, 0, slide);
+  updateAllPageNumbers();
+  S.dirty = true;
+  renderStrip();
+  selectSlide(S.selectedIdx + 1);
+  document.getElementById('assignModalBg').classList.remove('show');
+  toast(`${sess}회차 과제 ${num} 슬라이드 삽입 — 💾 DB 저장으로 영구 보존`);
+}
+
 // ============================================================
 // STATE
 // ============================================================
