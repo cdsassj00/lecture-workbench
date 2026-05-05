@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>강연 전문 · 신성진</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,700;1,500&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5efe4;--ink:#2b2015;--ink-soft:#4a3826;--accent:#b8532a;--line:#d8c8ae;--line-soft:#e6d9bf;--sb-w:240px}
+[data-theme="dark"]{--bg:#1a1612;--ink:#ede4d3;--ink-soft:#c9bba0;--accent:#e07a4a;--line:#3a2f22;--line-soft:#2d2419}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+body{
+  font-family:'EB Garamond','Noto Serif KR','Batang',serif;
+  font-size:20px;
+  line-height:1.95;
+  -webkit-font-smoothing:antialiased;
+  word-break:keep-all;
+}
+
+/* --- Controls (fixed top) --- */
+.ctrl{position:fixed;top:16px;z-index:20;display:flex;gap:8px}
+.ctrl button{
+  background:var(--bg);
+  border:1px solid var(--line);
+  color:var(--ink);
+  width:36px;height:36px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:15px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;
+}
+.ctrl button:hover{background:rgba(184,83,42,.1);color:var(--accent)}
+.ctrl.left{left:16px}
+.ctrl.right{right:16px}
+
+/* --- Sidebar --- */
+.sidebar{
+  position:fixed;
+  top:0;left:0;
+  width:var(--sb-w);
+  height:100vh;
+  background:var(--bg);
+  border-right:1px solid var(--line-soft);
+  padding:72px 22px 40px 26px;
+  overflow-y:auto;
+  transition:transform .3s ease;
+  z-index:15;
+}
+body.sb-closed .sidebar{transform:translateX(-100%)}
+
+.sidebar .brand{
+  font-family:'EB Garamond','Noto Serif KR',serif;
+  font-weight:700;
+  font-size:14px;
+  color:var(--accent);
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.sidebar .sub{
+  font-size:10.5px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  opacity:.7;
+  margin-bottom:24px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--line-soft);
+}
+.sidebar .grp{
+  font-size:10px;
+  letter-spacing:.2em;
+  font-weight:700;
+  color:var(--accent);
+  text-transform:uppercase;
+  margin:20px 0 8px;
+  opacity:.8;
+}
+.sidebar .grp:first-of-type{margin-top:0}
+.sidebar ul{list-style:none;padding:0;margin:0}
+.sidebar ul li{
+  font-family:'Noto Serif KR',serif;
+  font-size:13px;
+  line-height:1.5;
+  padding:6px 0 6px 10px;
+  border-left:2px solid transparent;
+  color:var(--ink-soft);
+  cursor:pointer;
+  transition:all .15s;
+}
+.sidebar ul li:hover{color:var(--accent);border-left-color:var(--line)}
+.sidebar ul li.active{color:var(--accent);border-left-color:var(--accent);font-weight:700}
+.sidebar ul li a{display:block;color:inherit;text-decoration:none}
+
+/* --- Article --- */
+.page{
+  padding-left:var(--sb-w);
+  transition:padding-left .3s ease;
+}
+body.sb-closed .page{padding-left:0}
+
+article{
+  max-width:760px;
+  margin:0 auto;
+  padding:80px 36px 120px;
+}
+
+h1{
+  font-family:'EB Garamond','Noto Serif KR',serif;
+  font-size:44px;
+  font-weight:700;
+  line-height:1.25;
+  margin:0 0 56px;
+  text-align:center;
+  letter-spacing:-.4px;
+}
+h1 em{font-style:italic;color:var(--accent);font-weight:700}
+
+h2{
+  font-family:'EB Garamond','Noto Serif KR',serif;
+  font-size:27px;
+  font-weight:700;
+  line-height:1.35;
+  margin:64px 0 20px;
+  letter-spacing:-.2px;
+  color:var(--ink);
+  scroll-margin-top:32px;
+}
+
+h3{
+  font-family:'EB Garamond','Noto Serif KR',serif;
+  font-size:22px;
+  font-weight:700;
+  margin:40px 0 14px;
+  color:var(--ink);
+  letter-spacing:-.1px;
+  scroll-margin-top:32px;
+}
+h3 .ord{color:var(--accent);font-style:italic;margin-right:10px;font-family:'EB Garamond',serif}
+
+p{margin:0 0 22px;color:var(--ink-soft);text-indent:0}
+p strong{color:var(--ink);font-weight:700}
+p em{color:var(--accent);font-style:italic}
+
+.quote{
+  margin:32px 0;
+  padding:18px 0 18px 26px;
+  border-left:3px solid var(--accent);
+  font-style:italic;
+  font-size:22px;
+  color:var(--ink);
+  line-height:1.65;
+  font-weight:500;
+}
+
+hr{
+  border:none;
+  text-align:center;
+  margin:56px 0;
+  color:var(--accent);
+  letter-spacing:.8em;
+  font-size:14px;
+}
+hr::after{content:"✦ ❦ ✦"}
+
+.end{text-align:center;font-style:italic;font-size:26px;color:var(--accent);margin:56px 0 0}
+
+@media(max-width:900px){
+  .page{padding-left:0}
+  .sidebar{transform:translateX(-100%)}
+  body.sb-open .sidebar{transform:translateX(0);box-shadow:6px 0 24px rgba(0,0,0,.15)}
+}
+@media(max-width:720px){
+  body{font-size:18px}
+  article{padding:56px 22px 80px}
+  h1{font-size:32px;margin-bottom:40px}
+  h2{font-size:22px;margin:48px 0 14px}
+  h3{font-size:19px}
+  .quote{font-size:19px;padding-left:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- Controls -->
+<div class="ctrl left">
+  <button id="sbToggle" title="사이드바 토글 (단축키: s)" aria-label="Toggle sidebar">☰</button>
+</div>
+<div class="ctrl right">
+  <button id="themeToggle" title="다크모드 토글" aria-label="Toggle theme">◐</button>
+</div>
+
+<!-- Sidebar -->
+<nav class="sidebar" aria-label="목차">
+  <div class="brand">The Dispatch</div>
+  <div class="sub">Full Transcript · 신성진</div>
+
+  <div class="grp">Prologue</div>
+  <ul>
+    <li><a href="#s-intro">인사와 문제의식</a></li>
+  </ul>
+
+  <div class="grp">Two Axes</div>
+  <ul>
+    <li><a href="#s-macro">거시와 미시, 두 개의 축</a></li>
+    <li><a href="#s-vibe">VIBE 코딩의 시대</a></li>
+  </ul>
+
+  <div class="grp">Eight Evidences</div>
+  <ul>
+    <li><a href="#s-eight">여덟 가지 기술</a></li>
+    <li><a href="#e1">① HTML · CSS · JS</a></li>
+    <li><a href="#e2">② 파이썬</a></li>
+    <li><a href="#e3">③ Electron 독립 앱</a></li>
+    <li><a href="#e4">④ Node.js</a></li>
+    <li><a href="#e5">⑤ Ollama · 로컬 SLM</a></li>
+    <li><a href="#e6">⑥ 레거시와의 결합</a></li>
+    <li><a href="#e7">⑦ 에이전틱 AI</a></li>
+    <li><a href="#e8">⑧ 오픈소스 생태계</a></li>
+  </ul>
+
+  <div class="grp">Closing</div>
+  <ul>
+    <li><a href="#s-synth">거시와 미시의 교차</a></li>
+    <li><a href="#s-seesaw">혁신과 규제의 시소</a></li>
+    <li><a href="#s-end">마무리</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+<article>
+
+<h1 id="s-top">거시와 미시가 만날 때,<br><em>진짜 소버린 AI가 시작된다</em></h1>
+
+<p id="s-intro">안녕하십니까. 한국 데이터 사이언티스트 협회 신성진입니다. 저는 AX를 연구하면서, 거시적 AX의 큰 물결 안에서 오히려 소외되고 있는 작은 현장의 문제들을 해결하기 위해 AX의 실무적 적용 방법을 고민해 왔습니다.</p>
+
+<p>먼저 이 자리에 중요한 많은 분들이 모이셨는데, 이렇게 중요한 자리에 초대해 주신 국장님께 감사의 말씀을 드립니다.</p>
+
+<h2 id="s-macro">거시와 미시, 두 개의 축</h2>
+
+<p>오늘 제가 여러분께 말씀드리고 싶은 내용은, AX 대전환의 문제에 있어 두 줄기의 관점입니다.</p>
+
+<p>첫째는 흔히 '소버린 AI'라 불리는 흐름입니다. 하드웨어 자산의 확보, K-AI 파운데이션 모델, 그리고 조선·제조·방산·식량 보안에 이르기까지 — 우리나라 주력 산업을 AX와 결합시켜 역수출하는 방향입니다. 진정한 소버린 AI는 AI 모델 자체가 아니라, <strong>이미 작동하고 있는 국가적 자원들과 연계될 때</strong> 비로소 펼쳐집니다. 이것이 거시적 혁신의 줄기입니다.</p>
+
+<p>또 한 줄기는 '아래에서부터의 혁신'입니다. 인공지능위원회나 소버린 AI를 외치며 K-AI를 만들어내는 거시적 전략의 흐름과 맞물려, 우리는 직원 한 사람 한 사람이 AX를 통해 자신의 삶을 어떻게 변화시키고 생산성을 향상시킬지 고민해야 하는 단계에 이르렀습니다.</p>
+
+<h2 id="s-vibe">ChatGPT 시대에서 VIBE 코딩의 시대로</h2>
+
+<p>그 이유는 이렇습니다. 단순히 ChatGPT, Gemini, Claude 같은 AI 서비스에 질문을 던지고, 답변으로 보고서 초안을 작성하는 '자동화된 문서 작성, 업무 자동화'의 틀에서 한 단계 더 나아가야 하기 때문입니다. 요즘 이를 <strong>VIBE 코딩</strong>이라 부릅니다.</p>
+
+<p>VIBE 코딩이라는 개념은 OpenAI 창립 멤버이자 Tesla AI·Autopilot 총괄을 지낸 <strong>안드레이 카파시</strong>가 제시한 말입니다. 그 정의는 이렇습니다.</p>
+
+<div class="quote">"내가 어떤 문제를 겪고 있는지 안다. 그 문제가 풀렸을 때의 이상적 결과를 상상할 수 있다. '어떻게' 푸는지는 몰라도 괜찮다 — 그 '어떻게'는 AI와 함께 풀어나간다."</div>
+
+<p>2024~2025년까지만 해도 저는 행정안전부 공무원분들을 대상으로 데이터 교육 과정을 운영했고, 당시 핵심은 ChatGPT와 Gemini 같은 상용 도구를 '얼마나 잘 쓰는가'에 대한 역량 강화였습니다.</p>
+
+<p>그러나 지금은 시대가 완전히 뒤바뀌었습니다. VIBE 코딩이라는 주체적 역량을 통해, 각 개인이 자신에게 필요한 소프트웨어와 시스템까지 직접 개발할 수 있는 시대가 열렸습니다.</p>
+
+<hr>
+
+<h2 id="s-eight">여덟 가지 기술 — 폐쇄망에서 돌아가는 것들</h2>
+
+<p>여러분께 현실을 정확히 인식시켜드리고자 여덟 가지 예시를 준비했습니다. 지금부터 하나씩 말씀드리겠습니다.</p>
+
+<h3 id="e1"><span class="ord">첫째.</span>HTML · CSS · 자바스크립트 단일 파일 도구</h3>
+
+<p>폐쇄망이든 일반망이든 브라우저만 있으면 작동합니다. 수천 개에 달하는 외부 자바스크립트 라이브러리를 파일 형태로 가져와 핵심망에서 작동시킨다면, 그 라이브러리는 보안에 전혀 위배됨 없이 브라우저 기반의 계산기·시뮬레이터·시스템 프로그램·업무 자동화 도구를 만들 수 있게 해 줍니다.</p>
+
+<h3 id="e2"><span class="ord">둘째.</span>파이썬</h3>
+
+<p>파이썬은 기본 기능만으로도 운영체제를 제어할 수 있는 라이브러리를 갖추고 있습니다. 외부망에서 생성형 AI에 코드를 요청해 받은 뒤 내부망에서 실행하면, 독립적으로 업무 자동화를 수행하는 프로그램을 만들 수 있습니다.</p>
+
+<p>파이썬의 추가 라이브러리는 외부에서는 명령 한 줄로 내려받을 수 있는데, 이를 폐쇄망에 파일 형태로 옮겨 작동시키면 — 엑셀과 파워포인트 문서 작업, 파일 제어, PDF 텍스트 추출 후 AI에 전달하는 작업까지 — 공통 기반을 훨씬 넓게 확장해 사용할 수 있습니다.</p>
+
+<h3 id="e3"><span class="ord">셋째.</span>Electron 기반 독립 실행 프로그램</h3>
+
+<p>내부망에 직접 설치하지 않더라도, 외부망에서 파이썬으로 완전히 개발한 뒤 Electron이라는 실행 환경을 이용해 실행 파일로 묶어낼 수 있습니다. 설치만 하면 바로 작동하는 독립형 프로그램입니다.</p>
+
+<p>물론 현재 많은 폐쇄망 환경에서는 실행 파일의 불안정성 때문에 보안 검토가 엄격한 것으로 알고 있습니다. 다만 그 실행 파일을 보안상 검증할 수 있을 정도의 우리나라 보안 실력이 부족하지 않을 것이라는 확신이 있습니다.</p>
+
+<p>이미 많은 사람들이 파이썬과 Electron으로 이러한 프로그램을 만들고 있으며, <strong>Claude Code 같은 도구가 주어진다면 이 자리에서도 한 시간 안에 열 개 이상을 만들어낼 수 있습니다.</strong> 파일 통합, 개인정보 마스킹, 민원 분류와 같은 워크플로우는 생성형 AI를 반드시 개입시키지 않고도 이러한 기술만으로 충분히 구현 가능합니다.</p>
+
+<h3 id="e4"><span class="ord">넷째.</span>Node.js</h3>
+
+<p>앞서 말씀드린 HTML·CSS·자바스크립트는 브라우저가 있어야 작동하지만, Node.js는 자바스크립트를 컴퓨터 내부에 설치함으로써 — 브라우저 없이도 자바스크립트의 다양한 기능을 업무에 활용하고 자동화할 수 있게 해 줍니다.</p>
+
+<h3 id="e5"><span class="ord">다섯째.</span>Ollama — 로컬 소형 언어 모델</h3>
+
+<p>1B·2B 규모의, CPU에서 돌아가는 모델만 가지고도 우리는 엑셀 작업, 간단한 문장 요약, SQL 데이터베이스 조회 코드 구현 같은 작업을 충분히 수행할 수 있습니다. 폐쇄망 로컬 환경에서 AI가 돌아가면서, 보안에 안정적으로 다양한 시스템·데이터베이스와 결합하여 AX 전환을 촉진할 수 있습니다.</p>
+
+<h3 id="e6"><span class="ord">여섯째.</span>Ollama와 레거시의 결합</h3>
+
+<p>소형 언어 모델을 엑셀·파워포인트 같은 기존 레거시 프로그램에 덧붙임으로써, 우리가 쓰던 프로그램 안에서 AI를 더 적극적으로 활용할 수 있게 해 줍니다.</p>
+
+<p>Hugging Face라는 사이트에서 오픈소스 형태로 모델을 받는 방식인데, 학습 단계에서는 파라미터를 직접 다루어야 하지만, <strong>이미 만들어진 모델의 코드베이스를 검증하는 일</strong>은 국가정보원이나 보안 당국에서 충분히 수행해 낼 수 있으리라 생각합니다.</p>
+
+<h3 id="e7"><span class="ord">일곱째.</span>에이전틱 AI</h3>
+
+<p>Claude Code, OpenCode, Codex, Antigravity — 이런 이름들을 들어보셨을 것입니다. 내 컴퓨터 안에 AI 에이전트가 들어와 파일을 제어·수정하고, 나의 작업을 자율적으로 어시스트하는 기능입니다.</p>
+
+<p>사실 모델 자체의 성능도 중요하지만, 진짜 핵심은 그 모델이 내 컴퓨터 안에서 다양한 작업을 수행하는 데 필요한 구조 — <em>기억과 메모리, 반복 작업 스케줄링, 정보 검색의 일관성</em> — 에 대한 지침과 규칙입니다. 이 구조를 잘 갖춘 에이전트에 공공 기반 모델이나 이미 보안 당국에서 검증된 모델을 결합한다면, 내부적으로 AI 에이전트를 훌륭히 수행해 낼 수 있을 것입니다. 삼성과 네이버 또한 이러한 기능을 충분히 개발할 역량을 갖추고 있습니다.</p>
+
+<h3 id="e8"><span class="ord">여덟째.</span>오픈소스 생태계 그 자체</h3>
+
+<p>깃허브에는 수없이 많은 새로운 라이브러리, 스킬, MCP, API 같은 기술들이 끊임없이 쏟아지고 있습니다. 민간의 1인 프리랜서나 작은 기업들이 이런 오픈소스를 발전시켜 더 좋은 프로그램을 만들어냅니다. 이러한 오픈소스 생태계는 이미 너무나 잘 열려 있습니다.</p>
+
+<p>공공에서도 검증된 오픈소스 에이전트와 라이브러리를 모아 하나의 '생태계 저장소'로 구축한다면 — 로컬 컴퓨터에 설치된 AI 에이전트가 자유롭게 이 저장소를 활용해 HTML, 파이썬, Node.js 기반의 도구를 로컬 환경 안에서 보안에 위배 없이 만들어낼 수 있습니다. 그렇게 되면 공공의 실무자들이, <strong>큰 시스템이 결코 해결해 주지 못하는 '작은 골목길의 문제들'</strong>을 스스로 풀어낼 수 있는 국가적 역량으로 이어질 것입니다.</p>
+
+<hr>
+
+<h2 id="s-synth">거시와 미시가 만나는 지점</h2>
+
+<p>바로 이것이 — 앞서 말씀드린 거시적 관점의 AX 전환과 미시적 관점의 AX 전환이 아울러졌을 때 나오는 — <strong>진짜 소버린 AI</strong>입니다. 그리고 그때 비로소 AX에서 'X' — Transformation이라는 개념을 우리가 당당히 얘기할 수 있게 됩니다.</p>
+
+<h2 id="s-seesaw">혁신과 규제의 시소</h2>
+
+<p>다소 늦었을 수 있습니다. 너무나 빠른 기술의 속도 때문에, 우리가 해야 할 일과 하지 말아야 할 일을 두고 고민이 많으신 것도 잘 알고 있습니다.</p>
+
+<p>다만 '성장과 규제', '혁신과 규제'라는 관점 안에서 — 우리의 시소가 지나치게 규제 쪽으로 기울어져 있지 않은가, 감히 여쭙고 싶습니다.</p>
+
+<p>많은 분들이 AI 교육을 받으면서 머릿속에 늘 맴도는 질문이 있다고 합니다. <em>"내가 이것을 배운들, 우리 공공기관에서 과연 쓸 수 있을까?"</em> 막연한 역량 강화 교육이 실무로 이어지는 과정에서 병목이 되는 이 거버넌스 체제 — 여기 계신 지혜롭고 연륜 있으신 분들께서, 공공을 사랑하시는 그 마음을 모아 꼭 해결해 주실 수 있기를 바라는 마음으로 오늘 발표를 마무리하려 합니다.</p>
+
+<h2 id="s-end">마무리</h2>
+
+<p>고생 많으셨습니다. 저는 다음 일정이 급하게 있어 이 자리에서 인사드리고 먼저 일어나야 할 것 같습니다.</p>
+
+<p>혹시 논의하시는 과정 중에 제가 말씀드린 내용에 대해 궁금하신 점, 추가로 발전시키거나 다시 한 번 생각해 볼 문제가 있으시다면 편하게 연락 주시기 바랍니다. 연락처는 홍성수 팀장을 통해 전달드리겠습니다.</p>
+
+<p class="end">감사합니다.</p>
+
+</article>
+</div>
+
+<script>
+(function(){
+  const body = document.body;
+  const KEY = 'lecture_sb_state';
+  const isWide = () => window.matchMedia('(min-width:901px)').matches;
+
+  // Restore state
+  const saved = localStorage.getItem(KEY);
+  if (isWide()) {
+    if (saved === 'closed') body.classList.add('sb-closed');
+  } else {
+    // mobile default: closed (uses .sb-open to show)
+    if (saved === 'open') body.classList.add('sb-open');
+  }
+
+  // Toggle
+  document.getElementById('sbToggle').addEventListener('click', () => {
+    if (isWide()) {
+      body.classList.toggle('sb-closed');
+      localStorage.setItem(KEY, body.classList.contains('sb-closed') ? 'closed' : 'open');
+    } else {
+      body.classList.toggle('sb-open');
+      localStorage.setItem(KEY, body.classList.contains('sb-open') ? 'open' : 'closed');
+    }
+  });
+
+  // Theme toggle
+  const savedTheme = localStorage.getItem('lecture_theme');
+  if (savedTheme === 'dark') document.documentElement.dataset.theme = 'dark';
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const cur = document.documentElement.dataset.theme;
+    const next = cur === 'dark' ? '' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('lecture_theme', next || 'light');
+  });
+
+  // Keyboard shortcut: s = toggle sidebar, d = toggle dark
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 's' || e.key === 'S') { e.preventDefault(); document.getElementById('sbToggle').click(); }
+    if (e.key === 'd' || e.key === 'D') { e.preventDefault(); document.getElementById('themeToggle').click(); }
+  });
+
+  // Auto-close on mobile after nav click
+  document.querySelectorAll('.sidebar a').forEach(a => {
+    a.addEventListener('click', () => {
+      if (!isWide()) {
+        body.classList.remove('sb-open');
+        localStorage.setItem(KEY, 'closed');
+      }
+    });
+  });
+
+  // Active section highlight
+  const navLinks = [...document.querySelectorAll('.sidebar ul li')];
+  const targets = navLinks.map(li => {
+    const a = li.querySelector('a');
+    if (!a) return null;
+    const id = a.getAttribute('href').slice(1);
+    return { li, el: document.getElementById(id) };
+  }).filter(x => x && x.el);
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        const match = targets.find(t => t.el === en.target);
+        if (match) {
+          navLinks.forEach(li => li.classList.remove('active'));
+          match.li.classList.add('active');
+        }
+      }
+    });
+  }, { rootMargin: '-10% 0px -75% 0px' });
+
+  targets.forEach(t => obs.observe(t.el));
+})();
+</script>
+
+</body>
+</html>
