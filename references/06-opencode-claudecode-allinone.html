@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenCode · Claude Code 올인원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,700;1,500&family=Noto+Serif+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5efe4;--ink:#2b2015;--ink-soft:#4a3826;--accent:#b8532a;--line:#d8c8ae;--line-soft:#e6d9bf;--code-bg:#ebe1cc;--sb-w:260px}
+[data-theme="dark"]{--bg:#1a1612;--ink:#ede4d3;--ink-soft:#c9bba0;--accent:#e07a4a;--line:#3a2f22;--line-soft:#2d2419;--code-bg:#2d2419}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+body{font-family:'EB Garamond','Noto Serif KR','Batang',serif;font-size:18px;line-height:1.85;-webkit-font-smoothing:antialiased;word-break:keep-all}
+
+.ctrl{position:fixed;top:16px;z-index:20;display:flex;gap:8px}
+.ctrl button{background:var(--bg);border:1px solid var(--line);color:var(--ink);width:36px;height:36px;border-radius:6px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.ctrl button:hover{background:rgba(184,83,42,.1);color:var(--accent)}
+.ctrl.left{left:16px} .ctrl.right{right:16px}
+
+.sidebar{position:fixed;top:0;left:0;width:var(--sb-w);height:100vh;background:var(--bg);border-right:1px solid var(--line-soft);padding:72px 22px 40px 26px;overflow-y:auto;transition:transform .3s ease;z-index:15}
+body.sb-closed .sidebar{transform:translateX(-100%)}
+.sidebar .brand{font-family:'EB Garamond','Noto Serif KR',serif;font-weight:700;font-size:14px;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px}
+.sidebar .sub{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);opacity:.7;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--line-soft)}
+.sidebar .grp{font-size:10px;letter-spacing:.2em;font-weight:700;color:var(--accent);text-transform:uppercase;margin:18px 0 6px;opacity:.85}
+.sidebar .grp:first-of-type{margin-top:0}
+.sidebar ul{list-style:none;padding:0;margin:0 0 4px}
+.sidebar ul li{font-family:'Noto Serif KR',serif;font-size:12px;line-height:1.45;padding:4px 0 4px 10px;border-left:2px solid transparent;color:var(--ink-soft);transition:all .15s}
+.sidebar ul li a{display:block;color:inherit;text-decoration:none}
+.sidebar ul li:hover{color:var(--accent);border-left-color:var(--line)}
+.sidebar ul li.active{color:var(--accent);border-left-color:var(--accent);font-weight:700}
+
+.page{padding-left:var(--sb-w);transition:padding-left .3s ease}
+body.sb-closed .page{padding-left:0}
+article{max-width:880px;margin:0 auto;padding:80px 36px 120px}
+
+h1{font-family:'EB Garamond','Noto Serif KR',serif;font-size:38px;font-weight:700;line-height:1.2;margin:0 0 56px;text-align:center;letter-spacing:-.4px;scroll-margin-top:32px}
+h1 em{font-style:italic;color:var(--accent)}
+h2{font-family:'EB Garamond','Noto Serif KR',serif;font-size:25px;font-weight:700;line-height:1.3;margin:54px 0 16px;letter-spacing:-.2px;color:var(--ink);scroll-margin-top:32px;border-bottom:1px solid var(--line-soft);padding-bottom:8px}
+h3{font-family:'EB Garamond','Noto Serif KR',serif;font-size:20px;font-weight:700;margin:34px 0 12px;color:var(--ink);letter-spacing:-.1px;scroll-margin-top:32px}
+h4{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:700;margin:24px 0 10px;color:var(--ink-soft)}
+
+p{margin:0 0 18px;color:var(--ink-soft)}
+p strong{color:var(--ink);font-weight:700}
+p em{color:var(--accent);font-style:italic}
+a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+a:hover{text-decoration-thickness:2px}
+
+ul, ol{padding-left:24px;margin:0 0 18px;color:var(--ink-soft)}
+li{margin-bottom:6px;line-height:1.7}
+li strong{color:var(--ink)}
+
+code{font-family:'JetBrains Mono','Consolas',monospace;font-size:.88em;background:var(--code-bg);color:var(--ink);padding:1.5px 5px;border-radius:3px}
+pre.code{background:var(--code-bg);padding:14px 18px;border-radius:5px;overflow-x:auto;margin:18px 0;border-left:3px solid var(--accent);font-size:13px;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.93em;color:var(--ink)}
+
+.quote{margin:24px 0;padding:14px 0 14px 22px;border-left:3px solid var(--accent);font-style:italic;font-size:18px;color:var(--ink);line-height:1.65;font-weight:500}
+
+.tblwrap{margin:18px 0;overflow-x:auto;border:1px solid var(--line-soft);border-radius:4px}
+table{border-collapse:collapse;width:100%;font-family:'Noto Serif KR',serif;font-size:13.5px}
+thead th{background:var(--code-bg);color:var(--ink);font-weight:700;text-align:left;padding:8px 12px;border-bottom:1.5px solid var(--accent);font-size:12px;letter-spacing:.5px}
+tbody td{padding:8px 12px;border-bottom:1px solid var(--line-soft);color:var(--ink-soft);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(184,83,42,.04)}
+table code{font-size:.85em}
+
+hr{border:none;text-align:center;margin:48px 0;color:var(--accent);letter-spacing:.7em;font-size:14px}
+hr::after{content:"✦ ❦ ✦"}
+
+@media(max-width:900px){
+  .page{padding-left:0}
+  .sidebar{transform:translateX(-100%)}
+  body.sb-open .sidebar{transform:translateX(0);box-shadow:6px 0 24px rgba(0,0,0,.15)}
+}
+@media(max-width:720px){
+  body{font-size:16px}
+  article{padding:56px 18px 80px}
+  h1{font-size:28px;margin-bottom:36px}
+  h2{font-size:21px;margin:42px 0 12px}
+  h3{font-size:18px}
+  table{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+
+<div class="ctrl left"><button id="sbToggle" title="사이드바 토글 (s)" aria-label="Toggle sidebar">☰</button></div>
+<div class="ctrl right"><button id="themeToggle" title="다크모드 (d)" aria-label="Toggle theme">◐</button></div>
+
+<nav class="sidebar" aria-label="목차">
+<div class="brand">OpenCode · Claude Code 올인원</div>
+<div class="sub">슬래시 명령 · 툴 · 설정 비교 가이드</div>
+<div class="grp">1) 1분 용어 정리</div>
+<ul>
+<li><a href="#1-1분-용어-정리">1) 1분 용어 정리</a></li>
+</ul>
+<div class="grp">2) 다른 코딩툴(Cursor/Copilot/Aider</div>
+<ul>
+<li><a href="#2-다른-코딩툴cursorcopilotaider-등과의-결정적-차이">2) 다른 코딩툴(Cursor/Copilot/Aider 등)과의 ‘결정적 차이’</a></li>
+</ul>
+<div class="grp">3) 공식 문서(정확도 기준점)</div>
+<ul>
+<li><a href="#3-공식-문서정확도-기준점">3) 공식 문서(정확도 기준점)</a></li>
+<li><a href="#31-claude-code-commands명령-전체-레퍼런스">3.1 Claude Code Commands(명령 전체 레퍼런스)</a></li>
+<li><a href="#32-opencode-slash-commands명령-전체-레퍼런스">3.2 OpenCode Slash Commands(명령 전체 레퍼런스)</a></li>
+</ul>
+<div class="grp">4) OpenCode — 슬래시 명령 “전체 목록”(공</div>
+<ul>
+<li><a href="#4-opencode-슬래시-명령-전체-목록공식-문서-기준">4) OpenCode — 슬래시 명령 “전체 목록”(공식 문서 기준)</a></li>
+<li><a href="#41-핵심-명령quick-reference">4.1 핵심 명령(Quick Reference)</a></li>
+<li><a href="#42-특수-문법프롬프트에-직접-사용">4.2 특수 문법(프롬프트에 직접 사용)</a></li>
+<li><a href="#43-커스텀-명령-만들기opencode">4.3 커스텀 명령 만들기(OpenCode)</a></li>
+<li><a href="#44-설정-파일opencode">4.4 설정 파일(OpenCode)</a></li>
+</ul>
+<div class="grp">5) Claude Code — 슬래시 명령 “전체 목록</div>
+<ul>
+<li><a href="#5-claude-code-슬래시-명령-전체-목록을-다루는-가장-안전한-방법">5) Claude Code — 슬래시 명령 “전체 목록”을 다루는 가장 안전한 방법</a></li>
+</ul>
+<div class="grp">6) Claude Code의 핵심 설정 방식(메모리/권</div>
+<ul>
+<li><a href="#6-claude-code의-핵심-설정-방식메모리권한훅">6) Claude Code의 핵심 설정 방식(메모리/권한/훅)</a></li>
+<li><a href="#61-메모리-claudemd">6.1 메모리: `CLAUDE.md`</a></li>
+<li><a href="#62-권한permissions">6.2 권한(Permissions)</a></li>
+<li><a href="#63-훅hooks">6.3 훅(Hooks)</a></li>
+</ul>
+<div class="grp">7) 스킬(Skills)·플러그인(Plugins)·MC</div>
+<ul>
+<li><a href="#7-스킬skills플러그인pluginsmcp외부연결">7) 스킬(Skills)·플러그인(Plugins)·MCP(외부연결)</a></li>
+<li><a href="#71-스킬skills">7.1 스킬(Skills)</a></li>
+<li><a href="#72-플러그인plugins">7.2 플러그인(Plugins)</a></li>
+<li><a href="#73-mcp">7.3 MCP</a></li>
+</ul>
+<div class="grp">8) (참고) 이 에이전트/채팅 환경의 Tool 인벤토</div>
+<ul>
+<li><a href="#8-참고-이-에이전트채팅-환경의-tool-인벤토리실제로-가능한-일">8) (참고) 이 에이전트/채팅 환경의 Tool 인벤토리(실제로 가능한 일)</a></li>
+<li><a href="#81-사용자-입력선택지-질문">8.1 사용자 입력(선택지 질문)</a></li>
+<li><a href="#82-터미널명령-실행">8.2 터미널/명령 실행</a></li>
+<li><a href="#83-파일디렉토리">8.3 파일/디렉토리</a></li>
+<li><a href="#84-lsp언어-서버">8.4 LSP(언어 서버)</a></li>
+<li><a href="#85-ast-기반-검색치환ast-grep">8.5 AST 기반 검색/치환(ast-grep)</a></li>
+<li><a href="#86-웹외부-레퍼런스">8.6 웹/외부 레퍼런스</a></li>
+<li><a href="#87-에이전트서브에이전트">8.7 에이전트(서브에이전트)</a></li>
+<li><a href="#88-백그라운드-태스크-관리">8.8 백그라운드 태스크 관리</a></li>
+<li><a href="#89-세션대화-기록-관리">8.9 세션(대화 기록) 관리</a></li>
+<li><a href="#810-미디어간단-추출">8.10 미디어/간단 추출</a></li>
+<li><a href="#811-todo작업-목록">8.11 Todo(작업 목록)</a></li>
+<li><a href="#812-스킬커맨드-로드">8.12 스킬/커맨드 로드</a></li>
+<li><a href="#813-병렬-실행-래퍼">8.13 병렬 실행 래퍼</a></li>
+<li><a href="#814-추가-oh-my-claudecode-접두사-툴-전체">8.14 (추가) oh-my-claudecode 접두사 툴 전체</a></li>
+</ul>
+<div class="grp">9) (참고) 이 환경에서 인식되는 Skill/Comm</div>
+<ul>
+<li><a href="#9-참고-이-환경에서-인식되는-skillcommand-이름-목록전체">9) (참고) 이 환경에서 인식되는 Skill/Command 이름 목록(전체)</a></li>
+<li><a href="#91-프로젝트사용자-스킬코딩-작업용">9.1 프로젝트/사용자 스킬(코딩 작업용)</a></li>
+<li><a href="#92-내장기본-스킬커맨드">9.2 내장(기본) 스킬/커맨드</a></li>
+<li><a href="#93-플러그인확장-제공-스킬커맨드">9.3 플러그인/확장 제공 스킬/커맨드</a></li>
+<li><a href="#94-oh-my-claudecode-네임스페이스전체">9.4 oh-my-claudecode 네임스페이스(전체)</a></li>
+</ul>
+<div class="grp">10) “진짜 실전” 체크리스트(일반 사용자용)</div>
+<ul>
+<li><a href="#10-진짜-실전-체크리스트일반-사용자용">10) “진짜 실전” 체크리스트(일반 사용자용)</a></li>
+</ul>
+<div class="grp">부록 A) 같은 폴더의 참고 문서</div>
+<ul>
+<li><a href="#부록-a-같은-폴더의-참고-문서">부록 A) 같은 폴더의 참고 문서</a></li>
+</ul>
+</nav>
+
+<div class="page">
+<article>
+<h1 id="오픈코드opencode-claude-code-슬래시-명령-툴-설정-방식-올인원-가이드-일반-사용자용">오픈코드(OpenCode) · Claude Code — 슬래시 명령 / 툴 / 설정 방식 올인원 가이드 (일반 사용자용)</h1>
+<p>이 문서는 “AI 코딩 도구”를 처음 쓰는 사람도 이해할 수 있도록, 다음을 <strong>한 파일에 빠짐없이</strong> 모았습니다.</p>
+<p>1) <strong>OpenCode</strong>의 슬래시 명령(<code>/...</code>)과 커스텀 명령 작성 방식 2) <strong>Claude Code</strong>의 슬래시 명령(<code>/...</code>)과 설정/확장(메모리, 권한, 훅, 스킬, 플러그인, MCP) 3) (참고) 이 채팅/에이전트 환경에서 실제로 호출 가능한 <strong>Tool/Skill 목록(인벤토리)</strong> 4) Cursor/Copilot/Aider/Windsurf 등과 비교했을 때 <strong>차별점(기술/설정 방식)</strong></p>
+<div class="quote">중요한 전제: 두 제품 모두 <strong>버전/플랫폼/요금제/환경</strong>에 따라 보이는 명령이 달라질 수 있습니다.  따라서 “지금 내 환경에서 진짜로 하나도 빠짐없이 보는 방법”은 <strong>OpenCode/Claude Code 모두에서 <code>/</code>를 입력해 명령 팔레트(목록)를 여는 것</strong>입니다.</div>
+<hr>
+<h2 id="1-1분-용어-정리">1) 1분 용어 정리</h2>
+<ul><li><strong>슬래시 명령(<code>/...</code>)</strong>: 대화 중 <code>/</code>로 시작하는 내장 명령/워크플로우.</li><li><strong>커스텀 슬래시 명령</strong>: 사용자가 마크다운 파일로 직접 만드는 <code>/my-command</code> 같은 명령.</li><li><strong>Tool(툴)</strong>: AI가 실제로 실행하는 기능(파일 읽기/검색/수정, 터미널 명령 실행 등).</li><li><strong>Skill(스킬)</strong>: 특정 작업을 잘 하기 위한 “워크플로우 묶음”(문서 + 규칙 + 스크립트 + 참고자료).</li><li><strong>Plugin(플러그인)</strong>: 슬래시 명령/스킬/훅/에이전트를 묶어 배포하는 패키지.</li><li><strong>MCP</strong>: 외부 시스템(깃헙, DB, 노션 등)을 AI에 연결하는 표준 프로토콜.</li></ul>
+<hr>
+<h2 id="2-다른-코딩툴cursorcopilotaider-등과의-결정적-차이">2) 다른 코딩툴(Cursor/Copilot/Aider 등)과의 ‘결정적 차이’</h2>
+<p>일반 사용자가 체감하는 차이만 핵심만 뽑으면:</p>
+<p>1) <strong>설정의 구조화(메모리/규칙 파일)</strong></p>
+<ul><li>Claude Code: <code>CLAUDE.md</code>(계층형)로 팀 규칙/금지사항/작업순서를 지속 적용</li><li>OpenCode: <code>AGENTS.md</code>(프로젝트 컨텍스트) + <code>.opencode/commands</code>로 반복 작업을 명령으로 캡슐화</li></ul>
+<p>2) <strong>슬래시 명령 생태계</strong></p>
+<ul><li>“명령이 곧 워크플로우”가 되어, 반복 작업을 메뉴/명령으로 실행 가능</li></ul>
+<p>3) <strong>확장 방식(스킬/플러그인/MCP/훅)</strong></p>
+<ul><li>단순 채팅이 아니라, 자동화/분업/외부도구 연결까지 포함한 플랫폼 형태</li></ul>
+<p>4) <strong>권한/안전 장치가 1급 기능</strong></p>
+<ul><li>파일 수정/터미널 실행/외부 연결을 세밀하게 허용/차단</li></ul>
+<hr>
+<h2 id="3-공식-문서정확도-기준점">3) 공식 문서(정확도 기준점)</h2>
+<h3 id="31-claude-code-commands명령-전체-레퍼런스">3.1 Claude Code Commands(명령 전체 레퍼런스)</h3>
+<ul><li>Claude Code 명령 레퍼런스(공식): https://code.claude.com/docs/en/commands</li><li>페이지에 <strong>“모든 명령 표”</strong>가 있으며, 플랫폼/요금제별로 일부만 보일 수 있다고 명시합니다.</li><li>내 환경에서 빠짐없이 확인: <strong>세션에서 <code>/</code> 입력 → 목록/검색</strong></li></ul>
+<h3 id="32-opencode-slash-commands명령-전체-레퍼런스">3.2 OpenCode Slash Commands(명령 전체 레퍼런스)</h3>
+<ul><li>OpenCode 슬래시 명령(공식): https://www.opencode.asia/reference/slash-commands/</li><li>내 환경에서 빠짐없이 확인: <strong>세션에서 <code>/</code> 입력 → 목록</strong></li></ul>
+<hr>
+<h2 id="4-opencode-슬래시-명령-전체-목록공식-문서-기준">4) OpenCode — 슬래시 명령 “전체 목록”(공식 문서 기준)</h2>
+<p>아래는 OpenCode 공식 문서의 Quick Reference를 한국어로 정리한 것입니다.</p>
+<h3 id="41-핵심-명령quick-reference">4.1 핵심 명령(Quick Reference)</h3>
+<div class="tblwrap"><table><thead><tr><th>명령</th><th>별칭</th><th>단축키</th><th>용도</th></tr></thead><tbody><tr><td><code>/help</code></td><td>-</td><td><code>Ctrl+X H</code></td><td>도움말</td></tr><tr><td><code>/new</code></td><td><code>/clear</code></td><td><code>Ctrl+X N</code></td><td>새 세션 시작(컨텍스트 리셋)</td></tr><tr><td><code>/undo</code></td><td>-</td><td><code>Ctrl+X U</code></td><td>직전 메시지 되돌리기(※ Git 필요)</td></tr><tr><td><code>/redo</code></td><td>-</td><td><code>Ctrl+X R</code></td><td>되돌린 메시지 재실행(※ Git 필요)</td></tr><tr><td><code>/compact</code></td><td><code>/summarize</code></td><td><code>Ctrl+X C</code></td><td>세션 요약/압축</td></tr><tr><td><code>/connect</code></td><td>-</td><td>-</td><td>AI Provider(모델 제공자) 추가</td></tr><tr><td><code>/models</code></td><td>-</td><td><code>Ctrl+X M</code></td><td>모델 목록</td></tr><tr><td><code>/sessions</code></td><td><code>/resume</code>, <code>/continue</code></td><td><code>Ctrl+X L</code></td><td>세션 목록/전환</td></tr><tr><td><code>/themes</code></td><td>-</td><td>-</td><td>테마 목록</td></tr><tr><td><code>/editor</code></td><td>-</td><td><code>Ctrl+X E</code></td><td>외부 에디터로 긴 메시지 작성</td></tr><tr><td><code>/export</code></td><td>-</td><td><code>Ctrl+X X</code></td><td>대화 Markdown 내보내기</td></tr><tr><td><code>/share</code></td><td>-</td><td><code>Ctrl+X S</code></td><td>대화 공유 링크 생성(공개 주의)</td></tr><tr><td><code>/unshare</code></td><td>-</td><td>-</td><td>공유 해제</td></tr><tr><td><code>/init</code></td><td>-</td><td><code>Ctrl+X I</code></td><td><code>AGENTS.md</code> 생성/업데이트</td></tr><tr><td><code>/details</code></td><td>-</td><td><code>Ctrl+X D</code></td><td>툴 실행 상세 표시 토글</td></tr><tr><td><code>/thinking</code></td><td>-</td><td>-</td><td>사고 과정 표시 토글</td></tr><tr><td><code>/exit</code></td><td><code>/quit</code>, <code>/q</code></td><td><code>Ctrl+X Q</code></td><td>종료</td></tr></tbody></table></div>
+<h3 id="42-특수-문법프롬프트에-직접-사용">4.2 특수 문법(프롬프트에 직접 사용)</h3>
+<ul><li><code>@path/to/file</code> : 파일 참조(내용이 모델로 전송됨 → 비밀정보 주의)</li><li><code>!command</code> : 셸 명령 실행(출력도 모델로 전송됨 → 비밀정보/파괴적 명령 주의)</li></ul>
+<h3 id="43-커스텀-명령-만들기opencode">4.3 커스텀 명령 만들기(OpenCode)</h3>
+<p>OpenCode는 마크다운 파일로 커스텀 슬래시 명령을 만들 수 있습니다.</p>
+<ul><li>프로젝트 단위:</li><li><code>&lt;PROJECT_DIR&gt;/.opencode/commands/</code></li><li>전역 단위(Windows):</li><li><code>%APPDATA%\\opencode\\commands\\</code></li></ul>
+<p>형식(YAML frontmatter + 본문 템플릿):</p>
+<pre class="code"><code class="lang-markdown">---
+description: Brief description
+model: optional-model
+agent: optional-agent
+---
+
+여기에 명령 템플릿을 작성합니다.
+!git diff</code></pre>
+<p>파일명(확장자 제외)이 명령명이 됩니다.</p>
+<h3 id="44-설정-파일opencode">4.4 설정 파일(OpenCode)</h3>
+<p>OpenCode는 설정을 두 층으로 둡니다.</p>
+<ul><li><strong>전역 설정(Global)</strong>: <code>~/.opencode/config.json</code></li><li><strong>프로젝트 설정(Project)</strong>: 프로젝트 루트의 <code>.opencode</code> 파일</li></ul>
+<p>공식 문서: https://www.opencode.asia/configuration/</p>
+<p>예시:</p>
+<pre class="code"><code class="lang-json">// ~/.opencode/config.json
+{
+  "default_provider": "anthropic",
+  "theme": "dark",
+  "auto_update": true,
+  "telemetry": false
+}</code></pre>
+<pre class="code"><code class="lang-yaml"># .opencode (프로젝트 루트)
+ignore:
+  - "dist/"
+  - "*.lock"
+
+context_window_limit: 128000</code></pre>
+<hr>
+<h2 id="5-claude-code-슬래시-명령-전체-목록을-다루는-가장-안전한-방법">5) Claude Code — 슬래시 명령 “전체 목록”을 다루는 가장 안전한 방법</h2>
+<p>Claude Code는 <strong>공식 문서 표</strong>가 존재하지만, 페이지에도 적혀 있듯이 환경에 따라 노출이 달라집니다.</p>
+<p>따라서 ‘내 환경에서’ 빠짐없이 확인하려면:</p>
+<p>1) <strong>세션에서 <code>/</code> 입력</strong> → 전체 명령 목록 표시 2) <code>/</code> + 몇 글자 입력 → 필터링(검색) 3) 명령 설명을 확인하고 실행</p>
+<p>공식 레퍼런스(전체 표): https://code.claude.com/docs/en/commands</p>
+<p>이 문서가 제공하는 것은:</p>
+<ul><li>“명령들이 어떤 범주로 나뉘고, 일반 사용자가 무엇을 언제 쓰면 좋은지”</li><li>“설정/권한/메모리/훅/스킬/플러그인/MCP가 실제로 어떻게 연결되는지”</li></ul>
+<hr>
+<h2 id="6-claude-code의-핵심-설정-방식메모리권한훅">6) Claude Code의 핵심 설정 방식(메모리/권한/훅)</h2>
+<h3 id="61-메모리-claudemd">6.1 메모리: <code>CLAUDE.md</code></h3>
+<p>Claude Code는 보통 다음 층위로 규칙/메모리를 누적합니다.</p>
+<ul><li>사용자 전역: <code>~/.claude/CLAUDE.md</code></li><li>프로젝트: <code>./CLAUDE.md</code></li><li>(선택) 개인용 프로젝트 로컬: <code>./CLAUDE.local.md</code> (보통 gitignore)</li></ul>
+<p><code>CLAUDE.md</code>에는 다음이 들어가면 좋습니다.</p>
+<ul><li>빌드/테스트 명령</li><li>기술스택, 폴더 구조</li><li>금지사항(any 금지 등)</li><li>브랜치 전략(예: main 직접 커밋 금지)</li></ul>
+<h3 id="62-권한permissions">6.2 권한(Permissions)</h3>
+<p>Claude Code는 “AI가 무엇을 실행할 수 있는지”를 규칙으로 관리합니다.  예를 들어 Bash를 전부 허용하지 않고, <code>git</code> 관련만 허용하는 식입니다.</p>
+<h3 id="63-훅hooks">6.3 훅(Hooks)</h3>
+<p>훅은 “특정 이벤트(툴 실행 전/후 등)에 자동으로 명령을 실행”하는 기능입니다.  포맷터/린터를 자동으로 돌리거나 위험 명령을 차단하는 데 씁니다.</p>
+<hr>
+<h2 id="7-스킬skills플러그인pluginsmcp외부연결">7) 스킬(Skills)·플러그인(Plugins)·MCP(외부연결)</h2>
+<h3 id="71-스킬skills">7.1 스킬(Skills)</h3>
+<ul><li>스킬은 “자주 하는 작업을 재사용 가능한 워크플로우로 묶은 것”입니다.</li><li>호출 방식: <code>/skill ...</code> 형태(환경에 따라), 또는 자동 트리거</li></ul>
+<h3 id="72-플러그인plugins">7.2 플러그인(Plugins)</h3>
+<ul><li>플러그인은 여러 구성요소(슬래시 명령 + 스킬 + 훅 + 에이전트 + MCP 등)를 하나로 묶어 배포합니다.</li></ul>
+<h3 id="73-mcp">7.3 MCP</h3>
+<ul><li>MCP는 깃헙/DB/노션/슬랙/피그마 같은 외부 시스템을 AI에 연결하는 표준입니다.</li><li>보안상 “토큰/자격증명”을 안전하게 다루는 설정이 중요합니다.</li></ul>
+<hr>
+<h2 id="8-참고-이-에이전트채팅-환경의-tool-인벤토리실제로-가능한-일">8) (참고) 이 에이전트/채팅 환경의 Tool 인벤토리(실제로 가능한 일)</h2>
+<p>여기부터는 “Claude Code 제품”이 아니라, <strong>현재 이 작업 환경(OpenCode Tool 인터페이스)</strong>에서 AI가 호출할 수 있는 기능을 정리한 것입니다.</p>
+<div class="quote">아래 목록은 이 세션의 툴 정의(시스템/개발자 메시지)에 기반해 정리했습니다. “하나도 빠짐없이”를 위해, <strong>정확한 함수명(툴 이름)을 전부 나열</strong>합니다.</div>
+<h3 id="81-사용자-입력선택지-질문">8.1 사용자 입력(선택지 질문)</h3>
+<ul><li><code>question(...)</code></li></ul>
+<h3 id="82-터미널명령-실행">8.2 터미널/명령 실행</h3>
+<ul><li><code>bash(...)</code></li><li><code>interactive_bash(...)</code></li></ul>
+<h3 id="83-파일디렉토리">8.3 파일/디렉토리</h3>
+<ul><li><code>read(...)</code></li><li><code>glob(...)</code></li><li><code>grep(...)</code></li><li><code>apply_patch(...)</code></li></ul>
+<h3 id="84-lsp언어-서버">8.4 LSP(언어 서버)</h3>
+<ul><li><code>lsp_goto_definition(...)</code></li><li><code>lsp_find_references(...)</code></li><li><code>lsp_symbols(...)</code></li><li><code>lsp_diagnostics(...)</code></li><li><code>lsp_prepare_rename(...)</code></li><li><code>lsp_rename(...)</code></li></ul>
+<h3 id="85-ast-기반-검색치환ast-grep">8.5 AST 기반 검색/치환(ast-grep)</h3>
+<ul><li><code>ast_grep_search(...)</code></li><li><code>ast_grep_replace(...)</code></li></ul>
+<h3 id="86-웹외부-레퍼런스">8.6 웹/외부 레퍼런스</h3>
+<ul><li><code>webfetch(...)</code></li><li><code>websearch_web_search_exa(...)</code></li><li><code>grep_app_searchGitHub(...)</code></li><li><code>context7_resolve-library-id(...)</code></li><li><code>context7_query-docs(...)</code></li></ul>
+<h3 id="87-에이전트서브에이전트">8.7 에이전트(서브에이전트)</h3>
+<ul><li><code>task(...)</code></li></ul>
+<h3 id="88-백그라운드-태스크-관리">8.8 백그라운드 태스크 관리</h3>
+<ul><li><code>background_output(...)</code></li><li><code>background_cancel(...)</code></li></ul>
+<h3 id="89-세션대화-기록-관리">8.9 세션(대화 기록) 관리</h3>
+<ul><li><code>session_list(...)</code></li><li><code>session_read(...)</code></li><li><code>session_search(...)</code></li><li><code>session_info(...)</code></li></ul>
+<h3 id="810-미디어간단-추출">8.10 미디어/간단 추출</h3>
+<ul><li><code>look_at(...)</code></li></ul>
+<h3 id="811-todo작업-목록">8.11 Todo(작업 목록)</h3>
+<ul><li><code>todowrite(...)</code></li></ul>
+<h3 id="812-스킬커맨드-로드">8.12 스킬/커맨드 로드</h3>
+<ul><li><code>skill(...)</code></li></ul>
+<h3 id="813-병렬-실행-래퍼">8.13 병렬 실행 래퍼</h3>
+<ul><li><code>multi_tool_use.parallel(...)</code></li></ul>
+<h3 id="814-추가-oh-my-claudecode-접두사-툴-전체">8.14 (추가) oh-my-claudecode 접두사 툴 전체</h3>
+<div class="quote">아래는 “추가 플러그인/확장”에서 노출된 도구들입니다.</div>
+<p><strong>LSP 래퍼</strong></p>
+<ul><li><code>oh-my-claudecode_t_lsp_hover(...)</code></li><li><code>oh-my-claudecode_t_lsp_goto_definition(...)</code></li><li><code>oh-my-claudecode_t_lsp_find_references(...)</code></li><li><code>oh-my-claudecode_t_lsp_document_symbols(...)</code></li><li><code>oh-my-claudecode_t_lsp_workspace_symbols(...)</code></li><li><code>oh-my-claudecode_t_lsp_diagnostics(...)</code></li><li><code>oh-my-claudecode_t_lsp_diagnostics_directory(...)</code></li><li><code>oh-my-claudecode_t_lsp_servers(...)</code></li><li><code>oh-my-claudecode_t_lsp_prepare_rename(...)</code></li><li><code>oh-my-claudecode_t_lsp_rename(...)</code></li><li><code>oh-my-claudecode_t_lsp_code_actions(...)</code></li><li><code>oh-my-claudecode_t_lsp_code_action_resolve(...)</code></li></ul>
+<p><strong>AST-grep 래퍼</strong></p>
+<ul><li><code>oh-my-claudecode_t_ast_grep_search(...)</code></li><li><code>oh-my-claudecode_t_ast_grep_replace(...)</code></li></ul>
+<p><strong>Python REPL</strong></p>
+<ul><li><code>oh-my-claudecode_t_python_repl(...)</code></li></ul>
+<p><strong>State(모드 상태) 관리</strong></p>
+<ul><li><code>oh-my-claudecode_t_state_read(...)</code></li><li><code>oh-my-claudecode_t_state_write(...)</code></li><li><code>oh-my-claudecode_t_state_clear(...)</code></li><li><code>oh-my-claudecode_t_state_list_active(...)</code></li><li><code>oh-my-claudecode_t_state_get_status(...)</code></li></ul>
+<p><strong>Notepad(메모장)</strong></p>
+<ul><li><code>oh-my-claudecode_t_notepad_read(...)</code></li><li><code>oh-my-claudecode_t_notepad_write_priority(...)</code></li><li><code>oh-my-claudecode_t_notepad_write_working(...)</code></li><li><code>oh-my-claudecode_t_notepad_write_manual(...)</code></li><li><code>oh-my-claudecode_t_notepad_prune(...)</code></li><li><code>oh-my-claudecode_t_notepad_stats(...)</code></li></ul>
+<p><strong>Project Memory</strong></p>
+<ul><li><code>oh-my-claudecode_t_project_memory_read(...)</code></li><li><code>oh-my-claudecode_t_project_memory_write(...)</code></li><li><code>oh-my-claudecode_t_project_memory_add_note(...)</code></li><li><code>oh-my-claudecode_t_project_memory_add_directive(...)</code></li></ul>
+<p><strong>Trace(흐름 추적)</strong></p>
+<ul><li><code>oh-my-claudecode_t_trace_timeline(...)</code></li><li><code>oh-my-claudecode_t_trace_summary(...)</code></li></ul>
+<p><strong>세션 검색(로컬 아카이브)</strong></p>
+<ul><li><code>oh-my-claudecode_t_session_search(...)</code></li></ul>
+<hr>
+<h2 id="9-참고-이-환경에서-인식되는-skillcommand-이름-목록전체">9) (참고) 이 환경에서 인식되는 Skill/Command 이름 목록(전체)</h2>
+<p>스킬/커맨드는 환경마다 설치 상태가 달라질 수 있습니다. 이 문서에는 “현재 환경에서 노출된 이름”을 정리합니다.</p>
+<div class="quote">주의: 같은 이름이 project/user로 중복 등록되어 보일 수 있습니다. 여기서는 이름 기준으로 “보이는 것”을 최대한 누락 없이 적습니다.</div>
+<h3 id="91-프로젝트사용자-스킬코딩-작업용">9.1 프로젝트/사용자 스킬(코딩 작업용)</h3>
+<ul><li><code>accessibility</code></li><li><code>api-integration</code></li><li><code>code-review</code></li><li><code>css-styling</code></li><li><code>deployment</code></li><li><code>find-skills</code></li><li><code>git-workflow</code></li><li><code>govern-writing-skill</code></li><li><code>performance</code></li><li><code>react-development</code></li><li><code>refactoring</code></li><li><code>security</code></li><li><code>skill-creator</code></li><li><code>testing</code></li><li><code>typescript-patterns</code></li></ul>
+<h3 id="92-내장기본-스킬커맨드">9.2 내장(기본) 스킬/커맨드</h3>
+<ul><li><code>playwright</code></li><li><code>frontend-ui-ux</code></li><li><code>git-master</code></li><li><code>dev-browser</code></li><li><code>init-deep</code></li><li><code>ralph-loop</code></li><li><code>ulw-loop</code></li><li><code>cancel-ralph</code></li><li><code>refactor</code></li><li><code>start-work</code></li><li><code>stop-continuation</code></li><li><code>handoff</code></li></ul>
+<h3 id="93-플러그인확장-제공-스킬커맨드">9.3 플러그인/확장 제공 스킬/커맨드</h3>
+<p><strong>superpowers</strong></p>
+<ul><li><code>superpowers:brainstorming</code></li><li><code>superpowers:dispatching-parallel-agents</code></li><li><code>superpowers:executing-plans</code></li><li><code>superpowers:finishing-a-development-branch</code></li><li><code>superpowers:receiving-code-review</code></li><li><code>superpowers:requesting-code-review</code></li><li><code>superpowers:subagent-driven-development</code></li><li><code>superpowers:systematic-debugging</code></li><li><code>superpowers:test-driven-development</code></li><li><code>superpowers:using-git-worktrees</code></li><li><code>superpowers:using-superpowers</code></li><li><code>superpowers:verification-before-completion</code></li><li><code>superpowers:writing-plans</code></li><li><code>superpowers:writing-skills</code></li></ul>
+<p><strong>commit-commands</strong></p>
+<ul><li><code>commit-commands:clean_gone</code></li><li><code>commit-commands:commit</code></li><li><code>commit-commands:commit-push-pr</code></li></ul>
+<p><strong>pr-review-toolkit</strong></p>
+<ul><li><code>pr-review-toolkit:review-pr</code></li></ul>
+<p><strong>agent-sdk-dev</strong></p>
+<ul><li><code>agent-sdk-dev:new-sdk-app</code></li></ul>
+<p><strong>claude-md-management</strong></p>
+<ul><li><code>claude-md-management:revise-claude-md</code></li><li><code>claude-md-management:claude-md-improver</code></li></ul>
+<p><strong>ralph-loop(플러그인)</strong></p>
+<ul><li><code>ralph-loop:cancel-ralph</code></li><li><code>ralph-loop:help</code></li><li><code>ralph-loop:ralph-loop</code></li></ul>
+<p><strong>feature-dev / code-review(플러그인)</strong></p>
+<ul><li><code>feature-dev:feature-dev</code></li><li><code>code-review:code-review</code></li></ul>
+<h3 id="94-oh-my-claudecode-네임스페이스전체">9.4 oh-my-claudecode 네임스페이스(전체)</h3>
+<ul><li><code>oh-my-claudecode:ai-slop-cleaner</code></li><li><code>oh-my-claudecode:ask</code></li><li><code>oh-my-claudecode:autopilot</code></li><li><code>oh-my-claudecode:cancel</code></li><li><code>oh-my-claudecode:ccg</code></li><li><code>oh-my-claudecode:configure-notifications</code></li><li><code>oh-my-claudecode:debug</code></li><li><code>oh-my-claudecode:deep-dive</code></li><li><code>oh-my-claudecode:deep-interview</code></li><li><code>oh-my-claudecode:deepinit</code></li><li><code>oh-my-claudecode:external-context</code></li><li><code>oh-my-claudecode:hud</code></li><li><code>oh-my-claudecode:learner</code></li><li><code>oh-my-claudecode:mcp-setup</code></li><li><code>oh-my-claudecode:omc-doctor</code></li><li><code>oh-my-claudecode:omc-reference</code></li><li><code>oh-my-claudecode:omc-setup</code></li><li><code>oh-my-claudecode:omc-teams</code></li><li><code>oh-my-claudecode:omc-plan</code></li><li><code>oh-my-claudecode:project-session-manager</code></li><li><code>oh-my-claudecode:ralph</code></li><li><code>oh-my-claudecode:ralplan</code></li><li><code>oh-my-claudecode:release</code></li><li><code>oh-my-claudecode:remember</code></li><li><code>oh-my-claudecode:sciomc</code></li><li><code>oh-my-claudecode:self-improve</code></li><li><code>oh-my-claudecode:setup</code></li><li><code>oh-my-claudecode:skill</code></li><li><code>oh-my-claudecode:skillify</code></li><li><code>oh-my-claudecode:team</code></li><li><code>oh-my-claudecode:trace</code></li><li><code>oh-my-claudecode:ultraqa</code></li><li><code>oh-my-claudecode:ultrawork</code></li><li><code>oh-my-claudecode:verify</code></li><li><code>oh-my-claudecode:visual-verdict</code></li><li><code>oh-my-claudecode:wiki</code></li><li><code>oh-my-claudecode:writer-memory</code></li></ul>
+<hr>
+<h2 id="10-진짜-실전-체크리스트일반-사용자용">10) “진짜 실전” 체크리스트(일반 사용자용)</h2>
+<p>1) <strong>명령이 기억 안 나면</strong>: <code>/</code> 입력해서 목록을 연다(가장 빠르고, 가장 ‘빠짐없음’) 2) <strong>규칙/지시사항을 계속 적용하려면</strong>: <code>CLAUDE.md</code>(Claude Code) 또는 <code>AGENTS.md</code>(OpenCode)를 쓴다 3) <strong>반복 작업은</strong>: 커스텀 명령(마크다운 파일)로 만든다 4) <strong>외부 서비스 연동은</strong>: MCP를 고려한다(토큰/권한 주의) 5) <strong>비밀정보</strong>: <code>@</code> 파일 참조, <code>!</code> 명령 출력에 섞이지 않게 한다</p>
+<hr>
+<h2 id="부록-a-같은-폴더의-참고-문서">부록 A) 같은 폴더의 참고 문서</h2>
+<ul><li><code>claude-code-완전가이드.md</code> — Claude Code 제품 중심의 매우 상세한 설명(설치, 플래그, 설정, 훅, 스킬, MCP, 플러그인 등)</li><li><code>opencode-슬래시명령-툴-설정-완전가이드.md</code> — 이 환경(OpenCode Tool 인터페이스)에서의 툴/스킬 인벤토리 중심</li></ul>
+</article>
+</div>
+
+<script>
+(function(){
+  const body = document.body;
+  const KEY = 'editorial_sb_state_06-opencode-claudecode-allinone';
+  const isWide = () => window.matchMedia('(min-width:901px)').matches;
+  const saved = localStorage.getItem(KEY);
+  if (isWide()) { if (saved === 'closed') body.classList.add('sb-closed'); }
+  else { if (saved === 'open') body.classList.add('sb-open'); }
+  document.getElementById('sbToggle').addEventListener('click', () => {
+    if (isWide()) { body.classList.toggle('sb-closed'); localStorage.setItem(KEY, body.classList.contains('sb-closed') ? 'closed' : 'open'); }
+    else { body.classList.toggle('sb-open'); localStorage.setItem(KEY, body.classList.contains('sb-open') ? 'open' : 'closed'); }
+  });
+  const savedTheme = localStorage.getItem('editorial_theme');
+  if (savedTheme === 'dark') document.documentElement.dataset.theme = 'dark';
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const cur = document.documentElement.dataset.theme;
+    const next = cur === 'dark' ? '' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('editorial_theme', next || 'light');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 's' || e.key === 'S') { e.preventDefault(); document.getElementById('sbToggle').click(); }
+    if (e.key === 'd' || e.key === 'D') { e.preventDefault(); document.getElementById('themeToggle').click(); }
+  });
+  document.querySelectorAll('.sidebar a').forEach(a => {
+    a.addEventListener('click', () => {
+      if (!isWide()) { body.classList.remove('sb-open'); localStorage.setItem(KEY, 'closed'); }
+    });
+  });
+  const navLinks = [...document.querySelectorAll('.sidebar ul li')];
+  const targets = navLinks.map(li => {
+    const a = li.querySelector('a');
+    if (!a) return null;
+    const id = a.getAttribute('href').slice(1);
+    return { li, el: document.getElementById(id) };
+  }).filter(x => x && x.el);
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        const match = targets.find(t => t.el === en.target);
+        if (match) { navLinks.forEach(li => li.classList.remove('active')); match.li.classList.add('active'); }
+      }
+    });
+  }, { rootMargin: '-10% 0px -75% 0px' });
+  targets.forEach(t => obs.observe(t.el));
+})();
+</script>
+
+</body>
+</html>

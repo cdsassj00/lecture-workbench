@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Claude Code 완전 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,700;1,500&family=Noto+Serif+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5efe4;--ink:#2b2015;--ink-soft:#4a3826;--accent:#b8532a;--line:#d8c8ae;--line-soft:#e6d9bf;--code-bg:#ebe1cc;--sb-w:260px}
+[data-theme="dark"]{--bg:#1a1612;--ink:#ede4d3;--ink-soft:#c9bba0;--accent:#e07a4a;--line:#3a2f22;--line-soft:#2d2419;--code-bg:#2d2419}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+body{font-family:'EB Garamond','Noto Serif KR','Batang',serif;font-size:18px;line-height:1.85;-webkit-font-smoothing:antialiased;word-break:keep-all}
+
+.ctrl{position:fixed;top:16px;z-index:20;display:flex;gap:8px}
+.ctrl button{background:var(--bg);border:1px solid var(--line);color:var(--ink);width:36px;height:36px;border-radius:6px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.ctrl button:hover{background:rgba(184,83,42,.1);color:var(--accent)}
+.ctrl.left{left:16px} .ctrl.right{right:16px}
+
+.sidebar{position:fixed;top:0;left:0;width:var(--sb-w);height:100vh;background:var(--bg);border-right:1px solid var(--line-soft);padding:72px 22px 40px 26px;overflow-y:auto;transition:transform .3s ease;z-index:15}
+body.sb-closed .sidebar{transform:translateX(-100%)}
+.sidebar .brand{font-family:'EB Garamond','Noto Serif KR',serif;font-weight:700;font-size:14px;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px}
+.sidebar .sub{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);opacity:.7;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--line-soft)}
+.sidebar .grp{font-size:10px;letter-spacing:.2em;font-weight:700;color:var(--accent);text-transform:uppercase;margin:18px 0 6px;opacity:.85}
+.sidebar .grp:first-of-type{margin-top:0}
+.sidebar ul{list-style:none;padding:0;margin:0 0 4px}
+.sidebar ul li{font-family:'Noto Serif KR',serif;font-size:12px;line-height:1.45;padding:4px 0 4px 10px;border-left:2px solid transparent;color:var(--ink-soft);transition:all .15s}
+.sidebar ul li a{display:block;color:inherit;text-decoration:none}
+.sidebar ul li:hover{color:var(--accent);border-left-color:var(--line)}
+.sidebar ul li.active{color:var(--accent);border-left-color:var(--accent);font-weight:700}
+
+.page{padding-left:var(--sb-w);transition:padding-left .3s ease}
+body.sb-closed .page{padding-left:0}
+article{max-width:880px;margin:0 auto;padding:80px 36px 120px}
+
+h1{font-family:'EB Garamond','Noto Serif KR',serif;font-size:38px;font-weight:700;line-height:1.2;margin:0 0 56px;text-align:center;letter-spacing:-.4px;scroll-margin-top:32px}
+h1 em{font-style:italic;color:var(--accent)}
+h2{font-family:'EB Garamond','Noto Serif KR',serif;font-size:25px;font-weight:700;line-height:1.3;margin:54px 0 16px;letter-spacing:-.2px;color:var(--ink);scroll-margin-top:32px;border-bottom:1px solid var(--line-soft);padding-bottom:8px}
+h3{font-family:'EB Garamond','Noto Serif KR',serif;font-size:20px;font-weight:700;margin:34px 0 12px;color:var(--ink);letter-spacing:-.1px;scroll-margin-top:32px}
+h4{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:700;margin:24px 0 10px;color:var(--ink-soft)}
+
+p{margin:0 0 18px;color:var(--ink-soft)}
+p strong{color:var(--ink);font-weight:700}
+p em{color:var(--accent);font-style:italic}
+a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+a:hover{text-decoration-thickness:2px}
+
+ul, ol{padding-left:24px;margin:0 0 18px;color:var(--ink-soft)}
+li{margin-bottom:6px;line-height:1.7}
+li strong{color:var(--ink)}
+
+code{font-family:'JetBrains Mono','Consolas',monospace;font-size:.88em;background:var(--code-bg);color:var(--ink);padding:1.5px 5px;border-radius:3px}
+pre.code{background:var(--code-bg);padding:14px 18px;border-radius:5px;overflow-x:auto;margin:18px 0;border-left:3px solid var(--accent);font-size:13px;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.93em;color:var(--ink)}
+
+.quote{margin:24px 0;padding:14px 0 14px 22px;border-left:3px solid var(--accent);font-style:italic;font-size:18px;color:var(--ink);line-height:1.65;font-weight:500}
+
+.tblwrap{margin:18px 0;overflow-x:auto;border:1px solid var(--line-soft);border-radius:4px}
+table{border-collapse:collapse;width:100%;font-family:'Noto Serif KR',serif;font-size:13.5px}
+thead th{background:var(--code-bg);color:var(--ink);font-weight:700;text-align:left;padding:8px 12px;border-bottom:1.5px solid var(--accent);font-size:12px;letter-spacing:.5px}
+tbody td{padding:8px 12px;border-bottom:1px solid var(--line-soft);color:var(--ink-soft);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(184,83,42,.04)}
+table code{font-size:.85em}
+
+hr{border:none;text-align:center;margin:48px 0;color:var(--accent);letter-spacing:.7em;font-size:14px}
+hr::after{content:"✦ ❦ ✦"}
+
+@media(max-width:900px){
+  .page{padding-left:0}
+  .sidebar{transform:translateX(-100%)}
+  body.sb-open .sidebar{transform:translateX(0);box-shadow:6px 0 24px rgba(0,0,0,.15)}
+}
+@media(max-width:720px){
+  body{font-size:16px}
+  article{padding:56px 18px 80px}
+  h1{font-size:28px;margin-bottom:36px}
+  h2{font-size:21px;margin:42px 0 12px}
+  h3{font-size:18px}
+  table{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+
+<div class="ctrl left"><button id="sbToggle" title="사이드바 토글 (s)" aria-label="Toggle sidebar">☰</button></div>
+<div class="ctrl right"><button id="themeToggle" title="다크모드 (d)" aria-label="Toggle theme">◐</button></div>
+
+<nav class="sidebar" aria-label="목차">
+<div class="brand">Claude Code 완전 가이드</div>
+<div class="sub">Full Guide · 슬래시 명령 · 설정 · 확장</div>
+<div class="grp">목차</div>
+<ul>
+<li><a href="#목차">목차</a></li>
+</ul>
+<div class="grp">1. Claude Code가 뭔가요?</div>
+<ul>
+<li><a href="#1-claude-code가-뭔가요">1. Claude Code가 뭔가요?</a></li>
+</ul>
+<div class="grp">2. 다른 AI 코딩 툴과 뭐가 다른가요?</div>
+<ul>
+<li><a href="#2-다른-ai-코딩-툴과-뭐가-다른가요">2. 다른 AI 코딩 툴과 뭐가 다른가요?</a></li>
+</ul>
+<div class="grp">3. 설치하고 처음 시작하기</div>
+<ul>
+<li><a href="#3-설치하고-처음-시작하기">3. 설치하고 처음 시작하기</a></li>
+<li><a href="#설치-한-번만">설치 (한 번만)</a></li>
+<li><a href="#mac이라면-더-쉽게">Mac이라면 더 쉽게</a></li>
+<li><a href="#처음-실행">처음 실행</a></li>
+<li><a href="#바로-질문하면서-시작하기">바로 질문하면서 시작하기</a></li>
+</ul>
+<div class="grp">4. 터미널에서 실행할 때 옵션들</div>
+<ul>
+<li><a href="#4-터미널에서-실행할-때-옵션들">4. 터미널에서 실행할 때 옵션들</a></li>
+<li><a href="#자주-쓰는-옵션">자주 쓰는 옵션</a></li>
+<li><a href="#서브커맨드-claude-뒤에-붙는-하위-명령">서브커맨드 (claude 뒤에 붙는 하위 명령)</a></li>
+</ul>
+<div class="grp">5. 슬래시 명령어 완전 목록</div>
+<ul>
+<li><a href="#5-슬래시-명령어-완전-목록">5. 슬래시 명령어 완전 목록</a></li>
+<li><a href="#세션대화-관리">세션/대화 관리</a></li>
+<li><a href="#모델모드-변경">모델/모드 변경</a></li>
+<li><a href="#설정초기화">설정/초기화</a></li>
+<li><a href="#메모리">메모리</a></li>
+<li><a href="#도구확장">도구/확장</a></li>
+<li><a href="#정보진단">정보/진단</a></li>
+<li><a href="#기타">기타</a></li>
+<li><a href="#플러그인이-추가하는-명령어-예시">플러그인이 추가하는 명령어 (예시)</a></li>
+</ul>
+<div class="grp">6. 키보드 단축키</div>
+<ul>
+<li><a href="#6-키보드-단축키">6. 키보드 단축키</a></li>
+<li><a href="#기본-입력">기본 입력</a></li>
+<li><a href="#중단종료">중단/종료</a></li>
+<li><a href="#특수-키">특수 키</a></li>
+<li><a href="#입력-시작-특수-문자">입력 시작 특수 문자</a></li>
+<li><a href="#키바인딩-커스터마이즈">키바인딩 커스터마이즈</a></li>
+</ul>
+<div class="grp">7. 특수 입력 문법</div>
+<ul>
+<li><a href="#7-특수-입력-문법">7. 특수 입력 문법</a></li>
+<li><a href="#파일폴더-참조">`@` — 파일/폴더 참조</a></li>
+<li><a href="#bash-명령-즉시-실행">`!` — Bash 명령 즉시 실행</a></li>
+<li><a href="#메모리에-영구-저장">`#` — 메모리에 영구 저장</a></li>
+<li><a href="#이미지-입력-방법">이미지 입력 방법</a></li>
+</ul>
+<div class="grp">8. 4가지 모드</div>
+<ul>
+<li><a href="#8-4가지-모드">8. 4가지 모드</a></li>
+<li><a href="#default-모드-기본">Default 모드 (기본)</a></li>
+<li><a href="#auto-accept-edits-모드">Auto-Accept Edits 모드</a></li>
+<li><a href="#plan-모드-읽기-전용">Plan 모드 (읽기 전용)</a></li>
+<li><a href="#bypass-permissions-모드">Bypass Permissions 모드</a></li>
+</ul>
+<div class="grp">9. Thinking 모드 — 더 깊이 생각하게 하기</div>
+<ul>
+<li><a href="#9-thinking-모드-더-깊이-생각하게-하기">9. Thinking 모드 — 더 깊이 생각하게 하기</a></li>
+<li><a href="#사용법">사용법</a></li>
+</ul>
+<div class="grp">10. 메모리 시스템</div>
+<ul>
+<li><a href="#10-메모리-시스템">10. 메모리 시스템</a></li>
+<li><a href="#4단계-계층">4단계 계층</a></li>
+<li><a href="#실제-활용-사례">실제 활용 사례</a></li>
+<li><a href="#메모리-만드는-3가지-방법">메모리 만드는 3가지 방법</a></li>
+</ul>
+<div class="grp">11. 설정 파일</div>
+<ul>
+<li><a href="#11-설정-파일">11. 설정 파일</a></li>
+<li><a href="#파일-위치와-용도">파일 위치와 용도</a></li>
+<li><a href="#주요-설정-항목-설명">주요 설정 항목 설명</a></li>
+<li><a href="#우선순위-높은-것이-이김">우선순위 (높은 것이 이김)</a></li>
+</ul>
+<div class="grp">12. 권한 시스템</div>
+<ul>
+<li><a href="#12-권한-시스템">12. 권한 시스템</a></li>
+<li><a href="#패턴-문법">패턴 문법</a></li>
+<li><a href="#3가지-동작">3가지 동작</a></li>
+<li><a href="#실제-설정-예시">실제 설정 예시</a></li>
+<li><a href="#대화-중-동적-권한">대화 중 동적 권한</a></li>
+</ul>
+<div class="grp">13. Hooks</div>
+<ul>
+<li><a href="#13-hooks">13. Hooks</a></li>
+<li><a href="#9가지-이벤트">9가지 이벤트</a></li>
+<li><a href="#실제-사용-사례들">실제 사용 사례들</a></li>
+<li><a href="#훅-차단-메커니즘">훅 차단 메커니즘</a></li>
+</ul>
+<div class="grp">14. Subagents</div>
+<ul>
+<li><a href="#14-subagents">14. Subagents</a></li>
+<li><a href="#왜-필요한가">왜 필요한가?</a></li>
+<li><a href="#실제-이점">실제 이점</a></li>
+<li><a href="#에이전트-파일-만들기">에이전트 파일 만들기</a></li>
+<li><a href="#사용법-2">사용법</a></li>
+</ul>
+<div class="grp">15. Skills</div>
+<ul>
+<li><a href="#15-skills">15. Skills</a></li>
+<li><a href="#구조">구조</a></li>
+<li><a href="#작동-방식">작동 방식</a></li>
+<li><a href="#주요-스킬-목록과-사례">주요 스킬 목록과 사례</a></li>
+<li><a href="#스킬-실행">스킬 실행</a></li>
+</ul>
+<div class="grp">16. MCP 서버</div>
+<ul>
+<li><a href="#16-mcp-서버">16. MCP 서버</a></li>
+<li><a href="#mcp가-뭔가">MCP가 뭔가?</a></li>
+<li><a href="#설치-방법">설치 방법</a></li>
+<li><a href="#유명한-mcp-서버와-사례">유명한 MCP 서버와 사례</a></li>
+<li><a href="#관리">관리</a></li>
+<li><a href="#스코프-적용-범위">스코프 (적용 범위)</a></li>
+</ul>
+<div class="grp">17. Plugins</div>
+<ul>
+<li><a href="#17-plugins">17. Plugins</a></li>
+<li><a href="#플러그인-번들">플러그인 = 번들</a></li>
+<li><a href="#설치">설치</a></li>
+<li><a href="#유명한-플러그인">유명한 플러그인</a></li>
+</ul>
+<div class="grp">18. Custom Slash Commands</div>
+<ul>
+<li><a href="#18-custom-slash-commands">18. Custom Slash Commands</a></li>
+<li><a href="#만드는-법">만드는 법</a></li>
+<li><a href="#저장-위치">저장 위치</a></li>
+</ul>
+<div class="grp">19. Output Styles</div>
+<ul>
+<li><a href="#19-output-styles">19. Output Styles</a></li>
+<li><a href="#내장-스타일">내장 스타일</a></li>
+<li><a href="#사용">사용</a></li>
+<li><a href="#커스텀-스타일-만들기">커스텀 스타일 만들기</a></li>
+</ul>
+<div class="grp">20. Status Line</div>
+<ul>
+<li><a href="#20-status-line">20. Status Line</a></li>
+<li><a href="#설정">설정</a></li>
+<li><a href="#대화형-설정">대화형 설정</a></li>
+</ul>
+<div class="grp">21. Git Worktree</div>
+<ul>
+<li><a href="#21-git-worktree">21. Git Worktree</a></li>
+<li><a href="#일반-git의-문제">일반 Git의 문제</a></li>
+<li><a href="#worktree의-해결">Worktree의 해결</a></li>
+<li><a href="#claude-code에서의-활용">Claude Code에서의 활용</a></li>
+</ul>
+<div class="grp">22. IDE 통합</div>
+<ul>
+<li><a href="#22-ide-통합">22. IDE 통합</a></li>
+<li><a href="#vs-code">VS Code</a></li>
+<li><a href="#jetbrains-intellij-pycharm-webstorm-등">JetBrains (IntelliJ, PyCharm, WebStorm 등)</a></li>
+<li><a href="#터미널에서-ide-연결">터미널에서 IDE 연결</a></li>
+</ul>
+<div class="grp">23. 파일 다루기</div>
+<ul>
+<li><a href="#23-파일-다루기">23. 파일 다루기</a></li>
+<li><a href="#이미지">이미지</a></li>
+<li><a href="#pdf">PDF</a></li>
+<li><a href="#jupyter-notebook">Jupyter Notebook</a></li>
+<li><a href="#오피스-문서-스킬-필요">오피스 문서 (스킬 필요)</a></li>
+</ul>
+<div class="grp">24. 백그라운드 태스크</div>
+<ul>
+<li><a href="#24-백그라운드-태스크">24. 백그라운드 태스크</a></li>
+<li><a href="#사용법-3">사용법</a></li>
+<li><a href="#작동-방식-2">작동 방식</a></li>
+</ul>
+<div class="grp">25. 세션 관리</div>
+<ul>
+<li><a href="#25-세션-관리">25. 세션 관리</a></li>
+<li><a href="#자동-저장">자동 저장</a></li>
+<li><a href="#이어가기-방법">이어가기 방법</a></li>
+<li><a href="#컨텍스트-관리">컨텍스트 관리</a></li>
+<li><a href="#히스토리-탐색">히스토리 탐색</a></li>
+</ul>
+<div class="grp">26. 비용 관리</div>
+<ul>
+<li><a href="#26-비용-관리">26. 비용 관리</a></li>
+<li><a href="#비용-확인">비용 확인</a></li>
+<li><a href="#요금제">요금제</a></li>
+<li><a href="#비용-절약-꿀팁">비용 절약 꿀팁</a></li>
+</ul>
+<div class="grp">27. 문제 해결</div>
+<ul>
+<li><a href="#27-문제-해결">27. 문제 해결</a></li>
+<li><a href="#자주-쓰는-진단-도구">자주 쓰는 진단 도구</a></li>
+<li><a href="#자주-겪는-문제와-해결">자주 겪는 문제와 해결</a></li>
+<li><a href="#로그-파일-위치">로그 파일 위치</a></li>
+<li><a href="#버그-신고">버그 신고</a></li>
+<li><a href="#도움-요청">도움 요청</a></li>
+</ul>
+<div class="grp">핵심 요약: Claude Code의 7대 차별화 기능</div>
+<ul>
+<li><a href="#핵심-요약-claude-code의-7대-차별화-기능">핵심 요약: Claude Code의 7대 차별화 기능</a></li>
+</ul>
+</nav>
+
+<div class="page">
+<article>
+<h1 id="claude-code-완전-가이드-모든-기능을-사례와-함께">Claude Code 완전 가이드 — 모든 기능을 사례와 함께</h1>
+<div class="quote">코딩을 전혀 모르는 사람도 이해할 수 있도록, 모든 명령어·기능·설정에 <strong>"이게 뭔데?"</strong>, <strong>"언제 쓰는데?"</strong>, <strong>"어떻게 쓰는데?"</strong> 를 빠짐없이 달았습니다.</div>
+<hr>
+<h2 id="목차">목차</h2>
+<ol><li><a href="#1-claude-code가-뭔가요" target="_blank" rel="noopener">Claude Code가 뭔가요?</a></li><li><a href="#2-다른-ai-코딩-툴과-뭐가-다른가요" target="_blank" rel="noopener">다른 AI 코딩 툴과 뭐가 다른가요?</a></li><li><a href="#3-설치하고-처음-시작하기" target="_blank" rel="noopener">설치하고 처음 시작하기</a></li><li><a href="#4-터미널에서-실행할-때-옵션들" target="_blank" rel="noopener">터미널에서 실행할 때 옵션들 (CLI 플래그)</a></li><li><a href="#5-슬래시-명령어-완전-목록" target="_blank" rel="noopener">슬래시 명령어 완전 목록 (/ 로 시작하는 것들)</a></li><li><a href="#6-키보드-단축키" target="_blank" rel="noopener">키보드 단축키</a></li><li><a href="#7-특수-입력-문법" target="_blank" rel="noopener">특수 입력 문법 (@ ! #)</a></li><li><a href="#8-4가지-모드" target="_blank" rel="noopener">4가지 모드</a></li><li><a href="#9-thinking-모드" target="_blank" rel="noopener">Thinking 모드 — 더 깊이 생각하게 하기</a></li><li><a href="#10-메모리-시스템" target="_blank" rel="noopener">메모리 시스템 (CLAUDE.md)</a></li><li><a href="#11-설정-파일" target="_blank" rel="noopener">설정 파일 (settings.json)</a></li><li><a href="#12-권한-시스템" target="_blank" rel="noopener">권한 시스템 — 뭘 허용하고 뭘 막을지</a></li><li><a href="#13-hooks" target="_blank" rel="noopener">Hooks — 자동 실행되는 명령</a></li><li><a href="#14-subagents" target="_blank" rel="noopener">Subagents — 전문 도우미 에이전트</a></li><li><a href="#15-skills" target="_blank" rel="noopener">Skills — 전문 기술 팩</a></li><li><a href="#16-mcp-서버" target="_blank" rel="noopener">MCP 서버 — 외부 도구 연결</a></li><li><a href="#17-plugins" target="_blank" rel="noopener">Plugins — 확장 패키지</a></li><li><a href="#18-custom-slash-commands" target="_blank" rel="noopener">Custom Slash Commands — 나만의 명령어 만들기</a></li><li><a href="#19-output-styles" target="_blank" rel="noopener">Output Styles — 말투 바꾸기</a></li><li><a href="#20-status-line" target="_blank" rel="noopener">Status Line — 하단 상태바</a></li><li><a href="#21-git-worktree" target="_blank" rel="noopener">Git Worktree — 독립 작업 공간</a></li><li><a href="#22-ide-통합" target="_blank" rel="noopener">IDE 통합 (VS Code, JetBrains)</a></li><li><a href="#23-파일-다루기" target="_blank" rel="noopener">이미지, PDF, 오피스 파일 다루기</a></li><li><a href="#24-백그라운드-태스크" target="_blank" rel="noopener">백그라운드 태스크</a></li><li><a href="#25-세션-관리" target="_blank" rel="noopener">세션 관리 — 대화 이어가기</a></li><li><a href="#26-비용-관리" target="_blank" rel="noopener">비용 관리</a></li><li><a href="#27-문제-해결" target="_blank" rel="noopener">문제 해결 (FAQ)</a></li></ol>
+<hr>
+<h2 id="1-claude-code가-뭔가요">1. Claude Code가 뭔가요?</h2>
+<p><strong>한마디로:</strong> 터미널(검은 화면)에서 대화하면서 코딩을 대신 해주는 AI 비서입니다.</p>
+<p><strong>일반적인 AI 코딩 툴과의 차이:</strong></p>
+<ul><li>ChatGPT에 코드를 복붙하는 게 아닙니다</li><li>Claude Code는 <strong>직접 여러분의 프로젝트 파일을 읽고, 수정하고, 명령어를 실행</strong>합니다</li><li>마치 "옆에 앉은 시니어 개발자"가 키보드를 잡고 직접 일하는 것과 같습니다</li></ul>
+<p><strong>쓸 수 있는 곳:</strong></p>
+<div class="tblwrap"><table><thead><tr><th>환경</th><th>설명</th></tr></thead><tbody><tr><td>터미널 (CLI)</td><td>가장 기본. 터미널에 <code>claude</code> 입력</td></tr><tr><td>VS Code 확장</td><td>VS Code 안에서 패널로 사용</td></tr><tr><td>JetBrains 플러그인</td><td>IntelliJ, PyCharm 등에서 사용</td></tr><tr><td>데스크탑 앱</td><td>Windows/Mac 전용 앱</td></tr><tr><td>웹</td><td>claude.ai/code 에서 브라우저로 사용</td></tr></tbody></table></div>
+<hr>
+<h2 id="2-다른-ai-코딩-툴과-뭐가-다른가요">2. 다른 AI 코딩 툴과 뭐가 다른가요?</h2>
+<div class="tblwrap"><table><thead><tr><th>기능</th><th>Claude Code</th><th>Cursor</th><th>GitHub Copilot</th><th>Aider</th><th>Windsurf</th></tr></thead><tbody><tr><td>작동 방식</td><td>터미널 에이전트</td><td>VS Code 포크</td><td>IDE 확장</td><td>터미널</td><td>VS Code 포크</td></tr><tr><td>파일 직접 수정</td><td>O</td><td>O</td><td>제한적</td><td>O</td><td>O</td></tr><tr><td>명령어 직접 실행</td><td>O</td><td>제한적</td><td>X</td><td>제한적</td><td>제한적</td></tr><tr><td>슬래시 명령어 확장</td><td>O (직접 만들기 가능)</td><td>일부</td><td>X</td><td>X</td><td>X</td></tr><tr><td>Hooks (이벤트 자동화)</td><td><strong>Claude Code만</strong></td><td>X</td><td>X</td><td>X</td><td>X</td></tr><tr><td>Subagents (분신술)</td><td><strong>Claude Code만</strong></td><td>X</td><td>X</td><td>X</td><td>X</td></tr><tr><td>Skills (전문기술)</td><td><strong>Claude Code만</strong></td><td>X</td><td>X</td><td>X</td><td>X</td></tr><tr><td>MCP 서버 연결</td><td>O (네이티브)</td><td>부분</td><td>X</td><td>X</td><td>부분</td></tr><tr><td>Plan 모드</td><td>O</td><td>X</td><td>X</td><td>X</td><td>X</td></tr><tr><td>메모리 파일</td><td>CLAUDE.md (계층형)</td><td>.cursorrules</td><td>X</td><td>CONVENTIONS.md</td><td>.windsurfrules</td></tr><tr><td>사고 깊이 조절</td><td>4단계</td><td>X</td><td>X</td><td>X</td><td>X</td></tr></tbody></table></div>
+<p><strong>쉽게 말하면:</strong> 다른 툴은 "더 똑똑한 자동완성"이고, Claude Code는 "프로그래밍 가능한 AI 직원"입니다.</p>
+<hr>
+<h2 id="3-설치하고-처음-시작하기">3. 설치하고 처음 시작하기</h2>
+<h3 id="설치-한-번만">설치 (한 번만)</h3>
+<pre class="code"><code class="lang-bash">npm install -g @anthropic-ai/claude-code</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> npm은 Node.js 패키지 관리자입니다. Node.js가 없으면 먼저 nodejs.org에서 설치하세요.</div>
+<h3 id="mac이라면-더-쉽게">Mac이라면 더 쉽게</h3>
+<pre class="code"><code class="lang-bash">brew install claude-code</code></pre>
+<h3 id="처음-실행">처음 실행</h3>
+<pre class="code"><code class="lang-bash">cd 내프로젝트폴더     # 작업할 폴더로 이동
+claude                # Claude Code 시작!</code></pre>
+<p><strong>처음 실행하면:</strong></p>
+<ol><li>로그인 화면이 나옵니다 (Anthropic 계정 또는 API 키)</li><li>로그인하면 바로 대화를 시작할 수 있습니다</li><li>프로젝트 폴더에 <code>.claude/</code> 폴더가 생깁니다 (설정 저장용)</li></ol>
+<h3 id="바로-질문하면서-시작하기">바로 질문하면서 시작하기</h3>
+<pre class="code"><code class="lang-bash">claude "이 프로젝트가 뭘 하는 코드인지 설명해줘"</code></pre>
+<div class="quote"><strong>사례:</strong> 남이 만든 프로젝트를 처음 봤을 때, 전체 구조를 파악하고 싶을 때</div>
+<hr>
+<h2 id="4-터미널에서-실행할-때-옵션들">4. 터미널에서 실행할 때 옵션들</h2>
+<p><code>claude</code> 명령어 뒤에 붙이는 옵션(플래그)들입니다.</p>
+<h3 id="자주-쓰는-옵션">자주 쓰는 옵션</h3>
+<p><strong><code>-p</code> 또는 <code>--print</code> — 질문하고 답만 받기</strong></p>
+<pre class="code"><code class="lang-bash">claude -p "package.json에 있는 의존성 목록 알려줘"</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 대화 모드로 들어가지 않고, 질문 → 답변 → 자동 종료. 스크립트에서 자동화할 때 유용.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> CI/CD 파이프라인에서 "코드 리뷰 자동화" 같은 것을 만들 때 사용</div>
+<p><strong><code>-c</code> 또는 <code>--continue</code> — 아까 하던 대화 이어하기</strong></p>
+<pre class="code"><code class="lang-bash">claude -c</code></pre>
+<div class="quote"><strong>사례:</strong> 점심 먹고 돌아와서 "아까 버그 고치던 거 이어서 해줘"</div>
+<p><strong><code>-r</code> 또는 <code>--resume</code> — 특정 과거 대화 다시 열기</strong></p>
+<pre class="code"><code class="lang-bash">claude -r              # 최근 대화 목록에서 선택
+claude -r abc123       # 특정 세션 ID로 바로 열기</code></pre>
+<div class="quote"><strong>사례:</strong> "3일 전에 로그인 기능 만들던 대화 다시 열어야 해"</div>
+<p><strong><code>--model</code> — AI 모델 고르기</strong></p>
+<pre class="code"><code class="lang-bash">claude --model opus     # 가장 똑똑한 모델 (비쌈)
+claude --model sonnet   # 균형 잡힌 모델 (기본값)
+claude --model haiku    # 가장 빠르고 저렴한 모델</code></pre>
+<div class="quote"><strong>사례:</strong> - 복잡한 아키텍처 설계 → <code>opus</code> - 일반 코딩 → <code>sonnet</code> - 간단한 질문, 파일 이름 바꾸기 → <code>haiku</code></div>
+<p><strong><code>--fallback-model</code> — 백업 모델</strong></p>
+<pre class="code"><code class="lang-bash">claude --model opus --fallback-model sonnet</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> opus가 바쁘거나 에러 나면 자동으로 sonnet으로 전환</div>
+<p><strong><code>--permission-mode</code> — 권한 모드 지정</strong></p>
+<pre class="code"><code class="lang-bash">claude --permission-mode plan          # 읽기만 가능 (안전)
+claude --permission-mode acceptEdits   # 파일 수정 자동 승인</code></pre>
+<div class="quote"><strong>사례:</strong> 처음 쓰는 프로젝트에서는 <code>plan</code> 모드로 시작해서 뭘 할지 먼저 확인</div>
+<p><strong><code>--dangerously-skip-permissions</code> — 모든 허락 건너뛰기</strong></p>
+<pre class="code"><code class="lang-bash">claude --dangerously-skip-permissions</code></pre>
+<div class="quote"><strong>주의:</strong> 모든 파일 수정, 명령어 실행을 묻지 않고 바로 합니다. 테스트 환경에서만 쓰세요!</div>
+<p><strong><code>--allowed-tools</code> — 특정 도구만 허용</strong></p>
+<pre class="code"><code class="lang-bash">claude --allowed-tools "Read Grep Glob"</code></pre>
+<div class="quote"><strong>사례:</strong> "읽기만 하고 아무것도 수정하지 마" 라고 제한하고 싶을 때</div>
+<p><strong><code>--disallowed-tools</code> — 특정 도구 금지</strong></p>
+<pre class="code"><code class="lang-bash">claude --disallowed-tools "Bash Write"</code></pre>
+<div class="quote"><strong>사례:</strong> "터미널 명령 실행이랑 파일 새로 만드는 건 하지 마"</div>
+<p><strong><code>--add-dir</code> — 추가 작업 폴더</strong></p>
+<pre class="code"><code class="lang-bash">claude --add-dir ../shared-library</code></pre>
+<div class="quote"><strong>사례:</strong> 메인 프로젝트 말고 공유 라이브러리 폴더도 같이 봐야 할 때</div>
+<p><strong><code>--mcp-config</code> — MCP 설정 파일 지정</strong></p>
+<pre class="code"><code class="lang-bash">claude --mcp-config ./my-mcp-servers.json</code></pre>
+<div class="quote"><strong>사례:</strong> 프로젝트마다 다른 외부 도구 연결이 필요할 때</div>
+<p><strong><code>--output-format</code> — 출력 형식 (스크립트용)</strong></p>
+<pre class="code"><code class="lang-bash">claude -p "버그 목록" --output-format json</code></pre>
+<div class="quote"><strong>사례:</strong> 다른 프로그램이 Claude의 결과를 파싱해야 할 때. <code>text</code>, <code>json</code>, <code>stream-json</code> 중 선택</div>
+<p><strong><code>--verbose</code> / <code>--debug</code> — 상세 로그</strong></p>
+<pre class="code"><code class="lang-bash">claude --verbose    # 자세한 로그
+claude --debug      # 디버그 수준 로그</code></pre>
+<div class="quote"><strong>사례:</strong> "왜 안 되지?" 싶을 때 내부에서 무슨 일이 일어나는지 확인</div>
+<p><strong><code>--append-system-prompt</code> — 숨은 지시 추가</strong></p>
+<pre class="code"><code class="lang-bash">claude --append-system-prompt "항상 한국어로 대답해"</code></pre>
+<div class="quote"><strong>사례:</strong> 자동화 스크립트에서 Claude의 동작 규칙을 추가로 넣고 싶을 때</div>
+<p><strong><code>--settings</code> — 커스텀 설정 파일</strong></p>
+<pre class="code"><code class="lang-bash">claude --settings ./team-settings.json</code></pre>
+<div class="quote"><strong>사례:</strong> 팀원마다 다른 설정 파일을 쓰고 싶을 때</div>
+<p><strong><code>--session-id</code> — 세션 ID 지정</strong></p>
+<pre class="code"><code class="lang-bash">claude --session-id "my-debug-session-001"</code></pre>
+<div class="quote"><strong>사례:</strong> 자동화에서 세션을 추적·관리할 때</div>
+<h3 id="서브커맨드-claude-뒤에-붙는-하위-명령">서브커맨드 (claude 뒤에 붙는 하위 명령)</h3>
+<p><strong><code>claude config</code> — 설정 관리</strong></p>
+<pre class="code"><code class="lang-bash">claude config set model sonnet    # 기본 모델을 sonnet으로
+claude config get model           # 현재 기본 모델 확인
+claude config list                # 모든 설정 보기</code></pre>
+<div class="quote"><strong>사례:</strong> "매번 --model sonnet 치기 귀찮아. 기본값으로 저장하자"</div>
+<p><strong><code>claude mcp</code> — MCP 서버 관리</strong></p>
+<pre class="code"><code class="lang-bash">claude mcp add        # 새 MCP 서버 추가 (대화형)
+claude mcp list       # 설치된 서버 목록
+claude mcp remove     # 서버 제거</code></pre>
+<div class="quote"><strong>사례:</strong> GitHub API 연결하거나, DB 직접 쿼리 기능 추가할 때</div>
+<p><strong><code>claude doctor</code> — 환경 진단</strong></p>
+<pre class="code"><code class="lang-bash">claude doctor</code></pre>
+<div class="quote"><strong>사례:</strong> "설치했는데 뭔가 이상해" → 이 명령으로 문제 자동 탐지</div>
+<p><strong><code>claude update</code> — 업데이트</strong></p>
+<pre class="code"><code class="lang-bash">claude update</code></pre>
+<div class="quote"><strong>사례:</strong> 새 기능이 나왔을 때. 주기적으로 실행 권장</div>
+<p><strong><code>claude login</code> / <code>claude logout</code> — 계정</strong></p>
+<pre class="code"><code class="lang-bash">claude login       # 로그인
+claude logout      # 로그아웃 (계정 전환 시)</code></pre>
+<hr>
+<h2 id="5-슬래시-명령어-완전-목록">5. 슬래시 명령어 완전 목록</h2>
+<p>대화 중에 <code>/</code> 를 치면 나오는 명령어입니다. 일반 대화와 구분하기 위해 슬래시(<code>/</code>)로 시작합니다.</p>
+<hr>
+<h3 id="세션대화-관리">세션/대화 관리</h3>
+<p><strong><code>/help</code> — 도움말</strong></p>
+<pre class="code"><code class="lang-">/help</code></pre>
+<div class="quote"><strong>언제:</strong> Claude Code 사용법이 기억 안 날 때. 간단한 가이드가 표시됩니다.</div>
+<p><strong><code>/clear</code> — 대화 초기화</strong></p>
+<pre class="code"><code class="lang-">/clear</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 지금까지의 대화를 전부 잊어버립니다. 새 주제를 시작할 때 유용합니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "로그인 기능 작업이 끝났으니, 이제 결제 기능 작업을 시작하자" → <code>/clear</code> 하고 새로 시작</div>
+<p><strong><code>/compact</code> — 대화 압축</strong></p>
+<pre class="code"><code class="lang-">/compact
+/compact 현재까지의 버그 수정 내용만 기억해</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 대화가 너무 길어지면 AI가 앞부분을 잊어버릴 수 있습니다. <code>/compact</code>는 중요한 내용만 요약해서 기억 공간을 확보합니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> 2시간째 작업 중인데 Claude가 앞에서 한 말을 잊어버릴 때</div>
+<p>&gt;</p>
+<div class="quote"><strong>팁:</strong> 뒤에 힌트를 주면 ("현재까지의 DB 스키마 변경만 기억해") 해당 내용을 우선 보존</div>
+<p><strong><code>/exit</code> 또는 <code>/quit</code> — 종료</strong></p>
+<pre class="code"><code class="lang-">/exit
+/quit</code></pre>
+<div class="quote"><strong>사례:</strong> 작업 끝났을 때. <code>Ctrl+D</code>나 <code>Ctrl+C</code> 두 번도 같은 효과.</div>
+<p><strong><code>/resume</code> — 과거 대화 목록에서 재개</strong></p>
+<pre class="code"><code class="lang-">/resume</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 이전에 했던 대화 목록이 나오고, 원하는 것을 선택해서 이어갈 수 있습니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "지난주에 로그인 기능 만들던 대화 어디 갔지?" → <code>/resume</code> → 목록에서 선택</div>
+<p><strong><code>/continue</code> — 직전 대화 바로 이어가기</strong></p>
+<pre class="code"><code class="lang-">/continue</code></pre>
+<div class="quote"><strong>사례:</strong> Claude Code를 종료했다가 다시 열었을 때, 바로 직전 대화를 이어서 진행</div>
+<p><strong><code>/export</code> — 대화 내보내기</strong></p>
+<pre class="code"><code class="lang-">/export</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 현재까지의 대화를 파일로 저장합니다. 기록 보관이나 공유할 때 유용.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "오늘 Claude랑 작업한 내용을 팀원에게 보여주고 싶어"</div>
+<p><strong><code>/rewind</code> — 시간 되돌리기</strong></p>
+<pre class="code"><code class="lang-">/rewind</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> "방금 Claude가 한 작업 취소하고 그 전으로 돌아가줘". Ctrl+Z의 대화 버전입니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> Claude가 파일을 잘못 수정했을 때 → <code>/rewind</code> → 수정 전 상태로 복구</div>
+<hr>
+<h3 id="모델모드-변경">모델/모드 변경</h3>
+<p><strong><code>/model</code> — AI 모델 바꾸기</strong></p>
+<pre class="code"><code class="lang-">/model opus      # 가장 똑똑 (복잡한 설계, 어려운 버그)
+/model sonnet    # 균형 (일반 코딩)
+/model haiku     # 가장 빠르고 저렴 (간단 질문)</code></pre>
+<div class="quote"><strong>사례:</strong> 아키텍처 설계할 때 opus로 바꿨다가, 단순 파일 수정은 haiku로 전환해서 비용 절약</div>
+<p>&gt;</p>
+<div class="quote"><strong>비유:</strong> opus = 교수님, sonnet = 시니어 개발자, haiku = 주니어 개발자</div>
+<p><strong><code>/fast</code> — 빠른 출력 모드 토글</strong></p>
+<pre class="code"><code class="lang-">/fast</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 같은 모델이지만 출력 속도가 빨라집니다. 품질은 거의 동일.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "답변이 너무 느려" → <code>/fast</code> 켜면 체감 속도 향상</div>
+<p><strong><code>/permissions</code> — 권한 설정</strong></p>
+<pre class="code"><code class="lang-">/permissions</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> "Claude가 어떤 행동을 할 수 있는지" 설정하는 화면이 열립니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "git push는 항상 허용하고, rm 명령은 항상 차단하고 싶어"</div>
+<p><strong><code>/mode</code> — 권한 모드 전환</strong></p>
+<pre class="code"><code class="lang-">/mode</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 4가지 모드(Default, Auto-Accept, Plan, Bypass) 사이를 전환합니다. (8장 참조)</div>
+<hr>
+<h3 id="설정초기화">설정/초기화</h3>
+<p><strong><code>/init</code> — CLAUDE.md 자동 생성</strong></p>
+<pre class="code"><code class="lang-">/init</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 프로젝트를 분석해서 "이 프로젝트는 이런 기술을 쓰고, 이런 규칙이 있다"는 메모 파일을 자동으로 만들어줍니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> 새 프로젝트에서 Claude Code를 처음 쓸 때. 이후 Claude가 프로젝트를 더 잘 이해합니다.</div>
+<p><strong><code>/config</code> — 설정 편집</strong></p>
+<pre class="code"><code class="lang-">/config</code></pre>
+<div class="quote"><strong>사례:</strong> 기본 모델, 테마, 권한 등을 대화형으로 변경</div>
+<p><strong><code>/settings</code> — settings.json 직접 열기</strong></p>
+<pre class="code"><code class="lang-">/settings</code></pre>
+<div class="quote"><strong>사례:</strong> 세부 설정을 JSON으로 직접 편집하고 싶을 때</div>
+<p><strong><code>/theme</code> — 색상 테마</strong></p>
+<pre class="code"><code class="lang-">/theme</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 터미널의 색상 배색을 바꿉니다. 어두운 테마, 밝은 테마 등.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "글자가 잘 안 보여" → 테마 변경</div>
+<p><strong><code>/statusline</code> — 하단 상태바 설정</strong></p>
+<pre class="code"><code class="lang-">/statusline</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 프롬프트 아래에 항상 보이는 정보줄을 커스터마이즈합니다. (20장 참조)</div>
+<p><strong><code>/terminal-setup</code> — 터미널 설정</strong></p>
+<pre class="code"><code class="lang-">/terminal-setup</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> <code>Shift+Enter</code>로 줄바꿈이 되도록 터미널을 설정합니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "여러 줄 입력하고 싶은데 Enter 치면 바로 전송돼" → <code>/terminal-setup</code> 실행</div>
+<hr>
+<h3 id="메모리">메모리</h3>
+<p><strong><code>/memory</code> — 메모리 파일 편집</strong></p>
+<pre class="code"><code class="lang-">/memory</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> CLAUDE.md (Claude의 장기 기억) 파일을 편집할 수 있는 에디터가 열립니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "이 프로젝트에서는 항상 TypeScript를 써야 해" 같은 규칙을 직접 작성</div>
+<p><strong><code>#메시지</code> — 빠른 메모리 저장</strong></p>
+<pre class="code"><code class="lang-">#이 프로젝트는 Tailwind v4를 사용한다
+#테스트는 항상 Vitest로 작성해</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 대화 입력창에서 <code>#</code>으로 시작하면 메모리 저장 모드가 됩니다. 프로젝트 또는 개인 메모리 중 어디에 저장할지 선택 UI가 뜹니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "아, 이건 Claude가 항상 기억했으면 좋겠다" → <code>#</code> 붙여서 입력</div>
+<hr>
+<h3 id="도구확장">도구/확장</h3>
+<p><strong><code>/agents</code> — 서브에이전트 관리</strong></p>
+<pre class="code"><code class="lang-">/agents</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 현재 사용 가능한 전문 에이전트 목록을 보여줍니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "코드 리뷰 전문 에이전트가 설치돼 있나 확인하자"</div>
+<p><strong><code>/mcp</code> — MCP 서버 상태 확인</strong></p>
+<pre class="code"><code class="lang-">/mcp</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 현재 연결된 외부 도구(GitHub, DB, Figma 등)의 상태를 보여줍니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "GitHub 연결이 안 되는 것 같아" → <code>/mcp</code>로 상태 확인</div>
+<p><strong><code>/hooks</code> — 훅 설정</strong></p>
+<pre class="code"><code class="lang-">/hooks</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 자동 실행 규칙(훅)을 설정합니다. (13장 참조)</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "파일 수정할 때마다 자동으로 prettier 돌리고 싶어"</div>
+<p><strong><code>/plugin</code> — 플러그인 관리</strong></p>
+<pre class="code"><code class="lang-">/plugin</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 설치된 플러그인 목록 확인, 새로 설치, 제거 등.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "oh-my-claudecode 플러그인 설치하자"</div>
+<p><strong><code>/skill</code> — 스킬 실행</strong></p>
+<pre class="code"><code class="lang-">/skill pdf             # PDF 처리 스킬 실행
+/skill commit          # 커밋 스킬 실행
+/skill frontend-design # 프론트엔드 디자인 스킬</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 설치된 전문 스킬을 수동으로 호출합니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "PDF에서 표를 추출하고 싶어" → <code>/skill pdf</code></div>
+<p><strong><code>/output-style</code> — 말투 변경</strong></p>
+<pre class="code"><code class="lang-">/output-style             # 목록 보기
+/output-style concise     # 짧고 간결하게
+/output-style explanatory # 자세히 설명</code></pre>
+<div class="quote"><strong>사례:</strong> "설명이 너무 길어" → <code>/output-style concise</code></div>
+<p><strong><code>/output-style:new</code> — 새 말투 만들기</strong></p>
+<pre class="code"><code class="lang-">/output-style:new</code></pre>
+<div class="quote"><strong>사례:</strong> "한국어 존댓말로만 답하고, 코드 예시를 항상 포함하는 스타일" 같은 커스텀 스타일 생성</div>
+<p><strong><code>/install-github-app</code> — GitHub 앱 설치</strong></p>
+<pre class="code"><code class="lang-">/install-github-app</code></pre>
+<div class="quote"><strong>사례:</strong> Claude Code를 GitHub 저장소와 연동할 때 (PR 자동 리뷰 등)</div>
+<hr>
+<h3 id="정보진단">정보/진단</h3>
+<p><strong><code>/cost</code> — 비용 확인</strong></p>
+<pre class="code"><code class="lang-">/cost</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 이번 대화에서 얼마나 토큰을 쓰고, 비용이 얼마인지 보여줍니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "오늘 얼마나 쓴 거지?" → <code>/cost</code></div>
+<p><strong><code>/status</code> — 전체 상태</strong></p>
+<pre class="code"><code class="lang-">/status</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 현재 모델, 작업 디렉토리, 로그인 계정, 권한 모드 등 모든 정보를 한눈에 보여줍니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "지금 어떤 모델로 작업 중이지?" → <code>/status</code></div>
+<p><strong><code>/doctor</code> — 환경 진단</strong></p>
+<pre class="code"><code class="lang-">/doctor</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> "이 컴퓨터에서 Claude Code가 제대로 동작하는지" 자동 검사합니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "뭔가 이상하게 동작해" → <code>/doctor</code>로 원인 파악</div>
+<p><strong><code>/bug</code> — 버그 신고</strong></p>
+<pre class="code"><code class="lang-">/bug</code></pre>
+<div class="quote"><strong>사례:</strong> Claude Code 자체의 버그를 발견했을 때. GitHub 이슈로 자동 연결.</div>
+<p><strong><code>/release-notes</code> — 업데이트 내역</strong></p>
+<pre class="code"><code class="lang-">/release-notes</code></pre>
+<div class="quote"><strong>사례:</strong> "최근에 뭐가 바뀌었지?" → 새 기능, 수정사항 확인</div>
+<p><strong><code>/privacy-settings</code> — 개인정보 설정</strong></p>
+<pre class="code"><code class="lang-">/privacy-settings</code></pre>
+<div class="quote"><strong>사례:</strong> 데이터 수집 동의, 텔레메트리 설정 등</div>
+<hr>
+<h3 id="기타">기타</h3>
+<p><strong><code>/login</code> / <code>/logout</code> — 계정</strong></p>
+<pre class="code"><code class="lang-">/login      # 다른 계정으로 로그인
+/logout     # 로그아웃</code></pre>
+<div class="quote"><strong>사례:</strong> 회사 계정 ↔ 개인 계정 전환</div>
+<p><strong><code>/pr_comments</code> — PR 코멘트 가져오기</strong></p>
+<pre class="code"><code class="lang-">/pr_comments</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 현재 브랜치와 관련된 GitHub Pull Request의 리뷰 코멘트를 가져옵니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "리뷰어가 뭐라고 했는지 확인하고, 그에 맞게 수정하자"</div>
+<p><strong><code>/review</code> — 코드 리뷰</strong></p>
+<pre class="code"><code class="lang-">/review</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 현재 변경사항에 대해 Claude가 코드 리뷰를 해줍니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> 커밋 전에 "내 코드 문제 없는지 한번 봐줘"</div>
+<p><strong><code>/vim</code> — Vim 키바인딩 토글</strong></p>
+<pre class="code"><code class="lang-">/vim</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> Vim 에디터 스타일 키보드 조작을 켜거나 끕니다. Vim을 모르면 무시하세요.</div>
+<p><strong><code>/ide</code> — IDE 연결</strong></p>
+<pre class="code"><code class="lang-">/ide</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> 현재 열려 있는 VS Code와 Claude Code를 연결합니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> VS Code에서 코드를 선택하면 Claude가 자동으로 해당 코드를 인식</div>
+<p><strong><code>/add-dir</code> — 작업 디렉토리 추가</strong></p>
+<pre class="code"><code class="lang-">/add-dir ../shared-library</code></pre>
+<div class="quote"><strong>사례:</strong> "메인 프로젝트 말고 옆에 있는 라이브러리 폴더도 같이 봐야 해"</div>
+<hr>
+<h3 id="플러그인이-추가하는-명령어-예시">플러그인이 추가하는 명령어 (예시)</h3>
+<p>플러그인을 설치하면 자동으로 슬래시 명령이 추가됩니다:</p>
+<div class="tblwrap"><table><thead><tr><th>명령</th><th>플러그인</th><th>설명</th><th>사례</th></tr></thead><tbody><tr><td><code>/commit</code></td><td>commit-commands</td><td>변경사항을 깔끔하게 커밋</td><td>"git add, commit 메시지 생성 다 해줘"</td></tr><tr><td><code>/commit-push-pr</code></td><td>commit-commands</td><td>커밋 + 푸시 + PR 생성</td><td>"한번에 PR까지 올려줘"</td></tr><tr><td><code>/review-pr</code></td><td>pr-review-toolkit</td><td>PR 전체 리뷰</td><td>"이 PR 리뷰해줘"</td></tr><tr><td><code>/autopilot</code></td><td>oh-my-claudecode</td><td>아이디어 → 완성 코드 자동</td><td>"알아서 다 해줘"</td></tr><tr><td><code>/ralph</code></td><td>oh-my-claudecode</td><td>완료될 때까지 반복 실행</td><td>"테스트 통과할 때까지 계속 고쳐"</td></tr><tr><td><code>/plan</code></td><td>oh-my-claudecode</td><td>전략적 기획</td><td>"이 기능 어떻게 만들지 계획 세워줘"</td></tr><tr><td><code>/debug</code></td><td>oh-my-claudecode</td><td>체계적 디버깅</td><td>"왜 안 되는지 추적해줘"</td></tr></tbody></table></div>
+<hr>
+<h2 id="6-키보드-단축키">6. 키보드 단축키</h2>
+<h3 id="기본-입력">기본 입력</h3>
+<div class="tblwrap"><table><thead><tr><th>키</th><th>기능</th><th>쉬운 설명</th></tr></thead><tbody><tr><td><code>Enter</code></td><td>메시지 전송</td><td>평소처럼 엔터</td></tr><tr><td><code>Shift+Enter</code></td><td>줄바꿈</td><td>여러 줄 입력하고 싶을 때 (먼저 <code>/terminal-setup</code> 필요)</td></tr><tr><td><code>\</code> + <code>Enter</code></td><td>줄바꿈 (대체)</td><td>Shift+Enter가 안 되면 이걸로</td></tr><tr><td><code>Ctrl+J</code></td><td>줄바꿈 (대체)</td><td>또 다른 줄바꿈 방법</td></tr><tr><td><code>Tab</code></td><td>자동완성</td><td>파일명이나 명령어 치다가 Tab 누르면 나머지 자동 완성</td></tr><tr><td><code>↑</code> / <code>↓</code></td><td>이전 입력</td><td>이전에 입력했던 프롬프트를 다시 불러오기</td></tr><tr><td><code>Ctrl+R</code></td><td>히스토리 검색</td><td>"예전에 뭐라고 입력했더라?" → 검색</td></tr></tbody></table></div>
+<h3 id="중단종료">중단/종료</h3>
+<div class="tblwrap"><table><thead><tr><th>키</th><th>기능</th><th>쉬운 설명</th></tr></thead><tbody><tr><td><code>Esc</code></td><td>응답 중단</td><td>Claude가 말하는 중에 "멈춰!"</td></tr><tr><td><code>Esc</code> 두 번</td><td>되돌리기(rewind)</td><td>"방금 한 거 취소"</td></tr><tr><td><code>Ctrl+C</code></td><td>취소</td><td>진행 중인 동작 취소. 두 번 누르면 종료</td></tr><tr><td><code>Ctrl+D</code></td><td>종료</td><td>Claude Code를 끕니다 (빈 입력 상태에서)</td></tr><tr><td><code>Ctrl+L</code></td><td>화면 정리</td><td>터미널 화면이 지저분할 때 깨끗하게</td></tr></tbody></table></div>
+<h3 id="특수-키">특수 키</h3>
+<div class="tblwrap"><table><thead><tr><th>키</th><th>기능</th><th>쉬운 설명</th></tr></thead><tbody><tr><td><code>Shift+Tab</code></td><td>모드 순환</td><td>Default → Auto-Accept → Plan → ... 빠르게 전환</td></tr><tr><td><code>Alt+M</code></td><td>모델 빠른 전환</td><td>opus ↔ sonnet ↔ haiku 빠르게</td></tr><tr><td><code>Ctrl+O</code></td><td>긴 출력 열기</td><td>출력이 너무 길어서 잘렸을 때 전체 보기</td></tr></tbody></table></div>
+<h3 id="입력-시작-특수-문자">입력 시작 특수 문자</h3>
+<div class="tblwrap"><table><thead><tr><th>문자</th><th>기능</th><th>사례</th></tr></thead><tbody><tr><td><code>@</code></td><td>파일/폴더 참조</td><td><code>@src/App.tsx 이 파일 분석해줘</code></td></tr><tr><td><code>!</code></td><td>터미널 명령 실행</td><td><code>!git status</code> (결과를 Claude가 읽음)</td></tr><tr><td><code>#</code></td><td>메모리 저장</td><td><code>#TypeScript strict 모드 필수</code></td></tr><tr><td><code>/</code></td><td>슬래시 명령</td><td><code>/model opus</code></td></tr></tbody></table></div>
+<h3 id="키바인딩-커스터마이즈">키바인딩 커스터마이즈</h3>
+<p><code>~/.claude/keybindings.json</code> 파일을 만들어 단축키를 바꿀 수 있습니다:</p>
+<pre class="code"><code class="lang-json">[
+  { "key": "ctrl+s", "command": "submit" },
+  { "key": "ctrl+k ctrl+c", "command": "clear" }
+]</code></pre>
+<div class="quote"><strong>사례:</strong> "Enter 대신 Ctrl+S로 전송하고 싶어"</div>
+<p>&gt;</p>
+<div class="quote">코드(chord) 단축키도 지원: <code>ctrl+k</code> 누르고 <code>ctrl+c</code> 누르면 clear</div>
+<hr>
+<h2 id="7-특수-입력-문법">7. 특수 입력 문법</h2>
+<p>프롬프트에서 쓸 수 있는 특수 문자들입니다.</p>
+<h3 id="파일폴더-참조"><code>@</code> — 파일/폴더 참조</h3>
+<pre class="code"><code class="lang-">@src/App.tsx 이 파일에서 버그 찾아줘
+@src/components/ 이 폴더 안의 모든 컴포넌트를 분석해줘
+@screenshot.png 이 스크린샷에서 에러 메시지 읽어줘
+@package.json 의존성 정리해줘</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> <code>@</code> 치면 자동완성 메뉴가 뜹니다. 파일을 선택하면 Claude가 그 파일을 읽고 작업합니다. 이미지 파일도 됩니다!</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> - "이 파일 리팩토링해줘" → <code>@src/utils/helpers.ts 리팩토링해줘</code> - "에러 스크린샷 보고 원인 찾아줘" → 이미지를 <code>@</code>로 참조</div>
+<h3 id="bash-명령-즉시-실행"><code>!</code> — Bash 명령 즉시 실행</h3>
+<pre class="code"><code class="lang-">!git status
+!npm test
+!ls -la src/
+!cat package.json | head -20</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> <code>!</code> 뒤에 터미널 명령을 치면, 그 결과를 Claude가 읽고 상황을 파악합니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> - "현재 git 상태가 어떤지 보고 작업해줘" → <code>!git status</code> - "테스트가 통과하는지 확인해" → <code>!npm test</code></div>
+<h3 id="메모리에-영구-저장"><code>#</code> — 메모리에 영구 저장</h3>
+<pre class="code"><code class="lang-">#이 프로젝트는 pnpm을 패키지 매니저로 사용
+#API 응답은 항상 camelCase로 통일
+#테스트 파일은 __tests__ 폴더에 둬</code></pre>
+<div class="quote"><strong>쉬운 설명:</strong> <code>#</code>으로 시작하면 Claude가 이걸 기억합니다. 다음에 새 대화를 시작해도 기억하고 있습니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> 프로젝트 규칙을 하나씩 알려주고 싶을 때. 한번 입력하면 매번 반복할 필요 없음.</div>
+<h3 id="이미지-입력-방법">이미지 입력 방법</h3>
+<div class="tblwrap"><table><thead><tr><th>방법</th><th>설명</th></tr></thead><tbody><tr><td><code>@이미지파일.png</code></td><td>파일 경로로 참조</td></tr><tr><td>드래그 앤 드롭</td><td>터미널에 이미지 파일을 끌어다 놓기</td></tr><tr><td><code>Ctrl+V</code></td><td>클립보드의 스크린샷 붙여넣기 (일부 터미널)</td></tr></tbody></table></div>
+<div class="quote"><strong>사례:</strong> "이 디자인 시안대로 만들어줘" → 디자인 이미지를 드래그</div>
+<hr>
+<h2 id="8-4가지-모드">8. 4가지 모드</h2>
+<p>Claude Code에는 "Claude가 얼마나 자유롭게 행동할 수 있는지" 결정하는 4가지 모드가 있습니다.</p>
+<p><code>Shift+Tab</code>으로 빠르게 전환하거나, <code>/mode</code> 명령으로 선택합니다.</p>
+<h3 id="default-모드-기본">Default 모드 (기본)</h3>
+<pre class="code"><code class="lang-">"모든 행동 전에 허락을 구합니다"</code></pre>
+<ul><li>파일 수정 전: "이 파일 수정해도 될까요?" → Yes/No</li><li>명령 실행 전: "npm install 실행해도 될까요?" → Yes/No</li><li><strong>장점:</strong> 가장 안전</li><li><strong>단점:</strong> 매번 허락하는 게 귀찮음</li></ul>
+<div class="quote"><strong>사례:</strong> 중요한 프로덕션 코드 작업할 때. 실수 방지.</div>
+<h3 id="auto-accept-edits-모드">Auto-Accept Edits 모드</h3>
+<pre class="code"><code class="lang-">"파일 수정은 알아서 하고, 위험한 명령만 물어봅니다"</code></pre>
+<ul><li>파일 읽기/수정: 자동 허용</li><li><code>git push</code>, <code>rm</code> 같은 위험 명령: 여전히 물어봄</li><li><strong>장점:</strong> 편리하면서도 적당히 안전</li><li><strong>단점:</strong> 원치 않는 파일 수정이 될 수 있음</li></ul>
+<div class="quote"><strong>사례:</strong> 일반적인 개발 작업. 가장 많이 쓰는 모드.</div>
+<h3 id="plan-모드-읽기-전용">Plan 모드 (읽기 전용)</h3>
+<pre class="code"><code class="lang-">"아무것도 수정하지 않고, 계획만 세웁니다"</code></pre>
+<ul><li>파일 읽기: 가능</li><li>파일 수정: <strong>불가능</strong></li><li>명령 실행: <strong>불가능</strong></li><li><strong>장점:</strong> 먼저 계획을 검토한 후 실행할 수 있음</li><li><strong>단점:</strong> 계획 확인 후 직접 모드를 전환해야 함</li></ul>
+<div class="quote"><strong>사례:</strong> - "이 리팩토링 어떻게 할 건지 먼저 계획 보여줘" → Plan 모드에서 계획 검토 - 검토 후 Shift+Tab으로 Auto-Accept로 전환 → "실행해"</div>
+<p>&gt;</p>
+<div class="quote"><strong>다른 툴에는 없는 기능!</strong> "먼저 생각, 나중에 행동" 패턴을 강제할 수 있습니다.</div>
+<h3 id="bypass-permissions-모드">Bypass Permissions 모드</h3>
+<pre class="code"><code class="lang-">"아무것도 묻지 않고 전부 실행합니다"</code></pre>
+<ul><li>모든 파일 수정: 자동</li><li>모든 명령 실행: 자동</li><li><strong>장점:</strong> 가장 빠름</li><li><strong>단점:</strong> 위험! 잘못된 명령도 바로 실행됨</li></ul>
+<div class="quote"><strong>사례:</strong> 격리된 테스트 환경, Docker 안, 또는 CI/CD에서만 사용. 실제 개발에서는 비추천.</div>
+<hr>
+<h2 id="9-thinking-모드-더-깊이-생각하게-하기">9. Thinking 모드 — 더 깊이 생각하게 하기</h2>
+<p>프롬프트에 특정 키워드를 넣으면 Claude가 <strong>더 오래, 더 깊이 생각</strong>합니다.</p>
+<div class="tblwrap"><table><thead><tr><th>키워드</th><th>사고 깊이</th><th>비유</th><th>언제 쓰나</th></tr></thead><tbody><tr><td><code>think</code></td><td>보통</td><td>잠깐 생각</td><td>약간 복잡한 질문</td></tr><tr><td><code>think hard</code></td><td>깊음</td><td>진지하게 고민</td><td>여러 파일에 걸친 버그</td></tr><tr><td><code>think harder</code></td><td>매우 깊음</td><td>풀 집중</td><td>아키텍처 설계</td></tr><tr><td><code>ultrathink</code></td><td>최대</td><td>모든 가능성 검토</td><td>가장 어려운 문제</td></tr></tbody></table></div>
+<h3 id="사용법">사용법</h3>
+<pre class="code"><code class="lang-">think: 이 함수가 왜 느린지 분석해줘
+
+think hard: 이 에러의 근본 원인을 찾아줘. 여러 파일에 걸쳐서 추적해봐.
+
+think harder: 이 마이크로서비스 아키텍처를 모노레포로 전환하는 방법을 설계해줘
+
+ultrathink: 이 코드베이스 전체의 성능 병목을 찾고 최적화 전략을 세워줘</code></pre>
+<div class="quote"><strong>비유:</strong> 일반 모드는 "5초 생각하고 대답", ultrathink는 "5분 숙고하고 대답"</div>
+<p>&gt;</p>
+<div class="quote"><strong>주의:</strong> 더 깊이 생각할수록 토큰(비용)을 더 많이 씁니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>다른 툴에는 없는 기능!</strong> Cursor나 Copilot에서는 사고 깊이를 조절할 수 없습니다.</div>
+<hr>
+<h2 id="10-메모리-시스템">10. 메모리 시스템</h2>
+<p>Claude Code는 대화가 끝나도 기억을 유지하는 <strong>영구 메모리</strong>가 있습니다. <code>CLAUDE.md</code> 파일에 저장됩니다.</p>
+<h3 id="4단계-계층">4단계 계층</h3>
+<pre class="code"><code class="lang-">1. 엔터프라이즈 정책 (회사 관리자가 배포, 최상위 우선순위)
+    ↓
+2. 사용자 메모리:  ~/.claude/CLAUDE.md
+   → 내가 하는 모든 프로젝트에 공통 적용
+    ↓
+3. 프로젝트 메모리: ./CLAUDE.md
+   → 이 프로젝트에만 적용, 팀원과 공유 (git 커밋)
+    ↓
+4. 로컬 메모리:     ./CLAUDE.local.md
+   → 이 프로젝트에만, 나만 적용 (git에 안 올라감)</code></pre>
+<h3 id="실제-활용-사례">실제 활용 사례</h3>
+<p><strong>사용자 메모리</strong> (<code>~/.claude/CLAUDE.md</code>):</p>
+<pre class="code"><code class="lang-markdown"># 나의 전역 설정
+- 항상 한국어로 대답해
+- 커밋 메시지는 영어로 써
+- console.log 대신 logger 쓰기</code></pre>
+<p><strong>프로젝트 메모리</strong> (<code>./CLAUDE.md</code>):</p>
+<pre class="code"><code class="lang-markdown"># 프로젝트 규칙 (팀 전원 적용)
+- TypeScript strict 모드 필수
+- API 응답은 camelCase
+- 테스트 커버리지 80% 이상 유지
+- Tailwind CSS 사용, 인라인 스타일 금지
+
+@docs/architecture.md    ← 다른 파일도 import 가능!</code></pre>
+<p><strong>로컬 메모리</strong> (<code>./CLAUDE.local.md</code>):</p>
+<pre class="code"><code class="lang-markdown"># 내 개인 설정 (팀원에게 안 보임)
+- 내 로컬 API 키: .env.local 참조
+- 현재 작업 중: 결제 모듈 리팩토링</code></pre>
+<h3 id="메모리-만드는-3가지-방법">메모리 만드는 3가지 방법</h3>
+<ol><li><strong><code>/init</code></strong> — Claude가 프로젝트를 분석해서 자동 생성</li><li><strong><code>/memory</code></strong> — 에디터에서 직접 편집</li><li><strong><code>#메시지</code></strong> — 대화 중 빠르게 추가</li></ol>
+<div class="quote"><strong>다른 툴과의 차이:</strong> - Cursor의 <code>.cursorrules</code>는 단일 파일, 계층 없음 - Claude Code는 4단계 계층 + 파일 import + 하위폴더별 분리 가능</div>
+<hr>
+<h2 id="11-설정-파일">11. 설정 파일</h2>
+<p><code>settings.json</code>은 Claude Code의 모든 동작을 제어하는 설정 파일입니다.</p>
+<h3 id="파일-위치와-용도">파일 위치와 용도</h3>
+<div class="tblwrap"><table><thead><tr><th>파일</th><th>위치</th><th>용도</th></tr></thead><tbody><tr><td>사용자 전역</td><td><code>~/.claude/settings.json</code></td><td>모든 프로젝트 공통</td></tr><tr><td>프로젝트 공유</td><td><code>.claude/settings.json</code></td><td>이 프로젝트, 팀 공유 (커밋)</td></tr><tr><td>프로젝트 개인</td><td><code>.claude/settings.local.json</code></td><td>이 프로젝트, 나만 (gitignore)</td></tr></tbody></table></div>
+<h3 id="주요-설정-항목-설명">주요 설정 항목 설명</h3>
+<pre class="code"><code class="lang-json">{
+  // 기본 모델 지정
+  // → "매번 --model 안 치고 싶어"
+  "model": "claude-sonnet-4-6",
+
+  // 색상 테마
+  "theme": "dark",
+
+  // 환경변수 설정
+  // → "API 키 같은 걸 Claude가 사용할 수 있게"
+  "env": {
+    "ANTHROPIC_API_KEY": "sk-...",
+    "DATABASE_URL": "postgres://..."
+  },
+
+  // 권한 설정 (12장 참조)
+  "permissions": {
+    "allow": ["Bash(git:*)", "Read", "Edit"],
+    "deny": ["Bash(rm -rf:*)"],
+    "defaultMode": "acceptEdits"
+  },
+
+  // 훅 설정 (13장 참조)
+  "hooks": { ... },
+
+  // MCP 서버 설정 (16장 참조)
+  "mcpServers": { ... },
+
+  // 상태바 설정 (20장 참조)
+  "statusLine": { ... },
+
+  // 출력 스타일
+  "outputStyle": "default",
+
+  // API 키를 스크립트로 가져오기
+  // → "1Password나 vault에서 키를 동적으로 로드"
+  "apiKeyHelper": "~/.claude/get-key.sh",
+
+  // 오래된 세션 자동 정리 (일 수)
+  "cleanupPeriodDays": 30,
+
+  // 커밋에 Co-Authored-By 포함 여부
+  "includeCoAuthoredBy": true
+}</code></pre>
+<h3 id="우선순위-높은-것이-이김">우선순위 (높은 것이 이김)</h3>
+<pre class="code"><code class="lang-">엔터프라이즈 정책 &gt; CLI 플래그 &gt; 프로젝트 local &gt; 프로젝트 공유 &gt; 사용자 전역</code></pre>
+<div class="quote"><strong>사례:</strong> 회사에서 "opus 모델 사용 금지" 정책을 배포하면, 개인 설정에서 opus를 지정해도 회사 정책이 이깁니다.</div>
+<hr>
+<h2 id="12-권한-시스템">12. 권한 시스템</h2>
+<p>"Claude가 뭘 할 수 있고 뭘 못하게 할지" 정하는 시스템입니다.</p>
+<h3 id="패턴-문법">패턴 문법</h3>
+<pre class="code"><code class="lang-">Bash                 → 모든 터미널 명령
+Bash(git:*)          → git으로 시작하는 모든 명령 (git push, git pull 등)
+Bash(git diff:*)     → git diff 계열만
+Bash(rm:*)           → rm으로 시작하는 삭제 명령
+Bash(npm publish:*)  → npm publish 명령
+
+Read                 → 모든 파일 읽기
+Read(~/.ssh/**)      → SSH 키 폴더 읽기
+Read(src/**)         → src 폴더 내 읽기
+
+Edit                 → 모든 파일 수정
+Edit(src/**)         → src 폴더만 수정 허용
+
+Write                → 새 파일 생성
+Write(**/.env)       → .env 파일 생성
+
+mcp__github__*       → GitHub MCP 서버의 모든 도구</code></pre>
+<h3 id="3가지-동작">3가지 동작</h3>
+<div class="tblwrap"><table><thead><tr><th>동작</th><th>설명</th><th>사례</th></tr></thead><tbody><tr><td><code>allow</code></td><td>물어보지 않고 자동 허용</td><td>git 명령, 파일 읽기</td></tr><tr><td><code>deny</code></td><td>무조건 차단 (Claude가 시도조차 못함)</td><td>rm -rf, .env 파일 수정</td></tr><tr><td><code>ask</code></td><td>매번 물어봄</td><td>npm publish, DB 마이그레이션</td></tr></tbody></table></div>
+<h3 id="실제-설정-예시">실제 설정 예시</h3>
+<pre class="code"><code class="lang-json">{
+  "permissions": {
+    "allow": [
+      "Read",              // 모든 파일 읽기 OK
+      "Edit(src/**)",      // src 폴더 수정 OK
+      "Bash(git:*)",       // git 명령 OK
+      "Bash(npm test:*)",  // 테스트 실행 OK
+      "Bash(npm run:*)"    // npm 스크립트 실행 OK
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",     // 재귀 삭제 절대 금지
+      "Write(**/.env*)",    // .env 파일 생성 금지
+      "Read(~/.ssh/**)"     // SSH 키 읽기 금지
+    ],
+    "ask": [
+      "Bash(npm publish:*)", // 패키지 배포는 항상 확인
+      "Bash(git push:*)"     // 푸시는 항상 확인
+    ]
+  }
+}</code></pre>
+<h3 id="대화-중-동적-권한">대화 중 동적 권한</h3>
+<p>Claude가 뭔가 하려고 물어볼 때:</p>
+<pre class="code"><code class="lang-">Claude wants to run: git push origin main
+[Y] Yes  [N] No  [A] Yes, and always allow Bash(git push:*)</code></pre>
+<p><code>A</code>를 선택하면 settings.json의 <code>allow</code>에 자동 저장됩니다.</p>
+<hr>
+<h2 id="13-hooks">13. Hooks</h2>
+<p><strong>한마디로:</strong> "Claude가 뭔가 할 때 자동으로 실행되는 내 스크립트"</p>
+<p>다른 AI 코딩 툴에는 없는 Claude Code만의 핵심 기능입니다.</p>
+<h3 id="9가지-이벤트">9가지 이벤트</h3>
+<div class="tblwrap"><table><thead><tr><th>이벤트</th><th>발동 시점</th><th>사례</th></tr></thead><tbody><tr><td><code>PreToolUse</code></td><td>Claude가 도구를 쓰기 <strong>직전</strong></td><td>"위험한 명령 차단", "로그 기록"</td></tr><tr><td><code>PostToolUse</code></td><td>Claude가 도구를 쓴 <strong>직후</strong></td><td>"파일 수정 후 자동 포맷팅"</td></tr><tr><td><code>UserPromptSubmit</code></td><td>내가 메시지를 보낼 때</td><td>"입력 검증", "자동 컨텍스트 추가"</td></tr><tr><td><code>Notification</code></td><td>알림이 뜰 때</td><td>"슬랙으로 알림 전송"</td></tr><tr><td><code>Stop</code></td><td>Claude 응답 완료 시</td><td>"작업 완료 알림", "자동 테스트 실행"</td></tr><tr><td><code>SubagentStop</code></td><td>서브에이전트 완료 시</td><td>"서브에이전트 결과 로깅"</td></tr><tr><td><code>SessionStart</code></td><td>세션 시작 시</td><td>"환경 체크", "상태 표시"</td></tr><tr><td><code>SessionEnd</code></td><td>세션 종료 시</td><td>"세션 요약 저장"</td></tr><tr><td><code>PreCompact</code></td><td>컨텍스트 압축 전</td><td>"중요 정보 백업"</td></tr></tbody></table></div>
+<h3 id="실제-사용-사례들">실제 사용 사례들</h3>
+<p><strong>사례 1: 파일 수정 후 자동 포맷팅</strong></p>
+<pre class="code"><code class="lang-json">{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write $CLAUDE_FILE_PATHS"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<div class="quote">Claude가 파일을 수정할 때마다 자동으로 prettier가 돌아갑니다. 수동으로 포맷팅할 필요 없음!</div>
+<p><strong>사례 2: 위험한 명령 차단</strong></p>
+<pre class="code"><code class="lang-json">{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/block-dangerous.sh"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<div class="quote">스크립트가 exit code 2를 리턴하면 Claude의 행동이 차단됩니다. "rm -rf /" 같은 명령 원천 봉쇄.</div>
+<p><strong>사례 3: 작업 완료 시 슬랙 알림</strong></p>
+<pre class="code"><code class="lang-json">{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "curl -X POST https://hooks.slack.com/... -d '{\"text\": \"Claude 작업 완료!\"}'"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<div class="quote">Claude가 응답을 끝내면 자동으로 슬랙에 알림. 긴 작업 맡기고 다른 일 할 때 유용.</div>
+<p><strong>사례 4: 세션 시작 시 환경 체크</strong></p>
+<pre class="code"><code class="lang-json">{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '현재 브랜치: '$(git branch --show-current)"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<h3 id="훅-차단-메커니즘">훅 차단 메커니즘</h3>
+<ul><li>훅 스크립트가 <strong>exit code 2</strong>를 리턴하면 → 해당 동작이 차단됨</li><li>stderr로 출력한 메시지가 → Claude에게 전달됨 (이유 설명용)</li></ul>
+<hr>
+<h2 id="14-subagents">14. Subagents</h2>
+<p><strong>한마디로:</strong> "Claude의 분신. 전문 분야별 도우미를 따로 부릴 수 있음"</p>
+<h3 id="왜-필요한가">왜 필요한가?</h3>
+<p>비유로 설명:</p>
+<ul><li>Claude = 팀장</li><li>Subagent = 팀원 (각자 전문 분야가 있음)</li><li>팀장이 "리뷰는 네가 해, 테스트는 네가 해" 하고 각자에게 시키는 것</li></ul>
+<h3 id="실제-이점">실제 이점</h3>
+<ol><li><strong>메인 대화 보호</strong> — 서브에이전트가 파일 100개를 검색해도, 그 결과가 메인 대화를 오염시키지 않음</li><li><strong>병렬 작업</strong> — 여러 서브에이전트가 동시에 다른 작업 가능</li><li><strong>전문화</strong> — 코드 리뷰어, 디버거, 테스터 등 역할 분리</li></ol>
+<h3 id="에이전트-파일-만들기">에이전트 파일 만들기</h3>
+<p><strong>위치:</strong></p>
+<ul><li><code>~/.claude/agents/*.md</code> — 모든 프로젝트에서 사용</li><li><code>.claude/agents/*.md</code> — 이 프로젝트에서만 사용</li></ul>
+<p><strong>예시: 코드 리뷰 에이전트</strong> (<code>.claude/agents/reviewer.md</code>)</p>
+<pre class="code"><code class="lang-markdown">---
+name: code-reviewer
+description: 코드 리뷰. 스타일, 보안, 성능 체크.
+tools: Read, Grep, Glob
+model: sonnet
+---
+
+당신은 코드 리뷰 전문 에이전트입니다.
+다음 기준으로 리뷰하세요:
+1. 보안 취약점 (SQL 인젝션, XSS 등)
+2. 성능 문제 (N+1 쿼리, 불필요한 렌더링)
+3. 코드 스타일 (네이밍, 함수 길이)
+심각도를 상/중/하로 표시하세요.</code></pre>
+<p><strong>예시: 테스트 작성 에이전트</strong> (<code>.claude/agents/tester.md</code>)</p>
+<pre class="code"><code class="lang-markdown">---
+name: test-writer
+description: 테스트 코드 작성 전문
+tools: Read, Write, Bash(npm test:*)
+model: sonnet
+---
+
+당신은 테스트 작성 전문가입니다.
+- 단위 테스트는 Vitest로 작성
+- 엣지 케이스 포함 필수
+- 테스트 실행까지 확인</code></pre>
+<h3 id="사용법-2">사용법</h3>
+<p>Claude에게 자연어로 요청하면 자동으로 적절한 에이전트를 호출합니다:</p>
+<pre class="code"><code class="lang-">이 PR을 코드 리뷰해줘
+→ code-reviewer 서브에이전트 자동 실행
+
+이 함수에 대한 테스트를 작성해줘
+→ test-writer 서브에이전트 자동 실행</code></pre>
+<p>또는 <code>/agents</code> 명령으로 직접 관리:</p>
+<pre class="code"><code class="lang-">/agents</code></pre>
+<hr>
+<h2 id="15-skills">15. Skills</h2>
+<p><strong>한마디로:</strong> "특정 분야의 전문 지식 + 도구 + 사용법을 묶은 패키지"</p>
+<p>서브에이전트가 "사람(역할)"이라면, 스킬은 "교과서 + 도구함"입니다.</p>
+<h3 id="구조">구조</h3>
+<pre class="code"><code class="lang-">~/.claude/skills/my-skill/
+├── SKILL.md           ← 이 스킬이 뭔지, 어떻게 쓰는지
+├── scripts/           ← 실행 스크립트
+├── references/        ← 참고 문서
+└── assets/            ← 템플릿 등</code></pre>
+<h3 id="작동-방식">작동 방식</h3>
+<ol><li>세션 시작 시 설치된 스킬의 <strong>이름과 설명만</strong> 로드 (메모리 절약)</li><li>사용자 요청이 스킬 설명과 매칭되면 <strong>전체 내용을 로드</strong></li><li>스킬의 지시에 따라 작업 수행</li></ol>
+<h3 id="주요-스킬-목록과-사례">주요 스킬 목록과 사례</h3>
+<div class="tblwrap"><table><thead><tr><th>스킬</th><th>하는 일</th><th>사용 사례</th></tr></thead><tbody><tr><td><code>pdf</code></td><td>PDF 읽기, 만들기, 병합, 폼 채우기</td><td>"이 PDF에서 표 추출해줘"</td></tr><tr><td><code>docx</code></td><td>Word 문서 생성/편집</td><td>"보고서를 docx로 만들어줘"</td></tr><tr><td><code>xlsx</code></td><td>엑셀 파일 생성/편집, 수식, 차트</td><td>"이 데이터로 엑셀 표 만들어줘"</td></tr><tr><td><code>pptx</code></td><td>파워포인트 생성/편집</td><td>"발표 자료 10장 만들어줘"</td></tr><tr><td><code>frontend-design</code></td><td>고품질 UI 코드 생성</td><td>"랜딩 페이지 만들어줘"</td></tr><tr><td><code>canvas-design</code></td><td>포스터/아트 PNG/PDF 생성</td><td>"홍보 포스터 디자인해줘"</td></tr><tr><td><code>algorithmic-art</code></td><td>p5.js 제너레이티브 아트</td><td>"파티클 시스템 아트 만들어줘"</td></tr><tr><td><code>mcp-builder</code></td><td>MCP 서버 개발 가이드</td><td>"Notion API를 MCP로 만들어줘"</td></tr><tr><td><code>webapp-testing</code></td><td>Playwright로 웹 테스트</td><td>"로그인 기능 E2E 테스트 해줘"</td></tr><tr><td><code>skill-creator</code></td><td>새로운 스킬 만들기</td><td>"나만의 스킬을 만들고 싶어"</td></tr></tbody></table></div>
+<h3 id="스킬-실행">스킬 실행</h3>
+<pre class="code"><code class="lang-">/skill pdf          # PDF 스킬 수동 실행
+/skill commit       # 커밋 스킬 수동 실행</code></pre>
+<p>또는 자연어로 요청하면 자동 매칭:</p>
+<pre class="code"><code class="lang-">이 PDF에서 2페이지의 표를 추출해줘
+→ pdf 스킬 자동 로드</code></pre>
+<hr>
+<h2 id="16-mcp-서버">16. MCP 서버</h2>
+<p><strong>한마디로:</strong> "Claude Code에 외부 도구를 플러그인처럼 연결하는 표준 규격"</p>
+<h3 id="mcp가-뭔가">MCP가 뭔가?</h3>
+<p><strong>MCP (Model Context Protocol)</strong> = Anthropic이 만든 오픈 표준으로, AI와 외부 도구를 연결하는 "USB 포트" 같은 것입니다.</p>
+<p>예를 들어:</p>
+<ul><li>GitHub MCP → Claude가 직접 GitHub PR을 만들 수 있음</li><li>PostgreSQL MCP → Claude가 직접 DB 쿼리를 날릴 수 있음</li><li>Figma MCP → Claude가 디자인 파일을 읽을 수 있음</li></ul>
+<h3 id="설치-방법">설치 방법</h3>
+<p><strong>대화형 (가장 쉬움):</strong></p>
+<pre class="code"><code class="lang-bash">claude mcp add</code></pre>
+<div class="quote">이름, 명령어, 환경변수를 물어보면서 설정</div>
+<p><strong>한 줄 명령:</strong></p>
+<pre class="code"><code class="lang-bash"># GitHub API 연결
+claude mcp add github -- npx -y @modelcontextprotocol/server-github
+
+# PostgreSQL 연결
+claude mcp add postgres -- npx -y @modelcontextprotocol/server-postgres</code></pre>
+<p><strong>JSON으로 직접:</strong></p>
+<pre class="code"><code class="lang-bash">claude mcp add-json '{
+  "name": "github",
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-github"],
+  "env": {
+    "GITHUB_TOKEN": "ghp_xxx..."
+  }
+}'</code></pre>
+<h3 id="유명한-mcp-서버와-사례">유명한 MCP 서버와 사례</h3>
+<div class="tblwrap"><table><thead><tr><th>MCP 서버</th><th>하는 일</th><th>사례</th></tr></thead><tbody><tr><td><strong>github</strong></td><td>GitHub API 접근</td><td>"PR 만들어줘", "이슈 목록 봐줘"</td></tr><tr><td><strong>filesystem</strong></td><td>파일 시스템 접근</td><td>보안이 필요한 파일 접근 제어</td></tr><tr><td><strong>postgres</strong></td><td>PostgreSQL 직접 쿼리</td><td>"유저 테이블 구조 보여줘"</td></tr><tr><td><strong>sqlite</strong></td><td>SQLite 쿼리</td><td>"로컬 DB에서 데이터 조회해줘"</td></tr><tr><td><strong>puppeteer</strong></td><td>브라우저 자동화</td><td>"이 URL 스크린샷 찍어줘"</td></tr><tr><td><strong>playwright</strong></td><td>고급 브라우저 자동화</td><td>"E2E 테스트 실행해줘"</td></tr><tr><td><strong>slack</strong></td><td>슬랙 API</td><td>"슬랙에 메시지 보내줘"</td></tr><tr><td><strong>notion</strong></td><td>Notion API</td><td>"노션 페이지 업데이트해줘"</td></tr><tr><td><strong>linear</strong></td><td>Linear 이슈 관리</td><td>"Linear에 이슈 만들어줘"</td></tr><tr><td><strong>figma</strong></td><td>디자인 파일 읽기</td><td>"이 Figma 디자인대로 코딩해줘"</td></tr><tr><td><strong>memory</strong></td><td>영구 메모리 저장소</td><td>대화 간 정보 유지</td></tr><tr><td><strong>fetch</strong></td><td>HTTP 요청</td><td>"이 API 호출해봐"</td></tr><tr><td><strong>context7</strong></td><td>최신 라이브러리 문서 조회</td><td>"Next.js 15 설정법 찾아줘"</td></tr><tr><td><strong>serena</strong></td><td>코드 시맨틱 분석</td><td>"이 클래스의 모든 참조 찾아줘"</td></tr></tbody></table></div>
+<h3 id="관리">관리</h3>
+<pre class="code"><code class="lang-bash">claude mcp list         # 설치된 서버 목록
+claude mcp remove &lt;name&gt; # 서버 제거
+/mcp                    # 대화 중 상태 확인</code></pre>
+<h3 id="스코프-적용-범위">스코프 (적용 범위)</h3>
+<div class="tblwrap"><table><thead><tr><th>스코프</th><th>설명</th><th>파일 위치</th></tr></thead><tbody><tr><td><code>user</code></td><td>내 모든 프로젝트</td><td><code>~/.claude/settings.json</code></td></tr><tr><td><code>local</code></td><td>이 프로젝트만, 나만</td><td><code>.claude/settings.local.json</code></td></tr><tr><td><code>project</code></td><td>이 프로젝트, 팀 공유</td><td><code>.mcp.json</code></td></tr></tbody></table></div>
+<pre class="code"><code class="lang-bash">claude mcp add --scope user github ...     # 모든 프로젝트에서 사용
+claude mcp add --scope project github ...  # 이 프로젝트 팀원 모두 사용</code></pre>
+<hr>
+<h2 id="17-plugins">17. Plugins</h2>
+<p><strong>한마디로:</strong> "슬래시 명령 + 서브에이전트 + 훅 + 스킬 + MCP를 한 번에 설치하는 확장 팩"</p>
+<h3 id="플러그인-번들">플러그인 = 번들</h3>
+<pre class="code"><code class="lang-">my-plugin/
+├── plugin.json        ← 메타데이터
+├── commands/          ← 슬래시 명령 모음
+├── agents/            ← 서브에이전트 모음
+├── skills/            ← 스킬 모음
+├── hooks/             ← 훅 모음
+└── .mcp.json          ← MCP 서버 설정</code></pre>
+<h3 id="설치">설치</h3>
+<pre class="code"><code class="lang-bash">claude plugin install &lt;이름&gt;    # CLI에서
+/plugin                         # 대화 중 관리</code></pre>
+<h3 id="유명한-플러그인">유명한 플러그인</h3>
+<p><strong><code>superpowers</code></strong> — 개발 워크플로우 강화</p>
+<ul><li>브레인스토밍 → 계획 수립 → TDD → 디버깅 → 코드리뷰 체계화</li><li><code>/brainstorm</code>, <code>/plan</code>, <code>/debug</code> 등 추가</li></ul>
+<div class="quote"><strong>사례:</strong> "기능 하나 만들어줘" → 자동으로 브레인스토밍 → 계획 → TDD → 구현 → 리뷰 순서로 진행</div>
+<p><strong><code>oh-my-claudecode</code></strong> — 에이전트 오케스트레이션</p>
+<ul><li><code>/autopilot</code> — 아이디어 → 완성 코드 자동</li><li><code>/ralph</code> — 목표 달성까지 반복 실행</li><li><code>/team</code> — 여러 에이전트 팀 작업</li><li><code>/ultrawork</code> — 병렬 고속 처리</li></ul>
+<div class="quote"><strong>사례:</strong> "테스트가 전부 통과할 때까지 알아서 고쳐" → <code>/ralph</code></div>
+<p><strong><code>commit-commands</code></strong> — Git 워크플로우</p>
+<ul><li><code>/commit</code> — 스마트 커밋 (메시지 자동 생성)</li><li><code>/commit-push-pr</code> — 커밋 + 푸시 + PR 원클릭</li></ul>
+<div class="quote"><strong>사례:</strong> "작업 끝났어, PR까지 한번에" → <code>/commit-push-pr</code></div>
+<p><strong><code>pr-review-toolkit</code></strong> — PR 리뷰 자동화</p>
+<ul><li><code>/review-pr</code> — 전문 에이전트 6개가 동시에 리뷰</li><li>코드 리뷰어, 보안 리뷰어, 타입 분석기, 테스트 분석기 등</li></ul>
+<p><strong><code>figma</code></strong> — 디자인 ↔ 코드</p>
+<ul><li>Figma 파일 읽기 → 코드 생성</li><li>코드 → Figma 컴포넌트 생성</li></ul>
+<p><strong><code>document-skills</code></strong> — 문서 처리 종합</p>
+<ul><li>PDF, DOCX, XLSX, PPTX 전부 지원</li><li>프론트엔드 디자인, 알고리즘 아트 등</li></ul>
+<hr>
+<h2 id="18-custom-slash-commands">18. Custom Slash Commands</h2>
+<p><strong>한마디로:</strong> "자주 하는 작업을 나만의 슬래시 명령으로 만들기"</p>
+<h3 id="만드는-법">만드는 법</h3>
+<p><code>.claude/commands/</code> 폴더에 <code>.md</code> 파일을 만들면 됩니다.</p>
+<p><strong>예시 1: <code>/review</code> 명령</strong> (<code>.claude/commands/review.md</code>)</p>
+<pre class="code"><code class="lang-markdown">---
+description: 변경사항 코드 리뷰
+argument-hint: [파일경로]
+allowed-tools: Read, Grep, Bash(git diff:*)
+---
+
+$ARGUMENTS 에 대한 코드 리뷰를 해줘.
+
+1. 먼저 `git diff`로 변경사항 확인
+2. 보안 취약점 체크
+3. 성능 문제 체크
+4. 개선 제안
+
+심각도를 상/중/하로 분류해서 보여줘.</code></pre>
+<p>사용:</p>
+<pre class="code"><code class="lang-">/review src/auth/login.ts</code></pre>
+<p><strong>예시 2: <code>/deploy-check</code> 명령</strong> (<code>.claude/commands/deploy-check.md</code>)</p>
+<pre class="code"><code class="lang-markdown">---
+description: 배포 전 체크리스트
+---
+
+배포 전 다음을 확인해줘:
+1. 모든 테스트 통과 여부 (npm test)
+2. TypeScript 컴파일 에러 없는지 (npx tsc --noEmit)
+3. 린트 에러 없는지 (npm run lint)
+4. 빌드 성공하는지 (npm run build)
+5. .env.example과 .env 키 일치하는지
+
+결과를 체크리스트로 보여줘.</code></pre>
+<p>사용:</p>
+<pre class="code"><code class="lang-">/deploy-check</code></pre>
+<p><strong>예시 3: 하위폴더로 네임스페이스</strong> (<code>.claude/commands/frontend/new-component.md</code>)</p>
+<pre class="code"><code class="lang-markdown">---
+description: React 컴포넌트 생성
+argument-hint: &lt;컴포넌트이름&gt;
+---
+
+$ARGUMENTS 이름으로 React 컴포넌트를 만들어줘:
+- src/components/$ARGUMENTS/$ARGUMENTS.tsx
+- src/components/$ARGUMENTS/$ARGUMENTS.test.tsx
+- src/components/$ARGUMENTS/index.ts</code></pre>
+<p>사용:</p>
+<pre class="code"><code class="lang-">/frontend:new-component UserProfile</code></pre>
+<h3 id="저장-위치">저장 위치</h3>
+<div class="tblwrap"><table><thead><tr><th>위치</th><th>적용 범위</th></tr></thead><tbody><tr><td><code>.claude/commands/</code></td><td>이 프로젝트 (팀 공유 가능, 깃 커밋)</td></tr><tr><td><code>~/.claude/commands/</code></td><td>내 모든 프로젝트</td></tr></tbody></table></div>
+<div class="quote"><strong>다른 툴에는 없는 기능!</strong> 팀 워크플로우를 명령어로 캡슐화해서 깃에 커밋. 새 팀원도 바로 사용 가능.</div>
+<hr>
+<h2 id="19-output-styles">19. Output Styles</h2>
+<p><strong>한마디로:</strong> "Claude의 말투와 답변 형식을 바꾸기"</p>
+<h3 id="내장-스타일">내장 스타일</h3>
+<div class="tblwrap"><table><thead><tr><th>스타일</th><th>특징</th><th>사례</th></tr></thead><tbody><tr><td><code>default</code></td><td>기본</td><td>보통 사용</td></tr><tr><td><code>concise</code></td><td>최대한 짧게</td><td>"설명 길어, 짧게 해줘"</td></tr><tr><td><code>explanatory</code></td><td>왜 그렇게 했는지 설명</td><td>"초보라서 이해가 안 돼"</td></tr><tr><td><code>learning</code></td><td>빈칸 남기고 사용자가 채우기</td><td>"공부 중이야, 힌트만 줘"</td></tr></tbody></table></div>
+<h3 id="사용">사용</h3>
+<pre class="code"><code class="lang-">/output-style              # 목록에서 선택
+/output-style concise      # 바로 적용</code></pre>
+<h3 id="커스텀-스타일-만들기">커스텀 스타일 만들기</h3>
+<pre class="code"><code class="lang-">/output-style:new</code></pre>
+<div class="quote">대화형으로 새 스타일을 정의할 수 있습니다.</div>
+<p>&gt;</p>
+<div class="quote"><strong>사례:</strong> "항상 한국어로, 코드 블록에는 주석을 달고, 마지막에 요약을 넣는 스타일" 같은 것을 만들 수 있음</div>
+<hr>
+<h2 id="20-status-line">20. Status Line</h2>
+<p><strong>한마디로:</strong> "프롬프트 아래에 항상 보이는 정보줄 커스터마이즈"</p>
+<h3 id="설정">설정</h3>
+<pre class="code"><code class="lang-json">{
+  "statusLine": {
+    "type": "command",
+    "command": "echo \"$(git branch --show-current) | 토큰: $(cat ~/.claude/usage.txt 2&gt;/dev/null || echo 'N/A')\""
+  }
+}</code></pre>
+<h3 id="대화형-설정">대화형 설정</h3>
+<pre class="code"><code class="lang-">/statusline</code></pre>
+<div class="quote"><strong>사례:</strong> 현재 브랜치, 비용, 모델명, 시간 등을 항상 하단에 표시</div>
+<p>&gt;</p>
+<div class="quote"><strong>비유:</strong> IDE 하단의 상태바(Python 버전, Git 브랜치 등)와 같은 개념</div>
+<hr>
+<h2 id="21-git-worktree">21. Git Worktree</h2>
+<p><strong>한마디로:</strong> "같은 저장소를 여러 폴더에 복사해서 동시에 다른 브랜치 작업"</p>
+<h3 id="일반-git의-문제">일반 Git의 문제</h3>
+<pre class="code"><code class="lang-">하나의 폴더 = 하나의 브랜치만 작업 가능
+브랜치 전환하면 현재 작업물이 사라짐 (stash 필요)</code></pre>
+<h3 id="worktree의-해결">Worktree의 해결</h3>
+<pre class="code"><code class="lang-bash"># main 브랜치는 원래 폴더에서
+# feature 브랜치는 새 폴더에서 동시에!
+git worktree add ../my-project-feature feature-branch
+cd ../my-project-feature
+claude    # 여기서 feature 작업</code></pre>
+<h3 id="claude-code에서의-활용">Claude Code에서의 활용</h3>
+<p>일부 플러그인은 자동으로 worktree를 생성합니다:</p>
+<pre class="code"><code class="lang-">서브에이전트가 worktree에서 독립적으로 작업
+→ 메인 작업을 방해하지 않음
+→ 완료 후 merge</code></pre>
+<div class="quote"><strong>사례:</strong> - "이 버그 수정하는 동안 새 기능도 동시에 개발하고 싶어" - 하나의 Claude Code 세션에서 여러 브랜치를 동시 작업</div>
+<hr>
+<h2 id="22-ide-통합">22. IDE 통합</h2>
+<h3 id="vs-code">VS Code</h3>
+<p><strong>설치:</strong></p>
+<ol><li>VS Code Marketplace에서 "Claude Code" 검색</li><li>확장 설치</li></ol>
+<p><strong>기능:</strong></p>
+<div class="tblwrap"><table><thead><tr><th>기능</th><th>설명</th><th>사용법</th></tr></thead><tbody><tr><td>사이드 패널</td><td>VS Code 안에서 Claude와 대화</td><td>사이드바에서 Claude 아이콘 클릭</td></tr><tr><td>코드 선택 전달</td><td>코드를 드래그하면 Claude가 인식</td><td>코드 선택 → Claude에게 질문</td></tr><tr><td>인라인 호출</td><td>편집기에서 바로 Claude 호출</td><td><code>Ctrl+Esc</code></td></tr><tr><td>열린 파일 인식</td><td>현재 편집 중인 파일을 자동 인식</td><td>파일 열어놓고 질문하면 해당 파일 컨텍스트</td></tr></tbody></table></div>
+<p><strong>사례:</strong></p>
+<pre class="code"><code class="lang-">1. src/App.tsx 열고, 특정 함수를 드래그 선택
+2. Claude에게: "이 함수를 최적화해줘"
+3. Claude가 선택된 함수를 보고 바로 수정 제안</code></pre>
+<h3 id="jetbrains-intellij-pycharm-webstorm-등">JetBrains (IntelliJ, PyCharm, WebStorm 등)</h3>
+<p><strong>설치:</strong></p>
+<ol><li>Settings → Plugins → Marketplace에서 "Claude Code" 검색</li><li>설치 후 재시작</li></ol>
+<p>기능은 VS Code 확장과 유사합니다.</p>
+<h3 id="터미널에서-ide-연결">터미널에서 IDE 연결</h3>
+<pre class="code"><code class="lang-">/ide</code></pre>
+<div class="quote">이미 열려 있는 VS Code 인스턴스와 연결됩니다. IDE에서 열린 파일, 선택 영역 등을 Claude가 인식.</div>
+<hr>
+<h2 id="23-파일-다루기">23. 파일 다루기</h2>
+<h3 id="이미지">이미지</h3>
+<div class="tblwrap"><table><thead><tr><th>방법</th><th>설명</th></tr></thead><tbody><tr><td><code>@스크린샷.png</code></td><td>파일 경로로 참조</td></tr><tr><td>드래그 앤 드롭</td><td>터미널에 이미지 끌어다 놓기</td></tr><tr><td><code>Ctrl+V</code></td><td>클립보드 이미지 붙이기 (일부 터미널)</td></tr></tbody></table></div>
+<div class="quote"><strong>사례:</strong> "이 에러 스크린샷 보고 뭐가 문제인지 알려줘" → 스크린샷 첨부</div>
+<h3 id="pdf">PDF</h3>
+<pre class="code"><code class="lang-">@보고서.pdf 이 PDF 요약해줘</code></pre>
+<ul><li>10페이지 이하: 그냥 읽힘</li><li>10페이지 초과: 페이지 범위 지정 필요</li><li>고급 처리 (폼 채우기, 표 추출, 병합): <code>/skill pdf</code> 사용</li></ul>
+<div class="quote"><strong>사례:</strong> "이 PDF에서 3페이지의 표를 엑셀로 변환해줘"</div>
+<h3 id="jupyter-notebook">Jupyter Notebook</h3>
+<pre class="code"><code class="lang-">@분석.ipynb 이 노트북 분석해줘</code></pre>
+<ul><li><code>.ipynb</code> 파일 직접 읽기</li><li>셀 단위 편집 가능</li><li>코드 + 출력 + 시각화 모두 인식</li></ul>
+<h3 id="오피스-문서-스킬-필요">오피스 문서 (스킬 필요)</h3>
+<div class="tblwrap"><table><thead><tr><th>형식</th><th>스킬</th><th>사례</th></tr></thead><tbody><tr><td><code>.docx</code></td><td><code>/skill docx</code></td><td>"회의록을 Word로 만들어줘"</td></tr><tr><td><code>.xlsx</code></td><td><code>/skill xlsx</code></td><td>"매출 데이터를 엑셀로 정리해줘"</td></tr><tr><td><code>.pptx</code></td><td><code>/skill pptx</code></td><td>"발표 자료 만들어줘"</td></tr></tbody></table></div>
+<hr>
+<h2 id="24-백그라운드-태스크">24. 백그라운드 태스크</h2>
+<p><strong>한마디로:</strong> "오래 걸리는 작업을 뒤에서 돌리면서 Claude와 계속 대화"</p>
+<h3 id="사용법-3">사용법</h3>
+<p>Claude에게 요청하면 자동으로 백그라운드 실행을 판단합니다:</p>
+<pre class="code"><code class="lang-">"dev 서버 띄워놓고, 그 다음에 코드 수정해줘"
+→ npm run dev를 백그라운드로 실행
+→ 서버가 돌아가는 동안 코드 수정 진행</code></pre>
+<h3 id="작동-방식-2">작동 방식</h3>
+<pre class="code"><code class="lang-">1. 긴 명령 (npm run dev, npm test 등)을 백그라운드로 실행
+2. Claude와 다른 대화를 계속할 수 있음
+3. 백그라운드 작업이 끝나면 알림</code></pre>
+<div class="quote"><strong>사례:</strong> - "테스트 돌려놓고, 그 동안 README 작성해줘" - "빌드하면서 다른 파일 수정해줘"</div>
+<hr>
+<h2 id="25-세션-관리">25. 세션 관리</h2>
+<h3 id="자동-저장">자동 저장</h3>
+<p>모든 대화는 자동으로 저장됩니다. 위치: <code>~/.claude/projects/</code></p>
+<h3 id="이어가기-방법">이어가기 방법</h3>
+<p><strong>방법 1: 직전 대화 바로 이어가기</strong></p>
+<pre class="code"><code class="lang-bash">claude -c              # CLI에서
+/continue              # 대화 중</code></pre>
+<p><strong>방법 2: 특정 과거 대화 선택</strong></p>
+<pre class="code"><code class="lang-bash">claude -r              # 목록에서 고르기
+/resume                # 대화 중</code></pre>
+<p><strong>방법 3: 세션 ID로 직접</strong></p>
+<pre class="code"><code class="lang-bash">claude -r abc123-def456</code></pre>
+<h3 id="컨텍스트-관리">컨텍스트 관리</h3>
+<div class="tblwrap"><table><thead><tr><th>명령</th><th>효과</th><th>사례</th></tr></thead><tbody><tr><td><code>/clear</code></td><td>전부 잊기</td><td>"새 주제 시작하자"</td></tr><tr><td><code>/compact</code></td><td>요약 후 계속</td><td>"대화가 너무 길어져서 느려졌어"</td></tr><tr><td><code>/compact 버그 수정 내용만 기억해</code></td><td>특정 내용만 보존</td><td>"나머지는 잊어도 돼"</td></tr><tr><td><code>/rewind</code></td><td>시간 되돌리기</td><td>"방금 한 거 취소"</td></tr><tr><td><code>/export</code></td><td>파일로 저장</td><td>"이 대화 기록 보관하고 싶어"</td></tr></tbody></table></div>
+<h3 id="히스토리-탐색">히스토리 탐색</h3>
+<div class="tblwrap"><table><thead><tr><th>키</th><th>기능</th></tr></thead><tbody><tr><td><code>↑</code> / <code>↓</code></td><td>최근 입력한 프롬프트 다시 불러오기</td></tr><tr><td><code>Ctrl+R</code></td><td>입력 히스토리에서 키워드 검색</td></tr></tbody></table></div>
+<hr>
+<h2 id="26-비용-관리">26. 비용 관리</h2>
+<h3 id="비용-확인">비용 확인</h3>
+<pre class="code"><code class="lang-">/cost</code></pre>
+<p>현재 세션에서 사용한 토큰 수와 예상 비용을 보여줍니다.</p>
+<h3 id="요금제">요금제</h3>
+<div class="tblwrap"><table><thead><tr><th>요금제</th><th>가격</th><th>특징</th></tr></thead><tbody><tr><td>Pro</td><td>$20/월</td><td>일반 사용량</td></tr><tr><td>Max 5x</td><td>$100/월</td><td>Pro의 5배 사용량</td></tr><tr><td>Max 20x</td><td>$200/월</td><td>Pro의 20배 사용량 + 우선 처리</td></tr><tr><td>API 직접</td><td>사용량만큼</td><td><code>ANTHROPIC_API_KEY</code> 사용</td></tr></tbody></table></div>
+<h3 id="비용-절약-꿀팁">비용 절약 꿀팁</h3>
+<div class="tblwrap"><table><thead><tr><th>상황</th><th>방법</th><th>절감 효과</th></tr></thead><tbody><tr><td>간단한 질문</td><td><code>/model haiku</code></td><td>비용 90% 감소</td></tr><tr><td>일반 코딩</td><td><code>/model sonnet</code> (기본)</td><td>기본</td></tr><tr><td>복잡한 설계만</td><td><code>/model opus</code></td><td>필요할 때만</td></tr><tr><td>대화가 길어짐</td><td><code>/compact</code></td><td>토큰 크게 절약</td></tr><tr><td>새 주제 시작</td><td><code>/clear</code></td><td>불필요한 누적 제거</td></tr><tr><td>대량 검색</td><td>서브에이전트 위임</td><td>메인 컨텍스트 절약</td></tr><tr><td>실행 전 검토</td><td>Plan 모드</td><td>재작업 비용 방지</td></tr><tr><td>속도 &gt; 품질</td><td><code>/fast</code></td><td>같은 모델이라 비용 동일, 체감 빠름</td></tr></tbody></table></div>
+<div class="quote"><strong>비유:</strong> - opus = 택시 (비싸지만 빠르고 정확) - sonnet = 버스 (적당한 가격에 쓸만함) - haiku = 지하철 (저렴, 간단한 이동에 딱)</div>
+<hr>
+<h2 id="27-문제-해결">27. 문제 해결</h2>
+<h3 id="자주-쓰는-진단-도구">자주 쓰는 진단 도구</h3>
+<div class="tblwrap"><table><thead><tr><th>도구</th><th>사용법</th><th>언제</th></tr></thead><tbody><tr><td><code>/doctor</code></td><td>대화 중 실행</td><td>"뭔가 이상해"</td></tr><tr><td><code>claude doctor</code></td><td>터미널에서</td><td>Claude Code 시작 전 점검</td></tr><tr><td><code>/status</code></td><td>대화 중</td><td>"지금 상태 확인"</td></tr><tr><td><code>/mcp</code></td><td>대화 중</td><td>"외부 도구 연결 상태 확인"</td></tr><tr><td><code>--verbose</code></td><td>시작 시</td><td>"내부에서 무슨 일이 일어나는지"</td></tr><tr><td><code>--debug</code></td><td>시작 시</td><td>"최대한 상세한 로그"</td></tr></tbody></table></div>
+<h3 id="자주-겪는-문제와-해결">자주 겪는 문제와 해결</h3>
+<p><strong>"Shift+Enter가 줄바꿈이 아니라 전송돼요"</strong></p>
+<pre class="code"><code class="lang-">/terminal-setup</code></pre>
+<div class="quote">터미널별 설정 안내가 나옵니다. 한 번만 하면 됨.</div>
+<p><strong>"매번 허락을 구해서 너무 귀찮아요"</strong></p>
+<pre class="code"><code class="lang-">/permissions</code></pre>
+<div class="quote">자주 쓰는 도구를 <code>allow</code>에 추가. 또는 <code>Shift+Tab</code>으로 Auto-Accept 모드 전환.</div>
+<p><strong>"MCP 서버가 연결이 안 돼요"</strong></p>
+<pre class="code"><code class="lang-">/mcp                    # 상태 확인
+claude mcp list         # 설치된 서버 목록</code></pre>
+<div class="quote">환경변수(API 키 등)가 제대로 설정됐는지 확인. <code>claude mcp remove</code> 후 다시 추가 시도.</div>
+<p><strong>"대화가 길어지니까 앞에 한 말을 잊어버려요"</strong></p>
+<pre class="code"><code class="lang-">/compact</code></pre>
+<div class="quote">핵심 내용만 요약해서 기억 공간 확보. 또는 <code>/clear</code> 후 새로 시작.</div>
+<p><strong>"응답이 너무 느려요"</strong></p>
+<pre class="code"><code class="lang-">/fast                   # 빠른 출력 모드
+/model sonnet           # 더 빠른 모델로 전환
+/model haiku            # 가장 빠른 모델</code></pre>
+<p><strong>"훅이 동작을 안 해요"</strong></p>
+<ol><li><code>settings.json</code> 문법 확인 (JSON 오류)</li><li>스크립트 실행 권한 확인 (<code>chmod +x</code>)</li><li>스크립트 경로가 맞는지 확인</li><li><code>--verbose</code>로 시작해서 로그 확인</li></ol>
+<p><strong>"파일을 수정 안 하고 설명만 해요"</strong></p>
+<pre class="code"><code class="lang-">Shift+Tab</code></pre>
+<div class="quote">Plan 모드에 있을 수 있습니다. Auto-Accept 또는 Default로 전환하세요.</div>
+<p><strong>"Claude Code가 아예 안 돼요"</strong></p>
+<pre class="code"><code class="lang-bash">claude doctor           # 환경 진단
+claude update           # 최신 버전으로 업데이트
+npm install -g @anthropic-ai/claude-code  # 재설치</code></pre>
+<h3 id="로그-파일-위치">로그 파일 위치</h3>
+<div class="tblwrap"><table><thead><tr><th>경로</th><th>내용</th></tr></thead><tbody><tr><td><code>~/.claude/logs/</code></td><td>세션 로그</td></tr><tr><td><code>~/.claude/projects/</code></td><td>프로젝트별 대화 기록</td></tr><tr><td><code>~/.claude/shell-snapshots/</code></td><td>터미널 상태 스냅샷</td></tr></tbody></table></div>
+<h3 id="버그-신고">버그 신고</h3>
+<pre class="code"><code class="lang-">/bug</code></pre>
+<p>또는 직접: https://github.com/anthropics/claude-code/issues</p>
+<h3 id="도움-요청">도움 요청</h3>
+<pre class="code"><code class="lang-">/help</code></pre>
+<hr>
+<h2 id="핵심-요약-claude-code의-7대-차별화-기능">핵심 요약: Claude Code의 7대 차별화 기능</h2>
+<p>다른 AI 코딩 툴에는 없고 Claude Code에만 있는 것들:</p>
+<div class="tblwrap"><table><thead><tr><th>기능</th><th>한마디 설명</th><th>비유</th></tr></thead><tbody><tr><td><strong>Hooks</strong></td><td>이벤트 자동화</td><td>"파일 수정될 때마다 자동 포맷팅"</td></tr><tr><td><strong>Subagents</strong></td><td>전문 분신</td><td>"리뷰는 리뷰어에게, 테스트는 테스터에게"</td></tr><tr><td><strong>Skills</strong></td><td>전문 기술 팩</td><td>"PDF 처리 전문가 호출"</td></tr><tr><td><strong>MCP</strong></td><td>외부 도구 연결</td><td>"GitHub, DB, Figma를 USB처럼 연결"</td></tr><tr><td><strong>Plugins</strong></td><td>확장 팩</td><td>"한 번에 명령어+에이전트+훅 설치"</td></tr><tr><td><strong>CLAUDE.md</strong></td><td>계층형 메모리</td><td>"팀 규칙부터 개인 선호까지 기억"</td></tr><tr><td><strong>Custom Commands</strong></td><td>나만의 명령어</td><td>"자주 하는 작업을 한 단어로"</td></tr></tbody></table></div>
+<p>이 7가지를 조합하면 <strong>"우리 팀만의 AI 개발 파이프라인"</strong>을 만들 수 있습니다.</p>
+<hr>
+<p><strong>작성일:</strong> 2026-04-12 <strong>버전:</strong> Claude Code (2026년 4월 기준)</p>
+</article>
+</div>
+
+<script>
+(function(){
+  const body = document.body;
+  const KEY = 'editorial_sb_state_06-claude-code-guide';
+  const isWide = () => window.matchMedia('(min-width:901px)').matches;
+  const saved = localStorage.getItem(KEY);
+  if (isWide()) { if (saved === 'closed') body.classList.add('sb-closed'); }
+  else { if (saved === 'open') body.classList.add('sb-open'); }
+  document.getElementById('sbToggle').addEventListener('click', () => {
+    if (isWide()) { body.classList.toggle('sb-closed'); localStorage.setItem(KEY, body.classList.contains('sb-closed') ? 'closed' : 'open'); }
+    else { body.classList.toggle('sb-open'); localStorage.setItem(KEY, body.classList.contains('sb-open') ? 'open' : 'closed'); }
+  });
+  const savedTheme = localStorage.getItem('editorial_theme');
+  if (savedTheme === 'dark') document.documentElement.dataset.theme = 'dark';
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const cur = document.documentElement.dataset.theme;
+    const next = cur === 'dark' ? '' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('editorial_theme', next || 'light');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 's' || e.key === 'S') { e.preventDefault(); document.getElementById('sbToggle').click(); }
+    if (e.key === 'd' || e.key === 'D') { e.preventDefault(); document.getElementById('themeToggle').click(); }
+  });
+  document.querySelectorAll('.sidebar a').forEach(a => {
+    a.addEventListener('click', () => {
+      if (!isWide()) { body.classList.remove('sb-open'); localStorage.setItem(KEY, 'closed'); }
+    });
+  });
+  const navLinks = [...document.querySelectorAll('.sidebar ul li')];
+  const targets = navLinks.map(li => {
+    const a = li.querySelector('a');
+    if (!a) return null;
+    const id = a.getAttribute('href').slice(1);
+    return { li, el: document.getElementById(id) };
+  }).filter(x => x && x.el);
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        const match = targets.find(t => t.el === en.target);
+        if (match) { navLinks.forEach(li => li.classList.remove('active')); match.li.classList.add('active'); }
+      }
+    });
+  }, { rootMargin: '-10% 0px -75% 0px' });
+  targets.forEach(t => obs.observe(t.el));
+})();
+</script>
+
+</body>
+</html>
