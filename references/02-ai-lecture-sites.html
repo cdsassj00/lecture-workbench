@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>강사 추천 AI 사이트 모음</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,700;1,500&family=Noto+Serif+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5efe4;--ink:#2b2015;--ink-soft:#4a3826;--accent:#b8532a;--line:#d8c8ae;--line-soft:#e6d9bf;--code-bg:#ebe1cc;--sb-w:260px}
+[data-theme="dark"]{--bg:#1a1612;--ink:#ede4d3;--ink-soft:#c9bba0;--accent:#e07a4a;--line:#3a2f22;--line-soft:#2d2419;--code-bg:#2d2419}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+body{font-family:'EB Garamond','Noto Serif KR','Batang',serif;font-size:18px;line-height:1.85;-webkit-font-smoothing:antialiased;word-break:keep-all}
+
+.ctrl{position:fixed;top:16px;z-index:20;display:flex;gap:8px}
+.ctrl button{background:var(--bg);border:1px solid var(--line);color:var(--ink);width:36px;height:36px;border-radius:6px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.ctrl button:hover{background:rgba(184,83,42,.1);color:var(--accent)}
+.ctrl.left{left:16px} .ctrl.right{right:16px}
+
+.sidebar{position:fixed;top:0;left:0;width:var(--sb-w);height:100vh;background:var(--bg);border-right:1px solid var(--line-soft);padding:72px 22px 40px 26px;overflow-y:auto;transition:transform .3s ease;z-index:15}
+body.sb-closed .sidebar{transform:translateX(-100%)}
+.sidebar .brand{font-family:'EB Garamond','Noto Serif KR',serif;font-weight:700;font-size:14px;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px}
+.sidebar .sub{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);opacity:.7;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--line-soft)}
+.sidebar .grp{font-size:10px;letter-spacing:.2em;font-weight:700;color:var(--accent);text-transform:uppercase;margin:18px 0 6px;opacity:.85}
+.sidebar .grp:first-of-type{margin-top:0}
+.sidebar ul{list-style:none;padding:0;margin:0 0 4px}
+.sidebar ul li{font-family:'Noto Serif KR',serif;font-size:12px;line-height:1.45;padding:4px 0 4px 10px;border-left:2px solid transparent;color:var(--ink-soft);transition:all .15s}
+.sidebar ul li a{display:block;color:inherit;text-decoration:none}
+.sidebar ul li:hover{color:var(--accent);border-left-color:var(--line)}
+.sidebar ul li.active{color:var(--accent);border-left-color:var(--accent);font-weight:700}
+
+.page{padding-left:var(--sb-w);transition:padding-left .3s ease}
+body.sb-closed .page{padding-left:0}
+article{max-width:880px;margin:0 auto;padding:80px 36px 120px}
+
+h1{font-family:'EB Garamond','Noto Serif KR',serif;font-size:38px;font-weight:700;line-height:1.2;margin:0 0 56px;text-align:center;letter-spacing:-.4px;scroll-margin-top:32px}
+h1 em{font-style:italic;color:var(--accent)}
+h2{font-family:'EB Garamond','Noto Serif KR',serif;font-size:25px;font-weight:700;line-height:1.3;margin:54px 0 16px;letter-spacing:-.2px;color:var(--ink);scroll-margin-top:32px;border-bottom:1px solid var(--line-soft);padding-bottom:8px}
+h3{font-family:'EB Garamond','Noto Serif KR',serif;font-size:20px;font-weight:700;margin:34px 0 12px;color:var(--ink);letter-spacing:-.1px;scroll-margin-top:32px}
+h4{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:700;margin:24px 0 10px;color:var(--ink-soft)}
+
+p{margin:0 0 18px;color:var(--ink-soft)}
+p strong{color:var(--ink);font-weight:700}
+p em{color:var(--accent);font-style:italic}
+a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+a:hover{text-decoration-thickness:2px}
+
+ul, ol{padding-left:24px;margin:0 0 18px;color:var(--ink-soft)}
+li{margin-bottom:6px;line-height:1.7}
+li strong{color:var(--ink)}
+
+code{font-family:'JetBrains Mono','Consolas',monospace;font-size:.88em;background:var(--code-bg);color:var(--ink);padding:1.5px 5px;border-radius:3px}
+pre.code{background:var(--code-bg);padding:14px 18px;border-radius:5px;overflow-x:auto;margin:18px 0;border-left:3px solid var(--accent);font-size:13px;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.93em;color:var(--ink)}
+
+.quote{margin:24px 0;padding:14px 0 14px 22px;border-left:3px solid var(--accent);font-style:italic;font-size:18px;color:var(--ink);line-height:1.65;font-weight:500}
+
+.tblwrap{margin:18px 0;overflow-x:auto;border:1px solid var(--line-soft);border-radius:4px}
+table{border-collapse:collapse;width:100%;font-family:'Noto Serif KR',serif;font-size:13.5px}
+thead th{background:var(--code-bg);color:var(--ink);font-weight:700;text-align:left;padding:8px 12px;border-bottom:1.5px solid var(--accent);font-size:12px;letter-spacing:.5px}
+tbody td{padding:8px 12px;border-bottom:1px solid var(--line-soft);color:var(--ink-soft);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(184,83,42,.04)}
+table code{font-size:.85em}
+
+hr{border:none;text-align:center;margin:48px 0;color:var(--accent);letter-spacing:.7em;font-size:14px}
+hr::after{content:"✦ ❦ ✦"}
+
+@media(max-width:900px){
+  .page{padding-left:0}
+  .sidebar{transform:translateX(-100%)}
+  body.sb-open .sidebar{transform:translateX(0);box-shadow:6px 0 24px rgba(0,0,0,.15)}
+}
+@media(max-width:720px){
+  body{font-size:16px}
+  article{padding:56px 18px 80px}
+  h1{font-size:28px;margin-bottom:36px}
+  h2{font-size:21px;margin:42px 0 12px}
+  h3{font-size:18px}
+  table{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+
+<div class="ctrl left"><button id="sbToggle" title="사이드바 토글 (s)" aria-label="Toggle sidebar">☰</button></div>
+<div class="ctrl right"><button id="themeToggle" title="다크모드 (d)" aria-label="Toggle theme">◐</button></div>
+
+<nav class="sidebar" aria-label="목차">
+<div class="brand">강사 추천 AI 사이트 모음</div>
+<div class="sub">AI Lecture Sites · 5개 카테고리 큐레이션</div>
+<div class="grp">1. 대화형 AI 및 핵심 언어모델 (LLM) 💬</div>
+<ul>
+<li><a href="#1-대화형-ai-및-핵심-언어모델-llm">1. 대화형 AI 및 핵심 언어모델 (LLM) 💬</a></li>
+</ul>
+<div class="grp">2. 문서 작업 및 데이터 분석 특화 📊</div>
+<ul>
+<li><a href="#2-문서-작업-및-데이터-분석-특화">2. 문서 작업 및 데이터 분석 특화 📊</a></li>
+</ul>
+<div class="grp">3. 미디어(이미지, 비디오, 음성) 생성 AI 🎨</div>
+<ul>
+<li><a href="#3-미디어이미지-비디오-음성-생성-ai">3. 미디어(이미지, 비디오, 음성) 생성 AI 🎨</a></li>
+</ul>
+<div class="grp">4. 노코드 개발 및 생산성 도구 모음 🚀</div>
+<ul>
+<li><a href="#4-노코드-개발-및-생산성-도구-모음">4. 노코드 개발 및 생산성 도구 모음 🚀</a></li>
+</ul>
+<div class="grp">5. AI 개발자 &amp; 강사님을 위한 전문 플랫폼 ⚙️</div>
+<ul>
+<li><a href="#5-ai-개발자-강사님을-위한-전문-플랫폼">5. AI 개발자 &amp; 강사님을 위한 전문 플랫폼 ⚙️</a></li>
+</ul>
+</nav>
+
+<div class="page">
+<article>
+<h1 id="ai-강의를-위한-유용한-ai-사이트-리스트">🎯 AI 강의를 위한 유용한 AI 사이트 리스트</h1>
+<p><em>(강사님의 브라우저 방문 기록 기반 추천 모음)</em></p>
+<p>본 리스트는 강사님께서 실제로 많이 활용하고 계신 AI 사이트 방문 기록을 분석하여, 수강생들에게 소개하기 좋도록 목적별로 깔끔하게 분류한 내용입니다. 강의안 작성 시 <strong>'각 분야별 대표적인 AI 툴 소개'</strong> 파트에 그대로 활용하실 수 있습니다.</p>
+<hr>
+<h2 id="1-대화형-ai-및-핵심-언어모델-llm">1. 대화형 AI 및 핵심 언어모델 (LLM) 💬</h2>
+<p>가장 기본이 되며, 일상과 업무 전반에 걸쳐 사용되는 대표적인 생성형 AI입니다.</p>
+<ul><li><strong><a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT (OpenAI)</a></strong>: 가장 대표적인 대화형 AI. 정보 검색, 문서 초안 작성, 엑셀/파이썬 코드 생성 등 범용적으로 활용</li><li><strong><a href="https://claude.ai/" target="_blank" rel="noopener">Claude (Anthropic)</a></strong>: 뛰어난 논리력과 긴 문맥 이해도를 자랑하며 분석 및 코딩 작업에 강점이 있는 AI</li><li><strong><a href="https://gemini.google.com/" target="_blank" rel="noopener">Gemini (Google)</a></strong>: 구글 생태계와 연동이 강력하며, 최신 정보 검색 및 멀티모달(이미지/음성 인식)에 특화</li><li><strong><a href="https://copilot.microsoft.com/" target="_blank" rel="noopener">MS Copilot (Microsoft)</a></strong>: 빙(Bing) 기반의 검색 특화 AI이자, 워드/엑셀 등 오피스 툴과의 연동성이 특징</li><li><strong><a href="https://www.perplexity.ai/" target="_blank" rel="noopener">Perplexity (퍼플렉시티)</a></strong>: 출처를 명확히 제시해주는 '논문/리서치 특화' AI 검색 엔진</li><li><strong><a href="https://clova-x.naver.com/" target="_blank" rel="noopener">CLOVA X (네이버)</a></strong>: 한국어와 한국의 로컬 정보에 가장 밝은 네이버의 대화형 AI</li><li><strong><a href="https://grok.com/" target="_blank" rel="noopener">Grok (xAI)</a></strong>: 실시간 X(트위터) 트렌드 반영 및 자유도 높은 이미지 생성을 지원하는 AI</li></ul>
+<hr>
+<h2 id="2-문서-작업-및-데이터-분석-특화">2. 문서 작업 및 데이터 분석 특화 📊</h2>
+<p>수많은 자료를 읽고 요약하거나 데이터를 분석해야 할 때 유용한 툴입니다.</p>
+<ul><li><strong><a href="https://notebooklm.google.com/" target="_blank" rel="noopener">NotebookLM (Google)</a></strong>: 강의 교안이나 수백 페이지의 PDF를 올리면 이를 기반으로 학습하여 답변해주고, 심지어 오디오 팟캐스트까지 만들어주는 도구</li><li><strong><a href="https://lilys.ai/" target="_blank" rel="noopener">Lilys AI (릴리스)</a></strong>: 긴 유튜브 영상, PDF 웹페이지를 빠르고 정확하게 분석하고 한글로 요약해 주는 특화 서비스</li><li><strong><a href="https://julius.ai/" target="_blank" rel="noopener">Julius AI</a></strong>: 엑셀 데이터 파일만 올리면 AI가 알아서 통계 분석을 하고 시각화 차트를 그려주는 데이터 분석 특화 툴</li><li><strong><a href="https://felo.ai/" target="_blank" rel="noopener">Felo (펠로)</a></strong>: 다국어로 된 해외 자료도 번역 기반으로 빠르게 검색해 주는 뛰어난 AI 리서치 엔진</li><li><strong><a href="https://app.napkin.ai/" target="_blank" rel="noopener">Napkin AI</a></strong>: 텍스트를 입력하면 그 내용을 바탕으로 깔끔한 마인드맵, 다이어그램, 순서도를 바로 그려주는 도구</li><li><strong><a href="https://clovanote.naver.com/" target="_blank" rel="noopener">클로바노트 (네이버)</a></strong>: 녹음된 회의 및 강의 음성을 텍스트로 변환하고 AI가 요약해 주는 서비스</li></ul>
+<hr>
+<h2 id="3-미디어이미지-비디오-음성-생성-ai">3. 미디어(이미지, 비디오, 음성) 생성 AI 🎨</h2>
+<p>비주얼적인 요소로 강의자료의 품격을 높이거나 미디어 콘텐츠를 제작할 때 사용합니다.</p>
+<ul><li><strong>이미지 생성</strong></li><li><strong><a href="https://www.midjourney.com/" target="_blank" rel="noopener">Midjourney (미드저니)</a></strong>: 디스코드 기반으로 최고의 퀄리티를 자랑하는 AI 예술 및 이미지 생성기</li><li><strong><a href="https://www.krea.ai/" target="_blank" rel="noopener">Krea AI (크레아)</a></strong>: 스케치를 실시간으로 고화질 이미지로 변환하거나 이미지를 개선해 주는 AI</li></ul>
+<ul><li><strong>비디오 생성</strong></li><li><strong><a href="https://app.klingai.com/" target="_blank" rel="noopener">Kling AI (클링)</a> / <a href="https://higgsfield.ai/" target="_blank" rel="noopener">Higgsfield</a></strong>: 텍스트나 이미지만으로 극강의 현실감을 보여주는 최상위급 AI 비디오 생성기</li><li><strong><a href="https://sora.chatgpt.com/" target="_blank" rel="noopener">Sora (OpenAI)</a></strong>: OpenAI의 최신 비디오 생성 AI 엔진</li></ul>
+<ul><li><strong>프레젠테이션 &amp; 음악 &amp; 음성</strong></li><li><strong><a href="https://gamma.app/" target="_blank" rel="noopener">Gamma (감마)</a></strong>: 주제만 입력하면 AI가 알아서 고품질 PPT 슬라이드를 제작해 주는 툴</li><li><strong><a href="https://codia.ai/" target="_blank" rel="noopener">Codia AI (코디아)</a></strong>: NotebookLM 등의 내용을 완전한 PPT로 자동 변환하는 특화 툴</li><li><strong><a href="https://suno.com/" target="_blank" rel="noopener">Suno (수노)</a></strong>: 가사와 장르만 입력하면 전문가 수준의 노래를 만들어주는 AI</li><li><strong><a href="https://elevenlabs.io/" target="_blank" rel="noopener">ElevenLabs (일레븐랩스)</a></strong>: 가장 현실적이고 억양까지 살려주는 텍스트-투-스피치(TTS) 음성 합성 AI</li></ul>
+<hr>
+<h2 id="4-노코드-개발-및-생산성-도구-모음">4. 노코드 개발 및 생산성 도구 모음 🚀</h2>
+<p>코딩을 몰라도 앱을 만들거나 AI 트렌드를 확인할 수 있는 사이트입니다.</p>
+<ul><li><strong><a href="https://v0.app/" target="_blank" rel="noopener">v0.app (Vercel)</a></strong>: 디자인을 글로 설명하거나 이미지를 올리면 웹사이트 UI 코드(React 등)를 바로 짜주는 AI</li><li><strong><a href="https://lovable.dev/" target="_blank" rel="noopener">Lovable</a></strong>: 프롬프트 대화만으로 실제 작동하는 웹 애플리케이션을 만들어주는 노코드 빌더</li><li><strong><a href="https://www.genspark.ai/" target="_blank" rel="noopener">Genspark (젠스파크)</a></strong>: 올인원 AI 리서치 및 맞춤형 위키보드를 생성해 주는 생산성 툴</li><li><strong><a href="https://www.toolify.ai/" target="_blank" rel="noopener">Toolify (툴리파이)</a> / <a href="https://arena.ai/" target="_blank" rel="noopener">Arena AI</a></strong>: 최신 AI 도구들을 분야별로 검색하고, 모델들의 성능 순위(리더보드)를 확인할 수 있는 트렌드 사이트</li></ul>
+<hr>
+<h2 id="5-ai-개발자-강사님을-위한-전문-플랫폼">5. AI 개발자 &amp; 강사님을 위한 전문 플랫폼 ⚙️</h2>
+<p>(<em>일반 수강생보다는 심화/전공 수업 등에서 소개하기 적합합니다.</em>)</p>
+<ul><li><strong><a href="https://aistudio.google.com/" target="_blank" rel="noopener">Google AI Studio</a></strong>: 구글의 최신 제미나이 모델을 개발자 입장에서 설정하고 테스트해 볼 수 있는 환경</li><li><strong><a href="https://platform.openai.com/" target="_blank" rel="noopener">OpenAI Platform</a></strong>: 챗GPT의 API 키를 발급받고 각종 모델 성능 측정 등을 할 수 있는 플랫폼</li><li><strong><a href="https://huggingface.co/" target="_blank" rel="noopener">Hugging Face (허깅페이스)</a></strong>: 전 세계 수많은 오픈소스 AI 모델들이 무료로 공유되고 있는 AI계의 깃허브</li><li><strong><a href="https://openrouter.ai/" target="_blank" rel="noopener">OpenRouter (오픈라우터)</a></strong>: ChatGPT, Claude, Gemini 등 다양한 AI 모델들을 한 곳에서 API로 비교하고 쓸 수 있는 허브</li><li><strong><a href="https://clovastudio.ncloud.com/" target="_blank" rel="noopener">CLOVA Studio (네이버)</a></strong>: 기업이나 기관에서 네이버 생성형 AI를 업무용으로 커스텀 개발할 때 사용하는 스튜디오</li></ul>
+<hr>
+<p>💡 <strong>강의 활용 TIP</strong>:  강사님께서는 기본적으로 <strong>[ChatGPT / Claude / Gemini]</strong>로 기초 생성형 AI의 차이를 설명하신 후, 데이터 분석 세션에는 <strong>[Julius AI / NotebookLM]</strong>, 시각화 활용 세션에는 <strong>[Gamma / Midjourney]</strong>를 배치하시면 짜임새 있는 전체 강의안 목차가 도출될 것입니다.</p>
+</article>
+</div>
+
+<script>
+(function(){
+  const body = document.body;
+  const KEY = 'editorial_sb_state_02-ai-lecture-sites';
+  const isWide = () => window.matchMedia('(min-width:901px)').matches;
+  const saved = localStorage.getItem(KEY);
+  if (isWide()) { if (saved === 'closed') body.classList.add('sb-closed'); }
+  else { if (saved === 'open') body.classList.add('sb-open'); }
+  document.getElementById('sbToggle').addEventListener('click', () => {
+    if (isWide()) { body.classList.toggle('sb-closed'); localStorage.setItem(KEY, body.classList.contains('sb-closed') ? 'closed' : 'open'); }
+    else { body.classList.toggle('sb-open'); localStorage.setItem(KEY, body.classList.contains('sb-open') ? 'open' : 'closed'); }
+  });
+  const savedTheme = localStorage.getItem('editorial_theme');
+  if (savedTheme === 'dark') document.documentElement.dataset.theme = 'dark';
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const cur = document.documentElement.dataset.theme;
+    const next = cur === 'dark' ? '' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('editorial_theme', next || 'light');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 's' || e.key === 'S') { e.preventDefault(); document.getElementById('sbToggle').click(); }
+    if (e.key === 'd' || e.key === 'D') { e.preventDefault(); document.getElementById('themeToggle').click(); }
+  });
+  document.querySelectorAll('.sidebar a').forEach(a => {
+    a.addEventListener('click', () => {
+      if (!isWide()) { body.classList.remove('sb-open'); localStorage.setItem(KEY, 'closed'); }
+    });
+  });
+  const navLinks = [...document.querySelectorAll('.sidebar ul li')];
+  const targets = navLinks.map(li => {
+    const a = li.querySelector('a');
+    if (!a) return null;
+    const id = a.getAttribute('href').slice(1);
+    return { li, el: document.getElementById(id) };
+  }).filter(x => x && x.el);
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        const match = targets.find(t => t.el === en.target);
+        if (match) { navLinks.forEach(li => li.classList.remove('active')); match.li.classList.add('active'); }
+      }
+    });
+  }, { rootMargin: '-10% 0px -75% 0px' });
+  targets.forEach(t => obs.observe(t.el));
+})();
+</script>
+
+</body>
+</html>

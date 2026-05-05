@@ -40,6 +40,12 @@ JOBS = [
         'title': 'OpenCode 완전 가이드',
         'subtitle': 'Tool 인터페이스 · Skill · Plugin 인벤토리',
     },
+    {
+        'src': r'C:\Users\value\Downloads\takeout-20260409T073847Z-3-001\Takeout\Chrome\ai_lecture_sites.md',
+        'out': 'references/02-ai-lecture-sites.html',
+        'title': '강사 추천 AI 사이트 모음',
+        'subtitle': 'AI Lecture Sites · 5개 카테고리 큐레이션',
+    },
 ]
 
 # ---------- 마크다운 파싱 ----------
