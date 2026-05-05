@@ -1,0 +1,4169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>생성형 AI 활용 노코드 데이터분석</title>
+  <style>
+    :root {
+      --paper:#faf4e6;
+      --paper-2:#f1e8d2;
+      --paper-3:#e9dcc0;
+      --ink:#1f1810;
+      --ink-soft:#3a2e20;
+      --ink-mute:#6a5a44;
+      --dark:#2b2015;
+      --dark-2:#1a1208;
+      --dark-ink:#f5ecd6;
+      --dark-mute:#c8b895;
+      --accent:#8a3d1f;
+      --accent-warm:#c96238;
+      --accent-soft:#e07a4a;
+      --line:#c8b898;
+      --line-soft:#e5d9bf;
+      --code-bg:#ede0c3;
+      --shadow-1:0 1px 2px rgba(0,0,0,.08);
+      --shadow-2:0 18px 56px rgba(0,0,0,.26);
+      --shadow-3:0 40px 100px rgba(0,0,0,.14);
+      --body-font-size:11pt;
+      --body-line-height:1.82;
+      --table-font-size:9.6pt;
+      --table-line-height:1.62;
+      --table-head-font-size:8pt;
+      --sheet-pad-top:16mm;
+      --sheet-pad-x:20mm;
+      --sheet-pad-bottom:20mm;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink-soft);
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(255,255,255,.45),
+          transparent 30%
+        ),
+        linear-gradient(160deg, #c9bfa8 0%, #b8ac92 48%, #b0a284 100%);
+      font:
+        400
+        var(--body-font-size)
+        /var(--body-line-height)
+        'Inter','Pretendard','Noto Sans KR',sans-serif;
+      counter-reset: page;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 14px 20px;
+      color: var(--dark-ink);
+      background: rgba(26,18,8,.78);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 30px rgba(0,0,0,.18);
+    }
+
+    .brand {
+      font: 700 11px/1.2 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent-soft);
+    }
+
+    .brand-sub {
+      font: 400 12px/1.2 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      color: var(--dark-ink);
+      max-width: 38vw;
+      opacity: .88;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .spacer { flex: 1; }
+
+    .topbar button {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(245,236,214,.24);
+      background: transparent;
+      color: var(--dark-ink);
+      font: 700 11px/1 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .topbar .btn-pdf {
+      background: #111;
+      border-color: #111;
+      color: #fff;
+    }
+
+    .meta-panel {
+      position: fixed;
+      top: 78px;
+      right: 18px;
+      z-index: 19;
+      width: min(420px, calc(100vw - 36px));
+      max-height: calc(100vh - 96px);
+      overflow: auto;
+      padding: 18px;
+      border: 1px solid rgba(43,32,21,.12);
+      border-radius: 24px;
+      background: rgba(250,244,230,.96);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 48px rgba(43,32,21,.18);
+      transform: translateX(calc(100% + 24px));
+      opacity: 0;
+      pointer-events: none;
+      transition: transform .24s ease, opacity .24s ease;
+    }
+
+    body.meta-panel-open .meta-panel {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .meta-panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .meta-panel-head strong {
+      display: block;
+      margin-bottom: 4px;
+      font: 700 15px/1.3 'Noto Serif KR',serif;
+      color: var(--ink);
+    }
+
+    .meta-panel-head p {
+      margin: 0;
+      color: var(--ink-mute);
+      font-size: 9pt;
+      line-height: 1.55;
+    }
+
+    .meta-close {
+      flex: 0 0 auto;
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(43,32,21,.14);
+      background: rgba(255,255,255,.72);
+      color: var(--ink-soft);
+      font: 700 11px/1 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1.2px;
+      cursor: pointer;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .meta-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .meta-field.wide {
+      grid-column: 1 / -1;
+    }
+
+    .meta-field span {
+      color: var(--ink-mute);
+      font: 700 10.5px/1.2 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .meta-field input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid rgba(43,32,21,.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,.78);
+      color: var(--ink);
+      font: 500 10pt/1.2 'Inter','Pretendard','Noto Sans KR',sans-serif;
+    }
+
+    .meta-field input:focus {
+      outline: 2px solid rgba(201,98,56,.22);
+      border-color: var(--accent-warm);
+    }
+
+    .meta-note {
+      margin: 14px 0 0;
+      color: var(--ink-mute);
+      font-size: 8.7pt;
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr) 250px;
+      gap: 24px;
+      width: min(1540px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 88px 0 60px;
+    }
+
+    .sidenav, .toc {
+      position: sticky;
+      top: 90px;
+      align-self: start;
+      max-height: calc(100vh - 110px);
+      overflow: auto;
+      padding: 18px;
+      border: 1px solid rgba(43,32,21,.08);
+      border-radius: 22px;
+      background: rgba(250,244,230,.85);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 34px rgba(43,32,21,.10);
+    }
+
+    .sidenav h3,
+    .toc h3 {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font: 700 11px/1.4 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .sidenav p {
+      margin: 0 0 12px;
+      font-size: 9pt;
+      color: var(--ink-mute);
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .toc a {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 8px 10px;
+      border-radius: 14px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .toc a:hover {
+      background: rgba(201,98,56,.08);
+      transform: translateX(2px);
+    }
+
+    .toc-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--dark);
+      color: var(--dark-ink);
+      font: 700 10px/1 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1px;
+    }
+
+    .toc-text {
+      font-size: 9pt;
+      line-height: 1.45;
+    }
+
+    .main {
+      display: grid;
+      gap: 16mm;
+      justify-items: center;
+    }
+
+    #paper-pages {
+      display: grid;
+      gap: 16mm;
+      justify-items: center;
+      width: 100%;
+    }
+
+    .paper-source {
+      display: none !important;
+    }
+
+    .sheet,
+    .print-cover,
+    .pagination-probe {
+      position: relative;
+      width: 210mm;
+      height: 297mm;
+      padding:
+        var(--sheet-pad-top)
+        var(--sheet-pad-x)
+        var(--sheet-pad-bottom);
+      background: var(--paper);
+      box-shadow: var(--shadow-1), var(--shadow-2), var(--shadow-3);
+      overflow: hidden;
+    }
+
+    .sheet,
+    .pagination-probe {
+      display: flex;
+      flex-direction: column;
+      gap: 4.5mm;
+    }
+
+    .pagination-probe {
+      position: absolute;
+      top: 0;
+      left: -9999px;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .sheet-header,
+    .sheet-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8mm;
+      flex: 0 0 auto;
+    }
+
+    .sheet-header {
+      padding-bottom: 2.8mm;
+      border-bottom: .4mm solid var(--line-soft);
+    }
+
+    .sheet-running-title {
+      min-width: 0;
+      color: var(--accent);
+      font: 700 8.8pt/1.3 'Noto Serif KR',serif;
+      letter-spacing: .3px;
+    }
+
+    .sheet-running-section {
+      min-width: 0;
+      max-width: 48%;
+      color: var(--ink-mute);
+      font: 600 7.8pt/1.4 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1.2px;
+      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sheet-footer {
+      margin-top: auto;
+      padding-top: 2.4mm;
+      border-top: .4mm solid var(--line-soft);
+      min-height: 9mm;
+    }
+
+    .sheet-footer-meta {
+      min-width: 0;
+      color: var(--ink-mute);
+      font: 600 7.2pt/1.4 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1.4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sheet-footer-page {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink-soft);
+      font: 600 7.5pt/1.2 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1.2px;
+      white-space: nowrap;
+    }
+
+    .sheet-footer-page-num::before {
+      counter-increment: page;
+      content: counter(page, decimal-leading-zero);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .sheet-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      padding-bottom: 1.5mm;
+    }
+
+    .print-cover {
+      display: flex;
+      flex-direction: column;
+      padding: 0 !important;
+      background: var(--dark) !important;
+      color: var(--dark-ink);
+    }
+
+    .print-cover::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5mm;
+      background: var(--accent-warm);
+    }
+
+    .pc-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24mm 22mm 12mm;
+    }
+
+    .pc-org-en {
+      display: grid;
+      gap: 6px;
+      color: var(--dark-mute);
+      font: 500 10pt/1.4 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .pc-org-en strong {
+      color: var(--accent-soft);
+      font-weight: 700;
+    }
+
+    .pc-year {
+      color: var(--accent-soft);
+      font: 300 22pt/1 'Noto Serif KR',serif;
+      margin-bottom: 12mm;
+    }
+
+    .pc-title {
+      margin: 0;
+      color: var(--dark-ink);
+      font: 700 34pt/1.18 'Noto Serif KR',serif;
+      letter-spacing: -.3px;
+    }
+
+    .pc-rule {
+      width: 48mm;
+      height: 1.2mm;
+      margin: 10mm 0 8mm;
+      background: var(--accent-warm);
+    }
+
+    .pc-doc-type {
+      color: var(--paper-2);
+      font: 400 24pt/1.2 'Noto Serif KR',serif;
+      margin-bottom: 5mm;
+    }
+
+    .pc-subtitle {
+      max-width: 136mm;
+      color: var(--paper-2);
+      font: 400 12pt/1.8 'Noto Serif KR',serif;
+    }
+
+    .pc-topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10mm;
+    }
+
+    .topic-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(245,236,214,.10);
+      border: 1px solid rgba(245,236,214,.16);
+      color: var(--paper-2);
+      font: 600 8pt/1 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .pc-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10mm;
+      border-top: .4mm solid rgba(245,236,214,.25);
+      padding-top: 6mm;
+    }
+
+    .pc-meta .ml {
+      color: var(--accent-soft);
+      font: 700 7pt/1.3 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 2mm;
+    }
+
+    .pc-meta .mv {
+      color: var(--dark-ink);
+      font: 600 10pt/1.5 'Inter','Pretendard','Noto Sans KR',sans-serif;
+    }
+
+    .pc-footer-strip {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9mm 22mm 11mm;
+      background: #fff;
+      color: var(--dark);
+    }
+
+    .pc-footer-strip::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: .8mm;
+      background: var(--accent-warm);
+    }
+
+    .pc-fs-wordmark {
+      font: 700 16pt/1 'Noto Serif KR',serif;
+      color: var(--dark);
+    }
+
+    .pc-fs-meta {
+      text-align: right;
+      color: var(--ink-mute);
+      font: 600 7.5pt/1.6 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, h4, h5 {
+      color: var(--ink);
+      margin: 0 0 10px;
+    }
+
+    h1 {
+      font: 700 22pt/1.28 'Noto Serif KR',serif;
+      letter-spacing: -.2px;
+      margin-bottom: 6mm;
+    }
+
+    h2 {
+      margin: 0 0 7mm;
+      padding: 5.8mm 8.5mm 5.2mm;
+      background: var(--dark);
+      color: var(--dark-ink);
+      border-left: 3pt solid var(--accent-warm);
+      font: 700 17pt/1.35 'Noto Serif KR',serif;
+      page-break-before: always;
+    }
+
+    h3 {
+      margin-top: 6mm;
+      font: 700 11.5pt/1.5 'Inter','Pretendard','Noto Sans KR',sans-serif;
+    }
+
+    h4 {
+      margin-top: 4.5mm;
+      font: 700 10.5pt/1.5 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      color: var(--accent);
+    }
+
+    p { margin: 0 0 4.6mm; }
+    ul, ol { margin: 0 0 4.6mm 5mm; padding-left: 5mm; }
+    li { margin-bottom: 2mm; }
+
+    .toc-list {
+      margin: 0 0 3.2mm 0;
+      padding-left: 4.6mm;
+      font-size: 9.4pt;
+      line-height: 1.5;
+    }
+
+    .toc-list li {
+      margin-bottom: 1.1mm;
+      break-inside: avoid;
+    }
+
+    .toc-list.compact {
+      column-count: 2;
+      column-gap: 6mm;
+      column-fill: balance;
+    }
+
+    blockquote {
+      margin: 6mm 0;
+      padding: 4mm 4.5mm;
+      background: var(--paper-2);
+      border-left: 3pt solid var(--accent-warm);
+      color: var(--ink);
+    }
+
+    .sheet-body img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: 9px;
+    }
+
+    .doc-figure {
+      margin: 3.8mm 0 4.8mm;
+      padding: 2.6mm;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,.94),
+        rgba(245,236,214,.56)
+      );
+      border: 1px solid rgba(49,79,79,.11);
+      border-radius: 10px;
+      box-shadow: 0 6px 14px rgba(25,31,38,.06);
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .doc-figure img {
+      width: 100%;
+      max-height: 82mm;
+      object-fit: contain;
+      background: #fff;
+      border: 1px solid rgba(49,79,79,.08);
+    }
+
+    .figure-context {
+      margin: 0 0 2.2mm;
+      padding: 2.2mm 2.6mm;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(166,98,56,.18);
+      border-left: 3px solid var(--accent-warm);
+      border-radius: 8px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+    }
+
+    .figure-context-label {
+      margin: 0 0 .7mm;
+      color: var(--accent-warm);
+      font: 700 7.1pt/1.2 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .figure-context-body {
+      color: var(--ink);
+      font: 600 8.1pt/1.58 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      word-break: keep-all;
+    }
+
+    .doc-figure.compact,
+    .doc-figure.figure-small {
+      max-width: 84mm;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .doc-figure.figure-medium {
+      max-width: 128mm;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .doc-figure.wide,
+    .doc-figure.figure-wide {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .doc-figure.figure-small img {
+      max-height: 58mm;
+    }
+
+    .doc-figure.figure-medium img {
+      max-height: 70mm;
+    }
+
+    .doc-figure.figure-wide img {
+      max-height: 86mm;
+    }
+
+    .doc-figure.full-slide-figure img {
+      max-height: 128mm;
+    }
+
+    .doc-figure.media-pair {
+      display: grid;
+      grid-template-columns: minmax(48mm, 70mm) 1fr;
+      gap: 3.5mm;
+      align-items: center;
+    }
+
+    .doc-figure.media-pair img {
+      max-height: 62mm;
+    }
+
+    .doc-figure.media-pair .figure-context {
+      grid-column: 1 / -1;
+      margin-bottom: 1mm;
+    }
+
+    .doc-figure figcaption {
+      margin-top: 2mm;
+      color: var(--ink-mute);
+      font: 600 8pt/1.55 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 0;
+      word-break: keep-all;
+    }
+
+    .figure-guide-label {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .doc-figure.media-pair figcaption {
+      margin-top: 0;
+      padding-left: 3mm;
+      border-left: 1px solid rgba(49,79,79,.16);
+    }
+
+    .media-note {
+      margin: 3.2mm 0 4.6mm;
+      padding: 3mm 3.6mm;
+      background: rgba(255,255,255,.68);
+      border: 1px solid rgba(166,98,56,.18);
+      border-left: 3px solid var(--accent-warm);
+      border-radius: 8px;
+      color: var(--ink);
+      font-size: 9.4pt;
+      line-height: 1.65;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .media-note strong {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+      margin: 5mm 0 6mm;
+      page-break-inside: avoid;
+      font-size: var(--table-font-size);
+      line-height: var(--table-line-height);
+      background: rgba(255,255,255,.25);
+    }
+
+    th, td {
+      border: 1px solid var(--line-soft);
+      padding: 3mm 3.2mm;
+      vertical-align: top;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-height: var(--table-line-height);
+    }
+
+    th {
+      background: var(--dark);
+      color: var(--dark-ink);
+      font:
+        700
+        var(--table-head-font-size)
+        /1.5
+        'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    pre {
+      margin: 5mm 0 6mm;
+      padding: 4mm 4.2mm;
+      overflow: auto;
+      background: var(--dark-2);
+      color: var(--dark-ink);
+      border-radius: 14px;
+      border: 1px solid rgba(245,236,214,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+      page-break-inside: avoid;
+    }
+
+    code {
+      font: 500 8.8pt/1.6 'JetBrains Mono',monospace;
+      background: var(--code-bg);
+      padding: 1px 4px;
+      border-radius: 6px;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+      color: inherit;
+    }
+
+    hr {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        var(--line),
+        transparent
+      );
+      margin: 7mm 0;
+    }
+
+    strong { color: var(--ink); }
+
+    .sheet-body > h2:first-child { margin-top: 0; }
+
+    .sheet-body > h2 + p,
+    .sheet-body > h2 + ul,
+    .sheet-body > h2 + ol,
+    .sheet-body > h2 + table {
+      margin-top: 5mm;
+    }
+
+    .topbar .btn-edit.active,
+    .topbar .btn-meta.active {
+      background: var(--accent-warm);
+      border-color: var(--accent-warm);
+      color: #fff;
+    }
+
+    [contenteditable="true"] {
+      outline: 2px dashed var(--accent-warm) !important;
+      outline-offset: 3px !important;
+      background: rgba(255,243,200,.55) !important;
+      cursor: text !important;
+      caret-color: var(--accent-warm);
+      border-radius: 2px;
+    }
+
+    [contenteditable="true"]:focus {
+      outline-style: solid !important;
+      outline-color: var(--accent) !important;
+      background: rgba(255,236,170,.75) !important;
+    }
+
+    body.edit-mode .sheet {
+      box-shadow:
+        var(--shadow-1),
+        var(--shadow-2),
+        0 0 0 3px rgba(201,98,56,.25) !important;
+    }
+
+    body.edit-mode::after {
+      content: '편집 모드 · 텍스트를 클릭하여 수정 · 완료 후 [HTML 저장] 클릭';
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      border: 1px solid rgba(201,98,56,.5);
+      border-radius: 24px;
+      background: var(--dark);
+      color: var(--dark-ink);
+      font: 700 12px/1 'Inter','Pretendard','Noto Sans KR',sans-serif;
+      letter-spacing: 1.5px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.3);
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .source-note {
+      margin-top: 12px;
+      color: var(--ink-mute);
+      font-size: 8.5pt;
+    }
+
+    @media (max-width: 1480px) {
+      .layout { grid-template-columns: 240px minmax(0, 1fr); }
+      .toc { display: none; }
+      .meta-panel { right: 14px; }
+    }
+
+    @media (max-width: 1120px) {
+      .layout {
+        grid-template-columns: 1fr;
+        width: min(100vw - 24px, 920px);
+      }
+      .sidenav, .toc { display: none; }
+      .sheet, .print-cover { width: min(100%, 210mm); }
+      .meta-panel {
+        top: 72px;
+        right: 12px;
+        width: calc(100vw - 24px);
+      }
+      .meta-grid { grid-template-columns: 1fr; }
+    }
+
+    @page { size: A4 portrait; margin: 0; }
+
+    @media print {
+      html, body { background: #fff !important; }
+      .topbar, .sidenav, .toc, .meta-panel { display: none !important; }
+      .layout { display: block; width: auto; padding: 0; margin: 0; }
+      .main { display: block; }
+      #paper-pages { display: block; }
+    .sheet, .print-cover {
+      width: 210mm;
+      height: 297mm;
+      min-height: 297mm;
+      margin: 0;
+      padding:
+        var(--sheet-pad-top)
+        var(--sheet-pad-x)
+        var(--sheet-pad-bottom);
+      box-shadow: none !important;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+    }
+    .print-cover { min-height: 297mm; padding: 0 !important; }
+    .print-cover .pc-content { padding: 24mm 22mm 12mm; }
+    .sheet {
+      display: flex;
+      flex-direction: column;
+      gap: 4.5mm;
+    }
+    .sheet-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      padding-bottom: 1.5mm;
+    }
+      h2 { page-break-before: auto; break-before: auto; }
+      tr, table, pre, blockquote { page-break-inside: avoid; }
+      [contenteditable] {
+        outline: none !important;
+        background: transparent !important;
+      }
+      body.edit-mode .sheet { box-shadow: none !important; }
+      body.edit-mode::after { display: none !important; }
+      .paper-source { display: none !important; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body
+  data-save-name="생성형 AI 활용 노코드 데이터분석"
+  data-doc-title="생성형 AI 활용 노코드 데이터분석"
+  data-doc-meta="2026 · C04 · 교재"
+  data-meta-title="생성형 AI 활용 노코드 데이터분석"
+  data-meta-subtitle="2026년 AI 데이터기반지능행정 역량강화 사업 Track 2 Module 1 교재"
+  data-meta-year="2026"
+  data-meta-track="Track 2"
+  data-meta-module="Module 1"
+  data-meta-course-code="C04"
+  data-meta-document-type="교재"
+  data-meta-cover-line="Generative AI No-Code Data Analysis"
+  data-meta-cover-wordmark="GENERATIVE AI LAB"
+>
+  <div class="topbar">
+    <div class="brand">Paper View</div>
+    <div class="brand-sub" data-meta-text="subtitle">2026년 AI 데이터기반지능행정 역량강화 사업 Track 2 Module 1 교재</div>
+    <div class="spacer"></div>
+    <button class="btn-meta" onclick="toggleMetaPanel()">요소 편집</button>
+    <button class="btn-edit" onclick="toggleEditMode()">✎ 편집</button>
+    <button class="btn-save" onclick="saveEditedHTML()">HTML 저장</button>
+    <button class="btn-pdf" onclick="window.print()">PDF 저장</button>
+    <button
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+    >TOP</button>
+  </div>
+
+  
+    <aside class="meta-panel" id="meta-panel" aria-hidden="true">
+      <div class="meta-panel-head">
+        <div>
+          <strong>공통 요소 편집</strong>
+          <p>
+            표지, 머릿글, 바닥글에 반복되는 정보를 한 번에 수정합니다.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="meta-close"
+          onclick="toggleMetaPanel(false)"
+        >닫기</button>
+      </div>
+      <div class="meta-grid">
+        <label class="meta-field wide"><span>교재명</span><input type="text" data-meta-input="title" value="생성형 AI 활용 노코드 데이터분석"></label><label class="meta-field wide"><span>부제</span><input type="text" data-meta-input="subtitle" value="2026년 AI 데이터기반지능행정 역량강화 사업 Track 2 Module 1 교재"></label><label class="meta-field"><span>연도</span><input type="text" data-meta-input="year" value="2026"></label><label class="meta-field"><span>문서구분</span><input type="text" data-meta-input="documentType" value="교재"></label><label class="meta-field"><span>과정코드</span><input type="text" data-meta-input="courseCode" value="C04"></label><label class="meta-field"><span>트랙</span><input type="text" data-meta-input="track" value="Track 2"></label><label class="meta-field"><span>모듈</span><input type="text" data-meta-input="module" value="Module 1"></label><label class="meta-field wide"><span>표지 상단 문구</span><input type="text" data-meta-input="coverLine" value="Generative AI No-Code Data Analysis"></label><label class="meta-field wide"><span>표지 하단 워드마크</span><input type="text" data-meta-input="coverWordmark" value="GENERATIVE AI LAB"></label>
+      </div>
+      <p class="meta-note">
+        변경값은 즉시 화면에 반영되며 HTML 저장 시 다음 차시에도 그대로
+        재사용할 수 있습니다.
+      </p>
+    </aside>
+    
+
+  <div class="layout">
+    <aside class="sidenav">
+      <h3>Document</h3>
+      <p data-meta-text="title">생성형 AI 활용 노코드 데이터분석</p>
+      <p data-meta-text="subtitle">2026년 AI 데이터기반지능행정 역량강화 사업 Track 2 Module 1 교재</p>
+      <p class="source-note">Source: 생성형 AI 활용 노코드 데이터분석 교재 원고</p>
+    </aside>
+
+    <main class="main">
+      
+    <section class="print-cover" data-page-label="cover">
+      <div class="pc-content">
+        <div class="pc-top">
+          <div class="pc-org-en">
+            <strong data-meta-derived="guideLabel">
+              2026 CURRICULUM GUIDEBOOK
+            </strong>
+            <span data-meta-text="coverLine">Generative AI No-Code Data Analysis</span>
+          </div>
+        </div>
+
+        <div class="pc-center">
+          <div class="pc-year" data-meta-text="year">2026</div>
+          <h1 class="pc-title" data-meta-text="title">생성형 AI 활용 노코드 데이터분석</h1>
+          <div class="pc-rule"></div>
+          <div class="pc-doc-type" data-meta-text="documentType">
+            교재
+          </div>
+          <div class="pc-subtitle" data-meta-text="subtitle">
+            2026년 AI 데이터기반지능행정 역량강화 사업 Track 2 Module 1 교재
+          </div>
+          <div class="pc-topics"><span class="topic-chip">생성형 AI 분석</span><span class="topic-chip">노코드 데이터분석</span><span class="topic-chip">파이썬 바이브코딩</span><span class="topic-chip">공공데이터 수집</span><span class="topic-chip">탐색적 데이터분석</span><span class="topic-chip">시각화와 대시보드</span></div>
+        </div>
+
+        <div class="pc-bottom">
+          <div class="pc-meta">
+            <div class="m">
+              <div class="ml">Track</div>
+              <div class="mv" data-meta-text="track">Track 2</div>
+            </div>
+            <div class="m">
+              <div class="ml">Module</div>
+              <div class="mv" data-meta-text="module">Module 1</div>
+            </div>
+            <div class="m">
+              <div class="ml">Course</div>
+              <div class="mv" data-meta-text="courseCode">
+                C04
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc-footer-strip">
+        <div class="pc-fs-wordmark" data-meta-text="coverWordmark">
+          GENERATIVE AI LAB
+        </div>
+        <div class="pc-fs-meta" data-meta-text="title">생성형 AI 활용 노코드 데이터분석</div>
+      </div>
+    </section>
+    
+      <div id="paper-pages"></div>
+    </main>
+
+    <aside class="toc">
+      <h3>Contents</h3>
+      <ol>
+        <li><a href="#section-01"><span class="toc-num">01</span><span class="toc-text">교재 개요</span></a></li>
+<li><a href="#section-02"><span class="toc-num">02</span><span class="toc-text">Section 01. 교과서 없는 초학문의 등장</span></a></li>
+<li><a href="#section-03"><span class="toc-num">03</span><span class="toc-text">Section 02. 개발자, 분석가, 실무자의 경계가 흐려지는 이유</span></a></li>
+<li><a href="#section-04"><span class="toc-num">04</span><span class="toc-text">Section 03. DX와 AX를 함께 읽기</span></a></li>
+<li><a href="#section-05"><span class="toc-num">05</span><span class="toc-text">Section 04. 생성형 AI 시대의 데이터분석 프로세스</span></a></li>
+<li><a href="#section-06"><span class="toc-num">06</span><span class="toc-text">Section 05. 노코딩을 넘어 바이브코딩으로</span></a></li>
+<li><a href="#section-07"><span class="toc-num">07</span><span class="toc-text">Section 06. 실행 환경을 고르는 기준</span></a></li>
+<li><a href="#section-08"><span class="toc-num">08</span><span class="toc-text">Section 07. Google Colab으로 시작하는 이유</span></a></li>
+<li><a href="#section-09"><span class="toc-num">09</span><span class="toc-text">Section 08. 로컬 환경: Anaconda와 python.org</span></a></li>
+<li><a href="#section-10"><span class="toc-num">10</span><span class="toc-text">Section 09. Jupyter Notebook이 C04에 적합한 이유</span></a></li>
+<li><a href="#section-11"><span class="toc-num">11</span><span class="toc-text">Section 10. 분석 어시스트용 시스템 프롬프트 설계</span></a></li>
+<li><a href="#section-12"><span class="toc-num">12</span><span class="toc-text">Section 11. 데이터 불러오기: 형식별 패턴 이해</span></a></li>
+<li><a href="#section-13"><span class="toc-num">13</span><span class="toc-text">Section 12. 공공데이터 수집: API, RSS, 웹크롤링</span></a></li>
+<li><a href="#section-14"><span class="toc-num">14</span><span class="toc-text">Section 13. API·RSS·웹크롤링 5종 실습을 읽는 법</span></a></li>
+<li><a href="#section-15"><span class="toc-num">15</span><span class="toc-text">Section 14. 전처리는 청소가 아니라 해석 준비임</span></a></li>
+<li><a href="#section-16"><span class="toc-num">16</span><span class="toc-text">Section 15. EDA는 답을 확정하는 과정이 아니라 질문을 정교하게 만드는 과정</span></a></li>
+<li><a href="#section-17"><span class="toc-num">17</span><span class="toc-text">Section 16. info()와 describe()로 구조를 읽는 법</span></a></li>
+<li><a href="#section-18"><span class="toc-num">18</span><span class="toc-text">Section 17. 범주형 탐색과 주소 파생의 의미</span></a></li>
+<li><a href="#section-19"><span class="toc-num">19</span><span class="toc-text">Section 18. 수치형 정리와 요약 통계 해석</span></a></li>
+<li><a href="#section-20"><span class="toc-num">20</span><span class="toc-text">Section 19. groupby와 crosstab으로 숨어 있던 차이 읽기</span></a></li>
+<li><a href="#section-21"><span class="toc-num">21</span><span class="toc-text">Section 20. 상관관계 분석과 LLM 해석 요청의 순서</span></a></li>
+<li><a href="#section-22"><span class="toc-num">22</span><span class="toc-text">Section 21. LLM에게 EDA 결과를 맡길 때의 원칙</span></a></li>
+<li><a href="#section-23"><span class="toc-num">23</span><span class="toc-text">Section 22. 시각화는 코딩 과목이 아니라 메시지 설계 과목임</span></a></li>
+<li><a href="#section-24"><span class="toc-num">24</span><span class="toc-text">Section 23. 막대차트와 히스토그램을 실무적으로 읽는 법</span></a></li>
+<li><a href="#section-25"><span class="toc-num">25</span><span class="toc-text">Section 24. seaborn과 plotly를 왜 함께 배워야 하는가</span></a></li>
+<li><a href="#section-26"><span class="toc-num">26</span><span class="toc-text">Section 25. HTML·CSS·JS를 3분 안에 이해하는 관점</span></a></li>
+<li><a href="#section-27"><span class="toc-num">27</span><span class="toc-text">Section 26. 단일 HTML 대시보드는 왜 실무 친화적인가</span></a></li>
+<li><a href="#section-28"><span class="toc-num">28</span><span class="toc-text">Section 27. 대시보드 확장은 데이터 사고를 더 깊게 만든다</span></a></li>
+<li><a href="#section-29"><span class="toc-num">29</span><span class="toc-text">Section 28. 파이썬 자동화는 분석 이후를 바꾸는 도구다</span></a></li>
+<li><a href="#section-30"><span class="toc-num">30</span><span class="toc-text">Section 29. 자동화 업무 카탈로그를 읽는 법</span></a></li>
+<li><a href="#section-31"><span class="toc-num">31</span><span class="toc-text">Section 30. 스케줄링은 자동화의 마침표가 아니라 시작점이다</span></a></li>
+<li><a href="#section-32"><span class="toc-num">32</span><span class="toc-text">Section 31. 노트북을 보고서와 발표자료로 바꾸는 단계</span></a></li>
+<li><a href="#section-33"><span class="toc-num">33</span><span class="toc-text">Section 32. LLM별 보고서 작성 전략</span></a></li>
+<li><a href="#section-34"><span class="toc-num">34</span><span class="toc-text">Section 33. 발표 슬라이드 4가지 제작 경로</span></a></li>
+<li><a href="#section-35"><span class="toc-num">35</span><span class="toc-text">Section 34. 공공조직에서 AI 보조 분석을 쓸 때의 보안 경계선</span></a></li>
+<li><a href="#section-36"><span class="toc-num">36</span><span class="toc-text">Section 35. 캡스톤 실습은 산출물을 묶어내는 과정임</span></a></li>
+<li><a href="#section-37"><span class="toc-num">37</span><span class="toc-text">Section 36. 캡스톤 1단계: 데이터 준비와 질문 정의</span></a></li>
+<li><a href="#section-38"><span class="toc-num">38</span><span class="toc-text">Section 37. 캡스톤 2단계: EDA 노트북 완성</span></a></li>
+<li><a href="#section-39"><span class="toc-num">39</span><span class="toc-text">Section 38. 캡스톤 3단계: 시각화와 HTML 대시보드 연결</span></a></li>
+<li><a href="#section-40"><span class="toc-num">40</span><span class="toc-text">Section 39. 캡스톤 4단계: 자동화와 보고 문서 마무리</span></a></li>
+<li><a href="#section-41"><span class="toc-num">41</span><span class="toc-text">Section 40. 워크북 01. AI 시대 분석가 역할 진단</span></a></li>
+<li><a href="#section-42"><span class="toc-num">42</span><span class="toc-text">Section 41. 워크북 02. 실행 환경 선택표 작성</span></a></li>
+<li><a href="#section-43"><span class="toc-num">43</span><span class="toc-text">Section 42. 워크북 03. 분석 어시스트 프롬프트 설계</span></a></li>
+<li><a href="#section-44"><span class="toc-num">44</span><span class="toc-text">Section 43. 워크북 04. 공공데이터 수집 계획서</span></a></li>
+<li><a href="#section-45"><span class="toc-num">45</span><span class="toc-text">Section 44. 워크북 05. 전처리 로그와 파생변수 정의서</span></a></li>
+<li><a href="#section-46"><span class="toc-num">46</span><span class="toc-text">Section 45. 워크북 06. EDA 메모와 후속 질문 목록</span></a></li>
+<li><a href="#section-47"><span class="toc-num">47</span><span class="toc-text">Section 46. 워크북 07. 시각화 평가표</span></a></li>
+<li><a href="#section-48"><span class="toc-num">48</span><span class="toc-text">Section 47. 워크북 08. 대시보드 요구사항 명세서</span></a></li>
+<li><a href="#section-49"><span class="toc-num">49</span><span class="toc-text">Section 48. 워크북 09. 자동화 후보 업무 발굴표</span></a></li>
+<li><a href="#section-50"><span class="toc-num">50</span><span class="toc-text">Section 49. 워크북 10. 보고서와 발표자료 전환 연습</span></a></li>
+<li><a href="#section-51"><span class="toc-num">51</span><span class="toc-text">Section 50. 실무 템플릿 모음</span></a></li>
+<li><a href="#section-52"><span class="toc-num">52</span><span class="toc-text">Section 51. 마무리 확장 읽기</span></a></li>
+<li><a href="#section-53"><span class="toc-num">53</span><span class="toc-text">Section 52. 프롬프트 패턴 카탈로그</span></a></li>
+<li><a href="#section-54"><span class="toc-num">54</span><span class="toc-text">Section 53. 단계별 확인 포인트 사전</span></a></li>
+<li><a href="#section-55"><span class="toc-num">55</span><span class="toc-text">Section 54. CSV, 엑셀, JSON에서 자주 만나는 오류 대응법</span></a></li>
+<li><a href="#section-56"><span class="toc-num">56</span><span class="toc-text">Section 55. API 호출 장애 대응 가이드</span></a></li>
+<li><a href="#section-57"><span class="toc-num">57</span><span class="toc-text">Section 56. 웹크롤링의 윤리와 안정화 원칙</span></a></li>
+<li><a href="#section-58"><span class="toc-num">58</span><span class="toc-text">Section 57. 공공데이터 품질 점검표</span></a></li>
+<li><a href="#section-59"><span class="toc-num">59</span><span class="toc-text">Section 58. 결측치 처리 의사결정 프레임</span></a></li>
+<li><a href="#section-60"><span class="toc-num">60</span><span class="toc-text">Section 59. 이상치 판단 시나리오</span></a></li>
+<li><a href="#section-61"><span class="toc-num">61</span><span class="toc-text">Section 60. 지역 파생변수 표준화 사전</span></a></li>
+<li><a href="#section-62"><span class="toc-num">62</span><span class="toc-text">Section 61. EDA 해석 문장 은행</span></a></li>
+<li><a href="#section-63"><span class="toc-num">63</span><span class="toc-text">Section 62. 시각화 캡션과 보고서 주석 문장 은행</span></a></li>
+<li><a href="#section-64"><span class="toc-num">64</span><span class="toc-text">Section 63. HTML 대시보드 화면 설계 패턴</span></a></li>
+<li><a href="#section-65"><span class="toc-num">65</span><span class="toc-text">Section 64. 대시보드 UX 점검표</span></a></li>
+<li><a href="#section-66"><span class="toc-num">66</span><span class="toc-text">Section 65. 자동화 스크립트 구조 템플릿</span></a></li>
+<li><a href="#section-67"><span class="toc-num">67</span><span class="toc-text">Section 66. 로그와 오류 처리 템플릿</span></a></li>
+<li><a href="#section-68"><span class="toc-num">68</span><span class="toc-text">Section 67. Windows 작업 스케줄러 실행 점검 메모</span></a></li>
+<li><a href="#section-69"><span class="toc-num">69</span><span class="toc-text">Section 68. 보고서 목차 템플릿</span></a></li>
+<li><a href="#section-70"><span class="toc-num">70</span><span class="toc-text">Section 69. 발표 스토리라인 템플릿</span></a></li>
+<li><a href="#section-71"><span class="toc-num">71</span><span class="toc-text">Section 70. AI 결과 검증 회의록 양식</span></a></li>
+<li><a href="#section-72"><span class="toc-num">72</span><span class="toc-text">Section 71. 후속 학습 로드맵</span></a></li>
+<li><a href="#section-73"><span class="toc-num">73</span><span class="toc-text">Section 72. 용어 사전과 자기 점검표</span></a></li>
+<li><a href="#section-74"><span class="toc-num">74</span><span class="toc-text">Section 73. 사례연구 01. 지역별 시설 규모 격차를 읽는 정책 메모</span></a></li>
+<li><a href="#section-75"><span class="toc-num">75</span><span class="toc-text">Section 74. 사례연구 02. 유료·무료 구조를 함께 읽는 보고서 초안</span></a></li>
+<li><a href="#section-76"><span class="toc-num">76</span><span class="toc-text">Section 75. 사례연구 03. 주말 운영 데이터를 활용한 서비스 개선 제안</span></a></li>
+<li><a href="#section-77"><span class="toc-num">77</span><span class="toc-text">Section 76. 사례연구 04. 공공데이터포털 메타정보와 본문 데이터를 연결하는 법</span></a></li>
+<li><a href="#section-78"><span class="toc-num">78</span><span class="toc-text">Section 77. 사례연구 05. 지도화와 위치정보 해석 시 주의할 점</span></a></li>
+<li><a href="#section-79"><span class="toc-num">79</span><span class="toc-text">Section 78. 실습 문제 10선</span></a></li>
+<li><a href="#section-80"><span class="toc-num">80</span><span class="toc-text">Section 79. 프롬프트 개선 일지 작성법</span></a></li>
+<li><a href="#section-81"><span class="toc-num">81</span><span class="toc-text">Section 80. 코드 리뷰 체크리스트</span></a></li>
+<li><a href="#section-82"><span class="toc-num">82</span><span class="toc-text">Section 81. 산출물 최종 점검 체크리스트</span></a></li>
+<li><a href="#section-83"><span class="toc-num">83</span><span class="toc-text">Section 82. 학습 이후 30일 실행 계획</span></a></li>
+<li><a href="#section-84"><span class="toc-num">84</span><span class="toc-text">Section 83. 팀 적용 워크숍 실행안</span></a></li>
+<li><a href="#section-85"><span class="toc-num">85</span><span class="toc-text">Section 84. 종합 루브릭</span></a></li>
+<li><a href="#section-86"><span class="toc-num">86</span><span class="toc-text">Section 85. 현업 적용 일일 체크리스트</span></a></li>
+<li><a href="#section-87"><span class="toc-num">87</span><span class="toc-text">Section 86. 부서별 활용 시나리오 예시</span></a></li>
+<li><a href="#section-88"><span class="toc-num">88</span><span class="toc-text">Section 87. 실습 결과 제출 양식</span></a></li>
+<li><a href="#section-89"><span class="toc-num">89</span><span class="toc-text">Section 88. 종합 리뷰 질문 20</span></a></li>
+<li><a href="#section-90"><span class="toc-num">90</span><span class="toc-text">Section 89. 최종 정리</span></a></li>
+<li><a href="#section-91"><span class="toc-num">91</span><span class="toc-text">Section 90. 보강 노트. 화면 캡처를 실습 언어로 바꾸는 법</span></a></li>
+<li><a href="#section-92"><span class="toc-num">92</span><span class="toc-text">Section 91. 보강 실무해설. 노코드 분석에서 사람이 남겨야 할 판단</span></a></li>
+<li><a href="#section-93"><span class="toc-num">93</span><span class="toc-text">심화 해설 01. 노코드 데이터분석은 코드를 피하는 방법이 아니라 분석 절차를 보이게 하는 방법이다</span></a></li>
+<li><a href="#section-94"><span class="toc-num">94</span><span class="toc-text">심화 해설 02. 생성형 AI를 분석 보조자로 쓸 때의 역할 분담</span></a></li>
+<li><a href="#section-95"><span class="toc-num">95</span><span class="toc-text">심화 해설 03. 대시보드는 예쁜 화면이 아니라 반복 의사결정 도구다</span></a></li>
+<li><a href="#section-96"><span class="toc-num">96</span><span class="toc-text">심화 해설 04. 노코드 분석 결과를 보고서로 바꾸는 법</span></a></li>
+<li><a href="#section-97"><span class="toc-num">97</span><span class="toc-text">추가 사례은행. 노코드 데이터분석 실습을 교재형 해설로 바꾸기</span></a></li>
+<li><a href="#section-98"><span class="toc-num">98</span><span class="toc-text">현장 적용 장. 노코드 데이터분석을 따라하기에서 설명하기로 확장하기</span></a></li>
+<li><a href="#section-99"><span class="toc-num">99</span><span class="toc-text">현장 적용 장. 공공업무형 노코드 분석 프로젝트 사례</span></a></li>
+<li><a href="#section-100"><span class="toc-num">100</span><span class="toc-text">현장 사례 장. 노코드 분석 결과를 보고서와 대시보드로 바꾸기</span></a></li>
+<li><a href="#section-101"><span class="toc-num">101</span><span class="toc-text">기준과 사례 장. 노코드 분석을 업무 의사결정 자료로 완성하기</span></a></li>
+      </ol>
+    </aside>
+  </div>
+
+  <div class="paper-source" id="paper-source" aria-hidden="true">
+    <article class="page-source-section" data-section-index="01" data-section-title="교재 개요"><h1>생성형 AI 활용 노코드 데이터분석</h1>
+<h2>교재 개요</h2>
+<p>이 교재는 2026년 AI 데이터기반지능행정 역량강화 사업 Track 2 Module 1의 핵심 내용을, 발표 중심 슬라이드를 넘어 실제 실습과 업무 적용까지 가능한 책형 교재로 재구성한 문서이다. 따라서 단순히 슬라이드의 문구를 옮기는 데 그치지 않고, 왜 이 과목이 지금 필요한지, 어떤 준비가 필요한지, 어떤 실습 순서로 따라가야 하는지, 생성형 AI를 어디까지 믿고 어디부터 검증해야 하는지를 모두 문장으로 풀어씀.</p>
+<p>C04의 핵심은 분명하다. 데이터분석을 전문 개발자나 데이터사이언티스트만의 영역으로 남겨두지 않고, 공공 실무자가 생성형 AI와 파이썬 환경을 활용해 직접 수집, 전처리, 탐색, 시각화, 대시보드, 자동화까지 연결해보게 만드는 것이다. 여기서 말하는 노코드 데이터분석은 코드를 완전히 쓰지 않는다는 뜻이 아니라, 코드를 외워서 직접 타이핑하는 방식에서 벗어나 AI에게 정확히 지시하고, 받은 코드를 검증하고, 필요한 부분만 수정하는 실무형 접근을 뜻한다.</p>
+<p>이 교재의 목적은 네 가지이다.</p>
+<ol>
+<li>생성형 AI 시대에 분석가와 일반 실무자의 역할이 어떻게 바뀌는지 이해하게 하는 것이다.</li>
+<li>파이썬, Jupyter, Colab, 공공데이터포털, 시각화 라이브러리, HTML 대시보드 같은 실습 환경을 두려움 없이 다루게 하는 것이다.</li>
+<li>전국공공시설개방정보표준데이터를 중심으로 수집, 전처리, EDA, 시각화, 대시보드, 자동화를 단계별로 실습하게 하는 것이다.</li>
+<li>생성형 AI를 빠른 초안 도구로만 쓰는 것이 아니라, 공공조직의 보안과 검증 원칙 안에서 책임 있게 활용하게 하는 것이다.</li>
+</ol>
+<h3>학습 대상</h3>
+<ul>
+<li>파이썬을 전문 개발 언어로 배우기보다, 업무 데이터를 직접 다뤄보고 싶은 공공부문 실무자이다.</li>
+<li>생성형 AI를 문서작성 보조를 넘어 데이터 수집, 전처리, 시각화, 자동화까지 확장해보고 싶은 사용자이다.</li>
+<li>공공데이터포털, 공공시설 데이터, RSS, 웹크롤링, Jupyter Notebook을 실제 업무에 연결하고 싶은 기획·행정·정책·홍보·전산 담당자이다.</li>
+<li>코드를 외우는 방식보다, 맥락을 잘 설명해 AI에게 코드를 받는 방식이 더 적합한 학습자이다.</li>
+</ul>
+<h3>학습 이후 기대 성과</h3>
+<ul>
+<li>DX와 AX의 차이를 설명하고, 생성형 AI 시대에 분석가가 어떤 역할을 맡아야 하는지 설명할 수 있게 된다.</li>
+<li>Colab, Anaconda, python.org, Jupyter Notebook 중 학습 환경과 조직 보안 조건에 맞는 실행 환경을 선택할 수 있게 된다.</li>
+<li>CSV, XLSX, JSON, API, RSS, 웹페이지 데이터를 읽고, 생성형 AI에게 정확한 수집·전처리 코드를 요청할 수 있게 된다.</li>
+<li>전국공공시설개방정보표준데이터를 기준으로 기초 EDA, 시각화, 대시보드 제작, 자동화 스크립트 초안을 스스로 설계할 수 있게 된다.</li>
+<li>생성형 AI가 만든 코드와 설명을 무비판적으로 받아들이지 않고, 확인 포인트와 검증 절차를 함께 운영할 수 있게 된다.</li>
+</ul>
+<h3>학습 준비물</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>권장 환경</th>
+<th>활용 목적</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>웹 브라우저</td>
+<td>Chrome 또는 Edge 최신 버전</td>
+<td>Colab, 공공데이터포털, HTML 대시보드 실행</td>
+</tr>
+<tr>
+<td>파이썬 환경</td>
+<td>Google Colab 또는 로컬 Jupyter</td>
+<td>AI가 만든 코드를 단계별로 실행하고 검증</td>
+</tr>
+<tr>
+<td>데이터 파일</td>
+<td>전국공공시설개방정보표준데이터.csv</td>
+<td>수집·전처리·EDA·시각화 기본 실습</td>
+</tr>
+<tr>
+<td>보조 데이터</td>
+<td>공공데이터포털 목록 메타정보, 목록개방현황 CSV</td>
+<td>공공데이터 읽기와 비교 실습</td>
+</tr>
+<tr>
+<td>생성형 AI 도구</td>
+<td>Claude, ChatGPT, Gemini 중 1개 이상</td>
+<td>코드 초안, 설명, 해석, 보고서 구조 생성</td>
+</tr>
+<tr>
+<td>문서 도구</td>
+<td>PDF, HTML, Markdown 편집기</td>
+<td>노트북 결과를 보고서와 발표자료로 전환</td>
+</tr>
+</tbody>
+</table>
+<h3>학습 원칙</h3>
+<blockquote>
+<p>핵심 메시지: 이 과목의 본질은 코드를 암기하는 것이 아니라, AI에게 일을 맡길 수 있을 만큼 문제를 분명하게 정의하고 결과를 검증하는 습관을 기르는 데 있다.</p>
+</blockquote>
+<ul>
+<li>생성형 AI가 준 코드는 반드시 셀 단위로 실행하면서 확인한다.</li>
+<li>결과 확인 전에는 다음 단계로 넘어가지 않는 것을 원칙으로 함.</li>
+<li>공공조직 자료는 민감도와 공개 가능 범위를 먼저 판단한 뒤 AI 도구에 넣는다.</li>
+<li>하나의 대답을 정답처럼 믿지 않고, 핵심 수치와 결론은 원문 데이터로 재검증한다.</li>
+<li>실습 결과는 결국 문서와 보고 구조로 정리해야 하므로, 분석과 동시에 설명 문장도 함께 남김.</li>
+</ul>
+<h3>학습 흐름</h3>
+<table>
+<thead>
+<tr>
+<th>파트</th>
+<th>핵심 질문</th>
+<th>실습 결과물</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Part 1. 역할 전환</td>
+<td>생성형 AI 시대에 분석가는 무엇을 하는가</td>
+<td>역할 재정의 메모, 환경 선택표</td>
+</tr>
+<tr>
+<td>Part 2. 수집과 전처리</td>
+<td>어떤 데이터를 어떻게 불러오고 정리할 것인가</td>
+<td>수집 코드, 전처리 노트북</td>
+</tr>
+<tr>
+<td>Part 3. EDA</td>
+<td>데이터 안에서 무엇을 먼저 볼 것인가</td>
+<td>요약 통계, 그룹별 집계, 상관관계 메모</td>
+</tr>
+<tr>
+<td>Part 4. 시각화</td>
+<td>어떤 차트가 어떤 메시지를 가장 빨리 전달하는가</td>
+<td>정적 차트, 통계형 차트, 인터랙티브 차트</td>
+</tr>
+<tr>
+<td>Part 5. 대시보드</td>
+<td>브라우저에서 바로 쓰는 결과물은 어떻게 만드는가</td>
+<td>단일 HTML 대시보드</td>
+</tr>
+<tr>
+<td>Part 6. 자동화</td>
+<td>반복 업무를 어떤 구조로 줄일 것인가</td>
+<td>자동화 스크립트 초안</td>
+</tr>
+<tr>
+<td>Part 7. 보고와 발표</td>
+<td>노트북 결과를 상사와 동료가 읽는 문서로 어떻게 바꾸는가</td>
+<td>정책 메모, 발표 흐름, 보고서 초안</td>
+</tr>
+</tbody>
+</table>
+<h3>이 교재가 사용하는 대표 실습 데이터</h3>
+<p>이 과목은 단순 예제용 데이터가 아니라 실제 공공데이터포털에서 활용 가능한 전국공공시설개방정보표준데이터를 핵심 실습 데이터로 사용한다. 이 데이터는 지역, 시설유형, 유료 여부, 운영시간, 사용료, 면적, 위경도 등 수집, 전처리, EDA, 시각화, 대시보드 제작에 필요한 요소를 폭넓게 포함하고 있어 학습용으로 매우 적합하다. 또한 같은 폴더에 있는 공공데이터포털 목록 메타정보와 목록개방현황 CSV는 공공데이터 자산을 읽고 비교하는 보조 실습 자료로 활용 가능하다.</p></article>
+<article class="page-source-section" data-section-index="02" data-section-title="Section 01. 교과서 없는 초학문의 등장"><h2>Section 01. 교과서 없는 초학문의 등장</h2>
+<p>C04의 출발점은 기술 설명이 아니라 학습 방식의 변화에 있다. 생성형 AI는 기존 학문처럼 오랜 기간 정리된 교과서를 기반으로만 움직이지 않으며, 오히려 실무에서 등장한 새로운 프롬프트, 워크플로우, 에이전트 사용법이 먼저 퍼지고 이후에 개념으로 정리되는 흐름을 자주 보인다. 그래서 이 과목은 무엇을 외울 것인가보다 무엇을 실험하고 어떻게 검증할 것인가를 먼저 묻는 과목이다.</p>
+<p>공공부문 실무자에게 이 변화가 중요한 이유는 분명하다. 과거에는 개발팀이나 전문 분석가가 결과를 만들어 전달하는 구조가 일반적이었으나, 생성형 AI 이후에는 일반 행정 담당자도 데이터 파일과 문제 설명만 있으면 초안을 빠르게 받아볼 수 있는 시대가 되었기 때문이다. 이는 곧 분석 진입장벽이 낮아졌다는 뜻이면서 동시에, 검증 책임이 더 넓은 범위로 이동했다는 뜻이기도 함.</p>
+<p>따라서 C04를 배울 때는 “이 도구를 쓸 줄 아는가”만으로 자기 수준을 판단하면 안 된다. 더 중요한 질문은 “나는 지금 무엇을 AI에게 맡길 수 있고, 무엇은 반드시 직접 판단해야 하는가”이다. 이 질문에 답할 수 있어야 노코드 데이터분석이 단순 시연이 아니라 업무 역량으로 이어진다.</p>
+<h3>왜 실천이 이론을 앞서는가</h3>
+<p>생성형 AI 관련 도구와 프롬프트 패턴은 너무 빠르게 바뀌기 때문에, 학습자는 완벽한 정리본이 나오기를 기다리기보다 작게 실행하고, 결과를 기록하고, 다시 정리하는 순서를 익혀야 한다. 대학 학습나 전통 교재보다 유튜브, 커뮤니티, 실무자 블로그에서 먼저 등장하는 패턴이 많다는 슬라이드의 메시지도 바로 이 점을 가리킨다. 여기서 중요한 것은 유행을 무작정 따라가는 것이 아니라, 새로운 패턴을 업무 맥락에 맞게 번역하는 능력이다.</p>
+<h3>실무 적용 질문</h3>
+<ol>
+<li>지금 내 업무에서 가장 반복되는 데이터 작업은 무엇인가.</li>
+<li>그 작업에서 직접 코드를 짜는 시간이 많이 드는가, 아니면 구조를 설명하는 시간이 더 많이 드는가.</li>
+<li>지금 바로 AI에게 맡길 수 있는 가장 작은 분석 작업은 무엇인가.</li>
+<li>그 결과를 검증할 기준은 무엇인가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="03" data-section-title="Section 02. 개발자, 분석가, 실무자의 경계가 흐려지는 이유"><h2>Section 02. 개발자, 분석가, 실무자의 경계가 흐려지는 이유</h2>
+<p>슬라이드가 던지는 “개발자? 분석가? 실무자?”라는 질문은 과장된 표현이 아니다. 실제로 생성형 AI 이후에는 프로그래머가 분석 업무를 빠르게 보조하고, 분석가가 간단한 웹서비스를 만들며, 일반 실무자가 챗봇과 자동화 흐름을 설계하는 일이 늘어나고 있다. 역할 경계가 완전히 사라지는 것은 아니지만, 각 역할이 다루는 도구의 범위가 확실히 넓어지고 있다.</p>
+<p>공공부문에서 이 변화는 더 직접적으로 체감될 수 있다. 이유는 많은 행정 업무가 문서, 표, 통계, 민원 기록, 공공데이터, 보고서, 시각화처럼 정형화된 산출물로 이어지기 때문이다. 이런 자료는 생성형 AI가 구조를 파악하고 초안을 만드는 데 상대적으로 유리하며, 따라서 실무자는 개발자에게 모든 것을 넘기기보다 스스로 문제를 정리해 AI를 통해 첫 결과를 만들어보는 위치로 이동하게 된다.</p>
+<p>그렇다고 전문성이 불필요해진 것은 아니다. 오히려 각자의 전문성이 어디서 쓰이는지가 달라졌다고 보는 편이 정확하다. 개발자는 통합과 배포와 시스템 안정성에 더 집중하게 되고, 분석가는 가설과 해석과 품질 관리에 더 집중하며, 일반 실무자는 업무 맥락과 제도 조건과 보고 구조를 정의하는 데 더 큰 역할을 하게 된다.</p>
+<h3>역할이 섞일수록 더 필요한 것</h3>
+<table>
+<thead>
+<tr>
+<th>역할</th>
+<th>여전히 중요한 핵심 책이다</th>
+<th>AI 이후 더 강조되는 부분</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>개발자</td>
+<td>환경 구축, 배포, 시스템 연결</td>
+<td>AI가 만든 코드의 안정성 검토</td>
+</tr>
+<tr>
+<td>분석가</td>
+<td>변수 설계, 해석, 검증</td>
+<td>문제정의와 설명 책이다</td>
+</tr>
+<tr>
+<td>일반 실무자</td>
+<td>업무 맥락 제공, 보고 구조 설계</td>
+<td>질문 설계와 결과 적용 판단</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="04" data-section-title="Section 03. DX와 AX를 함께 읽기"><h2>Section 03. DX와 AX를 함께 읽기</h2>
+<p>C04는 데이터분석AI와 생성형AI를 서로 대체 관계로 보지 않는다. 오히려 DX와 AX라는 두 축을 함께 이해하게 함. DX는 예측, 분류, 탐지, 최적화 등 데이터 기반 의사결정의 토대를 강화하는 흐름이고, AX는 생성형 AI를 활용해 문서작성, 요약, 분석 설계, 시각화 초안, 자동화 아이디어 등 업무 생산성을 높이는 흐름에 가까움.</p>
+<p>공공조직에서는 이 둘을 섞어서 말하면 문제가 생기기 쉬움. 예를 들어 예측모델의 정확도와 생성형 AI의 문장 품질을 같은 기준으로 비교하면 안 되고, 자동 요약이 잘된다고 해서 정책 판단까지 자동화할 수 있다고 생각해도 안 된다. DX와 AX는 모두 AI의 범주에 속하지만 목적, 산출물, 검증 기준이 다르기 때문이다.</p>
+<p>그래서 실무자는 먼저 지금 다루는 일이 어느 축에 가까운지 구분해야 한다. 민원 위험 예측, 재난 취약지 탐지, 수요 예측은 DX에 더 가깝고, 데이터 설명, 코드 생성, 보고서 초안, 대시보드 UI 생성은 AX에 더 가까움. C04는 이 둘을 연결하되 혼동하지 않게 하는 과목으로 읽어야 한다.</p>
+<h3>DX와 AX를 연결하는 질문</h3>
+<ol>
+<li>지금 하고 있는 일의 최종 산출물은 예측 점수인가, 설명 문장인가.</li>
+<li>검증 기준은 정확도와 재현성인가, 근거와 표현 적절성인가.</li>
+<li>결과를 사용하는 사람은 모델 학습자에 가까운가, 보고서를 읽는 의사결정자에 가까운가.</li>
+<li>사람 검토가 필요한 지점은 어느 단계인가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="05" data-section-title="Section 04. 생성형 AI 시대의 데이터분석 프로세스"><h2>Section 04. 생성형 AI 시대의 데이터분석 프로세스</h2>
+<p>생성형 AI가 분석 과정에 들어오면 데이터분석은 더 이상 “데이터를 열고 코드를 하나씩 작성하는 일”에만 머물지 않는다. 문제 설명, 데이터 구조 파악, 수집 코드 생성, 전처리 코드 초안, 차트 추천, 해석 보조, HTML 대시보드 틀 제안, 자동화 스크립트 골격 생성까지 여러 단계가 동시에 빨라질 수 있다. 그러나 이 속도가 곧바로 품질을 보장하지는 않는다.</p>
+<p>따라서 C04는 분석가의 역할을 코드 작성자에서 설계자와 연결자로 재정의한다. 생성형 AI는 코드를 잘 만들어 주는 도구일 수 있지만, 무엇을 먼저 볼지, 어떤 데이터가 필요한지, 어떤 결과가 의사결정에 중요한지, 어떤 표현을 보고서에 쓰면 안 되는지는 여전히 사람이 정해야 하기 때문이다.</p>
+<p>이 관점은 특히 공공 실무에서 중요하다. 분석 결과는 결국 시민 서비스, 예산, 규정, 대외 설명으로 이어지므로, 빠른 초안 생성보다 결과의 해석 범위와 검증 경계가 더 중요할 수 있다. 이 점을 이해해야만 생성형 AI를 생산성 도구로 활용하면서도 조직 위험을 줄일 수 있다.</p>
+<figure class="doc-figure figure-wide full-slide-figure">
+  <div class="figure-context"><p class="figure-context-label">이미지 맥락</p><div class="figure-context-body">생성형 AI는 코드 생성뿐 아니라 결과 해석까지 도울 수 있다. 그러나 공공 실무에서는 이런 설명을 그대로 가져다 쓰기보다, 어떤 데이터와 비교 기준을 근거로 말했는지 반드시 다시 확인해야 한다.</div></div><img src="C04_AI어시스트_노코드_데이터분석_assets/slide-08-full-slide.png" alt="생성형 AI가 코드와 그래프 해석을 보조하는 화면 예시" class="full-slide-asset">
+  <figcaption><span class="figure-guide-label">읽는 법</span>: 화면 캡처는 따라 하기용 안내이면서 동시에 검증 체크포인트다. 학습자는 그림 속 결과가 왜 나왔는지, 어떤 입력과 조건을 바꾸면 달라지는지 함께 확인해야 한다.</figcaption>
+</figure>
+
+<h3>생성형 AI가 특히 잘하는 분석 보조 작업</h3>
+<ul>
+<li>데이터 파일 구조를 읽고 기본 불러오기 코드를 제안한다.</li>
+<li>요약 통계, 빈도표, 그룹별 집계, 차트 초안을 빠르게 만들어 줌.</li>
+<li>차트가 보여주는 패턴을 자연어로 설명해 줌.</li>
+<li>반복 업무를 줄이는 스크립트 골격을 빠르게 제안한다.</li>
+<li>결과를 정책 메모나 보고서 구조로 다시 정리해 줌.</li>
+</ul>
+<h3>사람이 끝까지 가져가야 하는 책이다</h3>
+<ul>
+<li>분석 질문의 범위와 우선순위 설정</li>
+<li>데이터 민감성 판단과 외부 반출 여부 결정</li>
+<li>결측치와 이상치의 의미 판단</li>
+<li>상관과 인과 구분</li>
+<li>최종 보고 문장의 표현 수위 조정</li>
+</ul></article>
+<article class="page-source-section" data-section-index="06" data-section-title="Section 05. 노코딩을 넘어 바이브코딩으로"><h2>Section 05. 노코딩을 넘어 바이브코딩으로</h2>
+<p>C04가 반복해서 강조하는 개념 중 하나가 바이브코딩이다. 노코딩이 프로그램 없이 기능을 연결하는 접근이라면, 바이브코딩은 생성형 AI와의 대화를 통해 코드를 받아 실행하고, 수정하고, 다시 요청하면서 점점 원하는 결과물에 가까워지는 방식에 가깝다. 즉 코드를 직접 한 줄씩 작성하는 부담은 줄이되, 요구사항 정의와 검증 능력은 오히려 더 강하게 요구되는 방식이다.</p>
+<p>실무자는 여기서 흔히 오해를 함. 코드를 직접 쓰지 않으면 기술적 이해가 전혀 필요 없다고 생각하기 쉬운데, 실제로는 반대이다. 코드를 외우는 부담은 줄어들 수 있으나, 어떤 라이브러리를 써야 하는지, 결과가 왜 깨졌는지, 어떤 셀에서 멈췄는지, 어떤 예외가 발생했는지는 더 구조적으로 이해해야 한다. 생성형 AI가 만든 코드를 검토할 수 있는 최소한의 안목이 필요하다는 뜻이다.</p>
+<p>따라서 바이브코딩 학습은 “프롬프트만 잘 치면 다 된다”는 식으로 가면 실패한다. 오히려 C04처럼 작은 실행 단위, 확인 포인트, 셀 단위 검증, 재요청 규칙, 결과 해석 메모까지 함께 훈련하는 편이 실무에 맞다.</p>
+<h3>바이브코딩 실천 원칙</h3>
+<ol>
+<li>한 번에 전체 프로젝트를 요구하지 말고 한 단계씩 요청한다.</li>
+<li>코드와 함께 확인 포인트를 반드시 요구한다.</li>
+<li>결과 확인 전에는 다음 단계로 넘어가지 않는다.</li>
+<li>에러가 나면 에러 전체와 직전 코드, 현재 목적을 함께 다시 제공한다.</li>
+<li>최종 산출물은 코드가 아니라 업무 결과물이라는 점을 잊지 않는다.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="07" data-section-title="Section 06. 실행 환경을 고르는 기준"><h2>Section 06. 실행 환경을 고르는 기준</h2>
+<p>C04는 특정 환경 하나만을 정답처럼 제시하지 않는다. Google Colab은 설치 부담이 적고 어디서든 접근 가능하다는 장점이 있고, 로컬 Jupyter는 인터넷 연결이 불안정하거나 내부 자료를 다루는 상황에서 유리하며, Anaconda는 패키지 관리와 가상환경 운영에 강점을 가진다. python.org 설치는 가장 기본적이지만 조직 내 보안 정책에 따라 설치 제약이 있을 수 있다.</p>
+<p>공공조직에서 환경 선택은 단순 편의 문제가 아니다. 학습용 PC, 부서 PC, 외부 네트워크 차단, 관리자 권한 제한, 패키지 설치 허용 범위 같은 조건이 실습 가능 여부를 좌우한다. 따라서 좋은 학습자는 가장 멋진 환경을 고르기보다, 지금 조직에서 실제로 돌릴 수 있는 환경을 먼저 판단해야 한다.</p>
+<h3>환경 선택표</h3>
+<table>
+<thead>
+<tr>
+<th>상황</th>
+<th>우선 고려 환경</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>설치 권한이 거의 없다</td>
+<td>Google Colab</td>
+<td>브라우저만 있으면 시작 가능</td>
+</tr>
+<tr>
+<td>내부 자료를 외부로 올리기 어려움</td>
+<td>로컬 Jupyter</td>
+<td>로컬 파일 중심 검증 가능</td>
+</tr>
+<tr>
+<td>프로젝트별 라이브러리 충돌이 걱정된다</td>
+<td>Anaconda</td>
+<td>가상환경 분리가 쉬움</td>
+</tr>
+<tr>
+<td>학습 이후 개인 PC 복습 중심</td>
+<td>python.org + Jupyter</td>
+<td>가장 가볍고 범용적이다</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="08" data-section-title="Section 07. Google Colab으로 시작하는 이유"><h2>Section 07. Google Colab으로 시작하는 이유</h2>
+<p>Google Colab은 많은 초급 단계에서는 가장 낮은 진입장벽을 제공한다. 별도 설치 없이 브라우저에서 바로 파이썬 코드를 실행할 수 있고, 셀 단위로 결과를 확인하면서 진행할 수 있으므로 생성형 AI에게 받은 코드를 한 단계씩 검증하기 좋다. 특히 실습 환경에서 여러 사용자가 동시에 같은 환경으로 실습해야 할 때, Colab은 환경 차이에서 오는 혼선을 줄여줌.</p>
+<p>하지만 Colab은 만능이 아니다. 외부 서비스이고, 세션이 끊길 수 있으며, 로컬 파일 관리 방식이 다르고, 내부 문서를 올리는 데 주의가 필요하다. 따라서 C04에서 Colab은 첫 진입 환경으로 매우 좋지만, 이후 업무 전환 시에는 로컬 Jupyter나 내부 환경으로 옮겨갈 가능성도 함께 고려해야 한다.</p>
+<figure class="doc-figure figure-wide full-slide-figure">
+  <div class="figure-context"><p class="figure-context-label">이미지 맥락</p><div class="figure-context-body">Google Colab은 설치 없이 바로 셀 단위 실습을 시작하기 좋은 환경이다. 다만 공공자료를 다룰 때는 외부 업로드 가능 범위를 반드시 먼저 점검해야 한다.</div></div><img src="C04_AI어시스트_노코드_데이터분석_assets/slide-17-full-slide.png" alt="Google Colab 데이터 확인 화면 예시" class="full-slide-asset">
+  <figcaption><span class="figure-guide-label">읽는 법</span>: 화면 캡처는 따라 하기용 안내이면서 동시에 검증 체크포인트다. 학습자는 그림 속 결과가 왜 나왔는지, 어떤 입력과 조건을 바꾸면 달라지는지 함께 확인해야 한다.</figcaption>
+</figure>
+
+<h3>Colab을 사용할 때 먼저 확인할 것</h3>
+<ul>
+<li>로그인 가능한 구글 계정이 있는가.</li>
+<li>학습용 데이터가 외부 클라우드에 올라가도 되는가.</li>
+<li>필요한 라이브러리를 설치할 수 있는가.</li>
+<li>로컬 파일과 드라이브 파일 중 어떤 방식으로 불러올 것인가.</li>
+<li>결과를 나중에 HTML이나 PDF로 내보내야 하는가.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="09" data-section-title="Section 08. 로컬 환경: Anaconda와 python.org"><h2>Section 08. 로컬 환경: Anaconda와 python.org</h2>
+<p>Anaconda는 데이터분석 학습에서 매우 오래 검증된 배포판으로, 패키지 충돌을 줄이고 가상환경을 쉽게 운영하는 데 강점이 있다. 특히 학습 이후 개인 PC나 부서 PC에서 여러 프로젝트를 병행해야 할 때, 환경 격리가 잘 되어 있다는 점이 큰 장점이 된다. 반면 설치 용량이 크고, 조직 보안 정책에 따라 설치 자체가 제한될 수 있다.</p>
+<p>python.org 설치는 가장 기본적인 방식으로, 파이썬 자체를 가볍게 설치하고 필요한 패키지만 추가하는 흐름이다. 이 방식은 단순하고 범용적이지만, 패키지와 환경을 스스로 관리해야 하므로 초보자에게는 다소 부담이 될 수 있다. 따라서 C04에서는 어느 것이 더 우월하다고 말하기보다, 어떤 상황에서 무엇이 더 현실적인지 판단하는 기준을 주는 것이 중요하다.</p>
+<h3>관공서 PC에서 특히 주의할 점</h3>
+<ul>
+<li>관리자 권한 없이 설치 가능한지 확인해야 한다.</li>
+<li><code>Add python.exe to PATH</code> 설정 누락 여부를 확인해야 한다.</li>
+<li>외부 네트워크가 차단되어 있으면 <code>pip install</code>이 실패할 수 있다.</li>
+<li>내부망 환경에서는 필요한 휠 파일이나 설치 패키지를 사전 준비하는 것이 안전하다.</li>
+<li>학습 이후 실무 전환을 위해서는 동일 버전과 동일 패키지 목록을 문서로 남겨야 한다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="10" data-section-title="Section 09. Jupyter Notebook이 C04에 적합한 이유"><h2>Section 09. Jupyter Notebook이 C04에 적합한 이유</h2>
+<p>Jupyter Notebook은 생성형 AI와 함께 데이터분석을 배우기에 가장 적합한 도구 중 하나이다. 이유는 단순하다. 코드를 한 번에 모두 실행하는 것이 아니라, 셀 단위로 실행하고, 바로 아래에서 결과를 확인하고, 필요한 경우 한 셀만 다시 고칠 수 있기 때문이다. 생성형 AI가 만든 코드를 검증하는 과정도 이 구조와 매우 잘 맞다.</p>
+<p>또한 Jupyter는 코드와 설명과 차트를 한 문서 안에 함께 담을 수 있으므로, 나중에 보고서화와 발표자료 전환에도 유리하다. 노트북 파일은 분석 흔적과 중간 메모를 모두 포함할 수 있어, 단순 실행 도구가 아니라 학습 문서이자 협업 문서로도 기능한다.</p>
+<figure class="doc-figure figure-wide full-slide-figure">
+  <div class="figure-context"><p class="figure-context-label">이미지 맥락</p><div class="figure-context-body">Jupyter Notebook은 셀 단위 실행 구조 덕분에 AI가 준 코드를 작은 단위로 검증하기 좋다. C04의 실습은 대부분 이 점을 전제로 구성하는 것이 안전하다.</div></div><img src="C04_AI어시스트_노코드_데이터분석_assets/slide-25-full-slide.png" alt="Jupyter Notebook 새 노트북 화면 예시" class="full-slide-asset">
+  <figcaption><span class="figure-guide-label">읽는 법</span>: 화면 캡처는 따라 하기용 안내이면서 동시에 검증 체크포인트다. 학습자는 그림 속 결과가 왜 나왔는지, 어떤 입력과 조건을 바꾸면 달라지는지 함께 확인해야 한다.</figcaption>
+</figure>
+
+<h3>Jupyter 기본 조작에서 반드시 익혀야 할 것</h3>
+<ol>
+<li>코드 셀과 마크다운 셀의 차이</li>
+<li>Shift + Enter, Ctrl + Enter의 의미</li>
+<li>셀 위아래 삽입과 삭제 방법</li>
+<li>실행 순서가 결과에 어떤 영향을 주는지</li>
+<li>결과가 맞는지 확인하기 위한 작은 출력 습관</li>
+</ol></article>
+<article class="page-source-section" data-section-index="11" data-section-title="Section 10. 분석 어시스트용 시스템 프롬프트 설계"><h2>Section 10. 분석 어시스트용 시스템 프롬프트 설계</h2>
+<p>C04 슬라이드에서 매우 중요한 부분이 바로 “마법 프롬프트”이다. 그러나 이것을 만능 공식으로 이해하면 안 된다. 실제로 중요한 것은 문장 한 줄이 아니라, 어떤 작업 흐름과 제약 조건을 AI에게 먼저 알려주는가이다. 즉 AI에게 “분석 어시스트”라는 역할을 부여하고, 한 번에 무엇을 해도 되고 무엇은 하지 말아야 하는지 명시하는 것이 핵심이다.</p>
+<p>좋은 시스템 프롬프트는 다섯 요소를 포함한다. 첫째, 현재 실행 환경이 무엇인지. 둘째, 필요한 라이브러리 설치 여부를 어떻게 처리할지. 셋째, 코드와 확인 포인트를 어떤 순서로 줄지. 넷째, 결과 확인 전 다음 단계로 넘어가지 않게 할지. 다섯째, 최종 목표가 단순 코드 생성인지 전략 연결까지 포함하는지. C04는 이 구조를 명시적으로 가르치므로, 학습자는 코드를 잘 쓰는 AI보다 지시를 잘 받을 수 있는 AI를 만들게 된다.</p>
+<h3>시스템 프롬프트 예시</h3>
+<pre><code class="language-text">나는 로컬 Jupyter Notebook 환경에서 데이터 분석을 수행한다.
+다음 규칙을 반드시 지켜라.
+1) 내가 요청한 작업에 대해서만 코드 작성
+2) 필요한 라이브러리 설치 코드 포함
+3) 코드 → 실행 결과 확인 포인트 순서로 제시
+4) 결과 확인 전에는 다음 단계 제안 금지
+5) 추가 분석이나 확장 제안은 요청 시에만 수행
+
+[데이터]
+파일명: 전국공공시설개방정보표준데이터.csv
+파일 위치: 노트북과 동일 폴더
+
+[최종 목표]
+- 데이터 기반으로 분석 주제 도출
+- 각 분석 결과를 바탕으로 실행 가능한 전략까지 연결
+</code></pre>
+<h3>프롬프트가 잘못되면 생기는 문제</h3>
+<ul>
+<li>AI가 한 번에 너무 많은 코드를 내놓아 검증이 어려워진다.</li>
+<li>설치 코드와 실행 코드가 섞여 초보자가 어디서부터 실행해야 할지 모르게 된다.</li>
+<li>결과 확인 없이 다음 단계 제안을 계속해 학습 흐름이 무너짐.</li>
+<li>데이터 구조를 충분히 설명하지 않아 엉뚱한 컬럼명을 사용하는 코드가 나온다.</li>
+<li>최종 목표가 모호해, 차트만 그리고 실무 해석이 빠지게 된다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="12" data-section-title="Section 11. 데이터 불러오기: 형식별 패턴 이해"><h2>Section 11. 데이터 불러오기: 형식별 패턴 이해</h2>
+<p>공공데이터는 대부분 CSV, XLSX, JSON 중 하나의 형태로 제공된다. 따라서 C04에서 가장 먼저 익혀야 하는 실무 감각은 “어떤 형식의 파일을 지금 다루고 있는가”를 빠르게 파악하는 것이다. CSV는 가볍고 범용적이지만 인코딩 문제가 자주 생기고, XLSX는 시트와 머리글 구조가 복잡할 수 있으며, JSON은 API 응답에서 데이터가 중첩된 키 안에 들어 있을 수 있다.</p>
+<p>생성형 AI에게 정확한 코드를 받으려면 형식 정보가 반드시 필요하다. 파일명이 무엇인지, 경로가 어디인지, 인코딩이 cp949인지 utf-8-sig인지, 엑셀이라면 시트명이 무엇인지, JSON이라면 어느 키 안에 실제 값이 있는지까지 알려줘야 응답 품질이 올라감. 결국 형식 설명도 데이터 리터러시의 일부이다.</p>
+<h3>형식별 요청 문장 예시</h3>
+<table>
+<thead>
+<tr>
+<th>형식</th>
+<th>LLM에게 먼저 알려야 할 정보</th>
+<th>요청 예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CSV</td>
+<td>파일명, 경로, 인코딩 후보</td>
+<td>이 CSV를 cp949 우선, 실패 시 utf-8-sig로 다시 불러와 줘</td>
+</tr>
+<tr>
+<td>XLSX</td>
+<td>파일명, 시트명, 머리글 위치</td>
+<td>이 엑셀에서 개방현황 시트만 읽고 첫 두 행은 건너뛰어 줘</td>
+</tr>
+<tr>
+<td>JSON</td>
+<td>URL 또는 파일명, 데이터가 있는 키</td>
+<td>이 JSON 구조를 먼저 출력하고 실제 items 키를 찾아 DataFrame으로 바꿔 줘</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="13" data-section-title="Section 12. 공공데이터 수집: API, RSS, 웹크롤링"><h2>Section 12. 공공데이터 수집: API, RSS, 웹크롤링</h2>
+<p>파일로 이미 내려받은 데이터만으로 충분하지 않은 경우가 많다. 이때 공공 실무자는 API, RSS, 웹크롤링이라는 세 가지 수집 경로를 이해할 필요가 있다. API는 구조화된 데이터를 반복적으로 가져오기에 적합하고, RSS는 보도자료나 정책 브리핑처럼 주기적으로 갱신되는 콘텐츠를 가볍게 수집하기 좋으며, 웹크롤링은 테이블이나 HTML 본문처럼 페이지에만 존재하는 정보를 가져올 때 유용하다.</p>
+<p>다만 수집 단계에서 생성형 AI를 쓸 때는 반드시 입력 정보를 구체적으로 줘야 한다. 요청 URL, 인증키, 응답 형식, 페이지 수, HTML 구조, User-Agent 필요 여부, 저장 형식까지 알려줘야 한다. 그렇지 않으면 AI가 너무 일반적인 예제 코드를 주거나 실제 페이지 구조와 맞지 않는 코드를 제안하기 쉽다. C04가 좋은 이유는 이 부분을 매우 실습적으로 설명해 준다는 점이다.</p>
+<h3>수집 단계 체크리스트</h3>
+<ol>
+<li>어떤 데이터를 왜 수집하는가.</li>
+<li>파일 다운로드가 가능한가, 아니면 직접 호출해야 하는가.</li>
+<li>반복 수집이 필요한가, 1회성 수집인가.</li>
+<li>접속 제한이나 이용약관 이슈는 없는가.</li>
+<li>수집 실패 시 무엇을 로그로 남길 것인가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="14" data-section-title="Section 13. API·RSS·웹크롤링 5종 실습을 읽는 법"><h2>Section 13. API·RSS·웹크롤링 5종 실습을 읽는 법</h2>
+<p>C04의 수집 파트는 단순 예시를 보여주는 것이 아니라, 공공 실무에서 자주 만나는 다섯 가지 수집 패턴을 의도적으로 배열해 둔 것이다. 공공데이터포털 API 전체 수집, 금융 보고서 PDF 일괄 수집, 정책브리핑 RSS 수집, KOSIS 테이블 수집, API와 크롤링 결합 보강은 서로 성격이 다르지만 모두 실무에 자주 나타나는 패턴이다.</p>
+<p>학습자는 이 다섯 실습을 전부 외우려 하지 말고, 각 실습이 대표하는 질문을 먼저 이해하는 편이 좋다. API 실습은 반복 수집과 구조화의 문제를, PDF 다운로드는 링크 수집과 파일 저장의 문제를, RSS는 정기 모니터링의 문제를, KOSIS는 표 구조 인식의 문제를, API+크롤링 결합은 기본 데이터와 보강 데이터를 합치는 문제를 상징한다. 이렇게 읽어야 나중에 다른 사이트와 다른 데이터에도 같은 구조를 적용할 수 있다.</p>
+<h3>실습 5종이 남기는 실무 감각</h3>
+<ul>
+<li>공공데이터포털 API: 반복 호출과 페이지네이션</li>
+<li>네이버 금융 PDF 수집: 링크 구조 분석과 파일 저장</li>
+<li>RSS 수집: 주기 모니터링과 키워드 필터링</li>
+<li>KOSIS 테이블 수집: 표 구조를 바로 데이터프레임으로 전환</li>
+<li>API+크롤링 결합: 공공 데이터와 현장 정보 보강 결합</li>
+</ul></article>
+<article class="page-source-section" data-section-index="15" data-section-title="Section 14. 전처리는 청소가 아니라 해석 준비임"><h2>Section 14. 전처리는 청소가 아니라 해석 준비이다</h2>
+<p>많은 초급 학습자가 전처리를 지루한 사전작업처럼 여기지만, 실제로는 이 단계가 분석 품질을 크게 좌우한다. 결측치가 많은 이유가 무엇인지, object 타입 컬럼이 실제 숫자를 담고 있는지, 주소에서 지역을 어떻게 나눌지, Y/N 컬럼을 어떻게 변환할지 같은 결정이 뒤의 EDA와 시각화, 보고서 해석에 직접적인 영향을 미치기 때문이다.</p>
+<p>특히 전국공공시설개방정보표준데이터 같은 공공데이터는 컬럼은 많지만 값의 품질이 균일하지 않을 수 있다. 주말운영시간 결측치는 단순 누락이 아니라 “주말 미운영”이라는 실질적 의미를 담을 수 있고, 위경도 컬럼은 숫자처럼 보여도 문자열일 수 있으며, 사용료는 무료 시설과 유료 시설이 섞여 분포가 매우 비대칭적일 수 있다. 이런 구조를 이해하지 않고 평균만 보면 쉽게 오판한다.</p>
+<h3>전처리 기록에 남겨야 할 것</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>왜 남겨야 하는가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>원본 파일명과 수집일</td>
+<td>데이터 기준 시점을 추적하기 위해</td>
+</tr>
+<tr>
+<td>인코딩과 읽기 방식</td>
+<td>재현 가능성 확보를 위해</td>
+</tr>
+<tr>
+<td>타입 변환 규칙</td>
+<td>숫자 변환 시 오류를 줄이기 위해</td>
+</tr>
+<tr>
+<td>파생변수 정의</td>
+<td>이후 해석 근거를 남기기 위해</td>
+</tr>
+<tr>
+<td>제외한 행과 이유</td>
+<td>분석 범위를 설명하기 위해</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="16" data-section-title="Section 15. EDA는 답을 확정하는 과정이 아니라 질문을 정교하게 만드는 과정"><h2>Section 15. EDA는 답을 확정하는 과정이 아니라 질문을 정교하게 만드는 과정</h2>
+<p>탐색적 데이터분석은 정답을 빨리 내리는 과정이 아니다. 오히려 데이터를 처음 열었을 때 어떤 구조가 있는지, 어떤 결측이 의미를 가지는지, 어떤 집단 차이가 있는지, 어떤 변수 쌍이 추가 탐색을 요구하는지 발견하는 과정에 가까움. 따라서 C04에서 EDA는 통계 함수를 외우는 단원이 아니라, “무엇을 먼저 봐야 하는가”를 훈련하는 단원으로 읽어야 한다.</p>
+<p>이 관점은 생성형 AI 활용과도 잘 맞다. AI는 요약 통계와 기본 집계 코드를 빨리 만들어 줄 수 있지만, 무엇을 후속 질문으로 던질지 결정하는 것은 여전히 사람의 역할이다. 예를 들어 결측치가 많다는 결과를 받은 뒤, 그것이 데이터 오류인지 운영 현실인지 해석하는 질문은 자동으로 나오지 않는다. C04는 სწორედ 이 질문 전환 능력을 키우려는 과목이다.</p></article>
+<article class="page-source-section" data-section-index="17" data-section-title="Section 16. info()와 describe()로 구조를 읽는 법"><h2>Section 16. info()와 describe()로 구조를 읽는 법</h2>
+<p><code>info()</code>와 <code>describe()</code>는 단순 초급 함수가 아니라, 전체 데이터의 건강 상태를 가장 빠르게 진단하는 도구이다. <code>info()</code>는 컬럼 수, 타입, Non-Null 개수를 한 번에 보여주므로 어떤 컬럼에 결측이 많은지, 어떤 컬럼이 object로 들어와 있는지, 데이터가 예상보다 작거나 큰지 빠르게 판단하게 해 줌. <code>describe()</code>는 수치형 컬럼의 분포를 요약해 평균, 표준편차, 사분위수, 최댓값과 최솟값을 통해 이상치 가능성을 드러냄.</p>
+<p>공공데이터를 다룰 때 중요한 점은 결측이 곧바로 오류를 뜻하지 않는다는 점이다. 예를 들어 주말운영시작시각이 비어 있다면, 주말에 아예 운영하지 않는 시설일 수 있다. 따라서 결측을 삭제 대상으로만 보는 습관은 위험하다. 결측이 정보일 가능성을 먼저 검토하는 태도가 필요하다.</p>
+<h3>구조 진단 후 바로 물어야 할 질문</h3>
+<ol>
+<li>결측이 많은 컬럼은 실제 누락인가, 구조적 공백인가.</li>
+<li>숫자처럼 보이는 컬럼이 문자열로 들어온 이유는 무엇인가.</li>
+<li>값의 범위가 상식적으로 말이 되는가.</li>
+<li>분석에 꼭 필요한 컬럼과 덜 중요한 컬럼을 구분했는가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="18" data-section-title="Section 17. 범주형 탐색과 주소 파생의 의미"><h2>Section 17. 범주형 탐색과 주소 파생의 의미</h2>
+<p>전국공공시설개방정보표준데이터는 수치형보다 범주형 탐색이 더 큰 의미를 가질 수 있다. 시설유형, 유료사용여부, 신청방법, 관리기관명 같은 범주형 컬럼은 빈도 차이와 운영 구조를 보여주며, 주소에서 시도와 시군구를 추출하는 작업은 지역 기반 비교를 가능하게 함. 즉 데이터 자체가 이미 지역 행정과 시설 운영이라는 맥락을 품고 있으므로, 범주형 탐색은 단순 빈도표가 아니라 정책 질문을 만드는 출발점이 된다.</p>
+<p>주소 파생도 매우 중요하다. 소재지도로명주소와 지번주소를 함께 보고, 비어 있으면 대체하고, 시도명을 통일하는 과정은 단순 문자열 처리 같지만 실제로는 지역 정책 비교를 가능하게 하는 핵심 준비 단계이다. 이 단계를 튼튼하게 해야 이후 시도별 시설 수, 유료 비율, 주말 운영 비율 같은 지표가 의미를 갖게 된다.</p></article>
+<article class="page-source-section" data-section-index="19" data-section-title="Section 18. 수치형 정리와 요약 통계 해석"><h2>Section 18. 수치형 정리와 요약 통계 해석</h2>
+<p>수치형 컬럼 정리는 C04 전체 실습의 핵심 중 하나이다. 사용료, 초과사용료, 수용가능인원수, 면적, 위도, 경도 컬럼이 문자열로 들어오는 경우는 흔하고, 쉼표나 공백, 특수문자가 섞여 있으면 그대로는 계산이 되지 않는다. 따라서 먼저 현재 dtype을 확인하고, 숫자로 변환하고, 변환 실패는 NaN으로 처리하며, 변환 이후 다시 요약 통계를 보는 순서가 필요하다.</p>
+<p>여기서 단순 평균만 보는 것은 위험할 수 있다. 공공시설 사용료처럼 0원과 고가 유료 시설이 함께 섞인 경우 평균은 매우 왜곡되기 쉬움. 평균과 중앙값 차이가 크다면 분포가 한쪽으로 치우쳐 있다는 뜻이고, 무료 시설과 유료 시설을 분리해서 봐야 할 필요가 생긴다. C04는 이런 해석 감각을 실습 속에서 익히게 함.</p>
+<figure class="doc-figure figure-wide full-slide-figure">
+  <div class="figure-context"><p class="figure-context-label">이미지 맥락</p><div class="figure-context-body">요약 통계 표는 숫자를 보여주는 데서 끝나지 않고, 어떤 값이 비정상적으로 크거나 작은지, 평균과 중앙값의 차이가 큰지, 결측 처리 이후 통계가 어떻게 달라졌는지 읽게 해 줌.</div></div><img src="C04_AI어시스트_노코드_데이터분석_assets/slide-41-full-slide.png" alt="수치형 컬럼 요약 통계가 표시된 Jupyter 화면" class="full-slide-asset">
+  <figcaption><span class="figure-guide-label">읽는 법</span>: 화면 캡처는 따라 하기용 안내이면서 동시에 검증 체크포인트다. 학습자는 그림 속 결과가 왜 나왔는지, 어떤 입력과 조건을 바꾸면 달라지는지 함께 확인해야 한다.</figcaption>
+</figure>
+
+<h3>해석 포인트</h3>
+<ul>
+<li>평균이 큰데 중앙값이 작다면 일부 고가 값이 평균을 끌어올린 것일 수 있다.</li>
+<li>최대값이 지나치게 크다면 입력 오류나 특수 시설 여부를 따로 확인해야 한다.</li>
+<li>위경도 범위가 한국 범위를 벗어나면 형변환 오류 가능성을 먼저 봐야 한다.</li>
+<li>면적과 수용가능인원은 이상치 제거 기준을 미리 정해 두는 것이 좋다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="20" data-section-title="Section 19. groupby와 crosstab으로 숨어 있던 차이 읽기"><h2>Section 19. groupby와 crosstab으로 숨어 있던 차이 읽기</h2>
+<p>전체 평균만 보면 보이지 않던 차이는 집단별로 나누어 볼 때 드러난다. 시도별 시설 수, 시설유형별 평균 면적, 시도별 유료시설 비율, 시설유형별 주말 운영 비율 같은 지표는 <code>groupby()</code>와 <code>crosstab()</code>만으로도 상당 부분 드러낼 수 있다. 즉 고급 모델이 없어도, 비교 기준을 어떻게 세우느냐에 따라 분석의 힘이 달라진다.</p>
+<p>공공실무자는 여기서 두 가지를 기억해야 한다. 첫째, 전체 값보다 집단별 값이 정책에 더 직접적인 경우가 많다. 둘째, 교차집계 결과는 설명 문장으로 바로 이어져야 한다. 예를 들어 “시도별 유료 비율 차이가 크다”는 문장만으로는 부족하고, “시설 수가 많은 지역이 반드시 유료 비율도 높은 것은 아니므로, 절대 규모와 비율을 구분해 해석해야 한다”는 식의 설명이 필요하다.</p></article>
+<article class="page-source-section" data-section-index="21" data-section-title="Section 20. 상관관계 분석과 LLM 해석 요청의 순서"><h2>Section 20. 상관관계 분석과 LLM 해석 요청의 순서</h2>
+<p>상관관계 분석은 데이터를 한 번 더 압축해서 보는 단계이다. 수치형 컬럼과 파생변수 간의 관계를 빠르게 탐색하고, 어떤 변수 쌍이 후속 시각화나 추가 확인을 요구하는지 판단하는 데 유용하다. 그러나 상관관계는 인과를 뜻하지 않으므로, C04에서는 히트맵을 그린 뒤 그 의미를 AI에게 곧바로 물어보되, 사람이 다시 실무 맥락으로 번역하는 흐름을 권장한다.</p>
+<p>여기서 중요한 점은 순서이다. 먼저 사람이 <code>corr()</code> 결과와 절대값이 일정 수준 이상인 변수 쌍을 확인하고, 그 다음 AI에게 “이 관계를 어떻게 해석할 수 있는지, 하지만 어떤 한계가 있는지 같이 적어 달라”고 묻는 편이 안전하다. AI에게 상관관계 표만 던지고 원인까지 단정하게 만들면 과신 위험이 커짐.</p>
+<figure class="doc-figure figure-wide full-slide-figure">
+  <div class="figure-context"><p class="figure-context-label">이미지 맥락</p><div class="figure-context-body">히트맵은 어떤 변수 쌍을 더 자세히 볼지 알려주는 지도 역할을 함. 공공 실무에서는 값 자체보다 왜 그런 패턴이 나타났는지와 어디까지 해석 가능한지가 더 중요하다.</div></div><img src="C04_AI어시스트_노코드_데이터분석_assets/slide-56-full-slide.png" alt="변수 간 상관계수 히트맵 예시" class="full-slide-asset">
+  <figcaption><span class="figure-guide-label">읽는 법</span>: 화면 캡처는 따라 하기용 안내이면서 동시에 검증 체크포인트다. 학습자는 그림 속 결과가 왜 나왔는지, 어떤 입력과 조건을 바꾸면 달라지는지 함께 확인해야 한다.</figcaption>
+</figure>
+
+<h3>상관관계 해석 질문</h3>
+<ol>
+<li>이 관계가 실제 운영 구조를 반영하는가.</li>
+<li>데이터 정제 과정에서 생긴 인위적 패턴은 아닌가.</li>
+<li>무료 시설과 유료 시설을 분리하면 결과가 달라지는가.</li>
+<li>지역별로 다시 나누어 보면 관계가 유지되는가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="22" data-section-title="Section 21. LLM에게 EDA 결과를 맡길 때의 원칙"><h2>Section 21. LLM에게 EDA 결과를 맡길 때의 원칙</h2>
+<p>슬라이드 46은 EDA 결과를 <code>ipynb</code> 또는 <code>HTML</code> 형태로 저장해 AI에게 입력하는 흐름을 보여줌. 이 방식은 매우 실용적이다. 코드 그 자체보다 실행 결과와 차트를 함께 담은 문서를 AI에게 주면, 더 자연스러운 해석과 후속 분석 방향을 받을 수 있기 때문이다. 하지만 이때도 자료를 무엇까지 줄 수 있는지, 어떤 표현은 쓰지 말아야 하는지, 어떤 값은 사람이 재검토할지를 먼저 정해야 한다.</p>
+<p>가장 안전한 방식은 AI에게 세 가지를 동시에 요구하는 것이다. 첫째, 보이는 패턴을 정리한다. 둘째, 아직 확정할 수 없는 해석을 분리하게 함. 셋째, 후속으로 더 보면 좋은 질문을 제안하게 함. 이렇게 하면 AI가 결론 기계가 아니라 탐색 보조자로 기능하게 된다.</p>
+<h3>EDA 해석용 프롬프트 예시</h3>
+<pre><code class="language-text">다음은 공공시설 개방정보 데이터의 EDA 결과임.
+1) 먼저 데이터에서 눈에 띄는 패턴 5개를 정리하고,
+2) 현재 결과만으로는 확정할 수 없는 해석 5개를 분리하고,
+3) 후속으로 추가 확인할 변수 조합과 차트를 제안해 줘.
+단, 상관관계를 인과처럼 단정하지 말고,
+공공정책 문서에 바로 쓰기 어려운 과장 표현은 피할 것.
+</code></pre></article>
+<article class="page-source-section" data-section-index="23" data-section-title="Section 22. 시각화는 코딩 과목이 아니라 메시지 설계 과목임"><h2>Section 22. 시각화는 코딩 과목이 아니라 메시지 설계 과목이다</h2>
+<p>C04의 시각화 파트는 matplotlib, seaborn, plotly를 소개하지만, 그 핵심은 라이브러리 문법을 외우게 하는 데 있지 않는다. 실제 목적은 “무엇을 보고 싶은가”와 “누구에게 보여줄 것인가”에 맞춰 가장 적절한 차트를 고르는 훈련에 있다. 막대차트, 히스토그램, 산점도, 박스플롯, 히트맵, pairplot, 누적비율 차트, 인터랙티브 차트는 모두 각기 다른 질문에 답하는 도구이다.</p>
+<p>공공부문에서 차트는 예쁘게 그리는 것보다 오해를 줄이는 것이 더 중요하다. 제목과 주석이 과장되지 않는가, 절대값과 비율을 혼동하지 않는가, 색이 과도하게 메시지를 왜곡하지 않는가, 차트 하나가 하나의 핵심 문장을 지원하는가를 먼저 봐야 한다. 생성형 AI는 차트를 빠르게 만들어 주지만, 이런 판단 기준은 사람이 가져야 한다.</p>
+<h3>차트 선택의 기준</h3>
+<table>
+<thead>
+<tr>
+<th>보고 싶은 것</th>
+<th>대표 차트</th>
+<th>실무 해석 포인트</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>지역별 규모 비교</td>
+<td>막대차트</td>
+<td>순위와 격차를 읽기 쉬움</td>
+</tr>
+<tr>
+<td>사용료 분포</td>
+<td>히스토그램</td>
+<td>무료와 유료를 분리해서 볼 필요가 있다</td>
+</tr>
+<tr>
+<td>면적과 수용인원 관계</td>
+<td>산점도, regplot</td>
+<td>이상치와 추세를 함께 확인</td>
+</tr>
+<tr>
+<td>시설유형별 요금 분포</td>
+<td>박스플롯, 바이올린플롯</td>
+<td>평균이 아니라 분포와 편차를 확인</td>
+</tr>
+<tr>
+<td>변수 전체 관계</td>
+<td>히트맵, pairplot</td>
+<td>후속 탐색 후보를 좁히는 데 유용</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="24" data-section-title="Section 23. 막대차트와 히스토그램을 실무적으로 읽는 법"><h2>Section 23. 막대차트와 히스토그램을 실무적으로 읽는 법</h2>
+<p>막대차트는 가장 익숙한 차트이지만, 제대로 설계하지 않으면 메시지가 쉽게 흐려질 수 있다. 예를 들어 시도별 시설 수를 막대차트로 그릴 때는 내림차순 정렬, 상위 집단 강조, 숫자 라벨, 한글 폰트, 적절한 x축 회전 등 기본 요소만 챙겨도 전달력이 크게 올라감. C04는 이런 실무적 디테일까지 프롬프트에 넣게 함으로써, AI에게 더 나은 시각화 코드를 받도록 설계되어 있다.</p>
+<p>히스토그램은 분포를 읽는 데 적합하다. 특히 사용료처럼 0원이 매우 많은 데이터에서는 전체 분포와 0원 제외 분포를 나란히 놓는 방식이 유용하다. 이는 단순 차트 그리기 기술이 아니라, 무료 시설과 유료 시설이 같은 변수 안에 섞여 있을 때 어떻게 해석을 분리할 것인가에 대한 분석적 판단이다.</p>
+<figure class="doc-figure figure-wide full-slide-figure">
+  <div class="figure-context"><p class="figure-context-label">이미지 맥락</p><div class="figure-context-body">AI가 생성한 막대차트 코드도 결국 사람이 읽을 수 있는 제목, 정렬 기준, 색상 강조, 숫자 라벨 같은 조건을 먼저 정의해야 완성도가 높아진다.</div></div><img src="C04_AI어시스트_노코드_데이터분석_assets/slide-49-full-slide.png" alt="Jupyter Notebook에서 막대차트 코드를 실행한 화면" class="full-slide-asset">
+  <figcaption><span class="figure-guide-label">읽는 법</span>: 화면 캡처는 따라 하기용 안내이면서 동시에 검증 체크포인트다. 학습자는 그림 속 결과가 왜 나왔는지, 어떤 입력과 조건을 바꾸면 달라지는지 함께 확인해야 한다.</figcaption>
+</figure></article>
+<article class="page-source-section" data-section-index="25" data-section-title="Section 24. seaborn과 plotly를 왜 함께 배워야 하는가"><h2>Section 24. seaborn과 plotly를 왜 함께 배워야 하는가</h2>
+<p>matplotlib이 기본 문법과 세밀한 제어에 강하다면, seaborn은 통계적 시각화의 생산성을 높여 주고 plotly는 인터랙티브 탐색 경험을 제공한다. 세 도구를 경쟁 관계로 이해하기보다, 서로 다른 상황에 맞는 층위로 이해하는 것이 좋다. 정적 보고서용 차트, 분포와 관계를 더 잘 보여주는 통계형 차트, 클릭과 hover가 가능한 HTML 차트는 서로 쓰임이 다르기 때문이다.</p>
+<p>특히 공공부문에서는 정적 문서와 인터랙티브 결과물이 모두 필요할 수 있다. 상사 보고용 PDF에는 정적 차트가 적합하지만, 실무자끼리 탐색하고 필터링하면서 보는 용도라면 plotly나 HTML 대시보드가 더 효율적일 수 있다. C04는 이 차이를 자연스럽게 연결해 준다는 점에서 유용하다.</p></article>
+<article class="page-source-section" data-section-index="26" data-section-title="Section 25. HTML·CSS·JS를 3분 안에 이해하는 관점"><h2>Section 25. HTML·CSS·JS를 3분 안에 이해하는 관점</h2>
+<p>M5는 갑자기 웹개발 이야기로 넘어가는 것처럼 보일 수 있지만, 사실은 분석 결과를 브라우저에서 바로 읽히는 형태로 바꾸는 단원이다. HTML은 구조, CSS는 스타일, JavaScript는 상호작용이라는 매우 단순한 틀만 이해해도, 단일 HTML 대시보드가 어떻게 작동하는지 파악할 수 있다. 실무자에게 필요한 것은 프론트엔드 전문 개발이 아니라, 어떤 층이 어떤 역할을 하는지 이해하는 감각이다.</p>
+<p>이 이해가 중요한 이유는 AI에게 대시보드를 요청할 때 요구사항을 더 정확히 줄 수 있기 때문이다. 사용자가 CSV를 업로드하면 어떤 계산을 해야 하는지, 어떤 카드와 차트를 보여주어야 하는지, 필터와 드릴다운이 필요한지, 별도 서버 없이 단일 파일로 돌아가야 하는지를 명시할 수 있어야 결과물이 좋아진다.</p></article>
+<article class="page-source-section" data-section-index="27" data-section-title="Section 26. 단일 HTML 대시보드는 왜 실무 친화적인가"><h2>Section 26. 단일 HTML 대시보드는 왜 실무 친화적인가</h2>
+<p>단일 HTML 대시보드는 설치와 배포 부담이 낮다. 브라우저로 열 수 있고, 로컬 파일을 바로 읽을 수 있으며, 별도 서버를 띄우지 않아도 되는 경우가 많아 학습과 실무 시연에 적합하다. 공공조직에서는 보안과 배포 절차 때문에 복잡한 웹서비스보다 이런 로컬 HTML 분석 도구가 먼저 채택될 가능성이 높다.</p>
+<p>전국공공시설개방정보표준데이터를 업로드하면 자동으로 주요 지표, 지역별 분포, 시설유형별 유·무료 구조, 사용료 분포 등을 그려 주는 대시보드는 그 자체로 실습 과제이면서, 이후 내부 도구 개발의 좋은 원형이 될 수 있다. 특히 “한 파일로 열리고 공유된다”는 점은 학습용 산출물로 매우 강한 장점이다.</p>
+<figure class="doc-figure figure-wide full-slide-figure">
+  <div class="figure-context"><p class="figure-context-label">이미지 맥락</p><div class="figure-context-body">단일 HTML 대시보드는 로컬 브라우저에서 바로 실행되는 분석 결과물의 전형적인 형태이다. 지표 카드, 차트, 파일 업로드 흐름이 한 화면에서 연결되므로 학습 효과가 높다.</div></div><img src="C04_AI어시스트_노코드_데이터분석_assets/slide-69-full-slide.png" alt="전국공공시설개방정보 분석 대시보드 예시" class="full-slide-asset">
+  <figcaption><span class="figure-guide-label">읽는 법</span>: 화면 캡처는 따라 하기용 안내이면서 동시에 검증 체크포인트다. 학습자는 그림 속 결과가 왜 나왔는지, 어떤 입력과 조건을 바꾸면 달라지는지 함께 확인해야 한다.</figcaption>
+</figure>
+
+<h3>단일 HTML 대시보드 요구사항 예시</h3>
+<ol>
+<li>브라우저에서 CSV 파일 선택이 가능해야 한다.</li>
+<li>파일 업로드 직후 기본 통계가 카드 형태로 보여야 한다.</li>
+<li>시도별 시설 수, 시설유형별 비율, 사용료 분포 같은 핵심 차트가 자동 생성되어야 한다.</li>
+<li>색상과 폰트는 읽기 쉬운 공공 문서 톤을 유지해야 한다.</li>
+<li>오류가 발생하면 사용자에게 무엇을 확인해야 하는지 알려줘야 한다.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="28" data-section-title="Section 27. 대시보드 확장은 데이터 사고를 더 깊게 만든다"><h2>Section 27. 대시보드 확장은 데이터 사고를 더 깊게 만든다</h2>
+<p>대시보드 기본형을 완성한 뒤 드롭다운 필터, 시도 클릭 후 시군구 드릴다운, 데이터 테이블 검색 기능을 추가하는 과제는 단순 개발 연습이 아니다. 이것은 사용자의 질문이 점점 더 세분화된다는 사실을 반영하는 훈련이다. 처음에는 전체 현황만 보고 싶다가도, 곧 특정 시설유형만 보고 싶고, 특정 지역만 더 자세히 보고 싶고, 원본 데이터 행을 바로 확인하고 싶어지기 때문이다.</p>
+<p>이 점에서 대시보드 확장 과제는 좋은 데이터 리터러시 훈련이기도 함. 어떤 필터를 먼저 제공해야 하는지, 어떤 드릴다운이 실제로 의미 있는지, 차트 아래 원본 데이터를 얼마나 보여주어야 신뢰가 생기는지를 계속 고민하게 만들기 때문이다.</p>
+<figure class="doc-figure figure-wide full-slide-figure">
+  <div class="figure-context"><p class="figure-context-label">이미지 맥락</p><div class="figure-context-body">대시보드 확장은 기술 난이도만 높이는 작업이 아니라, 사용자가 실제로 어떤 질문을 더 하고 싶은지 구조화하는 과정이다.</div></div><img src="C04_AI어시스트_노코드_데이터분석_assets/slide-71-full-slide.png" alt="대시보드 필터와 확장 기능 예시 화면" class="full-slide-asset">
+  <figcaption><span class="figure-guide-label">읽는 법</span>: 화면 캡처는 따라 하기용 안내이면서 동시에 검증 체크포인트다. 학습자는 그림 속 결과가 왜 나왔는지, 어떤 입력과 조건을 바꾸면 달라지는지 함께 확인해야 한다.</figcaption>
+</figure></article>
+<article class="page-source-section" data-section-index="29" data-section-title="Section 28. 파이썬 자동화는 분석 이후를 바꾸는 도구다"><h2>Section 28. 파이썬 자동화는 분석 이후를 바꾸는 도구다</h2>
+<p>C04의 자동화 파트는 매우 중요하다. 많은 학습이 수집, 전처리, 시각화에서 끝나지만 실제 업무에서 시간을 잡아먹는 것은 반복 수행이다. 매주 파일을 열고, 같은 코드로 통계를 내고, 같은 형식의 보고서를 만들고, 같은 폴더에 저장하고, 같은 메일을 보내는 작업이 반복된다면, 그 시점부터는 분석 실력만으로는 충분하지 않고 자동화 설계 능력이 필요하다.</p>
+<p>파이썬은 데이터 분석 언어이면서 동시에 범용 자동화 언어이다. 파일 복사, 폴더 정리, 엑셀 읽기, PDF 만들기, 메일 전송, 웹 접속, API 호출, 스케줄러 연동까지 하나의 흐름으로 연결할 수 있다. 그래서 C04는 자동화를 부록이 아니라 필수 단원으로 다룸.</p>
+<h3>자동화 시나리오를 잘 고르는 기준</h3>
+<ul>
+<li>매주 또는 매월 반복되는가.</li>
+<li>입력과 출력 형식이 비교적 안정적인가.</li>
+<li>사람이 하는 판단보다 기계적 반복 비중이 큰가.</li>
+<li>자동화 후 검토 포인트를 명확히 둘 수 있는가.</li>
+<li>실패했을 때 되돌릴 수 있는가.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="30" data-section-title="Section 29. 자동화 업무 카탈로그를 읽는 법"><h2>Section 29. 자동화 업무 카탈로그를 읽는 법</h2>
+<p>슬라이드 74부터 77까지는 난이도별 자동화 업무 카탈로그처럼 읽을 수 있다. 파일 다루기, 문서·데이터 가공, 시스템 연동·자동 실행, AI 에이전트·서비스 연결처럼 난이도를 나누어 보여주는 이유는, 자동화가 한 번에 거대한 시스템부터 시작되지 않기 때문이다. 실무에서는 가장 작은 반복 작업부터 줄이는 것이 더 현실적이다.</p>
+<p>초보자에게 가장 적합한 첫 자동화는 파일과 보고서 보조 수준이다. 예를 들어 CSV를 읽어 주요 통계를 계산하고 결과를 새로운 파일로 저장하거나, 여러 파일을 폴더 단위로 처리하는 작업부터 시작하면 된다. 이후 문서 템플릿 채우기, 정기 보고서 초안 생성, 메일 전송 보조, 스케줄링 순으로 확장할 수 있다.</p></article>
+<article class="page-source-section" data-section-index="31" data-section-title="Section 30. 스케줄링은 자동화의 마침표가 아니라 시작점이다"><h2>Section 30. 스케줄링은 자동화의 마침표가 아니라 시작점이다</h2>
+<p>스크립트를 한 번 실행하는 것과, 정해진 시점에 자동 실행되도록 운영하는 것은 전혀 다른 문제이다. Windows 작업 스케줄러를 통한 자동 실행은 단순 기능처럼 보이지만, 실제로는 경로, 권한, 로그, 예외 처리, 결과 저장 위치까지 함께 고려해야 하므로 운영 감각을 요구한다. C04가 스케줄링을 별도 단원으로 다루는 이유가 여기에 있다.</p>
+<p>자동 실행을 걸었다고 해서 사람의 역할이 끝나는 것도 아니다. 스크립트가 성공적으로 실행되었는지, 결과값이 상식적으로 맞는지, 입력 파일 형식이 바뀌지 않았는지, 오류 로그가 쌓이지 않았는지 주기적으로 보는 운영 규칙이 필요하다. 자동화는 사람을 없애는 것이 아니라, 사람이 어디를 봐야 하는지를 바꾸는 것이다.</p></article>
+<article class="page-source-section" data-section-index="32" data-section-title="Section 31. 노트북을 보고서와 발표자료로 바꾸는 단계"><h2>Section 31. 노트북을 보고서와 발표자료로 바꾸는 단계</h2>
+<p>분석 결과가 Jupyter Notebook 안에만 남아 있으면 실무적으로는 절반만 끝난 것이다. 상사와 동료, 협업 부서는 <code>.ipynb</code> 파일보다 HTML, PDF, PPTX, 정책 메모 형태를 더 쉽게 읽는다. C04는 이 전환 문제를 매우 현실적으로 다룸. 코드를 읽을 수 있는 사람보다 결과를 해석해야 하는 사람이 더 많기 때문이다.</p>
+<p>노트북 결과를 정리할 때는 먼저 무엇을 보여줄지 선택해야 한다. 모든 셀을 다 내보내는 것이 아니라, 핵심 통계, 의미 있는 차트, 한계 설명, 후속 조치 제안을 남기고 실험 중간 흔적은 줄이는 편이 좋다. 그다음 생성형 AI에게 요약 초안을 요청하되, 원문 수치와 차트 제목, 해석 범위를 다시 사람이 조정하는 순서가 적합하다.</p></article>
+<article class="page-source-section" data-section-index="33" data-section-title="Section 32. LLM별 보고서 작성 전략"><h2>Section 32. LLM별 보고서 작성 전략</h2>
+<p>C04는 Claude, ChatGPT, Gemini 같은 LLM별 특성을 비교해 보고서 작성 전략을 다룸. 어떤 모델은 격식체 보고서에 더 강하고, 어떤 모델은 빠른 구조 초안 생성에 강하며, 어떤 모델은 파일 업로드 경험이 더 편할 수 있다. 이 비교는 도구 우열을 가리는 목적이 아니라, 같은 분석 결과라도 어떤 도구를 쓰느냐에 따라 산출물의 문체와 구조가 달라질 수 있다는 점을 이해시키기 위함이다.</p>
+<p>공공문서에서는 특히 격식체, 표현 수위, 근거 문장, 한계 표기가 중요하므로, 보고서 초안을 AI에게 맡길 때는 모델 선택보다도 지시 구조가 중요하다. “요약 → 구조 → 섹션 → 통합”의 네 단계를 나눠 요청하는 방식은 이 점에서 매우 실무적이다. 한 번에 전체 보고서를 요구하면 후반부가 얕아지거나 과장 표현이 늘어나는 경우가 많기 때문이다.</p>
+<h3>보고서 요청 4단계</h3>
+<ol>
+<li>데이터와 분석 결과 요약</li>
+<li>보고서 목차와 섹션 구조 설계</li>
+<li>섹션별 초안 작성</li>
+<li>통합 편집과 표현 수위 조정</li>
+</ol></article>
+<article class="page-source-section" data-section-index="34" data-section-title="Section 33. 발표 슬라이드 4가지 제작 경로"><h2>Section 33. 발표 슬라이드 4가지 제작 경로</h2>
+<p>보고서가 완성되면 그 다음은 발표자료이다. C04는 보고서에서 발표 슬라이드로 넘어가는 경로를 여러 가지로 제시한다. Claude로 마크다운 슬라이드 구조를 먼저 잡는 방법, ChatGPT로 바로 PPTX 초안을 요청하는 방법, 기존 PPT 템플릿에 핵심 문장만 옮기는 방법, HTML 대시보드와 보고서를 함께 보여주는 방법 등이 모두 가능하다.</p>
+<p>여기서 중요한 것은 화려한 디자인보다 메시지 압축이다. 발표자료는 보고서보다 더 짧고 더 강한 구조가 필요하므로, 하나의 슬라이드에는 하나의 메시지만 남기는 편이 좋다. 데이터 시각화가 이미 준비되어 있다면, 슬라이드 제작은 사실상 “어떤 차트를 남기고 어떤 문장을 제목으로 올릴 것인가”의 문제로 바뀜.</p></article>
+<article class="page-source-section" data-section-index="35" data-section-title="Section 34. 공공조직에서 AI 보조 분석을 쓸 때의 보안 경계선"><h2>Section 34. 공공조직에서 AI 보조 분석을 쓸 때의 보안 경계선</h2>
+<p>C04는 생산성에만 집중하지 않고 보안과 검증도 함께 다루어야 한다. 공공자료는 개인정보, 위치정보, 비공개 내부 문서, 정책 검토 메모 등 민감도가 높은 경우가 많으므로, 외부 AI 서비스에 무엇을 넣을 수 있는지 먼저 판단해야 한다. 특히 raw 데이터 전체를 그대로 업로드하는 방식은 학습 환경에서는 편해 보여도 실무 전환 시에는 위험할 수 있다.</p>
+<p>따라서 안전한 사용 원칙이 필요하다. 민감정보는 제거하거나 익명화하고, 가능한 경우 요약 통계나 샘플 구조만 제공하며, 외부 서비스 사용 시 기관 규정을 우선 확인해야 한다. 보고서 초안 작성에 AI를 썼다면, 최종 수치와 결론은 반드시 원문 데이터로 대조해야 한다. 이런 규칙이 있어야 AI 활용이 조직 안에서 지속 가능해진다.</p>
+<h3>최소 보안·검증 체크리스트</h3>
+<ol>
+<li>입력 자료에 개인정보가 포함되어 있지 않은가.</li>
+<li>비공개 내부자료를 외부 서비스에 그대로 넣지 않았는가.</li>
+<li>AI가 제시한 핵심 수치와 결론을 다시 확인했는가.</li>
+<li>결과 문장에 과도한 단정 표현이 없는가.</li>
+<li>누가 검토했고 무엇을 수정했는지 기록이 남아 있는가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="36" data-section-title="Section 35. 캡스톤 실습은 산출물을 묶어내는 과정임"><h2>Section 35. 캡스톤 실습은 산출물을 묶어내는 과정이다</h2>
+<p>C04의 가장 좋은 마무리는 모듈별 결과를 하나의 캡스톤 실습으로 묶는 것이다. 데이터 수집과 전처리, EDA, 시각화, HTML 대시보드, 자동화 스크립트, 보고서 요약이 각각 따로 존재하면 학습은 되었지만 업무 흐름으로 전환되었다고 보기 어렵다. 반대로 하나의 주제를 정해 끝까지 연결하면, AI 보조형 데이터분석이 실제로 어떤 과정인지 몸으로 이해하게 된다.</p>
+<p>전국공공시설개방정보표준데이터는 이 캡스톤의 좋은 재료이다. 지역별 시설 규모, 유료·무료 구조, 사용료 분포, 주말 운영 여부, 시설유형 차이, 위경도 기반 분포까지 다양한 질문을 만들 수 있으며, HTML 대시보드와 자동화 스크립트로도 확장하기 좋다.</p></article>
+<article class="page-source-section" data-section-index="37" data-section-title="Section 36. 캡스톤 1단계: 데이터 준비와 질문 정의"><h2>Section 36. 캡스톤 1단계: 데이터 준비와 질문 정의</h2>
+<p>캡스톤의 첫 단계는 파일을 여는 것이 아니라 질문을 정하는 것이다. 예를 들어 “지역별 개방시설 격차가 있는가”, “시설유형별 유료 비율은 얼마나 다른가”, “주말 운영률이 낮은 시설군은 무엇인가”, “어떤 지역에서 시설 수 대비 운영 구조가 특이한가” 같은 질문을 먼저 적어야 한다. 그 다음에야 필요한 컬럼과 파생변수가 분명해진다.</p>
+<p>이 단계에서 AI는 보조 역할을 할 수 있다. 어떤 질문이 데이터로 답 가능할지, 어떤 컬럼 조합이 필요한지, 후속 차트는 무엇이 مناسب한지 추천받을 수 있다. 하지만 최종 질문 선택은 사람이 해야 한다. 조직의 관심사와 발표 목적을 가장 잘 아는 것은 사람 쪽이기 때문이다.</p></article>
+<article class="page-source-section" data-section-index="38" data-section-title="Section 37. 캡스톤 2단계: EDA 노트북 완성"><h2>Section 37. 캡스톤 2단계: EDA 노트북 완성</h2>
+<p>캡스톤의 두 번째 단계는 노트북 안에서 데이터 구조, 결측치, 수치형 정리, 지역 파생, 그룹별 집계, 교차집계, 상관관계를 정리하는 것이다. 이때 노트북은 단순 실행 파일이 아니라, 다음 사람도 읽을 수 있는 분석 기록이 되어야 한다. 각 셀 앞뒤에 짧은 설명을 붙이고, 왜 이 집계를 하는지, 어떤 한계를 주의해야 하는지를 적어두면 훨씬 좋은 결과물이 된다.</p>
+<h3>노트북에 남겨야 할 기본 블록</h3>
+<ul>
+<li>데이터 불러오기와 파일 정보</li>
+<li>구조 확인과 결측치 요약</li>
+<li>파생변수 생성 설명</li>
+<li>그룹별 집계 결과와 1문장 해석</li>
+<li>차트 생성과 차트 해석 메모</li>
+<li>후속 분석 질문 목록</li>
+</ul></article>
+<article class="page-source-section" data-section-index="39" data-section-title="Section 38. 캡스톤 3단계: 시각화와 HTML 대시보드 연결"><h2>Section 38. 캡스톤 3단계: 시각화와 HTML 대시보드 연결</h2>
+<p>캡스톤의 세 번째 단계는 분석 결과를 보는 사람 중심 구조로 바꾸는 것이다. 노트북 안에서 여러 차트를 만들었다면, 이제는 어떤 차트가 핵심이고 어떤 순서로 보여주어야 하는지 다시 정해야 한다. 주요 카드, 핵심 막대차트, 유형별 비율 차트, 사용료 분포, 지역별 필터링 구조를 HTML 대시보드로 묶으면 결과물이 훨씬 실무 친화적으로 바뀜.</p>
+<p>대시보드는 단순 예쁜 화면이 아니라 질문 순서를 반영한 인터페이스여야 한다. 사용자가 무엇을 먼저 봐야 하는지, 어떤 필터를 자주 쓸지, 원본 데이터 확인이 필요한지까지 생각해야 한다. AI는 이 골격을 빨리 만들어 줄 수 있지만, 어떤 카드와 어떤 차트가 정말 필요한지는 사람이 선택해야 한다.</p></article>
+<article class="page-source-section" data-section-index="40" data-section-title="Section 39. 캡스톤 4단계: 자동화와 보고 문서 마무리"><h2>Section 39. 캡스톤 4단계: 자동화와 보고 문서 마무리</h2>
+<p>캡스톤의 마지막 단계는 결과를 반복 가능한 형태로 묶는 것이다. 데이터 파일 경로만 바뀌면 같은 통계와 차트를 다시 만들 수 있는지, HTML 대시보드를 다시 생성할 수 있는지, 월간 보고 메모 템플릿을 자동 채울 수 있는지를 점검해야 한다. 이때부터 분석은 1회성 실습이 아니라 작은 업무 도구로 바뀜.</p>
+<p>자동화 스크립트까지 연결했다면 마지막으로 보고 메모를 써야 한다. 어떤 데이터를 썼는지, 무엇을 발견했는지, 무엇은 아직 확정할 수 없는지, 다음 조치는 무엇인지 5문장 수준으로 정리하는 훈련이 필요하다. C04는 이 보고 단계까지 포함할 때 비로소 완성된다.</p></article>
+<article class="page-source-section" data-section-index="41" data-section-title="Section 40. 워크북 01. AI 시대 분석가 역할 진단"><h2>Section 40. 워크북 01. AI 시대 분석가 역할 진단</h2>
+<p>이 워크북은 자신의 현재 위치를 점검하게 하는 파트이다. 지금 나는 코드를 직접 타이핑하는 데 익숙한 사람인지, 문제 구조를 설명하고 AI에게 초안을 받는 방식에 더 적합한 사람인지, 결과 검증에는 강하지만 시작을 어려워하는 사람인지 돌아보게 함. 역할 진단을 해야 학습 전략도 달라진다.</p>
+<h3>연습문제</h3>
+<ol>
+<li>지금 내 업무에서 직접 코드 작성보다 분석 설계가 더 중요한 작업 세 가지를 적어보라.</li>
+<li>생성형 AI를 쓰면 빨라질 작업과 오히려 더 신중해야 할 작업을 나누어 적어보라.</li>
+<li>개발자, 분석가, 실무자 역할이 섞이는 상황에서 내가 가장 강한 역할은 무엇인지 적어보라.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="42" data-section-title="Section 41. 워크북 02. 실행 환경 선택표 작성"><h2>Section 41. 워크북 02. 실행 환경 선택표 작성</h2>
+<p>실습 환경은 취향이 아니라 조건에 따라 골라야 한다. 이 이 장에서는 Colab, 로컬 Jupyter, Anaconda, python.org 중 어떤 환경이 현재 조직과 개인에게 맞는지 비교표를 직접 작성한다. 설치 권한, 보안 정책, 네트워크 상태, 복습 편의성, 협업 방식까지 넣어 보면 현실적인 선택이 가능해진다.</p>
+<h3>비교 질문</h3>
+<ol>
+<li>외부 업로드가 가능한가.</li>
+<li>관리자 권한이 필요한가.</li>
+<li>설치 후 유지보수가 쉬운가.</li>
+<li>학습 종료 후 혼자 다시 실행할 수 있는가.</li>
+<li>조직 내부 자료를 다루기에 안전한가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="43" data-section-title="Section 42. 워크북 03. 분석 어시스트 프롬프트 설계"><h2>Section 42. 워크북 03. 분석 어시스트 프롬프트 설계</h2>
+<p>좋은 프롬프트는 짧고 화려한 문장이 아니라, 작업 흐름과 제약 조건이 분명한 문장이다. 이 이 장에서는 현재 데이터 분석 업무 하나를 고른 뒤, 환경, 파일명, 작업 순서, 확인 포인트, 최종 목표를 넣은 시스템 프롬프트를 직접 작성한다.</p>
+<h3>작성 항목</h3>
+<ul>
+<li>실행 환경</li>
+<li>데이터 파일명과 위치</li>
+<li>작업 단계</li>
+<li>확인 포인트</li>
+<li>금지할 행동</li>
+<li>최종 산출물 형태</li>
+</ul></article>
+<article class="page-source-section" data-section-index="44" data-section-title="Section 43. 워크북 04. 공공데이터 수집 계획서"><h2>Section 43. 워크북 04. 공공데이터 수집 계획서</h2>
+<p>수집 전에 무엇을 왜 모으는지 정리하지 않으면, 실습은 쉽게 사이트 탐험으로 끝남. 이 이 장에서는 공공데이터포털, API, RSS, 웹크롤링 중 어떤 경로가 지금 질문에 가장 맞는지 정리한다. 특히 수집 실패 가능성과 네트워크 제한, 보안 이슈까지 함께 적는 것이 중요하다.</p>
+<h3>수집 계획서 양식</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>작성 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분석 질문</td>
+<td>무엇을 알고 싶은가</td>
+</tr>
+<tr>
+<td>수집 경로</td>
+<td>파일, API, RSS, 웹 중 무엇인가</td>
+</tr>
+<tr>
+<td>핵심 정보</td>
+<td>URL, 인증키, 시트명, 인코딩 등</td>
+</tr>
+<tr>
+<td>반복 수집 여부</td>
+<td>1회성인지 정기인지</td>
+</tr>
+<tr>
+<td>위험 요소</td>
+<td>차단, 약관, 인코딩, 구조 변경</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="45" data-section-title="Section 44. 워크북 05. 전처리 로그와 파생변수 정의서"><h2>Section 44. 워크북 05. 전처리 로그와 파생변수 정의서</h2>
+<p>전처리 결과는 기억에만 남기면 다음번에 재현되지 않는다. 이 이 장에서는 인코딩 처리, 주소 정제, 수치형 변환, 파생변수 생성, 제외 규칙을 표로 남김. 특히 주말운영 같은 파생변수는 정의를 문장으로 남겨야 이후 해석이 흔들리지 않는다.</p>
+<h3>전처리 로그 항목</h3>
+<ol>
+<li>어떤 컬럼을 변환했는가.</li>
+<li>어떤 문자열을 NaN으로 처리했는가.</li>
+<li>주소를 어떤 규칙으로 시도·시군구로 나눴는가.</li>
+<li>무료와 유료를 어떻게 구분했는가.</li>
+<li>어떤 행을 제외했고 그 이유는 무엇인가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="46" data-section-title="Section 45. 워크북 06. EDA 메모와 후속 질문 목록"><h2>Section 45. 워크북 06. EDA 메모와 후속 질문 목록</h2>
+<p>EDA의 목적은 예쁜 표를 만드는 데 있지 않는다. 이 이 장에서는 <code>info()</code>, <code>describe()</code>, <code>value_counts()</code>, <code>groupby()</code>, <code>crosstab()</code>, <code>corr()</code> 결과를 보고, 무엇을 더 봐야 하는지 적는다. 좋은 답은 결과 자체보다 후속 질문이 분명한 답이다.</p>
+<h3>기록 항목</h3>
+<ul>
+<li>가장 먼저 눈에 띈 결측 패턴</li>
+<li>집단별로 차이가 큰 지표</li>
+<li>이상치로 의심되는 값</li>
+<li>추가 시각화가 필요한 변수 쌍</li>
+<li>AI에게 물어볼 해석 질문</li>
+</ul></article>
+<article class="page-source-section" data-section-index="47" data-section-title="Section 46. 워크북 07. 시각화 평가표"><h2>Section 46. 워크북 07. 시각화 평가표</h2>
+<p>시각화는 만들고 끝나는 것이 아니라 평가해야 한다. 이 이 장에서는 차트 한 개를 고른 뒤 메시지, 정렬, 단위, 색상, 제목, 주석, 오해 가능성을 점검한다. AI가 만든 차트라도 사람이 이 표로 다시 보면 품질이 눈에 띄게 안정된다.</p>
+<h3>평가 질문</h3>
+<ol>
+<li>이 차트가 말하는 핵심 문장은 무엇인가.</li>
+<li>절대값과 비율이 혼동되지 않는가.</li>
+<li>상위 몇 개만 강조한 이유가 설명 가능한가.</li>
+<li>제목이 차트보다 과장된 결론을 말하고 있지 않은가.</li>
+<li>동일 데이터를 다른 차트로 그리면 더 나은 설명이 가능한가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="48" data-section-title="Section 47. 워크북 08. 대시보드 요구사항 명세서"><h2>Section 47. 워크북 08. 대시보드 요구사항 명세서</h2>
+<p>대시보드는 “예쁘게 만들어 줘”라고 해서 좋은 결과가 나오지 않는다. 사용자 흐름, 업로드 방식, 보여줄 지표, 필터, 오류 처리, 파일 저장 방식을 문장으로 먼저 적어야 한다. 이 워크북은 개발 요청서처럼 요구사항을 정리하게 하는 용도로 읽으면 좋다.</p>
+<h3>요구사항 항목</h3>
+<ul>
+<li>입력 파일 형식</li>
+<li>계산할 핵심 지표</li>
+<li>필수 차트 4종</li>
+<li>필터와 드릴다운 여부</li>
+<li>원본 테이블 표시 여부</li>
+<li>오류 메시지 방식</li>
+</ul></article>
+<article class="page-source-section" data-section-index="49" data-section-title="Section 48. 워크북 09. 자동화 후보 업무 발굴표"><h2>Section 48. 워크북 09. 자동화 후보 업무 발굴표</h2>
+<p>반복 업무는 자동화 후보가 될 수 있다. 이 이 장에서는 최근 1개월 동안 반복한 데이터 업무를 적고, 빈도, 시간 소요, 오류 가능성, 자동화 난이도를 기준으로 우선순위를 매김. 이렇게 하면 자동화가 막연한 기술 꿈이 아니라 구체 업무 개선 계획으로 바뀜.</p>
+<h3>우선순위 평가표</h3>
+<table>
+<thead>
+<tr>
+<th>업무</th>
+<th>반복 빈도</th>
+<th>소요 시간</th>
+<th>오류 위험</th>
+<th>자동화 우선도</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>월간 CSV 요약</td>
+<td>높다</td>
+<td>중간</td>
+<td>중간</td>
+<td>높다</td>
+</tr>
+<tr>
+<td>보고용 차트 갱신</td>
+<td>높다</td>
+<td>중간</td>
+<td>높다</td>
+<td>높다</td>
+</tr>
+<tr>
+<td>파일명 정리</td>
+<td>높다</td>
+<td>낮다</td>
+<td>낮다</td>
+<td>중간</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="50" data-section-title="Section 49. 워크북 10. 보고서와 발표자료 전환 연습"><h2>Section 49. 워크북 10. 보고서와 발표자료 전환 연습</h2>
+<p>같은 분석 결과를 노트북 설명, 정책 메모, 발표 슬라이드 제목으로 각각 다시 써보는 연습이 필요하다. 이 워크북은 코드와 표에서 출발한 결과가 어떻게 읽는 사람 중심 문장으로 바뀌어야 하는지 체감하게 함.</p>
+<h3>연습문제</h3>
+<ol>
+<li>차트 하나를 골라 정책 메모용 5문장으로 바꾸어 보라.</li>
+<li>같은 내용을 발표 슬라이드 제목 3개로 압축해 보라.</li>
+<li>AI가 써 준 초안에서 과도한 단정 표현을 5개 찾아 수정해 보라.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="51" data-section-title="Section 50. 실무 템플릿 모음"><h2>Section 50. 실무 템플릿 모음</h2>
+<p>마지막으로 이 교재를 실제 업무에 연결하기 위해 바로 사용할 수 있는 템플릿을 남김. 문제정의 템플릿, 분석 어시스트 프롬프트 템플릿, 전처리 로그 템플릿, AI 검증 메모 템플릿 네 가지를 기본형으로 제시한다. 학습자는 이 템플릿을 바탕으로 자신의 부서 양식에 맞게 조정하면 된다.</p>
+<h3>50.1 문제정의 템플릿</h3>
+<ol>
+<li>지금 해결하려는 업무 불편은 무엇인가.</li>
+<li>가장 크게 영향을 받는 대상은 누구인가.</li>
+<li>이 문제를 설명하는 데이터는 무엇인가.</li>
+<li>분석 이후 바뀌어야 할 행동은 무엇인가.</li>
+<li>현재 자료만으로 답할 수 없는 것은 무엇인가.</li>
+</ol>
+<h3>50.2 분석 어시스트 프롬프트 템플릿</h3>
+<pre><code class="language-text">나는 [환경명]에서 [파일명]을 분석하려고 한다.
+다음 규칙을 지켜라.
+1) 필요한 코드만 단계별로 제시
+2) 각 단계마다 확인 포인트 포함
+3) 결과 확인 전 다음 단계 제안 금지
+4) 과도한 추론 대신 데이터 기반 설명 우선
+5) 최종적으로 실행 가능한 후속 분석 질문 제안
+</code></pre>
+<h3>50.3 전처리 로그 템플릿</h3>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>처리 내용</th>
+<th>이유</th>
+<th>확인 결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>인코딩 재시도</td>
+<td>cp949 우선 확인</td>
+<td>정상 불러오기 완료</td>
+</tr>
+<tr>
+<td>2</td>
+<td>주소 정제</td>
+<td>지역 파생 준비</td>
+<td>시도 컬럼 생성</td>
+</tr>
+<tr>
+<td>3</td>
+<td>숫자형 변환</td>
+<td>사용료·면적 계산 가능화</td>
+<td>NaN 변환 건수 확인</td>
+</tr>
+</tbody>
+</table>
+<h3>50.4 AI 검증 메모 템플릿</h3>
+<ol>
+<li>AI에게 맡긴 작업은 무엇인가.</li>
+<li>원문 데이터와 함께 준 정보는 무엇인가.</li>
+<li>AI 결과 중 그대로 사용한 부분은 무엇인가.</li>
+<li>사람이 수정하거나 삭제한 부분은 무엇인가.</li>
+<li>다음 요청 시 프롬프트를 어떻게 개선할 것인가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="52" data-section-title="Section 51. 마무리 확장 읽기"><h2>Section 51. 마무리 확장 읽기</h2>
+<p>C04를 끝까지 읽고 나면 중요한 것은 “이제 파이썬을 배웠다”는 감각이 아니라, “이제 나는 AI에게 데이터분석을 맡길 수 있을 만큼 문제를 구조화할 수 있다”는 감각이어야 한다. 이 과목은 코딩 능력 자체보다, AI와 함께 데이터를 다루는 실무자의 태도와 절차를 훈련하는 과목이기 때문이다.</p>
+<p>앞으로 이 과목을 실제 업무에 붙일 때는 항상 같은 질문으로 돌아오면 된다. 지금 무엇을 알고 싶은가. 어떤 데이터를 써야 하는가. AI에게 어디까지 맡길 수 있는가. 무엇을 사람이 최종 확인해야 하는가. 이 네 질문이 흔들리지 않으면 노코드 데이터분석은 유행이 아니라 지속 가능한 업무 방식이 될 수 있다.</p></article>
+<article class="page-source-section" data-section-index="53" data-section-title="Section 52. 프롬프트 패턴 카탈로그"><h2>Section 52. 프롬프트 패턴 카탈로그</h2>
+<p>같은 모델을 써도 어떤 프롬프트 패턴을 쓰느냐에 따라 결과물 품질이 크게 달라진다. 따라서 C04 이후 실무에 바로 적용하려면, 작업 유형별로 자주 쓰는 프롬프트 틀을 몇 가지 가지고 있는 편이 좋다. 이 카탈로그는 분석 실무에서 특히 자주 쓰는 다섯 패턴을 정리한 것이다.</p>
+<table>
+<thead>
+<tr>
+<th>패턴명</th>
+<th>쓰는 상황</th>
+<th>핵심 문장</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>단계 분리형</td>
+<td>초보자 실습, 오류 예방</td>
+<td>한 단계씩 제시하고 결과 확인 전 다음 단계 금지</td>
+</tr>
+<tr>
+<td>검증 포함형</td>
+<td>숫자·통계 작업</td>
+<td>코드 뒤에 확인 포인트와 예상 출력 형태 포한다</td>
+</tr>
+<tr>
+<td>비교 설명형</td>
+<td>정책 보고, 브리핑</td>
+<td>결과 차이를 표와 문장으로 함께 설명</td>
+</tr>
+<tr>
+<td>재사용형</td>
+<td>반복 업무 자동화</td>
+<td>함수화와 파일 경로 변수화를 포한다</td>
+</tr>
+<tr>
+<td>공공문서형</td>
+<td>보고서 초안 작성</td>
+<td>과장 표현 금지, 근거와 한계 분리</td>
+</tr>
+</tbody>
+</table>
+<h3>패턴 1. 단계 분리형</h3>
+<pre><code class="language-text">지금은 1단계만 수행해 줘.
+코드는 실행 가능한 최소 단위로 작성하고,
+실행 후 내가 확인해야 할 출력값을 함께 알려줘.
+내가 결과를 붙여넣기 전까지 2단계로 넘어가지 마.
+</code></pre>
+<h3>패턴 2. 검증 포함형</h3>
+<pre><code class="language-text">다음 작업을 수행하는 코드를 작성하되,
+각 단계 뒤에 &quot;확인 포인트&quot;를 반드시 한 줄씩 넣어 줘.
+확인 포인트에는 컬럼 수, 결측치 수, 행 수, 상위 5행처럼
+실행 직후 눈으로 검증 가능한 항목만 적어 줘.
+</code></pre>
+<h3>패턴 3. 공공문서형</h3>
+<pre><code class="language-text">다음 분석 결과를 바탕으로 공공기관 내부 보고용 초안을 작성해 줘.
+단, 과장 표현과 단정 표현은 피하고,
+확정 가능한 내용과 추가 확인이 필요한 내용을 분리해 줘.
+</code></pre></article>
+<article class="page-source-section" data-section-index="54" data-section-title="Section 53. 단계별 확인 포인트 사전"><h2>Section 53. 단계별 확인 포인트 사전</h2>
+<p>생성형 AI를 쓰는 실습에서 가장 중요한 습관 중 하나는 단계마다 눈으로 검증할 포인트를 갖는 것이다. AI가 준 코드가 길어질수록, 어디서부터 틀렸는지 추적하기가 어려워진다. 그래서 작업 유형별로 최소 확인 포인트를 미리 정해 두는 편이 좋다.</p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>최소 확인 포인트</th>
+<th>왜 필요한가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>파일 읽기</td>
+<td>행 수, 열 수, 컬럼 목록</td>
+<td>파일이 제대로 열렸는지 확인</td>
+</tr>
+<tr>
+<td>타입 변환</td>
+<td>dtype 변화 전후 비교</td>
+<td>숫자 계산 가능 여부 확인</td>
+</tr>
+<tr>
+<td>결측 처리</td>
+<td>컬럼별 결측치 수</td>
+<td>과도한 삭제 방지</td>
+</tr>
+<tr>
+<td>그룹 집계</td>
+<td>상위 5행 표 출력</td>
+<td>정렬 기준과 집계 기준 검토</td>
+</tr>
+<tr>
+<td>차트 생성</td>
+<td>제목, 축 라벨, 범례</td>
+<td>차트 해석 혼선 방지</td>
+</tr>
+<tr>
+<td>자동화 저장</td>
+<td>저장 경로, 파일 존재 여부</td>
+<td>후속 단계 누락 방지</td>
+</tr>
+</tbody>
+</table>
+<h3>확인 포인트를 문장으로 남기는 예시</h3>
+<ul>
+<li>파일 읽기 후에는 <code>df.shape</code>와 <code>df.head()</code>를 보고 예상한 데이터가 맞는지 적는다.</li>
+<li>전처리 후에는 새로 생성한 컬럼 목록과 샘플 5행을 적는다.</li>
+<li>차트 후에는 “차트가 말하는 한 문장”을 적는다.</li>
+<li>자동화 후에는 생성된 파일명을 실제 폴더와 대조한다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="55" data-section-title="Section 54. CSV, 엑셀, JSON에서 자주 만나는 오류 대응법"><h2>Section 54. CSV, 엑셀, JSON에서 자주 만나는 오류 대응법</h2>
+<p>실무자는 코드 문법 오류보다 파일 관련 오류를 더 자주 만남. 인코딩 오류, 시트명 오타, 머리글 위치 오류, JSON 키 경로 오판, 파일 경로 오기입이 대표적이다. 이 문제는 고급 기술 문제가 아니라 입력 정보와 검증 습관의 문제인 경우가 많다.</p>
+<h3>오류별 대응표</h3>
+<table>
+<thead>
+<tr>
+<th>오류 상황</th>
+<th>가장 흔한 원인</th>
+<th>우선 대응</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UnicodeDecodeError</td>
+<td>cp949와 utf-8 혼동</td>
+<td>cp949 우선, 실패 시 utf-8-sig 재시도</td>
+</tr>
+<tr>
+<td>Worksheet not found</td>
+<td>시트명 오타</td>
+<td><code>ExcelFile().sheet_names</code>로 실제 시트명 확인</td>
+</tr>
+<tr>
+<td>KeyError in JSON</td>
+<td>데이터 키 경로 오판</td>
+<td>최상위 키와 하위 키 구조 먼저 출력</td>
+</tr>
+<tr>
+<td>FileNotFoundError</td>
+<td>경로 오타, 상대경로 문제</td>
+<td>현재 작업 폴더 출력 후 경로 확인</td>
+</tr>
+<tr>
+<td>ParserError</td>
+<td>구분자나 헤더 구조 문제</td>
+<td><code>sep</code>, <code>header</code>, <code>skiprows</code> 후보 재검토</td>
+</tr>
+</tbody>
+</table>
+<h3>AI에게 에러를 다시 보낼 때의 규칙</h3>
+<ol>
+<li>에러 전체를 잘라내지 말고 그대로 붙여 넣는다.</li>
+<li>직전 코드와 현재 목적을 함께 제공한다.</li>
+<li>현재 작업 폴더와 파일명을 함께 알려 줌.</li>
+<li>내가 기대한 출력 형태를 같이 설명한다.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="56" data-section-title="Section 55. API 호출 장애 대응 가이드"><h2>Section 55. API 호출 장애 대응 가이드</h2>
+<p>API 실습은 성공하면 매우 깔끔하지만, 실제 실습 환경과 업무 현장에서는 실패 가능성도 높다. 인증키 누락, URL 오타, 파라미터 이름 오기재, 응답 형식 변경, 네트워크 차단, 하루 호출 제한이 대표적이다. 그래서 API 실습은 단순 호출 성공보다 장애 원인을 빠르게 좁혀 가는 훈련으로 접근하는 편이 좋다.</p>
+<h3>API 디버깅 순서</h3>
+<ol>
+<li>상태 코드가 200인지 확인한다.</li>
+<li>응답 본문을 일부 출력해 실제 형식을 확인한다.</li>
+<li><code>items</code>, <code>data</code>, <code>response</code> 같은 핵심 키가 존재하는지 확인한다.</li>
+<li>한 페이지 테스트 후 전체 페이지 반복으로 넘어감.</li>
+<li>저장 전 행 수와 중복 여부를 확인한다.</li>
+</ol>
+<h3>AI에게 요청할 때 포함해야 할 정보</h3>
+<ul>
+<li>요청 URL 전체</li>
+<li>서비스키 위치와 인코딩 여부</li>
+<li>응답 형식이 JSON인지 XML인지</li>
+<li>페이지당 건수와 전체 반복 여부</li>
+<li>실패 시 로그를 어떻게 남길지</li>
+</ul></article>
+<article class="page-source-section" data-section-index="57" data-section-title="Section 56. 웹크롤링의 윤리와 안정화 원칙"><h2>Section 56. 웹크롤링의 윤리와 안정화 원칙</h2>
+<p>웹크롤링은 기술적으로 가능하다고 해서 언제나 허용되는 것은 아니다. 서비스 이용약관, robots 정책, 요청 빈도, User-Agent 설정, 다운로드 범위를 고려해야 한다. 특히 공공기관 학습에서는 “할 수 있다”보다 “어디까지 하는 것이 적절한가”를 함께 가르쳐야 한다.</p>
+<p>안정화 측면에서도 기본 규칙이 필요하다. 과도한 반복 요청을 피하고, 지연을 두고, 실패한 URL만 따로 기록하며, HTML 구조가 바뀌면 전체 크롤러를 다시 확인해야 한다. 생성형 AI는 BeautifulSoup 코드 초안을 잘 만들어 주지만, 실제 사이트 구조는 자주 바뀌므로 구조 확인은 사람이 다시 해야 한다.</p>
+<h3>웹크롤링 실습 시 운영 원칙</h3>
+<ul>
+<li>학습 목적 범위에서 소량 페이지를 대상으로 함.</li>
+<li>다운로드 범위를 명시적으로 제한한다.</li>
+<li>실패 로그를 남겨 재시도 가능하게 함.</li>
+<li>제목, 링크, 날짜처럼 꼭 필요한 정보부터 수집한다.</li>
+<li>사이트 구조가 바뀌면 선택자부터 다시 확인한다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="58" data-section-title="Section 57. 공공데이터 품질 점검표"><h2>Section 57. 공공데이터 품질 점검표</h2>
+<p>공공데이터는 공개됐다고 해서 곧바로 분석 가능 품질이라는 뜻은 아니다. 수집 시점 차이, 기관별 입력 편차, 누락, 의미가 불분명한 코드값, 주소 체계 차이, 무료와 0원의 혼재 등 품질 이슈가 자주 존재한다. 따라서 본격 EDA 전에 데이터 품질 점검표를 한 번 작성해 두면 이후 해석 오류를 많이 줄일 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>점검 항목</th>
+<th>질문</th>
+<th>예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>기준 시점</td>
+<td>언제 수집된 데이터인가</td>
+<td>2026-03-31 기준</td>
+</tr>
+<tr>
+<td>공간 범위</td>
+<td>전국 전체인가, 일부 지역인가</td>
+<td>전국 시도 포함 여부</td>
+</tr>
+<tr>
+<td>값 정의</td>
+<td>Y/N, 유료/무료가 혼재하는가</td>
+<td>유료사용여부 표기 통일 필요</td>
+</tr>
+<tr>
+<td>주소 품질</td>
+<td>도로명과 지번이 모두 있는가</td>
+<td>일부는 지번만 존재</td>
+</tr>
+<tr>
+<td>수치형 품질</td>
+<td>쉼표, 문자, 단위가 섞였는가</td>
+<td>사용료 문자열 포함 가능</td>
+</tr>
+<tr>
+<td>결측 의미</td>
+<td>단순 누락인가, 미운영인가</td>
+<td>주말운영시간 결측 해석</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="59" data-section-title="Section 58. 결측치 처리 의사결정 프레임"><h2>Section 58. 결측치 처리 의사결정 프레이다</h2>
+<p>결측치는 삭제할 것인지, 대체할 것인지, 별도 범주로 둘 것인지 결정해야 한다. 이 결정은 분석 결과를 크게 바꿀 수 있으므로, 기계적으로 처리하면 안 된다. C04에서는 주말운영시간 결측처럼 구조적 의미를 가질 수 있는 결측을 다루므로, 결측치를 의미 중심으로 분류하는 프레임이 유용하다.</p>
+<h3>결측치 판단 3분류</h3>
+<ol>
+<li>구조적 결측: 값이 없는 것 자체가 의미인 경우. 예: 주말 미운영.</li>
+<li>우발적 결측: 입력 누락이나 전송 오류로 보이는 경우.</li>
+<li>분석상 제외 결측: 현재 질문과 무관하거나 너무 희소하여 제외하는 경우.</li>
+</ol>
+<h3>처리 기록 템플릿</h3>
+<table>
+<thead>
+<tr>
+<th>컬럼</th>
+<th>결측 비율</th>
+<th>결측 해석</th>
+<th>처리 방식</th>
+<th>주의점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>주말운영시작시각</td>
+<td>높다</td>
+<td>주말 미운영 가능성</td>
+<td>파생변수 생성 후 유지</td>
+<td>삭제 금지</td>
+</tr>
+<tr>
+<td>위도</td>
+<td>낮다</td>
+<td>누락 또는 위치정보 부재</td>
+<td>지도 분석에서만 제외</td>
+<td>전체 삭제 금지</td>
+</tr>
+<tr>
+<td>사용료</td>
+<td>중간</td>
+<td>무료/누락 혼재 가능</td>
+<td>원본과 0 구분 확인</td>
+<td>해석 주의</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="60" data-section-title="Section 59. 이상치 판단 시나리오"><h2>Section 59. 이상치 판단 시나리오</h2>
+<p>이상치는 눈에 띈다고 해서 모두 제거하면 안 된다. 면적이 매우 큰 시설은 실제 대형 체육시설일 수 있고, 사용료가 높은 값은 특수 시설 운영 정책을 반영할 수 있다. 반대로 음수 사용료나 한국 범위를 벗어난 위경도는 입력 오류일 가능성이 높다. 따라서 이상치는 수치 크기보다 업무 맥락과 함께 판단해야 한다.</p>
+<h3>이상치 판단 질문</h3>
+<ol>
+<li>이 값이 제도상 가능성이 있는가.</li>
+<li>같은 기관, 같은 지역에서 비슷한 값이 반복되는가.</li>
+<li>단위 오류일 가능성은 없는가.</li>
+<li>제외 시 결과가 크게 달라지는가.</li>
+<li>별도 집단으로 보는 편이 더 적절한가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="61" data-section-title="Section 60. 지역 파생변수 표준화 사전"><h2>Section 60. 지역 파생변수 표준화 사전</h2>
+<p>지역 분석의 품질은 주소 정제 수준에 크게 좌우된다. 서울특별시와 서울, 세종특별자치시와 세종, 전북특별자치도와 전북처럼 표기가 혼재할 수 있으므로, 분석 전에 표준화 사전을 만들어 두는 편이 좋다. 이는 지도 시각화, 그룹 집계, 보고 문구 일관성에 모두 영향을 줌.</p>
+<h3>시도 표준화 예시</h3>
+<table>
+<thead>
+<tr>
+<th>원본 표기</th>
+<th>표준 표기</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>서울특별시</td>
+<td>서울</td>
+</tr>
+<tr>
+<td>부산광역시</td>
+<td>부산</td>
+</tr>
+<tr>
+<td>대구광역시</td>
+<td>대구</td>
+</tr>
+<tr>
+<td>경기도</td>
+<td>경기</td>
+</tr>
+<tr>
+<td>강원특별자치도</td>
+<td>강원</td>
+</tr>
+<tr>
+<td>전북특별자치도</td>
+<td>전북</td>
+</tr>
+<tr>
+<td>제주특별자치도</td>
+<td>제주</td>
+</tr>
+</tbody>
+</table>
+<h3>지역 파생 작업 시 주의사항</h3>
+<ul>
+<li>도로명주소와 지번주소 중 우선순위를 미리 정한다.</li>
+<li>비어 있을 때는 대체 컬럼을 사용한다.</li>
+<li>시군구가 없는 경우는 미분류로 두되 비율을 따로 봄.</li>
+<li>표준화 사전은 코드와 문서 양쪽에 함께 남김.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="62" data-section-title="Section 61. EDA 해석 문장 은행"><h2>Section 61. EDA 해석 문장 은행</h2>
+<p>분석 결과를 읽는 사람은 코드가 아니라 문장을 먼저 읽는다. 따라서 EDA 결과를 설명하는 기본 문장 틀을 몇 가지 갖고 있으면 실무 속도가 빨라진다. 이 문장 은행은 그대로 복사하는 용도가 아니라, 숫자를 넣어 빠르게 설명 초안을 만드는 데 목적이 있다.</p>
+<h3>집계 결과 설명 문장</h3>
+<ul>
+<li>전체 시설 수는 많은 편이지만, 지역 간 편차가 커서 절대 규모만으로는 운영 특성을 설명하기 어려움.</li>
+<li>시설 수가 많은 지역이 반드시 유료 비율도 높은 것은 아니므로, 규모와 비율을 분리해 해석할 필요가 있다.</li>
+<li>특정 시설유형은 평균보다 중앙값이 더 해석 가치가 크며, 이는 일부 고가 시설이 평균을 끌어올린 결과로 볼 수 있다.</li>
+<li>결측이 많은 컬럼은 데이터 오류라기보다 운영 방식의 부재를 반영할 가능성이 있어 별도 해석이 필요하다.</li>
+<li>상관관계는 관찰되지만 인과로 단정하기에는 추가 변수 확인이 필요하다.</li>
+</ul>
+<h3>한계 표기 문장</h3>
+<ul>
+<li>본 결과는 공개 데이터 기준으로 산출된 것으로, 기관별 입력 편차가 반영될 수 있다.</li>
+<li>일부 주소와 운영시간 정보는 결측 또는 표기 불일치가 있어 해석 시 주의가 필요하다.</li>
+<li>무료와 누락 값이 혼재했을 가능성이 있으므로 사용료 관련 해석은 추가 점검이 필요하다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="63" data-section-title="Section 62. 시각화 캡션과 보고서 주석 문장 은행"><h2>Section 62. 시각화 캡션과 보고서 주석 문장 은행</h2>
+<p>차트는 데이터보다 먼저 보이는 요소이므로, 제목과 캡션이 과장되면 잘못된 메시지가 굳어질 수 있다. 이 섹션은 차트 캡션을 신중하게 쓰기 위한 기본 문장 틀을 정리한다.</p>
+<h3>캡션 문장 예시</h3>
+<ul>
+<li>시도별 공공시설 수는 지역 규모 차이를 보여 주지만, 인구와 면적을 고려한 상대 비교는 별도 분석이 필요하다.</li>
+<li>사용료 분포는 무료 시설과 유료 시설이 함께 포함되어 있어 전체 평균만으로는 운영 특성을 설명하기 어려움.</li>
+<li>시설유형별 유료 비율은 유형 간 운영 방식 차이를 시사하지만, 기관별 정책과 지역 조건을 함께 봐야 한다.</li>
+<li>주말 운영 비율 차이는 지역 및 시설유형에 따라 상이하며, 결측값 해석에 따라 일부 수치가 달라질 수 있다.</li>
+<li>히트맵은 변수 간 동행 패턴을 보여 주는 참고 자료이며, 원인 관계를 직접 입증하지는 않는다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="64" data-section-title="Section 63. HTML 대시보드 화면 설계 패턴"><h2>Section 63. HTML 대시보드 화면 설계 패턴</h2>
+<p>좋은 대시보드는 차트의 수보다 질문의 순서가 중요하다. 사용자가 파일을 올린 뒤 가장 먼저 알아야 할 것은 전체 건수, 유료 비율, 평균 사용료, 주말 운영 비율 같은 핵심 지표일 가능성이 높다. 그 다음에 지역별, 유형별, 분포형, 상세 테이블 순서로 내려가는 것이 일반적이다.</p>
+<h3>기본 화면 구조</h3>
+<ol>
+<li>파일 업로드 영역</li>
+<li>핵심 KPI 카드 4개</li>
+<li>지역별 시설 수 차트</li>
+<li>유형별 유·무료 비율 차트</li>
+<li>사용료 또는 면적 분포 차트</li>
+<li>원본 데이터 요약 테이블</li>
+</ol>
+<h3>확장 화면 구조</h3>
+<ul>
+<li>상단 필터 바: 시도, 시설유형, 유료 여부</li>
+<li>좌측 요약 카드: 필터 결과에 따라 재계산</li>
+<li>중앙 차트: 드릴다운 가능한 핵심 차트</li>
+<li>하단 테이블: 선택한 집단의 원본 행 일부 표시</li>
+</ul></article>
+<article class="page-source-section" data-section-index="65" data-section-title="Section 64. 대시보드 UX 점검표"><h2>Section 64. 대시보드 UX 점검표</h2>
+<p>대시보드는 코드가 돌아간다고 끝나는 것이 아니라, 실제 사용자가 이해하고 조작할 수 있어야 한다. 그래서 최소한의 UX 점검표를 갖고 있어야 한다. 공공조직 내부 도구는 더더욱 화려함보다 읽기 쉬움, 오류가 나도 당황하지 않는 구조, 필터 적용 결과의 명확성이 중요하다.</p>
+<table>
+<thead>
+<tr>
+<th>점검 항목</th>
+<th>질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>첫 화면 메시지</td>
+<td>사용자가 첫 5초 안에 무엇을 해야 하는지 아는가</td>
+</tr>
+<tr>
+<td>파일 업로드</td>
+<td>지원 형식과 오류 메시지가 분명한가</td>
+</tr>
+<tr>
+<td>KPI 카드</td>
+<td>무엇을 집계한 값인지 명확한가</td>
+</tr>
+<tr>
+<td>차트 제목</td>
+<td>질문 형태로 읽혀도 자연스러운가</td>
+</tr>
+<tr>
+<td>필터 적용</td>
+<td>적용 결과가 즉시 반영되는가</td>
+</tr>
+<tr>
+<td>원본 확인</td>
+<td>차트와 원본 데이터의 연결이 보이는가</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="66" data-section-title="Section 65. 자동화 스크립트 구조 템플릿"><h2>Section 65. 자동화 스크립트 구조 템플릿</h2>
+<p>반복 분석 스크립트는 한 파일 안에 모든 코드를 길게 쓰기보다, 입력, 처리, 저장, 로그라는 블록으로 나누어 두는 편이 좋다. 그래야 AI에게도 더 정확한 요청을 줄 수 있고, 나중에 일부 단계만 바꾸기도 쉬움.</p>
+<h3>구조 예시</h3>
+<pre><code class="language-text">1. 설정 블록: 입력 폴더, 출력 폴더, 파일명, 날짜 변수
+2. 읽기 블록: CSV/XLSX 읽기, 인코딩 재시도
+3. 처리 블록: 타입 변환, 파생변수 생성, 집계
+4. 산출 블록: 표 저장, 차트 저장, HTML 저장
+5. 기록 블록: 로그 출력, 오류 파일 저장
+</code></pre>
+<h3>AI 요청 예시</h3>
+<pre><code class="language-text">월간 보고서 자동화 스크립트를 작성해 줘.
+단, 설정 블록, 읽기 블록, 처리 블록, 저장 블록, 로그 블록으로 나누고,
+각 블록 위에 짧은 주석을 붙여 줘.
+</code></pre></article>
+<article class="page-source-section" data-section-index="67" data-section-title="Section 66. 로그와 오류 처리 템플릿"><h2>Section 66. 로그와 오류 처리 템플릿</h2>
+<p>자동화가 실무 도구가 되려면 실패했을 때 무엇이 잘못됐는지 남겨야 한다. 화면에만 에러가 지나가면 다음날 다시 똑같은 문제를 겪게 된다. 따라서 최소한 성공 건수, 실패 건수, 실패 파일명, 오류 메시지, 저장 위치는 남기는 구조가 필요하다.</p>
+<h3>로그 기본 항목</h3>
+<ul>
+<li>실행 시작 시각</li>
+<li>입력 파일명과 행 수</li>
+<li>처리 완료 건수</li>
+<li>저장된 산출물 경로</li>
+<li>실패 건수와 오류 메시지</li>
+<li>실행 종료 시각</li>
+</ul>
+<h3>운영 관점에서 로그를 보는 이유</h3>
+<ol>
+<li>입력 파일 구조가 바뀌었는지 알 수 있다.</li>
+<li>특정 단계에서 반복 실패하는지 파악 가능하다.</li>
+<li>보고서나 대시보드가 생성되지 않은 이유를 추적할 수 있다.</li>
+<li>수동 재실행 대상을 빠르게 좁힐 수 있다.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="68" data-section-title="Section 67. Windows 작업 스케줄러 실행 점검 메모"><h2>Section 67. Windows 작업 스케줄러 실행 점검 메모</h2>
+<p>Windows 작업 스케줄러는 공공조직 환경에서 비교적 접근 가능한 자동 실행 수단이다. 그러나 스케줄만 걸면 끝나는 것이 아니라, 어떤 계정으로 실행되는지, 네트워크 드라이브에 접근 가능한지, 실행 시점에 파이썬 경로가 인식되는지, 출력 파일이 어디에 저장되는지 함께 검토해야 한다.</p>
+<h3>작업 스케줄러 적용 전 점검사항</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>확인 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>실행 계정</td>
+<td>로그인 여부와 권한 수준</td>
+</tr>
+<tr>
+<td>Python 경로</td>
+<td>절대 경로 사용 여부</td>
+</tr>
+<tr>
+<td>작업 폴더</td>
+<td>상대경로 문제 방지</td>
+</tr>
+<tr>
+<td>로그 파일</td>
+<td>실패 시 기록 남기기</td>
+</tr>
+<tr>
+<td>입력 데이터</td>
+<td>실행 시점에 파일 존재 여부</td>
+</tr>
+</tbody>
+</table>
+<h3>실무 팁</h3>
+<ul>
+<li>배치 파일로 먼저 감싼 뒤 스케줄러에 연결하면 경로 관리가 쉬움.</li>
+<li>처음에는 매일보다 수동 테스트 후 주간 실행부터 시작하는 편이 안전하다.</li>
+<li>결과 파일명을 날짜 포함 형태로 저장하면 추적이 쉬움.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="69" data-section-title="Section 68. 보고서 목차 템플릿"><h2>Section 68. 보고서 목차 템플릿</h2>
+<p>분석 결과를 공공문서로 정리할 때는 보고서 구조를 먼저 잡는 것이 유리하다. 데이터가 많을수록, 차트가 많을수록 구조 없이 쓰면 장황해지기 쉽다. 다음은 C04 실습 결과를 보고서로 묶을 때 바로 쓸 수 있는 기본 목차이다.</p>
+<h3>기본 보고서 목차</h3>
+<ol>
+<li>분석 배경과 목적</li>
+<li>데이터 출처와 범위</li>
+<li>전처리 및 분석 방법</li>
+<li>핵심 결과 1: 규모와 분포</li>
+<li>핵심 결과 2: 지역 차이</li>
+<li>핵심 결과 3: 운영 특성</li>
+<li>해석의 한계와 추가 확인 필요사항</li>
+<li>실행 가능한 제안</li>
+</ol>
+<h3>1페이지 요약 메모 버전</h3>
+<ul>
+<li>목적 한 줄</li>
+<li>데이터 한 줄</li>
+<li>핵심 숫자 세 개</li>
+<li>차트 한 장 설명</li>
+<li>후속 조치 두 가지</li>
+</ul></article>
+<article class="page-source-section" data-section-index="70" data-section-title="Section 69. 발표 스토리라인 템플릿"><h2>Section 69. 발표 스토리라인 템플릿</h2>
+<p>발표는 보고서 축약이 아니라 메시지 재배열이다. 발표 슬라이드는 자료를 모두 보여주는 것이 아니라, 청중이 무엇을 기억해야 하는지 남기는 구조로 짜야 한다. C04 실습 결과를 발표할 때는 다음 6슬라이드 구조가 안정적이다.</p>
+<h3>6슬라이드 구조</h3>
+<ol>
+<li>문제 제기: 왜 이 데이터를 보게 되었는가</li>
+<li>데이터 소개: 어떤 데이터를 썼는가</li>
+<li>핵심 발견 1: 규모와 분포</li>
+<li>핵심 발견 2: 지역 또는 유형 차이</li>
+<li>산출물 소개: 대시보드와 자동화 흐름</li>
+<li>활용 계획: 부서 업무에 어떻게 붙일 것인가</li>
+</ol>
+<h3>발표 제목 예시</h3>
+<ul>
+<li>전국 공공시설 개방정보에서 확인한 지역별 운영 차이</li>
+<li>무료와 유료 구조를 함께 보면 보이는 시설 운영 패턴</li>
+<li>노코드 데이터분석으로 만든 공공시설 현황 대시보드</li>
+</ul></article>
+<article class="page-source-section" data-section-index="71" data-section-title="Section 70. AI 결과 검증 회의록 양식"><h2>Section 70. AI 결과 검증 회의록 양식</h2>
+<p>AI를 활용한 분석은 개인 작업에서 끝내기보다, 짧은 검증 회의로 마감하는 편이 좋다. 특히 부서 단위로 실무 적용을 시작할 때는 누가 무엇을 확인했고, 어떤 결과를 채택했고, 어떤 문장은 삭제했는지를 남겨 두어야 이후 책임과 품질 관리가 쉬움.</p>
+<h3>회의록 양식</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>기록 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>검토 일시</td>
+<td>2026-00-00 00:00</td>
+</tr>
+<tr>
+<td>검토 대상</td>
+<td>노트북, HTML, 보고서 초안 중 무엇인가</td>
+</tr>
+<tr>
+<td>확인한 핵심 수치</td>
+<td>예: 전체 시설 수, 유료 비율, 평균 사용료</td>
+</tr>
+<tr>
+<td>수정한 표현</td>
+<td>과장 또는 단정 표현 수정 내용</td>
+</tr>
+<tr>
+<td>남은 쟁점</td>
+<td>추가 확인할 데이터나 변수</td>
+</tr>
+<tr>
+<td>후속 작업</td>
+<td>자동화 개선, 대시보드 보완 등</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="72" data-section-title="Section 71. 후속 학습 로드맵"><h2>Section 71. 후속 학습 로드맵</h2>
+<p>C04를 마친 뒤에는 두 방향으로 확장할 수 있다. 하나는 더 깊은 모델링과 예측 분석으로 가는 방향이고, 다른 하나는 서비스화와 업무 자동화로 가는 방향이다. 현재 교재에서 다룬 수집, 전처리, EDA, 시각화, HTML, 자동화의 흐름은 이 두 방향 모두의 공통 기반이 된다.</p>
+<h3>확장 경로 1. 분석 심화</h3>
+<ul>
+<li>회귀, 분류, 군집 등 예측 모델링 학습</li>
+<li>특성 중요도와 설명 가능한 AI 도구 익히기</li>
+<li>정책 성과지표 예측과 시뮬레이션 과제 연결</li>
+</ul>
+<h3>확장 경로 2. 서비스화 심화</h3>
+<ul>
+<li>Streamlit, Dash, Gradio 기반 내부 도구화</li>
+<li>데이터 수집부터 보고서 생성까지 파이프라인화</li>
+<li>부서 협업용 대시보드 운영과 권한 관리 고민</li>
+</ul></article>
+<article class="page-source-section" data-section-index="73" data-section-title="Section 72. 용어 사전과 자기 점검표"><h2>Section 72. 용어 사전과 자기 점검표</h2>
+<p>마지막으로 학습자가 실무에서 다시 펼쳐볼 수 있도록 핵심 용어와 자기 점검표를 함께 남김. 용어를 정확히 이해해야 AI에게 정확한 요청을 할 수 있고, 자기 점검표가 있어야 한 번의 학습이 습관으로 이어진다.</p>
+<h3>핵심 용어 사전</h3>
+<table>
+<thead>
+<tr>
+<th>용어</th>
+<th>간단 정의</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EDA</td>
+<td>본격 분석 전에 구조와 패턴을 탐색하는 분석 과정</td>
+</tr>
+<tr>
+<td>파생변수</td>
+<td>원본 컬럼을 조합하거나 해석해 새로 만든 변수</td>
+</tr>
+<tr>
+<td>상관관계</td>
+<td>두 변수의 동행 정도를 나타내는 지표</td>
+</tr>
+<tr>
+<td>대시보드</td>
+<td>핵심 지표와 차트를 한 화면에 보여주는 분석 결과물</td>
+</tr>
+<tr>
+<td>자동화 스크립트</td>
+<td>반복 업무를 줄이기 위해 실행하는 코드</td>
+</tr>
+<tr>
+<td>바이브코딩</td>
+<td>AI와 대화하며 코드를 생성·수정·검증하는 작업 방식</td>
+</tr>
+</tbody>
+</table>
+<h3>자기 점검표</h3>
+<ol>
+<li>데이터 파일을 열기 전에 질문부터 정의하는가.</li>
+<li>AI에게 요청할 때 환경과 파일 정보를 함께 주는가.</li>
+<li>코드 실행 후 확인 포인트를 반드시 본인가.</li>
+<li>차트 제목과 캡션을 직접 다듬는가.</li>
+<li>보고서 초안의 단정 표현을 수정하는가.</li>
+<li>자동화 결과를 로그와 함께 점검하는가.</li>
+</ol>
+<p>이 점검표에서 절반 이하만 체크된다면, 기술 부족보다 절차 부족일 가능성이 큼. C04의 목적은 도구를 더 많이 아는 것이 아니라, 데이터를 다루는 과정을 안정적으로 운영하는 습관을 만드는 데 있다.</p></article>
+<article class="page-source-section" data-section-index="74" data-section-title="Section 73. 사례연구 01. 지역별 시설 규모 격차를 읽는 정책 메모"><h2>Section 73. 사례연구 01. 지역별 시설 규모 격차를 읽는 정책 메모</h2>
+<p>첫 번째 사례연구는 시도별 시설 수 막대차트와 지역 파생 결과를 바탕으로 지역 격차를 설명하는 정책 메모를 작성하는 연습이다. 여기서 중요한 것은 단순 순위 나열이 아니라, “시설 수가 많은 지역”과 “인구·면적을 고려해야 할 지역”을 구분해 쓰는 태도이다. 공공데이터는 규모가 큰 지역이 항상 잘 갖춰져 있다는 식의 단순 결론으로 흐르기 쉽기 때문이다.</p>
+<h3>메모 작성 절차</h3>
+<ol>
+<li>시도별 시설 수 상위 5개와 하위 5개를 정리한다.</li>
+<li>격차를 한 문장으로 요약하되 원인 단정은 피한다.</li>
+<li>인구나 면적 보정이 필요하다는 한계를 함께 적는다.</li>
+<li>후속으로 봐야 할 보조 지표를 적는다.</li>
+</ol>
+<h3>메모 예시 문장</h3>
+<ul>
+<li>시설 수는 수도권과 일부 광역지자체에 집중되어 있으나, 절대 규모만으로 지역의 개방 수준을 평가하기에는 한계가 있다.</li>
+<li>향후 인구 대비 시설 수, 면적 대비 시설 접근성 등을 함께 검토할 필요가 있다.</li>
+<li>동일한 시설 수라도 유료 비율과 주말 운영 비율이 다르면 실제 이용 가능성은 달라질 수 있다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="75" data-section-title="Section 74. 사례연구 02. 유료·무료 구조를 함께 읽는 보고서 초안"><h2>Section 74. 사례연구 02. 유료·무료 구조를 함께 읽는 보고서 초안</h2>
+<p>두 번째 사례연구는 시설유형별 유료 비율과 사용료 분포를 함께 읽는 연습이다. 실무에서는 “유료 시설이 많다”는 말이 곧바로 부정적 의미를 갖기도 하고, 반대로 “무료 시설이 많다”는 말이 운영 부담을 감춘 채 긍정적 문장처럼 쓰이기도 함. 따라서 유료·무료 구조는 정책 판단보다 운영 특성을 설명하는 자료로 먼저 읽는 습관이 필요하다.</p>
+<h3>분석 포인트</h3>
+<ul>
+<li>유료시설 비율이 높은 유형은 무엇인가.</li>
+<li>같은 유형 안에서도 지역별 차이가 큰가.</li>
+<li>평균 사용료와 중앙값 차이가 큰 유형은 무엇인가.</li>
+<li>무료 시설 비중이 높아도 운영시간이 짧을 가능성은 없는가.</li>
+</ul>
+<h3>보고서 문장 예시</h3>
+<ul>
+<li>시설유형별 유료 비율은 운영 특성의 차이를 보여 주며, 이용료 수준과 함께 볼 때 해석력이 높아진다.</li>
+<li>평균 사용료보다 중앙값이 낮은 유형은 일부 고가 시설이 평균을 끌어올렸을 가능성이 있다.</li>
+<li>무료와 유료 구분만으로 접근성을 단정하기보다 운영시간, 위치, 수용가능인원 등 보조 지표를 함께 검토할 필요가 있다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="76" data-section-title="Section 75. 사례연구 03. 주말 운영 데이터를 활용한 서비스 개선 제안"><h2>Section 75. 사례연구 03. 주말 운영 데이터를 활용한 서비스 개선 제안</h2>
+<p>세 번째 사례연구는 주말운영 파생변수를 활용해 시민 이용 편의 관점에서 결과를 읽는 연습이다. 주말운영 비율은 단순 운영시간 정보처럼 보이지만, 실제로는 생활권 접근성, 여가 활용, 시설 운영 정책과 직결되는 지표이다. 특히 가족 단위 이용이나 직장인 이용을 고려하면 주말 개방 여부는 체감 접근성과 직접 연결될 수 있다.</p>
+<h3>개선 제안서 구조</h3>
+<ol>
+<li>전체 주말 운영 비율 요약</li>
+<li>지역별 차이가 큰 집단 제시</li>
+<li>시설유형별 차이 제시</li>
+<li>운영시간 미기재 시설에 대한 정비 필요성 제안</li>
+<li>시범 개선 과제 제안</li>
+</ol>
+<h3>활용 문장 예시</h3>
+<ul>
+<li>주말운영 정보가 누락된 시설은 실제 미운영인지 단순 미기재인지 구분 정비가 필요하다.</li>
+<li>지역별 주말운영 격차는 시민 체감 접근성 차이로 이어질 수 있어 추가 점검이 필요하다.</li>
+<li>시설유형별 특성을 반영한 주말 개방 확대 시범사업 검토가 가능하다.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="77" data-section-title="Section 76. 사례연구 04. 공공데이터포털 메타정보와 본문 데이터를 연결하는 법"><h2>Section 76. 사례연구 04. 공공데이터포털 메타정보와 본문 데이터를 연결하는 법</h2>
+<p>핵심 실습 데이터만 읽는 것에서 한 단계 더 나아가려면, 같은 폴더에 있는 목록 메타정보와 목록개방현황 자료를 함께 읽는 연습도 유익한다. 이는 “이 데이터셋 하나 안에 무엇이 있나”를 넘어, “조직이 어떤 데이터를 얼마나 보유하고 있고 어떤 형식으로 개방하고 있나”를 보는 데이터 자산 관점으로 확장하게 함.</p>
+<h3>연결 질문</h3>
+<ul>
+<li>우리 실습 데이터는 공공데이터포털의 어떤 메타정보와 연결되는가.</li>
+<li>유사한 데이터셋은 어떤 기관에서 추가로 개방하고 있는가.</li>
+<li>파일 제공형과 API 제공형의 차이는 무엇인가.</li>
+<li>활용신청 절차가 필요한 데이터와 바로 활용 가능한 데이터는 무엇인가.</li>
+</ul>
+<h3>실무 확장 포인트</h3>
+<ul>
+<li>메타정보를 함께 읽으면 후속 분석 데이터 확보가 쉬워진다.</li>
+<li>같은 주제를 다른 기관 데이터와 비교하는 확장 과제를 만들 수 있다.</li>
+<li>데이터셋 갱신 주기를 확인하면 자동화 주기도 설계하기 쉬움.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="78" data-section-title="Section 77. 사례연구 05. 지도화와 위치정보 해석 시 주의할 점"><h2>Section 77. 사례연구 05. 지도화와 위치정보 해석 시 주의할 점</h2>
+<p>위도와 경도 컬럼이 있다고 해서 곧바로 지도로 시각화하면 해석이 쉬워질 것 같지만, 실제로는 몇 가지 주의가 필요하다. 좌표가 문자열로 저장되어 있을 수 있고, 일부 누락이나 오기입이 있을 수 있으며, 시설 주소와 좌표가 정확히 일치하지 않을 수 있다. 또한 좌표 자체는 점을 찍어 주지만, 생활권 접근성이나 교통 편의까지 설명해 주지는 않는다.</p>
+<h3>위치정보 분석 전 체크리스트</h3>
+<ol>
+<li>위도·경도가 숫자로 제대로 변환되었는가.</li>
+<li>한국 범위를 벗어난 값이 있는가.</li>
+<li>주소 기반 지역 파생과 좌표 기반 결과가 크게 충돌하지 않는가.</li>
+<li>점이 너무 많아 겹치면 집계 지도 방식이 더 적합한가.</li>
+<li>지도 결과를 보고 과도한 정책 결론을 내리고 있지 않은가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="79" data-section-title="Section 78. 실습 문제 10선"><h2>Section 78. 실습 문제 10선</h2>
+<p>이 섹션은 학습 이후 복습용 과제로 바로 쓸 수 있도록 구성한 문항 모음이다. 각각의 문제는 코드 완성보다 질문 구조화와 검증 포인트를 함께 쓰게 만드는 데 초점을 둠.</p>
+<h3>문제 목록</h3>
+<ol>
+<li>전국공공시설개방정보표준데이터를 인코딩 자동 대응으로 불러오고, 열 수와 상위 5행을 출력하라.</li>
+<li>주소에서 시도와 시군구를 파생하고, 시도별 시설 수 상위 10개를 구하라.</li>
+<li>유료사용여부를 이진 변수로 바꾸고 시도별 유료 비율을 계산하라.</li>
+<li>주말운영 파생변수를 만들고 시설유형별 주말운영 비율을 비교하라.</li>
+<li>사용료 분포를 전체와 0원 제외 버전으로 각각 그려라.</li>
+<li>시설유형별 사용료 박스플롯을 그리고 중앙값 차이를 요약하라.</li>
+<li>상관계수 행렬을 구하고 절대값이 큰 변수 쌍을 설명하라.</li>
+<li>CSV 업로드형 HTML 대시보드 요구사항을 작성하라.</li>
+<li>반복 보고 업무 하나를 고르고 자동화 스크립트 구조를 설계하라.</li>
+<li>EDA 결과를 바탕으로 1페이지 정책 메모를 작성하라.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="80" data-section-title="Section 79. 프롬프트 개선 일지 작성법"><h2>Section 79. 프롬프트 개선 일지 작성법</h2>
+<p>많은 학습자가 AI 결과가 좋지 않을 때 모델 탓부터 하지만, 실제로는 프롬프트 개선 여지가 더 큰 경우가 많다. 따라서 실습 후에는 “어떤 질문을 했고, 무엇이 부족했으며, 다음에는 무엇을 더 넣을지”를 짧게 기록하는 습관이 중요하다. 이것이 쌓이면 개인별 프롬프트 라이브러리가 생긴다.</p>
+<h3>개선 일지 양식</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>작성 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>작업 목적</td>
+<td>무엇을 하려 했는가</td>
+</tr>
+<tr>
+<td>첫 요청</td>
+<td>처음 어떤 프롬프트를 썼는가</td>
+</tr>
+<tr>
+<td>문제점</td>
+<td>응답의 어떤 점이 부족했는가</td>
+</tr>
+<tr>
+<td>보완 정보</td>
+<td>파일명, 컬럼명, 예시 출력 등 무엇을 더 넣었는가</td>
+</tr>
+<tr>
+<td>최종 개선점</td>
+<td>다음부터는 어떻게 요청할 것인가</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="81" data-section-title="Section 80. 코드 리뷰 체크리스트"><h2>Section 80. 코드 리뷰 체크리스트</h2>
+<p>AI가 만든 코드는 빨리 읽을 수 있어야 하며, 최소한의 구조와 안전성을 갖추어야 한다. 이 체크리스트는 전문 개발자 수준의 정교한 리뷰를 요구하는 것이 아니라, 공공 실무자가 스스로 확인할 수 있는 기본 항목을 정리한 것이다.</p>
+<h3>리뷰 항목</h3>
+<ul>
+<li>파일 경로가 하드코딩되어 있지 않은가.</li>
+<li>함수나 블록 단위로 의미가 나뉘어 있는가.</li>
+<li>출력 파일명이 명확한가.</li>
+<li>오류 발생 시 어디서 실패했는지 알 수 있는가.</li>
+<li>분석 결과 저장 전에 중간 검증이 포함되어 있는가.</li>
+<li>사용하지 않는 라이브러리가 과도하게 들어가 있지 않은가.</li>
+</ul></article>
+<article class="page-source-section" data-section-index="82" data-section-title="Section 81. 산출물 최종 점검 체크리스트"><h2>Section 81. 산출물 최종 점검 체크리스트</h2>
+<p>교재 실습의 최종 산출물은 보통 노트북, HTML 대시보드, 보고 메모, 자동화 스크립트 네 종류로 요약할 수 있다. 이 산출물을 제출하거나 부서에 공유하기 전에는 형식과 내용 양쪽을 모두 점검해야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>산출물</th>
+<th>점검 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>노트북</td>
+<td>실행 순서가 꼬이지 않았는가</td>
+</tr>
+<tr>
+<td>HTML</td>
+<td>브라우저에서 파일 하나만으로 정상 동작하는가</td>
+</tr>
+<tr>
+<td>보고 메모</td>
+<td>과장 표현 없이 핵심 수치가 반영되었는가</td>
+</tr>
+<tr>
+<td>자동화 스크립트</td>
+<td>입력 파일이 바뀌어도 다시 실행 가능한가</td>
+</tr>
+</tbody>
+</table>
+<h3>제출 전 마지막 확인</h3>
+<ol>
+<li>파일명과 버전 표기가 일관적인가.</li>
+<li>민감한 예시 데이터가 남아 있지 않은가.</li>
+<li>오류 셀이나 깨진 차트가 없는가.</li>
+<li>표와 차트의 숫자가 보고 문장과 일치하는가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="83" data-section-title="Section 82. 학습 이후 30일 실행 계획"><h2>Section 82. 학습 이후 30일 실행 계획</h2>
+<p>학습 직후에는 의욕이 높지만, 실제 업무에 붙이지 않으면 금방 잊히기 쉬움. 따라서 30일 실행 계획을 세우는 것이 중요하다. 첫 주에는 환경 정리와 재실행, 둘째 주에는 부서 데이터 1건 적용, 셋째 주에는 시각화나 대시보드 1건 완성, 넷째 주에는 자동화 후보 1건 선정 정도가 현실적이다.</p>
+<h3>30일 실행 로드맵</h3>
+<table>
+<thead>
+<tr>
+<th>기간</th>
+<th>권장 목표</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1주차</td>
+<td>학습 실습 재실행, 환경 재구성</td>
+</tr>
+<tr>
+<td>2주차</td>
+<td>부서 데이터 1건으로 EDA 재현</td>
+</tr>
+<tr>
+<td>3주차</td>
+<td>차트 3종 또는 HTML 대시보드 1건 완성</td>
+</tr>
+<tr>
+<td>4주차</td>
+<td>자동화 후보 업무 선정과 프롬프트 라이브러리 정리</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="84" data-section-title="Section 83. 팀 적용 워크숍 실행안"><h2>Section 83. 팀 적용 워크숍 실행안</h2>
+<p>개인 학습이 조직 적용으로 이어지려면, 부서 단위의 짧은 공유 워크숍이 도움이 된다. 한 사람이 만든 노트북과 대시보드를 팀이 함께 보면서, 어디까지 믿을 수 있는지, 어떤 자료는 외부 AI에 넣지 말아야 하는지, 어떤 업무부터 자동화할지를 함께 정하는 과정이 필요하다.</p>
+<h3>60분 워크숍 구성 예시</h3>
+<ol>
+<li>10분: 데이터와 문제 배경 소개</li>
+<li>15분: EDA 결과와 차트 설명</li>
+<li>10분: HTML 대시보드 시연</li>
+<li>10분: 자동화 후보 업무 토론</li>
+<li>15분: 보안·검증 기준 합의</li>
+</ol></article>
+<article class="page-source-section" data-section-index="85" data-section-title="Section 84. 종합 루브릭"><h2>Section 84. 종합 루브릭</h2>
+<p>마지막으로 학습 성과를 평가하는 루브릭을 남김. 이 루브릭은 시험 점수용이라기보다, 현재 자신의 수준이 어디에 와 있는지 판단하는 기준으로 보는 것이 적절하다.</p>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>초급</th>
+<th>중급</th>
+<th>실무 적용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>프롬프트 설계</td>
+<td>한 번에 길게 요청한다</td>
+<td>단계 분리 요청 가능</td>
+<td>검증 규칙까지 포함한다</td>
+</tr>
+<tr>
+<td>전처리</td>
+<td>코드 실행에 의존</td>
+<td>타입·결측 의미를 설명 가능</td>
+<td>처리 기준을 문서화한다</td>
+</tr>
+<tr>
+<td>EDA</td>
+<td>표와 차트를 만듦</td>
+<td>집단 차이와 한계를 설명한다</td>
+<td>후속 질문과 제안을 연결한다</td>
+</tr>
+<tr>
+<td>시각화</td>
+<td>차트를 생성한다</td>
+<td>차트 선택 이유를 설명한다</td>
+<td>보고와 발표용으로 재구성한다</td>
+</tr>
+<tr>
+<td>자동화</td>
+<td>예제 실행 가능</td>
+<td>반복 업무 구조를 설계한다</td>
+<td>운영 로그와 스케줄링까지 고려한다</td>
+</tr>
+</tbody>
+</table>
+<p>이 루브릭에서 실무 적용 칸을 대부분 설명할 수 있다면, C04의 목적은 충분히 달성된 것이다. 반대로 아직 초급 칸에 머무는 영역이 많다면, 더 많은 문법 학습보다 절차 반복과 작은 실제 적용을 먼저 권한다.</p></article>
+<article class="page-source-section" data-section-index="86" data-section-title="Section 85. 현업 적용 일일 체크리스트"><h2>Section 85. 현업 적용 일일 체크리스트</h2>
+<p>학습 이후 가장 큰 실패 원인은 한 번도 다시 열어보지 않는 것이다. 그래서 거창한 계획보다, 실제로 매일 또는 이틀에 한 번 정도 짧게라도 다시 실행해 보는 습관이 중요하다. 이 섹션은 10분 안에 할 수 있는 재실행 체크리스트를 제시한다.</p>
+<h3>10분 체크리스트</h3>
+<ol>
+<li>지난 실습 노트북을 다시 열어 첫 셀부터 순서대로 실행해 본다.</li>
+<li>실행 중 멈춘 셀이 있다면 오류 메시지를 별도 메모장에 복사한다.</li>
+<li>차트 한 개를 다시 그리고, 제목과 캡션을 한 줄 수정해 본다.</li>
+<li>프롬프트 하나를 개선해 더 짧고 분명하게 다시 써 본다.</li>
+<li>오늘의 개선점을 한 줄로 기록한다.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="87" data-section-title="Section 86. 부서별 활용 시나리오 예시"><h2>Section 86. 부서별 활용 시나리오 예시</h2>
+<p>노코드 데이터분석은 특정 직렬만의 과목이 아니다. 행정, 홍보, 시설관리, 민원, 정책기획 부서 모두 다른 방식으로 활용할 수 있다. 이 섹션은 같은 도구가 업무별로 어떻게 달리 쓰일 수 있는지 빠르게 보여 주기 위한 예시 모음이다.</p>
+<table>
+<thead>
+<tr>
+<th>부서</th>
+<th>활용 시나리오</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>정책기획</td>
+<td>공공데이터 현황 비교와 이슈 브리프 초안 작성</td>
+</tr>
+<tr>
+<td>시설관리</td>
+<td>지역·유형별 시설 운영 현황 점검과 주말운영 분석</td>
+</tr>
+<tr>
+<td>홍보</td>
+<td>RSS와 보도자료 수집, 키워드 모니터링</td>
+</tr>
+<tr>
+<td>민원</td>
+<td>반복 민원 분류와 월간 현황 시각화</td>
+</tr>
+<tr>
+<td>전산지원</td>
+<td>내부 파일 처리 자동화와 대시보드 보조 구축</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="88" data-section-title="Section 87. 실습 결과 제출 양식"><h2>Section 87. 실습 결과 제출 양식</h2>
+<p>학습 운영 입장에서는 학습자가 무엇을 만들었는지 일관되게 확인할 수 있는 제출 양식이 필요하다. 이 양식은 노트북, HTML, 메모, 자동화 스크립트가 각각 어떤 상태면 완료로 볼 수 있는지 판단하는 기준이 된다.</p>
+<h3>제출 항목</h3>
+<ul>
+<li>노트북 파일 1개: 데이터 불러오기, 전처리, EDA, 차트 최소 2종 포한다</li>
+<li>HTML 파일 1개: 단일 파일 실행 가능 또는 결과 화면 캡처 포한다</li>
+<li>요약 메모 1개: 핵심 발견 3개와 한계 2개 기재</li>
+<li>자동화 구상서 1개: 반복 업무, 입력, 출력, 실행 주기 기재</li>
+</ul></article>
+<article class="page-source-section" data-section-index="89" data-section-title="Section 88. 종합 리뷰 질문 20"><h2>Section 88. 종합 리뷰 질문 20</h2>
+<p>학습이 끝난 뒤에는 지식을 더 추가하는 것보다, 지금까지의 흐름을 말로 다시 설명할 수 있는지가 중요하다. 아래 질문은 스스로 설명 가능한지 점검하기 위한 종합 리뷰 목록이다.</p>
+<h3>리뷰 질문</h3>
+<ol>
+<li>DX와 AX의 차이는 무엇인가.</li>
+<li>생성형 AI 시대 분석가의 역할은 어떻게 달라졌는가.</li>
+<li>Colab과 로컬 Jupyter 중 무엇을 선택할 것인가.</li>
+<li>공공데이터 CSV에서 인코딩 문제는 왜 자주 생기는가.</li>
+<li>결측치가 정보가 되는 대표 사례는 무엇인가.</li>
+<li>주소 파생이 왜 중요한가.</li>
+<li>평균과 중앙값 차이가 클 때 무엇을 의심해야 하는가.</li>
+<li>groupby와 crosstab의 차이는 무엇인가.</li>
+<li>상관관계 해석에서 금지해야 할 표현은 무엇인가.</li>
+<li>막대차트와 히스토그램은 각각 어떤 질문에 답하는가.</li>
+<li>박스플롯과 바이올린플롯은 무엇이 다른가.</li>
+<li>HTML, CSS, JS는 대시보드에서 각각 무슨 역할을 하는가.</li>
+<li>단일 HTML 대시보드가 왜 실무 친화적인가.</li>
+<li>자동화 후보 업무는 어떤 기준으로 고르는가.</li>
+<li>스케줄러를 걸기 전에 무엇을 점검해야 하는가.</li>
+<li>AI가 만든 보고서 초안은 어떤 순서로 검증하는가.</li>
+<li>발표자료는 보고서와 어떻게 달라야 하는가.</li>
+<li>공공자료를 외부 AI에 넣을 때 가장 먼저 볼 것은 무엇인가.</li>
+<li>앞으로 내 업무에 바로 적용할 수 있는 실습은 무엇인가.</li>
+<li>C04를 마친 뒤 다음에 더 배우고 싶은 방향은 무엇인가.</li>
+</ol></article>
+<article class="page-source-section" data-section-index="90" data-section-title="Section 89. 최종 정리"><h2>Section 89. 최종 정리</h2>
+<p>C04의 핵심 성과는 코드 한 줄을 더 외우는 데 있지 않는다. 오히려 공공 실무자가 자신의 데이터와 문제를 기준으로, 생성형 AI에게 일을 맡기고, 결과를 검증하고, 시각화와 대시보드와 자동화까지 연결하는 전체 흐름을 경험했다는 데 있다. 이 경험이 쌓이면 AI는 신기한 도구가 아니라, 분명한 절차 안에서 쓰는 실무 파트너가 된다.</p>
+<p>이 교재는 여기서 끝나지만, 실제 적용은 지금부터 시작이다. 데이터를 묻는 질문, 결과를 검증하는 태도, 문서와 대시보드로 전환하는 힘, 반복 업무를 줄이는 감각을 계속 이어 간다면 C04는 한 번의 학습이 아니라 업무 방식 전환의 출발점이 될 수 있다.</p>
+<!-- CODEX_ENRICHMENT_START --></article>
+<article class="page-source-section" data-section-index="91" data-section-title="Section 90. 보강 노트. 화면 캡처를 실습 언어로 바꾸는 법"><h2>Section 90. 보강 노트. 화면 캡처를 실습 언어로 바꾸는 법</h2>
+<p>C04의 이미지는 대부분 도구 화면과 분석 결과 화면이다. 이런 이미지는 크게 넣으면 순간적으로 이해는 쉽지만, 책형 교재에서는 한 페이지를 과도하게 차지해 본문 흐름을 끊기 쉽다. 따라서 이미지는 “따라 할 화면”이 아니라 “확인해야 할 상태”로 읽어야 한다. Colab 화면은 설치가 필요 없다는 의미와 동시에 외부 업로드 제한을 떠올리게 해야 하고, Jupyter 화면은 셀 단위 검증이라는 학습 방식을 설명해야 한다.</p>
+<p>실습 결과를 읽을 때는 각 이미지를 보여줄 때 화면 요소 이름만 말하지 말고, 실습자가 놓치기 쉬운 판단을 덧붙여야 한다. 예를 들어 요약 통계 화면은 평균과 중앙값의 차이를 읽는 법, 상관관계 히트맵은 인과관계로 오해하지 않는 법, 대시보드 화면은 예쁜 UI보다 반복 사용자의 질문을 담았는지 확인하는 법으로 연결한다.</p>
+<h3>화면 캡처 해설 템플릿</h3>
+<table>
+<thead>
+<tr>
+<th>화면 유형</th>
+<th>반드시 덧붙일 설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Colab·Jupyter 실행 화면</td>
+<td>셀 단위 실행, 오류 위치, 외부 자료 업로드 가능 범위를 함께 설명한다</td>
+</tr>
+<tr>
+<td>요약 통계·EDA 화면</td>
+<td>숫자를 읽는 순서와 업무 질문으로 되돌리는 방식을 설명한다</td>
+</tr>
+<tr>
+<td>시각화 화면</td>
+<td>차트 유형보다 메시지, 정렬, 색상 강조, 캡션을 먼저 본다</td>
+</tr>
+<tr>
+<td>대시보드 화면</td>
+<td>사용자가 다음에 누를 버튼과 반복 사용 흐름을 점검한다</td>
+</tr>
+</tbody>
+</table></article>
+<article class="page-source-section" data-section-index="92" data-section-title="Section 91. 보강 실무해설. 노코드 분석에서 사람이 남겨야 할 판단"><h2>Section 91. 보강 실무해설. 노코드 분석에서 사람이 남겨야 할 판단</h2>
+<p>노코드 데이터분석은 사람이 판단하지 않아도 된다는 뜻이 아니다. 오히려 코드를 직접 쓰는 부담이 줄어든 만큼, 분석 목적과 검증 기준을 사람이 더 분명하게 제시해야 한다. AI가 코드를 만들어 주면 실행 속도는 빨라지지만, 잘못된 컬럼 선택, 부적절한 결측 처리, 차트 해석의 과장도 함께 빨라질 수 있다.</p>
+<p>공공업무에서는 분석 결과가 정책 설명, 민원 대응, 예산 검토, 현장 점검으로 이어진다. 따라서 실습자는 그래프를 만드는 데서 멈추지 않고 “이 그래프를 보고 무엇을 결정할 수 있는가”, “무엇은 아직 결정하면 안 되는가”, “추가 확인 자료는 무엇인가”를 함께 적어야 한다.</p>
+<h3>노코드 분석 검증 질문</h3>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>검증 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>데이터 불러오기</td>
+<td>행 수와 열 수가 원본과 일치하는가</td>
+</tr>
+<tr>
+<td>전처리</td>
+<td>삭제·대체한 값의 기준을 기록했는가</td>
+</tr>
+<tr>
+<td>EDA</td>
+<td>이상치와 결측을 업무 맥락으로 해석했는가</td>
+</tr>
+<tr>
+<td>시각화</td>
+<td>차트가 메시지를 과장하지 않는가</td>
+</tr>
+<tr>
+<td>대시보드</td>
+<td>사용자가 반복해서 볼 질문을 담았는가</td>
+</tr>
+<tr>
+<td>자동화</td>
+<td>실패했을 때 원본과 로그가 남는가</td>
+</tr>
+</tbody>
+</table>
+<!-- CODEX_ENRICHMENT_END -->
+
+<!-- CODEX_DEEP_ENRICHMENT_START --></article>
+<article class="page-source-section" data-section-index="93" data-section-title="심화 해설 01. 노코드 데이터분석은 코드를 피하는 방법이 아니라 분석 절차를 보이게 하는 방법이다"><h2>심화 해설 01. 노코드 데이터분석은 코드를 피하는 방법이 아니라 분석 절차를 보이게 하는 방법이다</h2>
+<p>C04에서 다루는 노코드 데이터분석은 “코드를 몰라도 된다”는 의미로만 설명하면 부족하다. 더 중요한 의미는 분석 절차를 현업 담당자가 직접 확인하고 수정할 수 있게 만든다는 점이다. 데이터 불러오기, 결측 처리, 그룹별 집계, 시각화, 대시보드 구성, 결과 해석은 모두 업무 판단과 연결된다. 전문 개발자가 코드를 대신 작성하더라도 현업 담당자가 이 절차를 이해하지 못하면 분석 결과를 제대로 활용하기 어렵다.</p>
+<p>생성형 AI와 노코드 도구가 결합되면 분석의 진입장벽은 낮아진다. 그러나 진입장벽이 낮아졌다는 말은 검증이 덜 필요하다는 뜻이 아니다. 오히려 더 많은 사람이 더 빠르게 결과를 만들 수 있기 때문에, 데이터 품질과 해석 기준을 더 명확히 해야 한다. AI가 만든 차트가 보기 좋더라도 축이 잘못 잡혔거나, 결측값 처리 기준이 설명되지 않거나, 평균만으로 결론을 내리면 보고서의 품질은 떨어진다.</p>
+<p>노코드 분석 이 장에서는 화면을 따라 하는 것만으로는 부족하다. 각 화면마다 “지금 어떤 분석 판단을 한 것인가”를 설명해야 한다. 파일을 업로드하는 화면에서는 자료 출처와 개인정보 여부를 묻고, 전처리 화면에서는 제외 기준을 묻고, 시각화 화면에서는 차트가 전달하는 메시지를 묻고, 대시보드 화면에서는 사용자가 다음에 어떤 행동을 해야 하는지 묻는다. 이 질문을 붙여야 화면 캡처가 교재의 본문이 된다.</p>
+<table>
+<thead>
+<tr>
+<th>노코드 화면</th>
+<th>먼저 붙여야 할 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>파일 업로드</td>
+<td>원자료 출처, 기준일, 민감정보 포함 여부가 확인되었는가</td>
+</tr>
+<tr>
+<td>결측 처리</td>
+<td>어떤 값을 제거하면 특정 집단이 과소대표될 수 있는가</td>
+</tr>
+<tr>
+<td>그룹 집계</td>
+<td>평균과 함께 표본 수를 같이 봤는가</td>
+</tr>
+<tr>
+<td>차트 생성</td>
+<td>차트 제목이 정책 질문에 직접 답하는가</td>
+</tr>
+<tr>
+<td>대시보드</td>
+<td>필터를 바꿨을 때 사용자가 어떤 결정을 할 수 있는가</td>
+</tr>
+</tbody>
+</table>
+<p>실습에서는 이 질문에 답하지 못하면 다음 단계로 넘어가지 않는다는 원칙이 중요하다. 예를 들어 파일 업로드 단계에서 민감정보 여부를 확인하지 못했다면 전처리 이전에 자료 반출 범위를 먼저 점검해야 하고, 그룹 집계 단계에서 표본 수를 모르면 평균 비교를 바로 보고서 문장으로 쓰면 안 된다. 이렇게 질문을 앞세우면 노코드 실습은 버튼을 따라 누르는 절차가 아니라 분석 판단을 명시하는 훈련이 된다.</p>
+<p>이렇게 설명하면 노코드 분석은 단순한 클릭 실습이 아니라 분석 사고 훈련이 된다. 학습자는 버튼을 누르는 순서보다 각 단계의 판단 기준을 배워야 한다. 그래야 다른 도구를 만나도 같은 절차를 다시 적용할 수 있다.</p></article>
+<article class="page-source-section" data-section-index="94" data-section-title="심화 해설 02. 생성형 AI를 분석 보조자로 쓸 때의 역할 분담"><h2>심화 해설 02. 생성형 AI를 분석 보조자로 쓸 때의 역할 분담</h2>
+<p>생성형 AI는 데이터분석에서 여러 역할을 할 수 있다. 데이터 구조를 설명하게 할 수 있고, 전처리 계획을 제안하게 할 수 있으며, 차트 후보를 추천하게 할 수 있다. 파이썬 코드나 엑셀 수식, 대시보드 문구를 만들게 할 수도 있다. 그러나 AI에게 모든 판단을 맡기면 위험하다. 분석 보조자로 쓸 때는 역할을 명확히 나누어야 한다.</p>
+<p>AI에게 맡기기 좋은 일은 반복적이고 검토 가능한 작업이다. 열 이름을 읽고 데이터 사전을 초안으로 만드는 일, 결측값 점검표를 만드는 일, 그래프 후보를 제안하는 일, 보고서 목차를 만드는 일은 적합하다. 사람이 맡아야 하는 일은 업무 맥락과 책임 판단이다. 어떤 열이 정책적으로 민감한지, 어떤 집단 비교가 부적절한지, 어떤 결과를 대외적으로 말할 수 있는지는 사람이 결정해야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>분석 단계</th>
+<th>AI에게 맡길 수 있는 일</th>
+<th>사람이 결정할 일</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>데이터 이해</td>
+<td>열 이름 설명, 데이터 사전 초안</td>
+<td>열의 행정적 의미, 민감정보 여부</td>
+</tr>
+<tr>
+<td>전처리</td>
+<td>결측·중복 점검 코드 제안</td>
+<td>삭제·대체 기준과 그 이유</td>
+</tr>
+<tr>
+<td>탐색 분석</td>
+<td>요약 통계와 차트 후보 제안</td>
+<td>어떤 차트가 정책 질문에 맞는지</td>
+</tr>
+<tr>
+<td>해석</td>
+<td>결과 문장 초안 작성</td>
+<td>인과관계 단정 여부, 한계 문장</td>
+</tr>
+<tr>
+<td>보고</td>
+<td>한 장 메모 구조 제안</td>
+<td>공개 범위, 책임자 검토, 후속 조치</td>
+</tr>
+</tbody>
+</table>
+<p>이 역할 분담을 명확히 하면 AI는 위험한 자동 결정자가 아니라 유용한 분석 보조자가 된다. 특히 공공 실무에서는 AI가 제안한 코드를 그대로 실행하기보다, “이 코드는 어떤 열을 사용하며, 어떤 값을 제외하며, 어떤 결과를 출력하는가”를 먼저 물어야 한다. 코드가 길수록 검토하기 어렵기 때문에, 초급 과정에서는 짧은 코드와 명확한 주석을 선호해야 한다.</p></article>
+<article class="page-source-section" data-section-index="95" data-section-title="심화 해설 03. 대시보드는 예쁜 화면이 아니라 반복 의사결정 도구다"><h2>심화 해설 03. 대시보드는 예쁜 화면이 아니라 반복 의사결정 도구다</h2>
+<p>노코드 데이터분석 과정에서 대시보드는 시각적으로 가장 눈에 띄는 산출물이다. 그러나 대시보드를 예쁜 화면으로만 만들면 실무 활용은 낮아진다. 좋은 대시보드는 사용자가 반복해서 묻는 질문에 빠르게 답해야 한다. “이번 달 어디에서 민원이 늘었는가”, “어떤 사업이 집행 지연 위험이 있는가”, “과정 만족도가 낮은 집단은 어디인가”처럼 의사결정 질문이 먼저 있어야 한다.</p>
+<p>대시보드에는 세 가지 층이 필요하다. 첫째, 전체 현황은 사용자가 첫 화면에서 현재 상태를 판단하게 해 준다. 예를 들어 민원 대시보드라면 전체 건수, 전월 대비 증감, 장기 처리 건수, 반복 민원 비율이 첫 화면에 있어야 한다. 둘째, 원인 탐색은 현황 숫자가 왜 그렇게 나타났는지 파고드는 장치다. 지역, 부서, 기간, 접수 채널, 민원 유형을 필터로 두어야 같은 증가라도 특정 제도 변경 때문인지, 특정 부서의 병목 때문인지, 단순 계절성 때문인지 구분할 수 있다. 셋째, 행동 연결은 화면을 본 뒤 무엇을 해야 하는지 알려주는 부분이다. 장기 처리 상위 20건 목록, 확인이 필요한 결측 데이터 목록, 안내문 수정 후보 유형처럼 다음 행동으로 이어지는 표가 있어야 한다. 단순히 차트를 많이 넣는다고 좋은 대시보드가 되지 않는다. 차트가 많을수록 사용자는 무엇을 먼저 봐야 할지 모를 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>대시보드 층위</th>
+<th>구성 요소</th>
+<th>설계 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>전체 현황</td>
+<td>핵심 지표 3~5개</td>
+<td>사용자가 10초 안에 상황을 이해하는가</td>
+</tr>
+<tr>
+<td>원인 탐색</td>
+<td>필터, 그룹 비교, 추세 차트</td>
+<td>차이를 설명할 수 있는 기준이 있는가</td>
+</tr>
+<tr>
+<td>행동 연결</td>
+<td>우선 검토 목록, 주의 알림</td>
+<td>다음 회의에서 결정할 안건으로 이어지는가</td>
+</tr>
+</tbody>
+</table>
+<p>대시보드 학습에서는 색상과 배치보다 질문 설계가 중요하다. 빨간색을 많이 쓰면 위험해 보이지만, 위험 기준이 명확하지 않으면 오히려 혼란을 만든다. 반대로 단순한 표라도 우선순위 기준이 분명하면 실무자는 바로 행동할 수 있다. 따라서 C04의 대시보드 실습은 “보여주기”보다 “결정하게 하기”에 초점을 맞춰야 한다.</p></article>
+<article class="page-source-section" data-section-index="96" data-section-title="심화 해설 04. 노코드 분석 결과를 보고서로 바꾸는 법"><h2>심화 해설 04. 노코드 분석 결과를 보고서로 바꾸는 법</h2>
+<p>노코드 도구에서 분석 결과가 나오면 학습자는 종종 화면 캡처를 그대로 붙여 보고서를 만들려고 한다. 그러나 화면 캡처는 보고서가 아니다. 보고서는 질문, 데이터, 방법, 결과, 한계, 조치를 연결한 문서다. 차트는 그중 결과를 설명하는 근거일 뿐이다. 이 장에서는 화면 캡처 옆에 반드시 해석 문장을 붙이고, 해석 문장에는 한계와 후속 조치가 포함되도록 안내해야 한다.</p>
+<p>좋은 보고 문장은 세 부분으로 구성된다. 첫째, 발견한 사실이다. 둘째, 그 사실의 업무적 의미다. 셋째, 추가 확인이나 조치다. 예를 들어 “A유형 민원이 증가했다”는 발견이다. “이는 특정 제도 변경 이후 안내 부족이 누적되었을 가능성을 시사한다”는 의미다. “다만 민원 본문 표본을 추가 검토하고, 담당 부서 의견을 확인한 뒤 안내문을 보완한다”는 조치다. 이 세 문장을 합쳐야 분석 결과가 업무 개선으로 이어진다.</p>
+<table>
+<thead>
+<tr>
+<th>차트 결과</th>
+<th>부족한 설명</th>
+<th>보고서형 설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>특정 월에 민원이 증가</td>
+<td>5월 민원이 많다</td>
+<td>5월 이후 A유형 민원이 증가했으며, 제도 변경 안내와의 관련성을 담당 부서 확인 후 검토한다</td>
+</tr>
+<tr>
+<td>부서별 처리기간 차이</td>
+<td>B부서가 늦다</td>
+<td>B부서는 장기 처리 건 비중이 높아 평균이 상승했으므로 단순 비교보다 사건 유형별 분해가 필요하다</td>
+</tr>
+<tr>
+<td>만족도 낮은 문항</td>
+<td>3번 문항이 낮다</td>
+<td>실습 시간 부족 의견이 반복되어 다음 학습에서는 실습 시간을 늘리고 사전 자료를 제공한다</td>
+</tr>
+</tbody>
+</table>
+<p>이 훈련을 반복하면 학습자는 도구 결과를 그대로 믿지 않고, 업무 언어로 다시 설명하는 습관을 갖게 된다. 노코드 분석의 목표는 분석가처럼 보이는 화면을 만드는 것이 아니라, 현업 담당자가 책임 있게 설명할 수 있는 근거를 만드는 것이다.</p>
+<h3>참고 기준</h3>
+<ul>
+<li>GOV.UK, <a href="https://www.gov.uk/government/publications/data-ethics-framework/data-and-ai-ethics-framework">Data and AI Ethics Framework</a></li>
+<li>Google, <a href="https://colab.google/">Colaboratory</a></li>
+<li>NIA, <a href="https://www.nia.or.kr/site/nia_kor/ex/bbs/View.do?bcIdx=26677&amp;cbIdx=99852&amp;parentSeq=26677">공공부문 초거대 AI 도입·활용 가이드라인 배포</a></li>
+</ul>
+<!-- CODEX_DEEP_ENRICHMENT_END -->
+
+<!-- CODEX_DEEPER_ENRICHMENT_START --></article>
+<article class="page-source-section" data-section-index="97" data-section-title="추가 사례은행. 노코드 데이터분석 실습을 교재형 해설로 바꾸기"><h2>추가 사례은행. 노코드 데이터분석 실습을 교재형 해설로 바꾸기</h2>
+<p>아래 사례는 화면 캡처 중심의 실습을 읽는 교재로 바꾸기 위한 해설 본문이다. 각 사례는 도구 조작 뒤에 숨어 있는 분석 판단을 설명한다.</p>
+<h3>사례 해설 01. 노코드 EDA 화면을 교재 본문으로 읽기</h3>
+<p>탐색적 데이터분석 화면은 한 화면에 많은 정보를 한꺼번에 보여준다. 열 목록, 결측치, 분포, 상관관계, 이상치 후보가 동시에 나오기 때문에 해설이 붙지 않으면 화면 캡처는 장식이 된다. 이 장에서는 EDA 화면을 ‘무엇을 봐야 하는지’ 순서대로 풀어야 한다. 먼저 데이터 크기와 열 의미를 보고, 다음으로 결측과 중복을 확인하며, 마지막으로 업무 질문과 연결되는 변수만 깊게 본다.</p>
+<p>이 장에서는 EDA 결과를 보고 바로 결론을 말하지 않게 해야 한다. “이상치가 있다”는 말은 시작일 뿐이다. 그 이상치가 입력 오류인지, 실제 예외 사건인지, 정책적으로 중요한 신호인지 구분해야 한다. 노코드 도구는 이상치를 보여줄 수 있지만, 이상치의 의미를 결정하지는 못한다.</p>
+<table>
+<thead>
+<tr>
+<th>장면</th>
+<th>핵심 해설</th>
+<th>적용 활동</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>열 목록</td>
+<td>분석 가능한 변수와 제외할 변수를 구분한다</td>
+<td>데이터 사전을 만든다</td>
+</tr>
+<tr>
+<td>결측</td>
+<td>빈 값이 의미 있는 누락인지 확인한다</td>
+<td>삭제·대체·별도분류 중 하나를 고른다</td>
+</tr>
+<tr>
+<td>이상치</td>
+<td>오류와 중요한 사건을 구분한다</td>
+<td>원자료와 업무 담당자 의견을 확인한다</td>
+</tr>
+</tbody>
+</table>
+<h3>사례 해설 02. 노코드 대시보드 실습을 업무 회의로 연결하기</h3>
+<p>대시보드 실습은 차트를 많이 배치하는 활동이 아니라 회의에서 반복해서 볼 질문을 설계하는 활동이어야 한다. 현업 담당자는 대시보드를 열었을 때 ‘그래서 무엇을 봐야 하는가’를 바로 알아야 한다. 핵심 지표가 너무 많으면 아무 지표도 중요하지 않게 된다. 따라서 첫 화면에는 가장 중요한 지표 3~5개만 두고, 나머지는 필터와 상세표로 내려보내는 편이 좋다.</p>
+<p>대시보드 제목은 명사형보다 질문형으로 쓸 때 분석 목적이 선명해진다. “민원 현황 대시보드”보다 “이번 달 반복 민원이 늘어난 부서는 어디인가”가 더 좋다. 질문형 제목은 차트 선택과 필터 설계를 자연스럽게 제한한다.</p>
+<table>
+<thead>
+<tr>
+<th>장면</th>
+<th>핵심 해설</th>
+<th>적용 활동</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>첫 화면</td>
+<td>핵심 지표를 적게 두어야 한다</td>
+<td>지표 3~5개를 고른다</td>
+</tr>
+<tr>
+<td>필터</td>
+<td>사용자가 비교 기준을 바꿀 수 있어야 한다</td>
+<td>기간, 부서, 유형 필터를 설계한다</td>
+</tr>
+<tr>
+<td>행동</td>
+<td>대시보드는 다음 조치로 이어져야 한다</td>
+<td>우선 검토 목록을 만든다</td>
+</tr>
+</tbody>
+</table>
+<h3>사례 해설 03. AI가 만든 분석 코드를 검토하는 방법</h3>
+<p>노코드 과정에서도 생성형 AI가 파이썬 코드나 수식을 제안할 수 있다. 이때 학습자는 코드를 모두 외울 필요는 없지만, 코드가 무엇을 하는지는 읽을 수 있어야 한다. 특히 파일을 읽는 부분, 열을 삭제하는 부분, 결측값을 바꾸는 부분, 모델을 학습하는 부분, 결과를 저장하는 부분은 반드시 확인해야 한다.</p>
+<p>실습 결과를 읽을 때는 코드 검토를 두려운 활동으로 만들지 말고 체크리스트 활동으로 바꾸면 좋다. “어떤 파일을 읽는가”, “어떤 열을 쓰는가”, “어떤 값을 제외하는가”, “결과 파일은 어디에 저장되는가” 네 질문만으로도 많은 오류를 잡을 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>장면</th>
+<th>핵심 해설</th>
+<th>적용 활동</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>파일</td>
+<td>잘못된 파일을 읽으면 분석 전체가 틀어진다</td>
+<td>파일명과 행 수를 출력한다</td>
+</tr>
+<tr>
+<td>열 선택</td>
+<td>예측 시점 이후 정보가 들어갈 수 있다</td>
+<td>사용 열 목록을 확인한다</td>
+</tr>
+<tr>
+<td>저장</td>
+<td>결과 파일이 덮어쓰기될 수 있다</td>
+<td>출력 파일명과 위치를 확인한다</td>
+</tr>
+</tbody>
+</table>
+<h3>사례 해설 04. 보고서 자동 초안의 검토 기준</h3>
+<p>AI가 분석 결과 보고서 초안을 만들어 주면 학습자는 완성된 문서처럼 느낄 수 있다. 그러나 자동 초안은 대체로 결과를 매끄럽게 연결하지만 한계를 약하게 쓰는 경향이 있다. 공공 보고서에서는 한계 문장이 매우 중요하다. 데이터 기간, 표본 수, 결측 처리, 인과관계 단정 금지, 공개 범위 제한을 명확히 적어야 한다.</p>
+<p>AI 보고서 초안은 일부러 한 번 더 검토해야 한다. 학습자는 좋은 문장을 찾는 것이 아니라 위험한 문장을 찾는다. “영향을 미쳤다”, “원인이다”, “반드시 필요하다” 같은 단정 표현은 근거가 없으면 수정해야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>장면</th>
+<th>핵심 해설</th>
+<th>적용 활동</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>결과</td>
+<td>핵심 발견은 간결하게 쓴다</td>
+<td>숫자와 차트 근거를 연결한다</td>
+</tr>
+<tr>
+<td>한계</td>
+<td>자료와 방법의 제약을 숨기지 않는다</td>
+<td>기간, 표본, 결측, 예외를 적는다</td>
+</tr>
+<tr>
+<td>조치</td>
+<td>보고서는 행동으로 끝나야 한다</td>
+<td>추가 확인과 담당자를 지정한다</td>
+</tr>
+</tbody>
+</table>
+<h3>사례 해설 05. 노코드 실습 오류를 학습 자료로 바꾸기</h3>
+<p>실습 중 오류가 발생하면 학습 흐름이 끊긴다고 생각하기 쉽다. 그러나 노코드 데이터분석 학습에서 오류는 매우 좋은 학습 자료다. 파일 인코딩 오류, 열 이름 불일치, 날짜 형식 오류, 숫자와 문자 혼합, 필터 조건 누락은 실제 업무에서도 자주 발생한다. 학습자가 오류를 한 번도 보지 않고 학습을 끝내면 현업에서 같은 오류를 만났을 때 멈추게 된다.</p>
+<p>오류는 숨길 대상이 아니라 읽고 수정할 단서로 다루어야 한다. 오류 메시지에서 파일명, 열 이름, 행 번호, 자료형 힌트를 찾고, 원자료에서 해당 부분을 확인한 뒤, 수정 기준을 기록한다. 이 과정을 교재에 서술하면 실습 화면은 훨씬 실무적으로 변한다.</p>
+<table>
+<thead>
+<tr>
+<th>장면</th>
+<th>핵심 해설</th>
+<th>적용 활동</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>인코딩</td>
+<td>한글이 깨지면 파일 읽기 단계 문제다</td>
+<td>UTF-8과 CP949를 구분해 본다</td>
+</tr>
+<tr>
+<td>열 이름</td>
+<td>AI가 존재하지 않는 열을 부를 수 있다</td>
+<td>실제 열 목록을 출력한다</td>
+</tr>
+<tr>
+<td>날짜</td>
+<td>문자 날짜는 정렬과 계산을 왜곡한다</td>
+<td>날짜 형식 변환 기준을 기록한다</td>
+</tr>
+</tbody>
+</table>
+<!-- CODEX_DEEPER_ENRICHMENT_END -->
+
+<!-- CODEX_FINAL_DENSE_ENRICHMENT_START --></article>
+<article class="page-source-section" data-section-index="98" data-section-title="현장 적용 장. 노코드 데이터분석을 따라하기에서 설명하기로 확장하기"><h2>현장 적용 장. 노코드 데이터분석을 따라하기에서 설명하기로 확장하기</h2>
+<h3>1. 실습 화면마다 업무 질문을 붙인다</h3>
+<p>노코드 데이터분석 교재가 얇아 보이는 가장 큰 이유는 화면 캡처가 많은데 해설이 짧기 때문이다. 화면은 도구의 상태를 보여줄 뿐, 왜 그 조작을 하는지는 설명하지 않는다. 따라서 각 화면에는 업무 질문이 붙어야 한다. 파일을 올리는 화면에는 “이 자료는 어떤 의사결정을 위해 수집되었는가”를 붙이고, 결측 처리 화면에는 “이 값을 지우면 어떤 집단이 빠지는가”를 붙이며, 차트 화면에는 “이 그림은 어떤 조치를 결정하게 하는가”를 붙여야 한다.</p>
+<p>예를 들어 단순히 “CSV 파일을 업로드한다”라고 쓰면 학습자는 버튼 위치만 기억한다. “CSV 업로드 단계에서는 원자료의 기준일, 작성 부서, 개인정보 포함 여부, 분석 목적과의 적합성을 확인한다. 업로드 전에 열 이름과 샘플 행을 보고 분석에서 제외할 열을 표시한다.”라고 쓰면 실무 절차가 된다. 같은 화면이라도 해설이 붙으면 교재의 밀도가 달라진다.</p>
+<h3>2. 노코드 도구의 자동 추천을 그대로 믿지 않는다</h3>
+<p>많은 노코드 도구는 데이터 형태를 보고 차트나 요약 통계를 자동으로 추천한다. 이 기능은 편리하지만, 추천 결과가 업무 질문에 맞는지는 별개다. 도구는 열의 이름과 데이터 타입을 보고 그래프를 제안할 수 있지만, 그 열이 정책적으로 어떤 의미인지, 비교해도 되는 집단인지, 개인정보나 민감정보가 포함되어 있는지는 알지 못한다. 따라서 자동 추천은 출발점이지 결론이 아니다.</p>
+<p>자동 추천 결과는 그대로 받아들이지 말고 일부러 검토해야 한다. 왜 이 차트가 제안되었는지, 축과 범례가 적절한지, 표본 수가 충분한지, 평균 대신 중앙값이 필요한지 묻는다. 이 과정을 거치면 학습자는 도구를 조작하는 사람이 아니라 분석을 감독하는 사람이 된다.</p>
+<h3>3. 노코드 분석에서 전처리는 설명 가능한 선택이어야 한다</h3>
+<p>전처리는 초보자가 가장 쉽게 건너뛰는 단계다. 빈 값 제거, 중복 제거, 날짜 변환, 범주 통합은 버튼 몇 번으로 끝나지만, 실제로는 분석 결과에 큰 영향을 준다. 결측값을 모두 삭제하면 특정 부서나 특정 기간의 자료가 과도하게 빠질 수 있다. 중복 제거 기준이 잘못되면 같은 민원을 여러 번 세거나, 반대로 실제로 다른 사건을 하나로 합칠 수 있다.</p>
+<p>전처리 단계에서는 선택의 이유를 기록해야 한다. “처리일자가 없는 12건은 처리기간 계산에서 제외하되, 누락 건수는 별도 표에 남긴다”, “동일 접수번호 중복 5건은 최신 수정본만 사용한다”, “부서명 변경 전후 명칭은 현재 조직명으로 통합한다”처럼 써야 한다. 이런 문장이 있어야 노코드 분석 결과도 감사와 재현이 가능하다.</p>
+<h3>4. 대시보드 실습은 사용자의 다음 행동을 설계하는 일이다</h3>
+<p>대시보드는 예쁜 차트를 모아 놓은 화면이 아니다. 반복 회의에서 같은 질문을 빠르게 확인하기 위한 업무 도구다. 좋은 대시보드는 사용자가 화면을 보고 다음 행동을 알 수 있게 한다. 어느 부서를 확인해야 하는지, 어떤 유형을 우선 검토해야 하는지, 어떤 기간의 변화가 비정상적인지 보여주어야 한다. 단순 현황판은 보는 순간은 좋지만 회의가 끝나면 잊힌다.</p>
+<p>대시보드 설계에서는 ‘첫 화면의 질문’을 정해야 한다. 민원 대시보드라면 “이번 달 민원이 어디서 왜 늘었는가”가 될 수 있다. 예산 대시보드라면 “집행 지연 위험 사업은 무엇인가”가 될 수 있다. 학습 대시보드라면 “다음 차수에서 무엇을 개선해야 하는가”가 될 수 있다. 질문이 정해지면 지표, 필터, 차트 순서가 자연스럽게 결정된다.</p>
+<h3>5. 생성형 AI는 노코드 분석의 설명자를 맡을 수 있다</h3>
+<p>노코드 도구가 결과를 만들면 생성형 AI는 그 결과를 설명하는 데 도움을 줄 수 있다. 예를 들어 요약 통계표를 보고 핵심 발견 후보를 만들거나, 차트 설명 문장을 초안으로 만들거나, 대시보드 사용 안내 문구를 작성할 수 있다. 그러나 AI 설명은 반드시 원자료와 대조해야 한다. AI는 차트의 시각적 패턴을 그럴듯하게 설명하면서도 실제 값의 크기나 예외를 놓칠 수 있다.</p>
+<p>좋은 활용 방식은 AI에게 “이 결과를 바탕으로 단정하지 말고 확인 필요 사항을 함께 써라”라고 지시하는 것이다. 그러면 보고 문장에 한계와 검토 항목이 들어갈 가능성이 높아진다. 노코드 분석에서 AI는 분석가를 대체하는 도구가 아니라 설명 초안을 풍부하게 만드는 보조자다.</p>
+<h3>6. 실습 산출물은 파일보다 의사결정 메모로 끝나야 한다</h3>
+<p>C04 실습의 마지막 산출물은 대시보드 파일이나 노트북 파일 하나로 끝나면 안 된다. 실제 업무에서 필요한 것은 그 결과를 보고 무엇을 할지 정리한 의사결정 메모다. 메모에는 분석 질문, 사용 데이터, 주요 발견, 한계, 후속 조치가 들어가야 한다. 이 메모가 있어야 상급자와 동료가 분석 결과를 업무에 사용할 수 있다.</p>
+<p>예를 들어 과정 만족도 분석을 했다면 “실습 시간 부족 의견이 자유응답에서 반복되었고, 3번 문항의 낮은 점수와 연결된다. 다음 차수에서는 개념 설명 시간을 줄이고 실습 시간을 20분 늘린다. 다만 응답자 수가 적어 전체 과정 개편 전 추가 차수에서도 같은 패턴을 확인한다.”처럼 끝나야 한다. 이것이 노코드 분석을 행정 개선으로 연결하는 문장이다.</p></article>
+<article class="page-source-section" data-section-index="99" data-section-title="현장 적용 장. 공공업무형 노코드 분석 프로젝트 사례"><h2>현장 적용 장. 공공업무형 노코드 분석 프로젝트 사례</h2>
+<h3>1. 민원 반복 이슈 분석 프로젝트</h3>
+<p>민원 데이터는 노코드 분석의 좋은 실습 자료다. 접수일, 처리부서, 민원유형, 처리기간, 처리상태, 만족도, 자유응답이 있으면 기본적인 분석 흐름을 모두 연습할 수 있다. 먼저 월별 민원 건수와 유형별 비중을 확인한다. 그다음 장기 처리 건을 따로 분리하고, 어떤 유형과 부서에서 반복되는지 본다. 마지막으로 자유응답이나 제목을 간단히 유형화해 숫자 뒤에 있는 이유를 찾는다.</p>
+<p>이 프로젝트의 핵심은 부서 순위를 만드는 것이 아니다. 특정 부서를 문제 부서로 지목하기보다, 반복 문의가 발생하는 안내 부족 지점, 처리기간이 길어지는 절차적 병목, 시민이 자주 헷갈리는 제도 표현을 찾는 것이 목적이다. 따라서 대시보드에는 부서별 순위뿐 아니라 유형별 반복 이슈, 장기 처리 사유, 개선 가능한 안내문 후보가 함께 들어가야 한다.</p>
+<p>보고 문장은 “A부서 민원이 많다”가 아니라 “A유형 민원은 특정 기간 이후 증가했으며, 안내문 변경과 관련이 있는지 확인이 필요하다. 장기 처리 건은 복합 문의와 현장 확인 요청에 집중되어 있어 단순 민원과 분리한 관리가 필요하다”처럼 써야 한다. 이 문장이 있어야 노코드 분석 결과가 현업 회의에서 토론 가능한 자료가 된다.</p>
+<h3>2. 학습 운영 개선 분석 프로젝트</h3>
+<p>학습 과정 자료는 노코드 분석을 배우기에 적합하다. 신청자 수, 참석자 수, 이수율, 만족도, 문항별 점수, 자유응답, 학습 방식, 제공 방식, 시간표 같은 자료가 있으면 학습 과정의 어떤 부분을 개선할지 판단할 수 있다. 단순 평균 만족도만 보면 학습 과정의 문제를 놓치기 쉽다. 문항별 점수, 낮은 점수 비율, 자유응답 주제를 함께 봐야 한다.</p>
+<p>이 프로젝트에서는 먼저 전체 만족도와 문항별 만족도를 비교한다. 다음으로 직급, 사전 경험, 학습 방식에 따라 차이가 있는지 본다. 마지막으로 자유응답을 실습 시간, 자료 난이도, 사례 적합성, 도구 접근성, 후속 학습 요청 등으로 분류한다. 노코드 도구는 이 과정을 빠르게 시각화할 수 있지만, 분류 기준은 사람이 업무에 맞게 만들어야 한다.</p>
+<p>좋은 산출물은 다음 차수 운영계획으로 이어진다. “전체 만족도는 높지만 실습 시간이 부족하다는 의견이 반복되었고, 초급자 집단에서 자료 난이도 부담이 높게 나타났다. 다음 차수에서는 사전 안내자료를 제공하고, 개념 설명 시간을 줄여 실습 시간을 늘린다”처럼 작성하면 분석이 개선 조치로 이어진다.</p>
+<h3>3. 예산 집행 모니터링 프로젝트</h3>
+<p>예산 집행 데이터는 노코드 대시보드 실습에서 매우 실용적이다. 사업명, 부서, 예산액, 집행액, 집행률, 계약상태, 집행예정일, 지연 사유가 있으면 분기별 점검 대시보드를 만들 수 있다. 다만 예산 데이터는 사업 유형과 집행 구조를 모르면 쉽게 오해한다. 집행률이 낮다고 해서 무조건 부진한 사업은 아니며, 하반기에 계약이 집중되는 사업도 있다.</p>
+<p>분석은 사업 유형을 먼저 나누는 데서 시작한다. 인건비성 경비, 용역 계약, 보조사업, 시설공사, 행사성 사업은 정상 집행 패턴이 다르다. 그다음 전년 동기 대비 집행률, 당초 계획 대비 지연 여부, 지연 사유 반복 여부를 본다. 대시보드에서는 전체 집행률보다 우선 점검 대상 사업 목록이 더 중요할 수 있다.</p>
+<p>보고 문장은 신중해야 한다. “집행률이 낮다”보다 “하반기 계약 예정 사업을 제외하면 실제 지연 의심 사업은 6건이며, 그중 3건은 보조사업자 선정 지연이 반복되고 있다. 담당 부서 확인 후 3분기 집행계획 조정이 필요하다”처럼 써야 한다. 노코드 분석은 이런 문장을 만들기 위한 근거를 제공한다.</p>
+<h3>4. 내부 업무량 균형 분석 프로젝트</h3>
+<p>부서나 팀의 업무량을 분석할 때는 조심해야 한다. 접수 건수, 처리 건수, 처리기간, 야근 시간, 회의 수 같은 지표는 업무 부담을 일부 보여주지만, 업무 난이도와 책임의 차이를 완전히 설명하지 못한다. 노코드 분석에서는 이런 한계를 명확히 써야 한다. 업무량 분석은 개인 평가가 아니라 조직 지원과 업무 조정의 참고자료로 제한하는 것이 안전하다.</p>
+<p>이 프로젝트에서는 먼저 업무 유형을 나누고, 반복 업무와 예외 업무를 구분한다. 단순 건수보다 장기 처리 건, 재작업 건, 타부서 협의 건, 민원성 업무 비중을 함께 본다. 가능하다면 담당자 인터뷰나 업무일지와 결합해 숫자가 설명하지 못하는 부담을 보완한다.</p>
+<p>산출물은 “누가 일을 적게 했는가”가 아니라 “어떤 업무에서 병목이 반복되는가”로 작성해야 한다. 예를 들어 “특정 팀은 처리 건수보다 타부서 협의 건 비중이 높아 평균 처리기간이 길게 나타난다. 단순 건수 기준의 비교는 적절하지 않으며, 협의 절차 표준화와 임시 지원 인력 배치가 필요하다”처럼 해석해야 한다.</p>
+<h3>5. 공공데이터 품질 점검 프로젝트</h3>
+<p>노코드 도구는 데이터 품질 점검에도 유용하다. 열별 결측률, 중복 행, 형식 오류, 범위 밖 값, 날짜 오류, 코드값 불일치를 빠르게 찾을 수 있다. 이 프로젝트는 분석 결과를 내기 전에 자료를 신뢰할 수 있는지 확인하는 데 목적이 있다. 학습자는 품질 점검이 분석의 부가 작업이 아니라 분석의 첫 단계라는 점을 배운다.</p>
+<p>품질 점검 보고서에는 오류 건수만 쓰지 않는다. 오류가 어떤 업무 단계에서 생겼는지, 분석 결과에 어떤 영향을 줄 수 있는지, 수정할 수 있는 오류와 기록만 남겨야 하는 한계를 구분해야 한다. 예를 들어 부서명 오타는 정정할 수 있지만, 과거 입력 기준이 달랐던 문제는 단순 수정이 어려울 수 있다.</p>
+<p>최종 문장은 “데이터 품질이 낮다”가 아니라 “처리일자 결측 18건은 처리기간 분석에서 제외하고 별도 목록으로 관리한다. 부서명 표기 불일치는 현재 조직명 기준으로 통합했으며, 2024년 이전 자료는 조직개편 전 기준이 섞여 있어 장기 추세 비교에는 주의가 필요하다”처럼 구체적으로 써야 한다.</p>
+<!-- CODEX_FINAL_DENSE_ENRICHMENT_END -->
+
+<!-- CODEX_CONCRETE_NARRATIVE_START --></article>
+<article class="page-source-section" data-section-index="100" data-section-title="현장 사례 장. 노코드 분석 결과를 보고서와 대시보드로 바꾸기"><h2>현장 사례 장. 노코드 분석 결과를 보고서와 대시보드로 바꾸기</h2>
+<p>노코드 데이터분석에서 가장 흔한 실패는 결과 화면을 그대로 보고서라고 생각하는 것이다. 피벗표, 상관관계 히트맵, 막대차트, 지도 화면은 모두 근거 자료일 뿐이다. 보고서는 질문과 데이터와 해석과 다음 행동을 연결해야 한다. 예를 들어 “민원 유형별 건수” 차트가 만들어졌다면, 좋은 보고 문장은 “반복 민원은 신청 절차 문의와 보완 서류 오류에 집중되어 있으며, 안내문 수정과 접수 화면 문구 개선을 우선 검토할 필요가 있다”처럼 업무 조치까지 이어져야 한다.</p>
+<p>공공시설 개방 데이터로 대시보드를 만든다고 가정하자. 단순 대시보드는 시설 수, 유료 비율, 평균 사용료, 주말 운영 여부를 카드로 보여준다. 그러나 실무형 대시보드는 여기서 한 단계 더 들어간다. 지역별 시설 수를 보여줄 때 인구 규모가 다른 지역을 그대로 비교하면 안 된다. 유료 비율을 볼 때 시설 유형을 섞으면 해석이 흔들린다. 주말 운영률을 볼 때 결측값이 실제 미운영인지, 입력 누락인지 확인해야 한다. 따라서 좋은 대시보드는 차트보다 필터와 주석이 중요하다.</p>
+<table>
+<thead>
+<tr>
+<th>대시보드 요소</th>
+<th>단순 표시</th>
+<th>실무형 해석</th>
+<th>필요한 보완</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>지역별 시설 수</td>
+<td>A지역이 가장 많다</td>
+<td>인구 대비 시설 수로 보면 다른 지역의 부족이 더 클 수 있다</td>
+<td>인구 또는 면적 보정 지표 추가</td>
+</tr>
+<tr>
+<td>유료 시설 비율</td>
+<td>유료 비율이 높다</td>
+<td>체육시설·문화시설 등 유형별 정책 차이일 수 있다</td>
+<td>시설 유형 필터와 유형별 비교 추가</td>
+</tr>
+<tr>
+<td>평균 사용료</td>
+<td>평균이 높다</td>
+<td>무료 시설과 고가 시설이 섞이면 평균이 왜곡된다</td>
+<td>중앙값, 사분위수, 무료·유료 분리</td>
+</tr>
+<tr>
+<td>주말 운영 여부</td>
+<td>운영률이 낮다</td>
+<td>결측이 미운영인지 미입력인지 구분해야 한다</td>
+<td>결측 목록과 확인 대상 분리</td>
+</tr>
+</tbody>
+</table>
+<p>노코드 도구가 자동으로 추천한 차트도 반드시 검토해야 한다. 도구는 데이터 형태를 보고 차트를 추천하지만, 업무 목적까지 이해하지는 못한다. 날짜 열이 있으면 선 그래프를 추천할 수 있고, 범주형 열이 있으면 막대차트를 추천할 수 있다. 그러나 그 차트가 정책 질문에 맞는지는 사람이 판단해야 한다. “신청 건수 추세”를 보려는지, “처리 지연 원인”을 보려는지, “지역별 불균형”을 보려는지에 따라 같은 데이터도 전혀 다른 화면이 필요하다.</p>
+<p>AI가 만든 분석 보고서 초안은 특히 조심해서 읽어야 한다. AI는 문장을 매끄럽게 만들지만, 한계를 약하게 쓰는 경향이 있다. 예를 들어 “주말 운영률이 낮아 주민 불편이 크다”라는 문장은 위험하다. 데이터가 주말 운영 여부만 보여준다면 주민 불편까지 직접 말할 수 없다. 더 안전한 문장은 “주말 운영 정보가 확인된 시설 중 운영률이 낮은 유형이 일부 관찰되며, 실제 이용 수요와 민원 자료를 함께 확인한 뒤 운영 확대 여부를 검토할 필요가 있다”이다. 이 문장은 관찰 사실, 한계, 후속 확인을 함께 담는다.</p>
+<h3>노코드 분석 보고서의 기본 구조</h3>
+<ol>
+<li>질문: 무엇을 확인하려는 분석인지 한 문장으로 쓴다.</li>
+<li>데이터: 기준일, 자료 출처, 주요 열, 제외한 값과 그 이유를 쓴다.</li>
+<li>처리 기준: 결측, 중복, 이상치, 파생변수 생성 방식을 쓴다.</li>
+<li>결과: 차트가 보여주는 관찰 사실을 쓴다.</li>
+<li>해석: 가능한 원인 후보와 주의할 점을 분리한다.</li>
+<li>조치: 다음 회의에서 확인할 항목과 담당 부서가 취할 행동을 쓴다.</li>
+</ol>
+<p>예를 들어 “시설유형별 주말 운영률” 분석이라면 보고서는 다음처럼 쓰는 것이 좋다. “2026년 기준 공공시설 개방 데이터에서 주말 운영 여부가 확인된 시설을 대상으로 유형별 운영률을 비교했다. 체육시설은 주말 운영률이 상대적으로 높고, 회의실과 학습실은 낮게 나타났다. 다만 일부 시설은 주말 운영 여부가 비어 있어 미운영으로 단정할 수 없으며, 결측 시설 목록을 별도 확인해야 한다. 다음 단계에서는 이용 신청 건수와 민원 자료를 함께 확인해 실제 수요가 높은 시설부터 운영 기준을 검토한다.”</p>
+<p>이 정도 문장이 붙어야 노코드 분석은 화면 캡처가 아니라 의사결정 자료가 된다.</p>
+<h3>화면 캡처를 보고 문장으로 바꾸는 예시</h3>
+<p>노코드 도구의 결과 화면에는 보통 많은 정보가 한꺼번에 나온다. 초급 단계에서는 이 화면을 전부 붙이고 싶어지지만, 보고서에는 전부가 필요하지 않다. 중요한 것은 화면에서 읽은 핵심을 업무 문장으로 바꾸는 것이다. 예를 들어 상관관계 히트맵에서 두 변수가 진하게 보인다고 해서 “원인이다”라고 쓰면 안 된다. “두 변수 사이에 함께 움직이는 경향이 관찰되며, 실제 원인 여부는 업무 절차와 추가 자료 확인이 필요하다”라고 써야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>도구 화면</th>
+<th>흔한 나쁜 문장</th>
+<th>교재형 좋은 문장</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>결측치 요약</td>
+<td>결측이 많아서 데이터가 나쁘다</td>
+<td>처리일자 결측은 미처리 상태와 입력 누락이 섞여 있을 수 있으므로, 분석 제외 건과 별도 확인 건을 분리한다.</td>
+</tr>
+<tr>
+<td>막대차트</td>
+<td>A유형이 제일 많다</td>
+<td>A유형은 전체의 42%를 차지하며, 최근 2개월 증가분의 대부분도 A유형에서 발생해 안내문 개선 후보로 볼 수 있다.</td>
+</tr>
+<tr>
+<td>지도</td>
+<td>특정 지역이 문제다</td>
+<td>해당 지역은 절대 건수가 많지만 인구와 시설 수를 보정한 뒤에도 높은지 추가 확인이 필요하다.</td>
+</tr>
+<tr>
+<td>자동 보고서</td>
+<td>AI가 원인을 찾았다</td>
+<td>AI가 제시한 원인 후보는 가설이며, 실제 제도 변경일과 현장 처리 절차를 대조해야 한다.</td>
+</tr>
+</tbody>
+</table>
+<p>노코드 분석에서 전처리는 숨은 핵심이다. 버튼 몇 번으로 결과가 나오더라도, 결측을 어떻게 처리했는지, 중복을 제거했는지, 날짜 형식을 통일했는지, 부서명 표기를 합쳤는지 기록하지 않으면 결과를 신뢰하기 어렵다. 특히 행정 데이터는 조직개편, 명칭 변경, 제도 변경의 영향을 받는다. “복지과”와 “복지정책과”가 같은 조직인지 다른 조직인지, “처리완료”와 “종결”이 같은 상태인지 다른 상태인지 확인해야 한다. 이 확인 없이 차트만 만들면 보고서는 빨라지지만 판단은 약해진다.</p>
+<p>대시보드의 마지막 화면에는 원자료 목록이 일부라도 있어야 한다. 요약 지표만 있으면 사용자는 숫자를 믿어야만 한다. 그러나 원자료 20건, 장기 처리 상위 목록, 결측 확인 대상 목록이 함께 있으면 숫자가 어디서 나왔는지 추적할 수 있다. 좋은 대시보드는 예쁜 화면이 아니라 질문에서 원자료까지 내려갈 수 있는 화면이다.</p>
+<!-- CODEX_CONCRETE_NARRATIVE_END -->
+
+<!-- CODEX_SOURCE_INFORMED_PRACTICE_START --></article>
+<article class="page-source-section" data-section-index="101" data-section-title="기준과 사례 장. 노코드 분석을 업무 의사결정 자료로 완성하기"><h2>기준과 사례 장. 노코드 분석을 업무 의사결정 자료로 완성하기</h2>
+<p>노코드 데이터분석에서 가장 흔한 실패는 도구 화면을 결과물로 착각하는 것이다. 피벗 테이블, 자동 차트, 대시보드 화면은 분석의 끝이 아니라 해석의 시작이다. 실제 업무에서는 화면을 본 사람이 무엇을 결정해야 하는지까지 이어져야 한다. 따라서 노코드 분석 결과물은 세 가지를 함께 가져야 한다. 첫째, 데이터가 어떻게 정리되었는지 설명하는 처리 메모다. 둘째, 차트가 말하는 핵심을 문장으로 바꾼 해석이다. 셋째, 그 해석으로 어떤 조치를 할지 적은 의사결정 메모다.</p>
+<p>NIA의 공공부문 초거대 AI 도입·활용 가이드라인 2.0은 도입 절차, 고려사항, 성과관리 관점을 함께 제시한다. 노코드 분석도 같은 방식으로 보아야 한다. 도구를 켰는지보다 어떤 업무 문제를 풀었는지, 어떤 데이터를 썼는지, 결과가 어떤 조치로 이어졌는지, 이후 재사용할 수 있는 기록이 남았는지가 더 중요하다.</p>
+<p>예를 들어 시설 이용 예약 데이터를 분석한다고 해 보자. 도구는 시간대별 예약 건수, 취소율, 이용자 유형, 공간별 가동률을 빠르게 보여 준다. 여기서 멈추면 “금요일 오후 예약이 많다” 정도의 관찰만 남는다. 업무 자료로 만들려면 한 단계 더 가야 한다. 금요일 오후 예약이 많은 공간은 어느 곳인지, 취소율도 함께 높은지, 특정 단체가 반복 예약하는지, 대기 수요가 발생하는지 확인해야 한다. 그래야 “금요일 오후 대형 회의실은 예약 집중과 취소율이 동시에 높으므로, 대기자 자동 안내와 반복 취소 제한 기준을 검토한다”라는 문장이 나온다.</p>
+<table>
+<thead>
+<tr>
+<th>분석 단계</th>
+<th>도구가 보여 주는 것</th>
+<th>업무 문장으로 바꿀 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>정제</td>
+<td>결측값, 중복값, 형식 오류</td>
+<td>어떤 값을 제외했고 왜 제외했는지</td>
+</tr>
+<tr>
+<td>집계</td>
+<td>건수, 평균, 비율</td>
+<td>비교 기준과 변화 폭이 무엇인지</td>
+</tr>
+<tr>
+<td>시각화</td>
+<td>막대, 선, 분포, 지도</td>
+<td>눈에 띄는 패턴과 예외가 무엇인지</td>
+</tr>
+<tr>
+<td>해석</td>
+<td>상관, 추세, 군집</td>
+<td>원인으로 단정할 수 있는지 여부</td>
+</tr>
+<tr>
+<td>조치</td>
+<td>필터링된 목록, 우선순위</td>
+<td>누가 언제 무엇을 확인할지</td>
+</tr>
+</tbody>
+</table>
+<p>노코드 분석에서는 원본 데이터와 가공 데이터의 관계를 남기는 것이 특히 중요하다. 버튼 몇 번으로 열을 삭제하고 값을 변환하면 화면은 깔끔해지지만, 나중에 같은 결과를 다시 만들기 어렵다. 날짜 형식을 어떻게 통일했는지, 비어 있는 값은 제외했는지 0으로 바꾸었는지, 중복 행은 어떤 기준으로 제거했는지 기록해야 한다. 이 기록이 없으면 대시보드가 맞는지 틀린지 확인할 방법이 줄어든다.</p>
+<p>AI가 자동으로 보고서 초안을 만들어 줄 때도 검토 기준은 필요하다. AI는 차트의 눈에 띄는 변화를 문장으로 잘 바꾸지만, 업무 맥락을 모르면 과장할 수 있다. “증가했다”와 “문제가 심각해졌다”는 다르다. “상관이 있다”와 “원인이다”도 다르다. 노코드 도구와 AI를 함께 쓸수록 담당자는 차트의 숫자, 데이터 범위, 해석 문장을 서로 대조해야 한다. 좋은 보고서는 화려한 화면보다 조심스러운 문장이 더 중요할 때가 많다.</p>
+<p>공공업무형 노코드 분석의 완성본은 대시보드, 해석문, 조치표가 함께 있는 형태가 좋다. 대시보드는 전체 흐름을 보여 주고, 해석문은 핵심 판단을 설명하며, 조치표는 다음 업무를 만든다. 조치표에는 확인 대상, 담당 부서, 필요한 추가 자료, 결정 기한이 들어간다. 이렇게 구성하면 분석 결과가 “참고 자료”에 머물지 않고 실제 업무 회의에서 다룰 수 있는 안건이 된다.</p>
+<p>화면 캡처를 보고서에 넣을 때도 원칙이 있다. 한 페이지에 큰 그림 하나만 넣는 방식은 보기에는 시원하지만 교재나 보고서에서는 정보 밀도가 낮다. 그림 옆에는 “무엇을 먼저 볼 것인가”, “어떤 수치가 중요한가”, “어떤 해석은 아직 조심해야 하는가”를 붙여야 한다. 예를 들어 대시보드 그림 옆에 “좌측 필터는 부서와 기간을 바꾸는 장치이며, 우측 상단의 전체 건수보다 하단의 장기 처리 건 추이를 먼저 확인해야 한다”라고 쓰면 그림은 장식이 아니라 읽을 수 있는 자료가 된다.</p>
+<!-- CODEX_SOURCE_INFORMED_PRACTICE_END --></article>
+  </div>
+
+  <script>
+    (function() {
+      var EDITABLE_TAGS = {
+        P:1,H1:1,H2:1,H3:1,H4:1,H5:1,H6:1,
+        TD:1,TH:1,LI:1,SPAN:1,STRONG:1,EM:1,SMALL:1,DIV:1
+      };
+      var EDITABLE_SELECTOR = [
+        '.sheet p',
+        '.sheet h1',
+        '.sheet h2',
+        '.sheet h3',
+        '.sheet h4',
+        '.sheet h5',
+        '.sheet h6',
+        '.sheet td',
+        '.sheet th',
+        '.sheet li',
+        '.sheet span',
+        '.sheet strong',
+        '.sheet em',
+        '.sheet small',
+        '.sheet blockquote'
+      ].join(', ');
+      var META_DATASET_KEYS = {
+        title: 'metaTitle',
+        subtitle: 'metaSubtitle',
+        year: 'metaYear',
+        track: 'metaTrack',
+        module: 'metaModule',
+        courseCode: 'metaCourseCode',
+        documentType: 'metaDocumentType',
+        coverLine: 'metaCoverLine',
+        coverWordmark: 'metaCoverWordmark'
+      };
+      var repaginateTimer = null;
+
+      function isInExcludedArea(el) {
+        return !!el.closest(
+          '.topbar, .sidenav, .toc, .paper-source, .meta-panel, '
+          + '.sheet-header, .sheet-footer'
+        );
+      }
+
+      function readMetaFromDataset() {
+        return {
+          title: (
+            document.body.dataset.metaTitle
+            || document.body.dataset.docTitle
+            || '문서'
+          ),
+          subtitle: document.body.dataset.metaSubtitle || '',
+          year: document.body.dataset.metaYear || '',
+          track: document.body.dataset.metaTrack || '',
+          module: document.body.dataset.metaModule || '',
+          courseCode: document.body.dataset.metaCourseCode || '',
+          documentType: document.body.dataset.metaDocumentType || '',
+          coverLine: document.body.dataset.metaCoverLine || '',
+          coverWordmark: document.body.dataset.metaCoverWordmark || ''
+        };
+      }
+
+      function buildGuideLabel(meta) {
+        var prefix = meta.year ? meta.year + ' ' : '';
+        return (prefix + 'CURRICULUM GUIDEBOOK').trim();
+      }
+
+      function buildFooterMeta(meta) {
+        return [meta.year, meta.courseCode, meta.documentType]
+          .filter(function(part) {
+            return !!part;
+          })
+          .join(' · ');
+      }
+
+      function setMetaTextTargets(key, value) {
+        document
+          .querySelectorAll('[data-meta-text="' + key + '"]')
+          .forEach(function(el) {
+            el.textContent = value;
+          });
+      }
+
+      function setMetaDerivedTargets(key, value) {
+        document
+          .querySelectorAll('[data-meta-derived="' + key + '"]')
+          .forEach(function(el) {
+            el.textContent = value;
+          });
+      }
+
+      function syncMetaInputs(meta) {
+        document
+          .querySelectorAll('[data-meta-input]')
+          .forEach(function(field) {
+          var key = field.getAttribute('data-meta-input');
+          var value = meta[key] || '';
+          field.value = value;
+          field.setAttribute('value', value);
+        });
+      }
+
+      function applyMeta(meta, options) {
+        var settings = options || {};
+        var displayTitle = meta.title || '문서';
+        var footerMeta = buildFooterMeta(meta) || displayTitle;
+
+        Object.keys(META_DATASET_KEYS).forEach(function(key) {
+          document.body.dataset[META_DATASET_KEYS[key]] = meta[key] || '';
+        });
+
+        document.body.dataset.docTitle = displayTitle;
+        document.body.dataset.docMeta = footerMeta;
+        document.body.dataset.saveName = displayTitle;
+        document.title = displayTitle;
+
+        var titleTag = document.querySelector('title');
+        if (titleTag) {
+          titleTag.textContent = displayTitle;
+        }
+
+        setMetaTextTargets('title', displayTitle);
+        setMetaTextTargets('subtitle', meta.subtitle || '');
+        setMetaTextTargets('year', meta.year || '');
+        setMetaTextTargets('track', meta.track || '');
+        setMetaTextTargets('module', meta.module || '');
+        setMetaTextTargets('courseCode', meta.courseCode || '');
+        setMetaTextTargets('documentType', meta.documentType || '');
+        setMetaTextTargets('coverLine', meta.coverLine || '');
+        setMetaTextTargets('coverWordmark', meta.coverWordmark || '');
+        setMetaDerivedTargets('guideLabel', buildGuideLabel(meta));
+
+        if (settings.syncFields !== false) {
+          syncMetaInputs(meta);
+        }
+
+        if (settings.repaginate) {
+          repaginateSoon();
+        }
+      }
+
+      function readMetaFromForm() {
+        var meta = readMetaFromDataset();
+
+        document
+          .querySelectorAll('[data-meta-input]')
+          .forEach(function(field) {
+          var key = field.getAttribute('data-meta-input');
+          meta[key] = field.value.trim();
+        });
+
+        return meta;
+      }
+
+      function getEditableElements() {
+        return Array.prototype.slice.call(
+          document.querySelectorAll(EDITABLE_SELECTOR)
+        ).filter(function(el) {
+          return !isInExcludedArea(el);
+        });
+      }
+
+      function syncEditedElement(el) {
+        var blockId = el.getAttribute('data-block-id');
+        if (!blockId) return;
+        var sourceBlock = document.querySelector(
+          '.paper-source [data-block-id="' + blockId + '"]'
+        );
+        if (!sourceBlock) return;
+        sourceBlock.innerHTML = el.innerHTML;
+      }
+
+      function syncAllEditedElements() {
+        getEditableElements().forEach(syncEditedElement);
+      }
+
+      function fitsPage(body) {
+        return body.scrollHeight <= body.clientHeight + 1;
+      }
+
+      function createSheet(container, sectionTitle, sectionIndex, partIndex) {
+        var sheet = document.createElement('section');
+        var header = document.createElement('div');
+        var runningTitle = document.createElement('div');
+        var runningSection = document.createElement('div');
+        var body = document.createElement('div');
+        var footer = document.createElement('div');
+        var footerMeta = document.createElement('div');
+        var footerPage = document.createElement('div');
+        var footerPageNum = document.createElement('span');
+        var footerPageLabel = document.createElement('span');
+        var suffix = partIndex > 1 ? ' · ' + partIndex : '';
+        var pageLabel = sectionTitle + suffix;
+        var docTitle = document.body.dataset.docTitle || '문서';
+        var docMeta = document.body.dataset.docMeta || docTitle;
+        sheet.className = 'sheet';
+        sheet.dataset.pageLabel = pageLabel;
+        sheet.id = partIndex === 1
+          ? 'section-' + sectionIndex
+          : (
+              'section-' + sectionIndex + '-p'
+              + String(partIndex).padStart(2, '0')
+            );
+        header.className = 'sheet-header';
+        runningTitle.className = 'sheet-running-title';
+        runningSection.className = 'sheet-running-section';
+        runningTitle.textContent = docTitle;
+        runningSection.textContent = pageLabel;
+        header.appendChild(runningTitle);
+        header.appendChild(runningSection);
+        body.className = 'sheet-body';
+        footer.className = 'sheet-footer';
+        footerMeta.className = 'sheet-footer-meta';
+        footerPage.className = 'sheet-footer-page';
+        footerPageNum.className = 'sheet-footer-page-num';
+        footerPageLabel.className = 'sheet-footer-page-label';
+        footerMeta.textContent = docMeta;
+        footerPageLabel.textContent = pageLabel;
+        footerPage.appendChild(footerPageNum);
+        footerPage.appendChild(footerPageLabel);
+        footer.appendChild(footerMeta);
+        footer.appendChild(footerPage);
+        sheet.appendChild(header);
+        sheet.appendChild(body);
+        sheet.appendChild(footer);
+        container.appendChild(sheet);
+        return {
+          sheet: sheet,
+          body: body,
+          sectionTitle: sectionTitle,
+          sectionIndex: sectionIndex,
+          partIndex: partIndex
+        };
+      }
+
+      function applySectionAnchor(clone, state, sectionTitle, sectionIndex) {
+        if (!clone.dataset || !clone.dataset.sectionAnchor) return;
+        if (!document.getElementById(clone.dataset.sectionAnchor)) {
+          clone.id = clone.dataset.sectionAnchor;
+        }
+        state.sectionTitle = sectionTitle;
+        state.sectionIndex = sectionIndex;
+        state.partIndex = 1;
+      }
+
+      function appendWholeBlock(
+        container,
+        state,
+        sourceNode,
+        sectionTitle,
+        sectionIndex,
+      ) {
+        var clone = sourceNode.cloneNode(true);
+        state.body.appendChild(clone);
+        if (fitsPage(state.body)) {
+          applySectionAnchor(clone, state, sectionTitle, sectionIndex);
+          return state;
+        }
+
+        state.body.removeChild(clone);
+        if (!state.body.children.length) {
+          state.body.appendChild(clone);
+          applySectionAnchor(clone, state, sectionTitle, sectionIndex);
+          state.sheet.dataset.oversize = 'true';
+          return state;
+        }
+
+        state = createSheet(
+          container,
+          sectionTitle,
+          sectionIndex,
+          state.sectionIndex === sectionIndex ? state.partIndex + 1 : 1,
+        );
+        clone = sourceNode.cloneNode(true);
+        state.body.appendChild(clone);
+        applySectionAnchor(clone, state, sectionTitle, sectionIndex);
+        if (!fitsPage(state.body)) {
+          state.sheet.dataset.oversize = 'true';
+        }
+        return state;
+      }
+
+      function appendListBlock(
+        container,
+        state,
+        sourceList,
+        sectionTitle,
+        sectionIndex,
+      ) {
+        var items = Array.prototype.slice.call(sourceList.children);
+        var listClone = sourceList.cloneNode(false);
+        state.body.appendChild(listClone);
+
+        items.forEach(function(item) {
+          var itemClone = item.cloneNode(true);
+          listClone.appendChild(itemClone);
+          if (fitsPage(state.body)) {
+            return;
+          }
+
+          listClone.removeChild(itemClone);
+          if (!listClone.children.length) {
+            if (
+              state.body.children.length > 1
+              || state.body.firstElementChild !== listClone
+            ) {
+              state.body.removeChild(listClone);
+              state = createSheet(
+                container,
+                sectionTitle,
+                sectionIndex,
+                state.partIndex + 1,
+              );
+              listClone = sourceList.cloneNode(false);
+              state.body.appendChild(listClone);
+              listClone.appendChild(itemClone);
+              if (!fitsPage(state.body)) {
+                state.sheet.dataset.oversize = 'true';
+              }
+              return;
+            }
+
+            listClone.appendChild(itemClone);
+            state.sheet.dataset.oversize = 'true';
+            return;
+          }
+
+          state = createSheet(
+            container,
+            sectionTitle,
+            sectionIndex,
+            state.partIndex + 1,
+          );
+          listClone = sourceList.cloneNode(false);
+          state.body.appendChild(listClone);
+          listClone.appendChild(itemClone);
+          if (!fitsPage(state.body)) {
+            state.sheet.dataset.oversize = 'true';
+          }
+        });
+
+        return state;
+      }
+
+      function createTableClone(sourceTable) {
+        var tableClone = sourceTable.cloneNode(false);
+        var header = sourceTable.querySelector('thead');
+        var body = sourceTable.querySelector('tbody');
+        Array.prototype.slice.call(sourceTable.children).forEach(function(child) {
+          var tagName = child.tagName;
+          if (tagName === 'THEAD' || tagName === 'TBODY') return;
+          tableClone.appendChild(child.cloneNode(true));
+        });
+        if (header) {
+          tableClone.appendChild(header.cloneNode(true));
+        }
+        var bodyClone = body
+          ? body.cloneNode(false)
+          : document.createElement('tbody');
+        tableClone.appendChild(bodyClone);
+        return { table: tableClone, body: bodyClone };
+      }
+
+      function appendTableBlock(
+        container,
+        state,
+        sourceTable,
+        sectionTitle,
+        sectionIndex,
+      ) {
+        var body = sourceTable.querySelector('tbody');
+        var rows = body
+          ? Array.prototype.slice.call(body.children)
+          : Array.prototype.slice.call(sourceTable.querySelectorAll('tr'))
+              .filter(function(row) {
+                return !row.closest('thead');
+              });
+
+        if (!rows.length) {
+          return appendWholeBlock(
+            container,
+            state,
+            sourceTable,
+            sectionTitle,
+            sectionIndex,
+          );
+        }
+
+        var current = createTableClone(sourceTable);
+        state.body.appendChild(current.table);
+
+        rows.forEach(function(row) {
+          var rowClone = row.cloneNode(true);
+          current.body.appendChild(rowClone);
+          if (fitsPage(state.body)) {
+            return;
+          }
+
+          current.body.removeChild(rowClone);
+          if (!current.body.children.length) {
+            if (
+              state.body.children.length > 1
+              || state.body.firstElementChild !== current.table
+            ) {
+              state.body.removeChild(current.table);
+              state = createSheet(
+                container,
+                sectionTitle,
+                sectionIndex,
+                state.partIndex + 1,
+              );
+              current = createTableClone(sourceTable);
+              state.body.appendChild(current.table);
+              current.body.appendChild(rowClone);
+              if (!fitsPage(state.body)) {
+                state.sheet.dataset.oversize = 'true';
+              }
+              return;
+            }
+
+            current.body.appendChild(rowClone);
+            state.sheet.dataset.oversize = 'true';
+            return;
+          }
+
+          state = createSheet(
+            container,
+            sectionTitle,
+            sectionIndex,
+            state.partIndex + 1,
+          );
+          current = createTableClone(sourceTable);
+          state.body.appendChild(current.table);
+          current.body.appendChild(rowClone);
+          if (!fitsPage(state.body)) {
+            state.sheet.dataset.oversize = 'true';
+          }
+        });
+
+        if (!current.body.children.length) {
+          state.body.removeChild(current.table);
+        }
+
+        return state;
+      }
+
+      function paginatePaperView() {
+        var paperPages = document.getElementById('paper-pages');
+        var sourceSections = Array.prototype.slice.call(
+          document.querySelectorAll('.page-source-section')
+        );
+        if (!paperPages || !sourceSections.length) return;
+
+        paperPages.innerHTML = '';
+
+        var state = null;
+
+        sourceSections.forEach(function(section) {
+          var sectionTitle = section.dataset.sectionTitle || 'SECTION';
+          var sectionIndex = section.dataset.sectionIndex || '00';
+          var blocks = Array.prototype.slice.call(section.children);
+          blocks.forEach(function(block, blockIndex) {
+            if (!block.dataset.blockId) {
+              block.dataset.blockId = (
+                sectionIndex + '-b' + String(blockIndex).padStart(3, '0')
+              );
+            }
+            if (blockIndex === 0) {
+              block.dataset.sectionAnchor = 'section-' + sectionIndex;
+            }
+          });
+          if (!state) {
+            state = createSheet(paperPages, sectionTitle, sectionIndex, 1);
+          } else if (state.body.children.length) {
+            state = createSheet(paperPages, sectionTitle, sectionIndex, 1);
+          }
+
+          blocks.forEach(function(block) {
+            if (block.tagName === 'UL' || block.tagName === 'OL') {
+              state = appendListBlock(
+                paperPages,
+                state,
+                block,
+                sectionTitle,
+                sectionIndex,
+              );
+              return;
+            }
+            if (block.tagName === 'TABLE') {
+              state = appendTableBlock(
+                paperPages,
+                state,
+                block,
+                sectionTitle,
+                sectionIndex,
+              );
+              return;
+            }
+            state = appendWholeBlock(
+              paperPages,
+              state,
+              block,
+              sectionTitle,
+              sectionIndex,
+            );
+          });
+        });
+
+        if (document.body.classList.contains('edit-mode')) {
+          getEditableElements().forEach(function(el) {
+            el.setAttribute('contenteditable', 'true');
+          });
+        }
+      }
+
+      function repaginateSoon() {
+        window.clearTimeout(repaginateTimer);
+        repaginateTimer = window.setTimeout(paginatePaperView, 120);
+      }
+
+      window.toggleMetaPanel = function(force) {
+        var next = typeof force === 'boolean'
+          ? force
+          : !document.body.classList.contains('meta-panel-open');
+        var panel = document.getElementById('meta-panel');
+        var button = document.querySelector('.btn-meta');
+
+        document.body.classList.toggle('meta-panel-open', next);
+
+        if (panel) {
+          panel.setAttribute('aria-hidden', next ? 'false' : 'true');
+        }
+
+        if (button) {
+          button.classList.toggle('active', next);
+        }
+
+        if (next && panel) {
+          syncMetaInputs(readMetaFromDataset());
+          var firstInput = panel.querySelector('input');
+          if (firstInput) {
+            firstInput.focus();
+            firstInput.select();
+          }
+        }
+      };
+
+      window.toggleEditMode = function() {
+        var on = document.body.classList.toggle('edit-mode');
+        getEditableElements().forEach(function(el) {
+          el.setAttribute('contenteditable', on ? 'true' : 'false');
+        });
+        document.querySelector('.btn-edit').classList.toggle('active', on);
+        if (!on) {
+          syncAllEditedElements();
+          paginatePaperView();
+        }
+      };
+
+      window.saveEditedHTML = function() {
+        window.toggleMetaPanel(false);
+
+        if (document.body.classList.contains('edit-mode')) {
+          window.toggleEditMode();
+        } else {
+          syncAllEditedElements();
+          paginatePaperView();
+        }
+
+        syncMetaInputs(readMetaFromDataset());
+
+        document
+          .querySelectorAll('[contenteditable="true"]')
+          .forEach(function(el) {
+          el.setAttribute('contenteditable', 'false');
+          });
+
+        var html = '<!doctype html>\n' + document.documentElement.outerHTML;
+        var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        var baseName = document.body.getAttribute('data-save-name') || '문서';
+        a.href = url;
+        a.download = (
+          baseName
+          + '_편집본_'
+          + new Date().toISOString().slice(0, 10)
+          + '.html'
+        );
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.setTimeout(function() {
+          URL.revokeObjectURL(url);
+        }, 1000);
+      };
+
+      document.addEventListener('dblclick', function(e) {
+        var el = e.target;
+        if (!el || !EDITABLE_TAGS[el.tagName]) return;
+        if (isInExcludedArea(el)) return;
+        if (document.body.classList.contains('edit-mode')) return;
+        if (el.getAttribute('contenteditable') === 'true') return;
+
+        el.setAttribute('contenteditable', 'true');
+        el.focus();
+
+        function endEdit() {
+          syncEditedElement(el);
+          el.setAttribute('contenteditable', 'false');
+          repaginateSoon();
+        }
+
+        el.addEventListener('blur', endEdit, { once: true });
+        el.addEventListener('keydown', function(ev) {
+          if (ev.key === 'Escape') {
+            ev.preventDefault();
+            el.blur();
+          }
+        }, { once: true });
+      });
+
+      document.addEventListener('input', function(e) {
+        var el = e.target;
+        if (el && el.matches && el.matches('[data-meta-input]')) {
+          el.setAttribute('value', el.value);
+          applyMeta(readMetaFromForm(), {
+            repaginate: true,
+            syncFields: false
+          });
+          return;
+        }
+        if (!el || !el.matches || !el.matches(EDITABLE_SELECTOR)) return;
+        syncEditedElement(el);
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+        if (!document.body.classList.contains('meta-panel-open')) return;
+        window.toggleMetaPanel(false);
+      });
+
+      applyMeta(readMetaFromDataset(), {
+        syncFields: true,
+        repaginate: false
+      });
+      paginatePaperView();
+      window.addEventListener('resize', repaginateSoon);
+      window.addEventListener('DOMContentLoaded', function() {
+        applyMeta(readMetaFromDataset(), {
+          syncFields: true,
+          repaginate: false
+        });
+        paginatePaperView();
+      });
+    })();
+  </script>
+</body>
+</html>
