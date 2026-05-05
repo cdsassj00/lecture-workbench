@@ -5,7 +5,7 @@
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-sonnet-4-5-20250929";
 
-const SYSTEM_PROMPT = `당신은 한국 공공 행정 강의안(2026 행정안전부 AI·데이터기반행정 전문인재 양성과정)의 슬라이드 텍스트 편집자입니다.
+const SYSTEM_PROMPT = `당신은 한국 공공 행정 강의안(AI 챔피언 고급 과정 (AI 데이터분석 전문인재 과정))의 슬라이드 텍스트 편집자입니다.
 
 작성 원칙:
 - 한국어 존댓말("~합니다"), 강의 voice

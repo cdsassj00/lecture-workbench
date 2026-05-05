@@ -201,7 +201,7 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
         <div class="sec">
           <div class="sec-t">머리글·바닥글 (전 슬라이드 일괄)</div>
           <div class="hint" style="margin-bottom:8px">아래 두 칸은 본문을 건드리지 않고 모든 슬라이드의 헤더바 오른쪽·바닥글 모듈명만 일괄 교체합니다. 표지 슬라이드는 별도 양식이라 자동으로 제외됩니다. 페이지 번호는 자동.</div>
-          <div class="f"><label>헤더바 우측 (예: 과정명·차시)</label><input id="sHbarR" placeholder="공공 AI 전문인재 양성과정 · Session 04" oninput="markDirty()"></div>
+          <div class="f"><label>헤더바 우측 (예: 과정명·차시)</label><input id="sHbarR" placeholder="AI 챔피언 고급 과정 · Session 04" oninput="markDirty()"></div>
           <div class="f"><label>바닥글 모듈명</label><input id="sFbar" placeholder="04 · 어시스트 코딩 ①" oninput="markDirty()"></div>
         </div>
         <div class="sec">
@@ -1419,7 +1419,7 @@ async function exportPPTX() {
 
   const pres = new PptxGenJS();
   pres.layout = 'LAYOUT_WIDE';
-  pres.title  = '공공 AI 전문인재 양성과정';
+  pres.title  = 'AI 챔피언 고급 과정';
   pres.author = 'Lecture Workbench';
 
   // 마스터: 자동 페이지 번호 placeholder만. PNG 캡처 직전에 슬라이드 안
@@ -3194,7 +3194,7 @@ window.runAIRewrite = async function(quickInstruction) {
       return;
     }
     const slideTitle = (S.slides[S.selectedIdx] && S.slides[S.selectedIdx].dataTitle) || '';
-    const ctx = `슬라이드 제목: ${slideTitle}. 8주 행정안전부 AI·데이터기반행정 전문인재 양성과정. 한국어 강의안. 첫째·둘째·셋째 열거. 비유·은유·메거진 어조 금지.`;
+    const ctx = `슬라이드 제목: ${slideTitle}. 8주 AI 챔피언 고급 과정 (AI 데이터분석 전문인재 과정). 한국어 강의안. 첫째·둘째·셋째 열거. 비유·은유·메거진 어조 금지.`;
     const resp = await fetch(`${SB_URL}/functions/v1/rewrite-text`, {
       method: 'POST',
       headers: {
