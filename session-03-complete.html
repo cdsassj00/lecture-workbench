@@ -7,197 +7,34 @@
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f5efe4;--bg2:#ede4d3;--ink:#2b2015;--ink2:#5a4a38;--ink3:#8a7659;--acc:#b8532a;--acc3:#d49575;--ln:#d8c8ae;--ln2:#e6d9bf;--dk:#1a1612;--dk2:#241e17;--on:#ede4d3;--on2:#a89172;--serif:'Fraunces','Noto Serif KR',Georgia,serif;--sans:'Pretendard Variable',Pretendard,sans-serif;--mono:'JetBrains Mono',ui-monospace,Consolas,monospace}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background:#0e0a06;font-family:var(--sans);-webkit-font-smoothing:antialiased}
-.deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;background:#0e0a06}
-.deck::-webkit-scrollbar{display:none}
-.stage{width:100vw;min-height:100vh;display:flex;align-items:center;justify-content:center;scroll-snap-align:start;padding:0;background:#0e0a06}
-.slide{width:1600px;height:900px;background:var(--bg);position:relative;overflow:hidden;transform-origin:center;box-shadow:0 40px 90px -30px rgba(0,0,0,0.7);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.08  0 0 0 0.025 0'/%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")}
+:root{--bg:#f5efe4;--bg2:#ede4d3;--ink:#2b2015;--ink2:#5a4a38;--ink3:#8a7659;--acc:#b8532a;--acc3:#d49575;--ln:#d8c8ae;--ln2:#e6d9bf;--dk:#1a1612;--dk2:#241e17;--on:#ede4d3;--on2:#a89172;--serif:'Fraunces','Noto Serif KR',Georgia,serif;--sans:'Pretendard Variable',Pretendard,sans-serif;--mono:'JetBrains Mono',ui-monospace,Consolas,monospace}*{box-sizing:border-box;margin:0;padding:0}html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background:#0e0a06;font-family:var(--sans);-webkit-font-smoothing:antialiased}.deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;background:#0e0a06}.deck::-webkit-scrollbar{display:none}.stage{width:100vw;min-height:100vh;display:flex;align-items:center;justify-content:center;scroll-snap-align:start;padding:0;background:#0e0a06}.slide{width:1600px;height:900px;background:var(--bg);position:relative;overflow:hidden;transform-origin:center;box-shadow:0 40px 90px -30px rgba(0,0,0,0.7);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.08  0 0 0 0.025 0'/%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")}
 
 .hbar{position:absolute;top:0;left:0;right:0;height:52px;background:var(--dk);display:flex;align-items:center;justify-content:space-between;padding:0 80px}
 .hbar-l{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:10.5px;color:#fff;letter-spacing:2.5px;font-weight:600}
 .hbar-l::before{content:"";width:22px;height:8px;background:var(--acc)}
-.hbar-r{font-family:var(--mono);font-size:10.5px;color:#bbb;letter-spacing:1.5px}
-.hl{position:absolute;left:80px;right:80px;top:86px}
-.hl-kicker{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:14px}
-.hl-title{font-family:var(--serif);font-weight:700;font-size:36px;line-height:1.22;letter-spacing:-0.5px;color:var(--ink)}
-.hl-sub{font-size:15.5px;color:var(--ink2);margin-top:12px;line-height:1.6}
-.hl-bar{width:60px;height:3px;background:var(--ink);margin-top:16px}
-.hl-rule{position:absolute;left:80px;right:80px;top:248px;height:1px;background:var(--ln2)}
+.hbar-r{font-family:var(--mono);font-size:10.5px;color:#bbb;letter-spacing:1.5px}.hl{position:absolute;left:80px;right:80px;top:86px}.hl-kicker{font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:14px}.hl-title{font-family:var(--serif);font-weight:700;font-size:36px;line-height:1.22;letter-spacing:-0.5px;color:var(--ink)}.hl-sub{font-size:15.5px;color:var(--ink2);margin-top:12px;line-height:1.6}.hl-bar{width:60px;height:3px;background:var(--ink);margin-top:16px}.hl-rule{position:absolute;left:80px;right:80px;top:248px;height:1px;background:var(--ln2)}
 .fbar{position:absolute;bottom:0;left:0;right:0;height:52px;background:#f0e8d8;border-top:3px solid var(--ln);display:flex;align-items:center;justify-content:space-between;padding:0 80px}
 .fbar-l,.fbar-r{display:flex;flex-direction:column;gap:2px}.fbar-r{align-items:flex-end}
 .fbar-label{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2.5px;font-weight:700}
-.fbar-title{font-size:13px;color:var(--ink)}
-
-.bd{position:absolute;left:80px;right:80px;top:264px;bottom:72px;display:grid;gap:1px;background:var(--ln2)}
-.bd.col3{grid-template-columns:1fr 1fr 1fr}
-.bd.col2{grid-template-columns:1fr 1fr}
-.bd.col2w{grid-template-columns:1.25fr 1fr}
-.bd.col2n{grid-template-columns:1fr 1.3fr}
-.col{background:var(--bg);padding:30px 34px;display:flex;flex-direction:column;overflow:hidden;min-width:0;gap:14px}
-.col > .grow{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}
-
-.card{background:var(--bg);padding:34px 36px;display:flex;flex-direction:column;gap:16px;overflow:hidden;min-width:0}
-.card.dk{background:var(--dk);color:var(--on)}
-.card-k{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:2.5px;font-weight:700}
-.card.dk .card-k{color:var(--acc3)}
-.card-anchor{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1.22;color:var(--ink);letter-spacing:-0.4px}
-.card.dk .card-anchor{color:var(--on)}
-.card-anchor em{color:var(--acc);font-style:normal}
-.card.dk .card-anchor em{color:var(--acc3)}
-.card-body{font-size:14px;line-height:1.75;color:var(--ink2)}
-.card.dk .card-body{color:var(--on2)}
-.card-body strong{color:var(--ink);font-weight:700}
-.card.dk .card-body strong{color:var(--on)}
-.card-spacer{flex:1;min-height:8px}
-.card-note{font-size:12.5px;color:var(--ink3);font-style:italic;line-height:1.6}
-.card.dk .card-note{color:var(--on2)}
-
-.sh{display:flex;align-items:baseline;gap:12px;margin-bottom:3px}
-.sh-n{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;white-space:nowrap}
-.sh-t{font-size:12.5px;color:var(--ink2)}
-.sh-line{height:1px;background:var(--ln2);margin-bottom:10px}
+.fbar-title{font-size:13px;color:var(--ink)}.bd{position:absolute;left:80px;right:80px;top:264px;bottom:72px;display:grid;gap:1px;background:var(--ln2)}.bd.col3{grid-template-columns:1fr 1fr 1fr}.bd.col2{grid-template-columns:1fr 1fr}.bd.col2w{grid-template-columns:1.25fr 1fr}.bd.col2n{grid-template-columns:1fr 1.3fr}.col{background:var(--bg);padding:30px 34px;display:flex;flex-direction:column;overflow:hidden;min-width:0;gap:14px}.col > .grow{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}.card{background:var(--bg);padding:34px 36px;display:flex;flex-direction:column;gap:16px;overflow:hidden;min-width:0}.card.dk{background:var(--dk);color:var(--on)}.card-k{font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2.5px;font-weight:700}.card.dk .card-k{color:var(--acc3)}.card-anchor{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1.22;color:var(--ink);letter-spacing:-0.4px}.card.dk .card-anchor{color:var(--on)}.card-anchor em{color:var(--acc);font-style:normal}.card.dk .card-anchor em{color:var(--acc3)}.card-body{font-size:14px;line-height:1.75;color:var(--ink2)}.card.dk .card-body{color:var(--on2)}.card-body strong{color:var(--ink);font-weight:700}.card.dk .card-body strong{color:var(--on)}.card-spacer{flex:1;min-height:8px}.card-note{font-size:15px;color:var(--ink3);font-style:italic;line-height:1.6}.card.dk .card-note{color:var(--on2)}.sh{display:flex;align-items:baseline;gap:12px;margin-bottom:3px}.sh-n{font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;white-space:nowrap}.sh-t{font-size:15px;color:var(--ink2)}.sh-line{height:1px;background:var(--ln2);margin-bottom:10px}
 
 .mtbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .mtbl thead th{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;text-align:left;padding:9px 9px;border-bottom:1.5px solid var(--ink);background:var(--bg2)}
 .mtbl tbody td{padding:10px 9px;border-bottom:1px solid var(--ln2);color:var(--ink2);vertical-align:top;line-height:1.6}
 .mtbl tbody tr:last-child td{border-bottom:0}
 .mtbl tbody td:first-child{color:var(--ink);font-weight:700;font-family:var(--mono);font-size:10.5px;letter-spacing:1px;white-space:nowrap}
-.mtbl tbody td.q{color:var(--ink);font-weight:600;font-family:var(--sans);font-size:12.5px;letter-spacing:0}
-
-.co{background:var(--bg2);border-left:3px solid var(--acc);padding:14px 18px}
-.co-lb{font-family:var(--mono);font-size:10.5px;color:var(--acc);letter-spacing:2px;font-weight:700;margin-bottom:5px}
-.co-main{font-size:14.5px;color:var(--ink);font-weight:700;line-height:1.5}
-.co p{font-size:12.5px;color:var(--ink2);line-height:1.7;margin-top:5px}
-
-.next{background:var(--dk);padding:16px 20px;color:var(--on)}
-.next-k{font-family:var(--mono);font-size:10.5px;color:var(--acc3);letter-spacing:2px;font-weight:700;margin-bottom:5px}
-.next-t{font-size:13.5px;line-height:1.65;color:var(--on2)}
-.next-t strong{color:var(--on);font-weight:700}
-
-.pit{border-left:3px solid var(--ink);padding:11px 15px;background:var(--bg2)}
-.pit-lb{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:5px}
-.pit-h{font-size:13px;color:var(--ink);font-weight:700;line-height:1.45}
-.pit-d{font-size:12px;color:var(--ink2);line-height:1.65;margin-top:4px}
-
-.smap{display:flex;flex-direction:column;gap:7px}
-.smap-i{display:grid;grid-template-columns:50px 1fr;gap:12px;align-items:start;padding:9px 13px;background:var(--bg2);border-left:2px solid var(--ln)}
-.smap-i.on{border-left-color:var(--acc);background:#f0e7d6}
-.smap-n{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:1.5px;font-weight:700;padding-top:2px}
-.smap-t{font-size:13px;color:var(--ink);font-weight:600;line-height:1.5}
-
-.qex{background:var(--bg2);border-left:3px solid var(--ink);padding:20px 26px;font-family:var(--serif);font-size:19px;line-height:1.75;color:var(--ink)}
-.qex .hot{background:var(--ink);color:var(--on);padding:2px 7px;border-radius:2px;font-weight:700;font-family:var(--sans);font-size:16px;letter-spacing:-0.2px}
-.qex .dim{color:var(--ink3);font-style:italic;font-size:16px}
-
-.draft{padding:14px 18px}
-.draft.weak{background:var(--bg2);border-left:3px solid var(--ln)}
-.draft.strong{background:var(--dk);color:var(--on);border-left:3px solid var(--acc3)}
-.draft-k{font-family:var(--mono);font-size:10px;letter-spacing:1.8px;font-weight:700;color:var(--ink3);margin-bottom:5px}
-.draft.strong .draft-k{color:var(--acc3)}
-.draft-t{font-size:13.5px;line-height:1.7;color:var(--ink)}
-.draft.strong .draft-t{color:var(--on)}
-.draft-note{font-size:11px;color:var(--ink3);margin-top:7px;line-height:1.55;font-style:italic}
-.draft.strong .draft-note{color:var(--on2)}
-
-.cmp2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--ln2)}
-.cmp2c{padding:18px 22px;display:flex;flex-direction:column;gap:9px;background:var(--bg2)}
-.cmp2c.dk{background:var(--dk);color:var(--on)}
-.cmp2c-k{font-family:var(--mono);font-size:10.5px;color:var(--acc);letter-spacing:2px;font-weight:700}
-.cmp2c.dk .cmp2c-k{color:var(--acc3)}
-.cmp2c-h{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-0.3px}
-.cmp2c.dk .cmp2c-h{color:var(--on)}
-.cmp2c-d{font-size:12.5px;color:var(--ink2);line-height:1.7}
-.cmp2c.dk .cmp2c-d{color:var(--on2)}
-.cmp2c-list{display:flex;flex-direction:column;gap:4px;font-size:12px;line-height:1.65;color:var(--ink2)}
-.cmp2c.dk .cmp2c-list{color:var(--on2)}
-.cmp2c-list li{list-style:none;padding-left:14px;position:relative}
-.cmp2c-list li::before{content:"—";position:absolute;left:0;color:var(--ink3);font-family:var(--mono)}
-.cmp2c.dk .cmp2c-list li::before{color:var(--on2)}
-.cmp2c-fig{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;padding-top:7px;border-top:1px solid var(--ln);margin-top:auto}
-.cmp2c.dk .cmp2c-fig{color:var(--acc3);border-top-color:#3a2f24}
-
-.hybrid{background:#f0e7d6;border-left:4px solid var(--acc);padding:18px 24px;display:flex;flex-direction:column;gap:8px}
-.hybrid-k{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:2.5px;font-weight:700}
-.hybrid-h{font-family:var(--serif);font-size:21px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-0.3px}
-.hybrid-d{font-size:13px;color:var(--ink2);line-height:1.7}
-.hybrid-d strong{color:var(--ink);font-weight:700}
-
-.tline{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--ln2);width:100%}
-.tblock{background:var(--bg2);padding:18px 20px;display:flex;flex-direction:column;gap:8px;position:relative}
-.tblock.dk{background:var(--dk);color:var(--on)}
-.tblock-w{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:2px;font-weight:700}
-.tblock.dk .tblock-w{color:var(--acc3)}
-.tblock-h{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1.25;color:var(--ink);letter-spacing:-0.3px}
-.tblock.dk .tblock-h{color:var(--on)}
-.tblock-sess{font-size:11.5px;color:var(--ink2);line-height:1.6;font-family:var(--mono);letter-spacing:0.3px}
-.tblock.dk .tblock-sess{color:var(--on2)}
-.tblock-d{font-size:12px;color:var(--ink2);line-height:1.7}
-.tblock.dk .tblock-d{color:var(--on2)}
-
-/* 추가 컴포넌트 */
-.flow{display:grid;gap:10px;align-items:center}
-.flow.h4{grid-template-columns:1fr auto 1fr auto 1fr auto 1fr}
-.flow.h3{grid-template-columns:1fr auto 1fr auto 1fr}
-.flow-box{background:var(--bg2);border:1px solid var(--ln);padding:12px 14px;text-align:center;display:flex;flex-direction:column;gap:4px}
-.flow-box.dk{background:var(--dk);color:var(--on);border-color:var(--dk)}
-.flow-box.on{background:#f0e7d6;border-color:var(--acc);border-width:2px}
-.flow-box-k{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700}
-.flow-box.dk .flow-box-k{color:var(--acc3)}
-.flow-box.on .flow-box-k{color:var(--acc)}
-.flow-box-t{font-size:12.5px;color:var(--ink);font-weight:700;line-height:1.4}
-.flow-box.dk .flow-box-t{color:var(--on)}
-.flow-arrow{font-family:var(--mono);font-size:22px;color:var(--acc);font-weight:700;text-align:center}
-
-.grid2x2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;background:var(--ln2)}
-.qd{background:var(--bg2);padding:16px 20px;display:flex;flex-direction:column;gap:6px}
-.qd.dk{background:var(--dk);color:var(--on)}
-.qd-k{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2px;font-weight:700}
-.qd.dk .qd-k{color:var(--acc3)}
-.qd-h{font-size:14px;color:var(--ink);font-weight:700;line-height:1.35;font-family:var(--serif)}
-.qd.dk .qd-h{color:var(--on)}
-.qd-d{font-size:12px;color:var(--ink2);line-height:1.65}
-.qd.dk .qd-d{color:var(--on2)}
-.qd-d strong{color:var(--ink);font-weight:700}
-.qd.dk .qd-d strong{color:var(--on)}
-
-.ladder{display:flex;flex-direction:column;gap:1px;background:var(--ln2)}
-.ladder-step{background:var(--bg);padding:14px 18px;display:grid;grid-template-columns:56px 1fr auto;gap:16px;align-items:center}
-.ladder-step.dk{background:var(--dk);color:var(--on)}
-.ladder-step.on{background:#f0e7d6}
-.ladder-n{font-family:var(--serif);font-size:28px;color:var(--acc);font-weight:700;letter-spacing:-0.03em}
-.ladder-step.dk .ladder-n{color:var(--acc3)}
-.ladder-b{display:flex;flex-direction:column;gap:3px;min-width:0}
-.ladder-h{font-size:14px;color:var(--ink);font-weight:700;line-height:1.4}
-.ladder-step.dk .ladder-h{color:var(--on)}
-.ladder-d{font-size:12px;color:var(--ink2);line-height:1.6}
-.ladder-step.dk .ladder-d{color:var(--on2)}
-.ladder-tag{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;text-align:right;white-space:nowrap}
-.ladder-step.dk .ladder-tag{color:var(--acc3)}
+.mtbl tbody td.q{color:var(--ink);font-weight:600;font-family:var(--sans);font-size:12.5px;letter-spacing:0}.co{background:var(--bg2);border-left:3px solid var(--acc);padding:14px 18px}.co-lb{font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700;margin-bottom:5px}.co-main{font-size:14.5px;color:var(--ink);font-weight:700;line-height:1.5}.co p{font-size:15px;color:var(--ink2);line-height:1.7;margin-top:5px}.next{background:var(--dk);padding:16px 20px;color:var(--on)}.next-k{font-family:var(--mono);font-size:15px;color:var(--acc3);letter-spacing:2px;font-weight:700;margin-bottom:5px}.next-t{font-size:13.5px;line-height:1.65;color:var(--on2)}.next-t strong{color:var(--on);font-weight:700}.pit{border-left:3px solid var(--ink);padding:11px 15px;background:var(--bg2)}.pit-lb{font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:5px}.pit-h{font-size:15px;color:var(--ink);font-weight:700;line-height:1.45}.pit-d{font-size:15px;color:var(--ink2);line-height:1.65;margin-top:4px}.smap{display:flex;flex-direction:column;gap:7px}.smap-i{display:grid;grid-template-columns:50px 1fr;gap:12px;align-items:start;padding:9px 13px;background:var(--bg2);border-left:2px solid var(--ln)}.smap-i.on{border-left-color:var(--acc);background:#f0e7d6}.smap-n{font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:1.5px;font-weight:700;padding-top:2px}.smap-t{font-size:15px;color:var(--ink);font-weight:600;line-height:1.5}.qex{background:var(--bg2);border-left:3px solid var(--ink);padding:20px 26px;font-family:var(--serif);font-size:19px;line-height:1.75;color:var(--ink)}.qex .hot{background:var(--ink);color:var(--on);padding:2px 7px;border-radius:2px;font-weight:700;font-family:var(--sans);font-size:16px;letter-spacing:-0.2px}.qex .dim{color:var(--ink3);font-style:italic;font-size:16px}.draft{padding:14px 18px}.draft.weak{background:var(--bg2);border-left:3px solid var(--ln)}.draft.strong{background:var(--dk);color:var(--on);border-left:3px solid var(--acc3)}.draft-k{font-family:var(--mono);font-size:15px;letter-spacing:1.8px;font-weight:700;color:var(--ink3);margin-bottom:5px}.draft.strong .draft-k{color:var(--acc3)}.draft-t{font-size:13.5px;line-height:1.7;color:var(--ink)}.draft.strong .draft-t{color:var(--on)}.draft-note{font-size:15px;color:var(--ink3);margin-top:7px;line-height:1.55;font-style:italic}.draft.strong .draft-note{color:var(--on2)}.cmp2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--ln2)}.cmp2c{padding:18px 22px;display:flex;flex-direction:column;gap:9px;background:var(--bg2)}.cmp2c.dk{background:var(--dk);color:var(--on)}.cmp2c-k{font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700}.cmp2c.dk .cmp2c-k{color:var(--acc3)}.cmp2c-h{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-0.3px}.cmp2c.dk .cmp2c-h{color:var(--on)}.cmp2c-d{font-size:15px;color:var(--ink2);line-height:1.7}.cmp2c.dk .cmp2c-d{color:var(--on2)}.cmp2c-list{display:flex;flex-direction:column;gap:4px;font-size:15px;line-height:1.65;color:var(--ink2)}.cmp2c.dk .cmp2c-list{color:var(--on2)}.cmp2c-list li{list-style:none;padding-left:14px;position:relative}.cmp2c-list li::before{content:"—";position:absolute;left:0;color:var(--ink3);font-family:var(--mono)}.cmp2c.dk .cmp2c-list li::before{color:var(--on2)}.cmp2c-fig{font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;padding-top:7px;border-top:1px solid var(--ln);margin-top:auto}.cmp2c.dk .cmp2c-fig{color:var(--acc3);border-top-color:#3a2f24}.hybrid{background:#f0e7d6;border-left:4px solid var(--acc);padding:18px 24px;display:flex;flex-direction:column;gap:8px}.hybrid-k{font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2.5px;font-weight:700}.hybrid-h{font-family:var(--serif);font-size:21px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-0.3px}.hybrid-d{font-size:15px;color:var(--ink2);line-height:1.7}.hybrid-d strong{color:var(--ink);font-weight:700}.tline{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--ln2);width:100%}.tblock{background:var(--bg2);padding:18px 20px;display:flex;flex-direction:column;gap:8px;position:relative}.tblock.dk{background:var(--dk);color:var(--on)}.tblock-w{font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700}.tblock.dk .tblock-w{color:var(--acc3)}.tblock-h{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1.25;color:var(--ink);letter-spacing:-0.3px}.tblock.dk .tblock-h{color:var(--on)}.tblock-sess{font-size:15px;color:var(--ink2);line-height:1.6;font-family:var(--mono);letter-spacing:0.3px}.tblock.dk .tblock-sess{color:var(--on2)}.tblock-d{font-size:15px;color:var(--ink2);line-height:1.7}.tblock.dk .tblock-d{color:var(--on2)}/* 추가 컴포넌트 */
+.flow{display:grid;gap:10px;align-items:center}.flow.h4{grid-template-columns:1fr auto 1fr auto 1fr auto 1fr}.flow.h3{grid-template-columns:1fr auto 1fr auto 1fr}.flow-box{background:var(--bg2);border:1px solid var(--ln);padding:12px 14px;text-align:center;display:flex;flex-direction:column;gap:4px}.flow-box.dk{background:var(--dk);color:var(--on);border-color:var(--dk)}.flow-box.on{background:#f0e7d6;border-color:var(--acc);border-width:2px}.flow-box-k{font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700}.flow-box.dk .flow-box-k{color:var(--acc3)}.flow-box.on .flow-box-k{color:var(--acc)}.flow-box-t{font-size:15px;color:var(--ink);font-weight:700;line-height:1.4}.flow-box.dk .flow-box-t{color:var(--on)}.flow-arrow{font-family:var(--mono);font-size:22px;color:var(--acc);font-weight:700;text-align:center}.grid2x2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;background:var(--ln2)}.qd{background:var(--bg2);padding:16px 20px;display:flex;flex-direction:column;gap:6px}.qd.dk{background:var(--dk);color:var(--on)}.qd-k{font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2px;font-weight:700}.qd.dk .qd-k{color:var(--acc3)}.qd-h{font-size:14px;color:var(--ink);font-weight:700;line-height:1.35;font-family:var(--serif)}.qd.dk .qd-h{color:var(--on)}.qd-d{font-size:15px;color:var(--ink2);line-height:1.65}.qd.dk .qd-d{color:var(--on2)}.qd-d strong{color:var(--ink);font-weight:700}.qd.dk .qd-d strong{color:var(--on)}.ladder{display:flex;flex-direction:column;gap:1px;background:var(--ln2)}.ladder-step{background:var(--bg);padding:14px 18px;display:grid;grid-template-columns:56px 1fr auto;gap:16px;align-items:center}.ladder-step.dk{background:var(--dk);color:var(--on)}.ladder-step.on{background:#f0e7d6}.ladder-n{font-family:var(--serif);font-size:28px;color:var(--acc);font-weight:700;letter-spacing:-0.03em}.ladder-step.dk .ladder-n{color:var(--acc3)}.ladder-b{display:flex;flex-direction:column;gap:3px;min-width:0}.ladder-h{font-size:14px;color:var(--ink);font-weight:700;line-height:1.4}.ladder-step.dk .ladder-h{color:var(--on)}.ladder-d{font-size:15px;color:var(--ink2);line-height:1.6}.ladder-step.dk .ladder-d{color:var(--on2)}.ladder-tag{font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;text-align:right;white-space:nowrap}.ladder-step.dk .ladder-tag{color:var(--acc3)}
 
 .code{background:var(--dk2);padding:14px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:var(--on);white-space:pre-wrap;border-left:3px solid var(--acc3)}
 .code .cm{color:var(--on2)}
-.code .kw{color:var(--acc3);font-weight:600}
-
-.typelist{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ln2);flex:1}
-.type{background:var(--bg2);padding:16px 18px;display:flex;flex-direction:column;gap:6px}
-.type.dk{background:var(--dk);color:var(--on)}
-.type-n{font-family:var(--serif);font-size:32px;color:var(--acc);font-weight:700;line-height:1;letter-spacing:-0.03em}
-.type.dk .type-n{color:var(--acc3)}
-.type-h{font-size:13px;color:var(--ink);font-weight:700;line-height:1.35}
-.type.dk .type-h{color:var(--on)}
-.type-d{font-size:11.5px;color:var(--ink2);line-height:1.6}
-.type.dk .type-d{color:var(--on2)}
-.type-tag{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;margin-top:auto;padding-top:6px;border-top:1px solid var(--ln)}
-.type.dk .type-tag{color:var(--acc3);border-top-color:#3a2f24}
+.code .kw{color:var(--acc3);font-weight:600}.typelist{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ln2);flex:1}.type{background:var(--bg2);padding:16px 18px;display:flex;flex-direction:column;gap:6px}.type.dk{background:var(--dk);color:var(--on)}.type-n{font-family:var(--serif);font-size:32px;color:var(--acc);font-weight:700;line-height:1;letter-spacing:-0.03em}.type.dk .type-n{color:var(--acc3)}.type-h{font-size:15px;color:var(--ink);font-weight:700;line-height:1.35}.type.dk .type-h{color:var(--on)}.type-d{font-size:15px;color:var(--ink2);line-height:1.6}.type.dk .type-d{color:var(--on2)}.type-tag{font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;margin-top:auto;padding-top:6px;border-top:1px solid var(--ln)}.type.dk .type-tag{color:var(--acc3);border-top-color:#3a2f24}
 
 .toolbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 20px;background:rgba(14,10,6,0.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08)}
 .toolbar button{background:rgba(255,255,255,0.08);color:#ccc;border:1px solid rgba(255,255,255,0.12);padding:5px 14px;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;cursor:pointer;border-radius:3px;text-transform:uppercase;font-weight:600}
 .toolbar button:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
 .toolbar .pg{color:rgba(255,255,255,0.55);font-size:11px;padding:5px 10px;min-width:80px;text-align:center;font-family:var(--mono);letter-spacing:1px}
-@media print{@page{size:423.33mm 237.5mm;margin:0}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{overflow:visible!important;height:auto!important;background:#fff!important}.deck{overflow:visible!important;height:auto!important;scroll-snap-type:none!important;background:#fff!important}.stage{min-height:0!important;height:auto!important;page-break-after:always;page-break-inside:avoid;padding:0!important;margin:0!important;background:#fff!important;display:block!important}.stage:last-child{page-break-after:avoid}.slide{transform:none!important;box-shadow:none!important;width:1600px!important;height:900px!important}.toolbar{display:none!important}}
-</style>
+@media print{@page{size:423.33mm 237.5mm;margin:0}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{overflow:visible!important;height:auto!important;background:#fff!important}.deck{overflow:visible!important;height:auto!important;scroll-snap-type:none!important;background:#fff!important}.stage{min-height:0!important;height:auto!important;page-break-after:always;page-break-inside:avoid;padding:0!important;margin:0!important;background:#fff!important;display:block!important}.stage:last-child{page-break-after:avoid}.slide{transform:none!important;box-shadow:none!important;width:1600px!important;height:900px!important}.toolbar{display:none!important}}</style>
 </head>
 <body>
 <div class="deck" id="deck">
@@ -210,13 +47,13 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
 
   <div style="position:absolute;top:140px;right:72px;font-family:var(--serif);font-size:280px;line-height:1;color:var(--acc);font-weight:300;opacity:0.08;letter-spacing:-0.06em;pointer-events:none;font-style:italic">03</div>
 
-  <div style="position:absolute;top:92px;left:80px;display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:3px;font-weight:700">
+  <div style="position:absolute;top:92px;left:80px;display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:3px;font-weight:700">
     <div style="width:26px;height:2px;background:var(--acc)"></div>
     PUBLIC AI EXPERT PROGRAM · 2026
   </div>
 
   <div style="position:absolute;top:150px;left:80px;max-width:1020px">
-    <div style="font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:14px">SESSION 03 · 3회차 / 8회차 중 3번째</div>
+    <div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:14px">SESSION 03 · 3회차 / 8회차 중 3번째</div>
     <h1 style="font-family:var(--serif);font-weight:700;font-size:54px;line-height:1.1;letter-spacing:-0.04em;color:var(--ink);margin-bottom:16px">메타 프롬프트 설계와<br>AI 서비스 워크플로우 오케스트레이션</h1>
     <div style="width:72px;height:3px;background:var(--ink);margin-bottom:18px"></div>
     <div style="font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:600;line-height:1.5">3회차 끝에 메타 프롬프트 2건과 레시피 카드 1건을 .md로 등록한다</div>
@@ -224,18 +61,18 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
   </div>
 
   <div style="position:absolute;top:340px;right:80px;width:380px;border-top:2px solid var(--ink);padding-top:18px">
-    <div style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:18px">SESSION METADATA</div>
-    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">SEGMENT</span><span style="color:var(--ink);font-weight:600">1~3회차 구간 (3/3 · 완료)</span></div>
-    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">SESSION</span><span style="color:var(--ink);font-weight:600">03 / 08</span></div>
-    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">DURATION</span><span style="color:var(--ink);font-weight:600">8시간 · 3파트 7블록</span></div>
-    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">FOCUS</span><span style="color:var(--ink);font-weight:600">메타 프롬프트 + 워크플로우 6타입</span></div>
-    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;font-size:13.5px"><span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700">OUTPUT</span><span style="color:var(--ink);font-weight:600">메타 프롬프트 2건 + 레시피 카드 1건</span></div>
+    <div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:18px">SESSION METADATA</div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:15px;letter-spacing:2px;color:var(--ink3);font-weight:700">SEGMENT</span><span style="color:var(--ink);font-weight:600">1~3회차 구간 (3/3 · 완료)</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:15px;letter-spacing:2px;color:var(--ink3);font-weight:700">SESSION</span><span style="color:var(--ink);font-weight:600">03 / 08</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:15px;letter-spacing:2px;color:var(--ink3);font-weight:700">DURATION</span><span style="color:var(--ink);font-weight:600">8시간 · 3파트 7블록</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13.5px"><span style="font-family:var(--mono);font-size:15px;letter-spacing:2px;color:var(--ink3);font-weight:700">FOCUS</span><span style="color:var(--ink);font-weight:600">메타 프롬프트 + 워크플로우 6타입</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;font-size:13.5px"><span style="font-family:var(--mono);font-size:15px;letter-spacing:2px;color:var(--ink3);font-weight:700">OUTPUT</span><span style="color:var(--ink);font-weight:600">메타 프롬프트 2건 + 레시피 카드 1건</span></div>
   </div>
 
   <div style="position:absolute;bottom:80px;left:80px;right:80px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART A · 09:30–12:00</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">메타 프롬프트 · 교차 검증 · 시드</div><div style="font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5">자기 업무 프롬프트 2건 · 2개 이상 모델 교차 검증 · 80개 시드 라이브러리</div></div>
-    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART B · 13:00–16:20</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">워크플로우 6타입 시연</div><div style="font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5">문서 취합·변환 / 데이터 / 재구성 / 리서치 / 이미지 / 영상</div></div>
-    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART C · 16:30–17:30</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">수강생 조립 실습</div><div style="font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5">현업 과제 1건 · 체인 설계 · 실행 · 레시피 카드 등록</div></div>
+    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:15px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART A · 09:30–12:00</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">메타 프롬프트 · 교차 검증 · 시드</div><div style="font-size:15px;color:var(--ink2);margin-top:3px;line-height:1.5">자기 업무 프롬프트 2건 · 2개 이상 모델 교차 검증 · 80개 시드 라이브러리</div></div>
+    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:15px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART B · 13:00–16:20</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">워크플로우 6타입 시연</div><div style="font-size:15px;color:var(--ink2);margin-top:3px;line-height:1.5">문서 취합·변환 / 데이터 / 재구성 / 리서치 / 이미지 / 영상</div></div>
+    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:15px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART C · 16:30–17:30</div><div style="font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.4">수강생 조립 실습</div><div style="font-size:15px;color:var(--ink2);margin-top:3px;line-height:1.5">현업 과제 1건 · 체인 설계 · 실행 · 레시피 카드 등록</div></div>
   </div>
 
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">03 · 메타 프롬프트 설계와 AI 서비스 워크플로우 오케스트레이션</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">001 / 032</span></div></div>
@@ -248,16 +85,16 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
   <div class="hbar"><div class="hbar-l">SESSION 03 · CORE MESSAGE</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 03</div></div>
 
   <div style="position:absolute;top:80px;left:80px;right:80px;bottom:260px;background:var(--dk);padding:60px 80px;color:var(--on);display:flex;flex-direction:column;justify-content:center">
-    <div style="font-family:var(--mono);font-size:11.5px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:18px">SESSION 03 · CORE MESSAGE</div>
+    <div style="font-family:var(--mono);font-size:15px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:18px">SESSION 03 · CORE MESSAGE</div>
     <div style="font-family:var(--serif);font-weight:700;font-size:56px;line-height:1.12;letter-spacing:-0.03em;color:var(--on)">프롬프트 기법은 <span style="color:var(--acc3);font-style:italic">AI에게 시키고</span>,<br>서비스 2~3개를 <span style="color:var(--acc3);font-style:italic">체인으로 연결</span>한다.</div>
     <div style="width:60px;height:3px;background:var(--acc3);margin:22px 0 18px"></div>
     <p style="font-size:16.5px;color:var(--on2);line-height:1.75;max-width:1200px">3회차에 끝내야 할 일 네 가지. <strong style="color:var(--on)">① 자기 업무 프롬프트 2건을 메타 프롬프트로 생성하고 ChatGPT·Claude·Gemini 중 2개 모델에 교차 투입해 비교한다</strong> · <strong style="color:var(--on)">② 워크플로우 6타입(문서 취합·데이터·재구성·리서치·이미지·영상)별 서비스 체인 형식을 익힌다</strong> · <strong style="color:var(--on)">③ 자기 현업 과제 1건을 도구 3개 이하 체인으로 실행해 산출물 1개를 만든다</strong> · <strong style="color:var(--on)">④ 프롬프트 .md 2개와 레시피 카드 .md 1개를 기관 공용 저장소에 비식별 처리 후 업로드한다</strong>.</p>
   </div>
 
   <div style="position:absolute;bottom:80px;left:80px;right:80px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ln2);height:160px">
-    <div style="background:var(--bg2);padding:24px 28px;display:flex;flex-direction:column;gap:6px"><div style="font-family:var(--mono);font-size:10.5px;color:var(--acc);letter-spacing:2px;font-weight:700">STEP 01 · 09:30–12:00</div><div style="font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:700;line-height:1.3">프롬프트 2건 + 교차 검증</div><div style="font-size:12.5px;color:var(--ink2);line-height:1.6">상황·목표·제약을 적어 AI에 보내고 받은 프롬프트 5섹션을 ChatGPT와 Claude 두 곳에 동일하게 넣어 5관점 매트릭스로 비교한다.</div></div>
-    <div style="background:var(--bg2);padding:24px 28px;display:flex;flex-direction:column;gap:6px"><div style="font-family:var(--mono);font-size:10.5px;color:var(--acc);letter-spacing:2px;font-weight:700">STEP 02 · 13:00–16:20</div><div style="font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:700;line-height:1.3">6타입 시연 + 체인 1개 직접 실행</div><div style="font-size:12.5px;color:var(--ink2);line-height:1.6">강사가 6타입을 순서대로 시연한 뒤, 한 타입을 골라 입력→체인→게이트→출력 4칸을 자기 데이터로 채워 실행한다.</div></div>
-    <div style="background:var(--dk);padding:24px 28px;display:flex;flex-direction:column;gap:6px;color:var(--on)"><div style="font-family:var(--mono);font-size:10.5px;color:var(--acc3);letter-spacing:2px;font-weight:700">STEP 03 · 16:30–17:30</div><div style="font-family:var(--serif);font-size:20px;color:var(--on);font-weight:700;line-height:1.3">.md 3개를 공용 저장소에 업로드</div><div style="font-size:12.5px;color:var(--on2);line-height:1.6">실명·부서명을 "A기관"으로 치환하고 프롬프트 2개·레시피 카드 1개를 .md로 등록한다. 수강생 20~40명이 같은 작업을 마치면 약 80개 프롬프트가 모인다.</div></div>
+    <div style="background:var(--bg2);padding:24px 28px;display:flex;flex-direction:column;gap:6px"><div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700">STEP 01 · 09:30–12:00</div><div style="font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:700;line-height:1.3">프롬프트 2건 + 교차 검증</div><div style="font-size:15px;color:var(--ink2);line-height:1.6">상황·목표·제약을 적어 AI에 보내고 받은 프롬프트 5섹션을 ChatGPT와 Claude 두 곳에 동일하게 넣어 5관점 매트릭스로 비교한다.</div></div>
+    <div style="background:var(--bg2);padding:24px 28px;display:flex;flex-direction:column;gap:6px"><div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700">STEP 02 · 13:00–16:20</div><div style="font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:700;line-height:1.3">6타입 시연 + 체인 1개 직접 실행</div><div style="font-size:15px;color:var(--ink2);line-height:1.6">강사가 6타입을 순서대로 시연한 뒤, 한 타입을 골라 입력→체인→게이트→출력 4칸을 자기 데이터로 채워 실행한다.</div></div>
+    <div style="background:var(--dk);padding:24px 28px;display:flex;flex-direction:column;gap:6px;color:var(--on)"><div style="font-family:var(--mono);font-size:15px;color:var(--acc3);letter-spacing:2px;font-weight:700">STEP 03 · 16:30–17:30</div><div style="font-family:var(--serif);font-size:20px;color:var(--on);font-weight:700;line-height:1.3">.md 3개를 공용 저장소에 업로드</div><div style="font-size:15px;color:var(--on2);line-height:1.6">실명·부서명을 "A기관"으로 치환하고 프롬프트 2개·레시피 카드 1개를 .md로 등록한다. 수강생 20~40명이 같은 작업을 마치면 약 80개 프롬프트가 모인다.</div></div>
   </div>
 
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">03 · 메타 프롬프트 설계와 AI 서비스 워크플로우 오케스트레이션</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">002 / 032</span></div></div>
@@ -505,14 +342,14 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
   <div class="hbar"><div class="hbar-l">KEY INSIGHT · PART A</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 03</div></div>
 
   <div style="position:absolute;top:80px;left:80px;right:80px;bottom:80px;background:var(--bg2);padding:80px 90px;display:flex;flex-direction:column;justify-content:center">
-    <div style="font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:3px;font-weight:700;margin-bottom:18px">KEY INSIGHT · PART A</div>
+    <div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:3px;font-weight:700;margin-bottom:18px">KEY INSIGHT · PART A</div>
     <div style="font-family:var(--serif);font-weight:700;font-size:58px;line-height:1.12;letter-spacing:-0.03em;color:var(--ink)">3회차 12시 시점에<br>같은 저장소에 <span style="color:var(--acc);font-style:italic">.md 약 80개</span>가 모인다</div>
     <div style="width:72px;height:3px;background:var(--acc);margin:22px 0 20px"></div>
     <p style="font-size:17px;color:var(--ink2);line-height:1.75;max-width:1200px">수강생 20~40명 × 1인 2건 = <strong style="color:var(--ink)">약 80개 메타 프롬프트 .md</strong>가 A-3 종료 시점(12:00)에 같은 GitHub Organization 또는 사내 위키 폴더에 들어와 있다. 각 .md에는 상황·목표·제약 기술, 2개 모델 교차 검증 매트릭스, 실패 회고 노트 한 단락이 들어간다. 4회차 이후에는 본인 부서에서 쓸 프롬프트를 이 폴더에서 검색해 가져오고, 변형본을 다시 commit한다.</p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:36px;max-width:1200px">
-      <div style="border-top:3px solid var(--acc);padding-top:14px"><div style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:4px">A-1 생성</div><div style="font-size:15px;color:var(--ink);font-weight:700;line-height:1.35">1인 2건 · 총 40~80건</div><div style="font-size:12.5px;color:var(--ink2);margin-top:3px;line-height:1.55">상황·목표·제약 기술로 AI가 프롬프트 설계.</div></div>
-      <div style="border-top:3px solid var(--acc);padding-top:14px"><div style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:4px">A-2 검증</div><div style="font-size:15px;color:var(--ink);font-weight:700;line-height:1.35">2개 이상 모델 교차 투입</div><div style="font-size:12.5px;color:var(--ink2);margin-top:3px;line-height:1.55">누락·편향·불필요 수사 제거 + 검증 기록 첨부.</div></div>
-      <div style="border-top:3px solid var(--acc);padding-top:14px"><div style="font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:4px">A-3 공유</div><div style="font-size:15px;color:var(--ink);font-weight:700;line-height:1.35">.md 파일 약 80개 commit</div><div style="font-size:12.5px;color:var(--ink2);margin-top:3px;line-height:1.55">실패 회고 노트 포함 · 동료 프롬프트 1건을 골라 자기 부서로 변형 재등록.</div></div>
+      <div style="border-top:3px solid var(--acc);padding-top:14px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:4px">A-1 생성</div><div style="font-size:15px;color:var(--ink);font-weight:700;line-height:1.35">1인 2건 · 총 40~80건</div><div style="font-size:15px;color:var(--ink2);margin-top:3px;line-height:1.55">상황·목표·제약 기술로 AI가 프롬프트 설계.</div></div>
+      <div style="border-top:3px solid var(--acc);padding-top:14px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:4px">A-2 검증</div><div style="font-size:15px;color:var(--ink);font-weight:700;line-height:1.35">2개 이상 모델 교차 투입</div><div style="font-size:15px;color:var(--ink2);margin-top:3px;line-height:1.55">누락·편향·불필요 수사 제거 + 검증 기록 첨부.</div></div>
+      <div style="border-top:3px solid var(--acc);padding-top:14px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-bottom:4px">A-3 공유</div><div style="font-size:15px;color:var(--ink);font-weight:700;line-height:1.35">.md 파일 약 80개 commit</div><div style="font-size:15px;color:var(--ink2);margin-top:3px;line-height:1.55">실패 회고 노트 포함 · 동료 프롬프트 1건을 골라 자기 부서로 변형 재등록.</div></div>
     </div>
   </div>
 
@@ -520,18 +357,18 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
 </div></div><div class="stage"><div class="slide" data-title="Part B Intro">
   <div class="hbar"><div class="hbar-l">PART B · WORKFLOW 6 TYPES</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 03</div></div>
   <div style="position:absolute;top:90px;left:80px;right:80px;bottom:290px;padding:30px 0 0">
-    <div style="font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:3px;font-weight:700;margin-bottom:18px">PART B · WORKFLOW 6 TYPES · 13:00–16:20</div>
+    <div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:3px;font-weight:700;margin-bottom:18px">PART B · WORKFLOW 6 TYPES · 13:00–16:20</div>
     <div style="font-family:var(--serif);font-weight:700;font-size:52px;line-height:1.1;letter-spacing:-0.03em;color:var(--ink)">에이전트 툴 없이 <span style="color:var(--acc);font-style:italic">서비스 체인</span>으로 업무를 푼다</div>
     <div style="width:72px;height:3px;background:var(--ink);margin:22px 0 18px"></div>
     <p style="font-size:16px;color:var(--ink2);line-height:1.75;max-width:1200px">Part B는 3블록 · B-1(13:00–14:00 타입 1·2) · B-2(14:10–15:10 타입 3·4) · B-3(15:20–16:20 타입 5·6). AI 도구·서비스 생태계의 서비스들을 체인으로 엮어 과제를 해결하는 <strong style="color:var(--ink)">오케스트레이션</strong>을 시연한다. 타입별 구조(입력 → 체인 → 게이트 → 출력)는 고정이고 구체 도구·데이터는 교체된다.</p>
   </div>
   <div style="position:absolute;bottom:80px;left:80px;right:80px;display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--ln2);height:190px">
-    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:10px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 01 · B-1</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">문서 취합·변환</div><div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-top:auto">HWP 30개 예산표 통합 · PDF 100p 브리핑</div></div>
-    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:10px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 02 · B-1</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">데이터 분석·시각화</div><div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-top:auto">CSV 10종 조인 분석 · 공공 대시보드</div></div>
-    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:10px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 03 · B-2</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">문서 변환·재구성</div><div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-top:auto">엑셀→슬라이드 4경로 · 정책→안내문→카드뉴스</div></div>
-    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:10px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 04 · B-2</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">논문·리서치</div><div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-top:auto">논문 10편 메타 요약 · 정책 벤치마킹 · 주간 브리핑</div></div>
-    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:10px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 05 · B-3</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">이미지·콘텐츠 생성</div><div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-top:auto">보고서 인포그래픽 · SNS 카드 · 안내문 포스터</div></div>
-    <div style="background:var(--dk);padding:18px 16px;display:flex;flex-direction:column;gap:5px;color:var(--on)"><div style="font-family:var(--mono);font-size:10px;color:var(--acc3);letter-spacing:2px;font-weight:700">TYPE 06 · B-3</div><div style="font-family:var(--serif);font-size:17px;color:var(--on);font-weight:700;line-height:1.25">영상 콘텐츠</div><div style="font-size:11px;color:var(--on2);line-height:1.5;margin-top:auto">보고서→스크립트→TTS→영상 파이프라인</div></div>
+    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 01 · B-1</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">문서 취합·변환</div><div style="font-size:15px;color:var(--ink2);line-height:1.5;margin-top:auto">HWP 30개 예산표 통합 · PDF 100p 브리핑</div></div>
+    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 02 · B-1</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">데이터 분석·시각화</div><div style="font-size:15px;color:var(--ink2);line-height:1.5;margin-top:auto">CSV 10종 조인 분석 · 공공 대시보드</div></div>
+    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 03 · B-2</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">문서 변환·재구성</div><div style="font-size:15px;color:var(--ink2);line-height:1.5;margin-top:auto">엑셀→슬라이드 4경로 · 정책→안내문→카드뉴스</div></div>
+    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 04 · B-2</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">논문·리서치</div><div style="font-size:15px;color:var(--ink2);line-height:1.5;margin-top:auto">논문 10편 메타 요약 · 정책 벤치마킹 · 주간 브리핑</div></div>
+    <div style="background:var(--bg2);padding:18px 16px;display:flex;flex-direction:column;gap:5px"><div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:2px;font-weight:700">TYPE 05 · B-3</div><div style="font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:700;line-height:1.25">이미지·콘텐츠 생성</div><div style="font-size:15px;color:var(--ink2);line-height:1.5;margin-top:auto">보고서 인포그래픽 · SNS 카드 · 안내문 포스터</div></div>
+    <div style="background:var(--dk);padding:18px 16px;display:flex;flex-direction:column;gap:5px;color:var(--on)"><div style="font-family:var(--mono);font-size:15px;color:var(--acc3);letter-spacing:2px;font-weight:700">TYPE 06 · B-3</div><div style="font-family:var(--serif);font-size:17px;color:var(--on);font-weight:700;line-height:1.25">영상 콘텐츠</div><div style="font-size:15px;color:var(--on2);line-height:1.5;margin-top:auto">보고서→스크립트→TTS→영상 파이프라인</div></div>
   </div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">03 · 메타 프롬프트 설계와 AI 서비스 워크플로우 오케스트레이션</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">009 / 032</span></div></div>
 </div></div>
@@ -1156,17 +993,17 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
 <div class="stage"><div class="slide" data-title="Hero Flow Not Tool">
   <div class="hbar"><div class="hbar-l">KEY INSIGHT · PART B</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 03</div></div>
   <div style="position:absolute;top:80px;left:80px;right:80px;bottom:80px;background:var(--bg2);padding:80px 90px;display:flex;flex-direction:column;justify-content:center">
-    <div style="font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:3px;font-weight:700;margin-bottom:18px">KEY INSIGHT · PART B</div>
+    <div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:3px;font-weight:700;margin-bottom:18px">KEY INSIGHT · PART B</div>
     <div style="font-family:var(--serif);font-weight:700;font-size:58px;line-height:1.12;letter-spacing:-0.03em;color:var(--ink)">에이전트 도구 없이도 <span style="color:var(--acc);font-style:italic">AI 도구·서비스 생태계</span>의<br>서비스를 <span style="color:var(--acc);font-style:italic">체인으로 엮는다</span></div>
     <div style="width:72px;height:3px;background:var(--acc);margin:22px 0 20px"></div>
     <p style="font-size:17px;color:var(--ink2);line-height:1.75;max-width:1200px">6타입은 도구 추천이 아니라 <strong style="color:var(--ink)">오케스트레이션 구조</strong>다. 4~5차시 어시스트 바이브 코딩과 6차시 에이전트 도구 이전에도, AI 도구·서비스 생태계의 서비스들을 체인으로 엮는 것만으로 현업 과제가 풀린다. 도구는 교체되지만 타입별 구조는 유지된다.</p>
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:36px;max-width:1300px">
-      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">01</div><div style="font-size:13px;color:var(--ink);font-weight:700;margin-top:3px">문서 취합·변환</div></div>
-      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">02</div><div style="font-size:13px;color:var(--ink);font-weight:700;margin-top:3px">데이터 분석·시각화</div></div>
-      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">03</div><div style="font-size:13px;color:var(--ink);font-weight:700;margin-top:3px">문서 변환·재구성</div></div>
-      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">04</div><div style="font-size:13px;color:var(--ink);font-weight:700;margin-top:3px">논문·리서치</div></div>
-      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">05</div><div style="font-size:13px;color:var(--ink);font-weight:700;margin-top:3px">이미지·콘텐츠</div></div>
-      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">06</div><div style="font-size:13px;color:var(--ink);font-weight:700;margin-top:3px">영상 콘텐츠</div></div>
+      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">01</div><div style="font-size:15px;color:var(--ink);font-weight:700;margin-top:3px">문서 취합·변환</div></div>
+      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">02</div><div style="font-size:15px;color:var(--ink);font-weight:700;margin-top:3px">데이터 분석·시각화</div></div>
+      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">03</div><div style="font-size:15px;color:var(--ink);font-weight:700;margin-top:3px">문서 변환·재구성</div></div>
+      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">04</div><div style="font-size:15px;color:var(--ink);font-weight:700;margin-top:3px">논문·리서치</div></div>
+      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">05</div><div style="font-size:15px;color:var(--ink);font-weight:700;margin-top:3px">이미지·콘텐츠</div></div>
+      <div style="border-top:3px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">06</div><div style="font-size:15px;color:var(--ink);font-weight:700;margin-top:3px">영상 콘텐츠</div></div>
     </div>
   </div>
   <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">03 · 메타 프롬프트 설계와 AI 서비스 워크플로우 오케스트레이션</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">022 / 032</span></div></div>
@@ -1325,7 +1162,7 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
 <div class="stage"><div class="slide" data-title="Hero Closing">
   <div class="hbar"><div class="hbar-l">CLOSING QUOTE</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 03</div></div>
   <div style="position:absolute;top:80px;left:80px;right:80px;bottom:80px;background:var(--dk);padding:80px 90px;display:flex;flex-direction:column;justify-content:center;color:var(--on)">
-    <div style="font-family:var(--mono);font-size:11.5px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:18px">SESSION 03 · CLOSING QUOTE</div>
+    <div style="font-family:var(--mono);font-size:15px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:18px">SESSION 03 · CLOSING QUOTE</div>
     <div style="font-family:var(--serif);font-weight:700;font-size:56px;line-height:1.12;letter-spacing:-0.03em;color:var(--on)">3회차 17:30에<br>프롬프트 .md 2개와 레시피 .md 1개가<br><span style="color:var(--acc3);font-style:italic">같은 저장소</span>에 올라가 있다</div>
     <div style="width:72px;height:3px;background:var(--acc3);margin:22px 0 20px"></div>
     <p style="font-size:17px;color:var(--on2);line-height:1.75;max-width:1200px">3회차에 끝내야 할 일 네 가지. <strong style="color:var(--on)">① 자기 업무 프롬프트 2건을 메타 프롬프트로 생성하고 ChatGPT·Claude·Gemini 중 2개에 교차 투입한다</strong> · <strong style="color:var(--on)">② 워크플로우 6타입별로 입력→체인→게이트→출력 4칸 형식을 받아 적는다</strong> · <strong style="color:var(--on)">③ 현업 과제 1건을 도구 3개 이하 체인으로 실제 실행해 산출물 1개를 만든다</strong> · <strong style="color:var(--on)">④ 프롬프트 .md 2개와 레시피 카드 .md 1개를 비식별 처리 후 기관 저장소에 commit한다</strong>.</p>
@@ -1377,14 +1214,14 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
     <div style="background:var(--bg);padding:20px 30px 14px">
       <div class="sh"><span class="sh-n">8 SESSIONS</span><span class="sh-t">차시별 상태</span></div><div class="sh-line"></div>
       <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:1px;background:var(--ln2)">
-        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S01 · DONE</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">지형·미션</div></div>
-        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S02 · DONE</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">도구 생태계</div></div>
-        <div style="background:#f0e7d6;padding:14px 14px;border:2px solid var(--acc);margin:-2px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--acc);letter-spacing:1.5px;font-weight:700">S03 · TODAY</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">메타+6타입</div></div>
-        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S04 · NEXT</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">바이브 ① 분석</div></div>
-        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S05</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">바이브 ② 앱</div></div>
-        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S06</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">에이전트</div></div>
-        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S07</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">RAG·웹</div></div>
-        <div style="background:var(--dk);padding:14px 14px;color:var(--on)"><div style="font-family:var(--mono);font-size:9.5px;color:var(--acc3);letter-spacing:1.5px;font-weight:700">S08</div><div style="font-family:var(--serif);font-size:14px;color:var(--on);font-weight:700;line-height:1.25;margin-top:4px">API·MCP·캡스톤</div></div>
+        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S01 · DONE</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">지형·미션</div></div>
+        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S02 · DONE</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">도구 생태계</div></div>
+        <div style="background:#f0e7d6;padding:14px 14px;border:2px solid var(--acc);margin:-2px"><div style="font-family:var(--mono);font-size:15px;color:var(--acc);letter-spacing:1.5px;font-weight:700">S03 · TODAY</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">메타+6타입</div></div>
+        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S04 · NEXT</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">바이브 ① 분석</div></div>
+        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S05</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">바이브 ② 앱</div></div>
+        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S06</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">에이전트</div></div>
+        <div style="background:var(--bg2);padding:14px 14px"><div style="font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:1.5px;font-weight:700">S07</div><div style="font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:700;line-height:1.25;margin-top:4px">RAG·웹</div></div>
+        <div style="background:var(--dk);padding:14px 14px;color:var(--on)"><div style="font-family:var(--mono);font-size:15px;color:var(--acc3);letter-spacing:1.5px;font-weight:700">S08</div><div style="font-family:var(--serif);font-size:14px;color:var(--on);font-weight:700;line-height:1.25;margin-top:4px">API·MCP·캡스톤</div></div>
       </div>
     </div>
     <div style="background:var(--bg);padding:18px 30px 22px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:stretch">
@@ -1422,7 +1259,7 @@ addEventListener('resize',fitSlides);fitSlides();
 
 function curIdx(){let i=0,m=1e9;allStages.forEach((s,x)=>{const d=Math.abs(s.getBoundingClientRect().top+s.getBoundingClientRect().height/2-innerHeight/2);if(d<m){m=d;i=x}});return i}
 function pNav(dir){const i=curIdx()+dir;if(i>=0&&i<allStages.length)allStages[i].scrollIntoView({behavior:'smooth'})}
-function updPg(){document.getElementById('pgInd').textContent=`${curIdx()+1} / ${allStages.length}`}
+function updPg(){document.getElementById('pgInd').textContent=`${curIdx()+1}/ ${allStages.length}`}
 deck.addEventListener('scroll',updPg);updPg();
 function tFull(){if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}
 
@@ -1431,33 +1268,25 @@ function tEdit(){
   editMode=!editMode;
   const btn=document.getElementById('editBtn'),tb=document.querySelector('.toolbar');
   const SEL='.hl-kicker,.hl-title,.hl-sub,.card-k,.card-anchor,.card-body,.card-note,.co-lb,.co-main,.co p,.next-k,.next-t,.pit-lb,.pit-h,.pit-d,.sh-n,.sh-t,.hybrid-k,.hybrid-h,.hybrid-d,.draft-k,.draft-t,.draft-note,.cmp2c-k,.cmp2c-h,.cmp2c-d,.cmp2c-fig,.qd-k,.qd-h,.qd-d,.ladder-h,.ladder-d,.ladder-tag,.tblock-w,.tblock-h,.tblock-d,.tblock-sess,.type-h,.type-d,.type-tag,.flow-box-t,.hbar-l,.hbar-r,.fbar-title,.mtbl td,.mtbl th,h1,p,.slide>div>div>div[style],.slide>div>div>p[style],.slide div[style*="font-size"],.slide span[style*="font-size"]';
-  if(editMode){
-    btn.textContent='✎ EDITING';btn.style.background='#b8532a';btn.style.color='#fff';tb.style.borderBottom='2px solid #b8532a';
+  if(editMode){btn.textContent='✎ EDITING';btn.style.background='#b8532a';btn.style.color='#fff';tb.style.borderBottom='2px solid #b8532a';
     document.querySelectorAll(SEL).forEach(el=>{el.contentEditable='true';el.style.outline='1px dashed rgba(184,83,42,0.3)';el.style.cursor='text'});
     deck.style.scrollSnapType='none';
     sToast('EDIT ON — 텍스트 클릭 수정 · Ctrl+S 저장 · E 또는 ESC로 종료');
-  }else{
-    btn.textContent='✎ EDIT';btn.style.background='';btn.style.color='';tb.style.borderBottom='';
+  }else{btn.textContent='✎ EDIT';btn.style.background='';btn.style.color='';tb.style.borderBottom='';
     document.querySelectorAll('[contenteditable="true"]').forEach(el=>{el.contentEditable='false';el.style.outline='';el.style.cursor=''});
     deck.style.scrollSnapType='y mandatory';
     sToast('EDIT OFF — 프레젠테이션 모드');
   }
 }
-function sToast(m){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(14,10,6,0.92);color:#ede4d3;font-family:var(--mono,monospace);font-size:11px;letter-spacing:1.5px;padding:10px 24px;border-radius:4px;z-index:300;pointer-events:none;opacity:0;transition:opacity 0.4s';document.body.appendChild(t)}t.textContent=m;t.style.opacity='1';clearTimeout(t._tid);t._tid=setTimeout(()=>{t.style.opacity='0'},3000)}
+function sToast(m){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(14,10,6,0.92);color:#ede4d3;font-family:var(--mono,monospace);font-size:15px;letter-spacing:1.5px;padding:10px 24px;border-radius:4px;z-index:300;pointer-events:none;opacity:0;transition:opacity 0.4s';document.body.appendChild(t)}t.textContent=m;t.style.opacity='1';clearTimeout(t._tid);t._tid=setTimeout(()=>{t.style.opacity='0'},3000)}
 
 document.addEventListener('keydown',e=>{
   if(editMode){
-    if(e.key==='s'&&(e.ctrlKey||e.metaKey)){e.preventDefault();const b=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=document.title.replace(/[^a-zA-Z0-9가-힣\s·_-]/g,'')+'.html';a.click();URL.revokeObjectURL(a.href);sToast('HTML 파일 저장 완료')}
-    if(e.key==='Escape'||e.key==='e'||e.key==='E'){if(!document.activeElement||document.activeElement===document.body)tEdit()}
+    if(e.key==='s'&&(e.ctrlKey||e.metaKey)){e.preventDefault();const b=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=document.title.replace(/[^a-zA-Z0-9가-힣\s·_-]/g,'')+'.html';a.click();URL.revokeObjectURL(a.href);sToast('HTML 파일 저장 완료')}if(e.key==='Escape'||e.key==='e'||e.key==='E'){if(!document.activeElement||document.activeElement===document.body)tEdit()}
     return;
-  }
-  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '||e.key==='PageDown'){e.preventDefault();pNav(1)}
-  else if(e.key==='ArrowLeft'||e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();pNav(-1)}
+  }if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '||e.key==='PageDown'){e.preventDefault();pNav(1)}else if(e.key==='ArrowLeft'||e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();pNav(-1)}
   else if(e.key==='Home'){e.preventDefault();allStages[0].scrollIntoView({behavior:'smooth'})}
-  else if(e.key==='End'){e.preventDefault();allStages[allStages.length-1].scrollIntoView({behavior:'smooth'})}
-  else if(e.key==='f'||e.key==='F11'){e.preventDefault();tFull()}
-  else if(e.key==='Escape'){if(document.fullscreenElement)document.exitFullscreen()}
-  else if(e.key==='e'||e.key==='E'){tEdit()}
+  else if(e.key==='End'){e.preventDefault();allStages[allStages.length-1].scrollIntoView({behavior:'smooth'})}else if(e.key==='f'||e.key==='F11'){e.preventDefault();tFull()}else if(e.key==='Escape'){if(document.fullscreenElement)document.exitFullscreen()}else if(e.key==='e'||e.key==='E'){tEdit()}
 });
 </script>
 </body>

@@ -10,3 +10,4 @@ _supabase.local.json
 .env
 .env.*
 
+bump_fonts_backup_*.json
