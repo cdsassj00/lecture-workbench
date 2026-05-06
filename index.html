@@ -35,8 +35,10 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
 .strip{background:var(--wb2);border-right:1px solid var(--wln);overflow-y:auto;padding:8px}
 .strip::-webkit-scrollbar{width:5px}
 .strip::-webkit-scrollbar-thumb{background:var(--wln);border-radius:3px}
-.s-thumb{position:relative;border:2px solid transparent;border-radius:var(--rad);cursor:pointer;margin-bottom:2px;transition:border-color 0.15s;background:#fff;overflow:hidden}
+.s-thumb{position:relative;border:2px solid transparent;border-radius:var(--rad);cursor:pointer;margin-bottom:2px;transition:border-color 0.15s;background:#fff;overflow:hidden;user-select:none}
 .s-thumb.active{border-color:var(--wacc)}
+.s-thumb.multi-selected{border-color:var(--wacc);background:rgba(184,83,42,0.06);box-shadow:inset 0 0 0 1px rgba(184,83,42,0.4)}
+.s-thumb.multi-selected.active{box-shadow:inset 0 0 0 2px rgba(184,83,42,0.6)}
 .s-thumb:hover{border-color:var(--wink3)}
 .s-thumb-inner{width:180px;height:101px;overflow:hidden;position:relative;pointer-events:none}
 .s-thumb-inner iframe{width:1600px;height:900px;border:none;transform:scale(0.1125);transform-origin:top left;pointer-events:none}
@@ -878,8 +880,29 @@ function renderStrip() {
     
     // Thumbnail
     const thumb = document.createElement('div');
-    thumb.className = 's-thumb' + (i === S.selectedIdx ? ' active' : '');
-    thumb.onclick = () => selectSlide(i);
+    thumb.className = 's-thumb' + (i === S.selectedIdx ? ' active' : '') + (_multiSlides.has(i) ? ' multi-selected' : '');
+    thumb.onclick = (e) => {
+      if (e.shiftKey && _lastClickedSlide >= 0) {
+        // 범위 선택
+        const a = Math.min(_lastClickedSlide, i), b = Math.max(_lastClickedSlide, i);
+        _multiSlides.clear();
+        for (let k = a; k <= b; k++) _multiSlides.add(k);
+        refreshThumbMulti();
+        selectSlide(i);
+      } else if (e.ctrlKey || e.metaKey) {
+        // 토글
+        if (_multiSlides.has(i)) _multiSlides.delete(i);
+        else _multiSlides.add(i);
+        _lastClickedSlide = i;
+        refreshThumbMulti();
+        if (_multiSlides.size > 0) selectSlide(i);
+      } else {
+        // 일반 클릭 — 다중 해제 + 단일 선택
+        clearMultiSlides();
+        _lastClickedSlide = i;
+        selectSlide(i);
+      }
+    };
     thumb.oncontextmenu = (e) => { e.preventDefault(); showSlideMenu(i, e); };
     
     const inner = document.createElement('div');
@@ -904,11 +927,29 @@ function renderStrip() {
     thumb.draggable = true;
     thumb.dataset.idx = String(i);
     thumb.addEventListener('dragstart', (e) => {
+      // 드래그 시작 시 — 현재 thumb이 다중 선택 안에 있으면 전체 묶음 드래그, 아니면 단일
+      let dragSet;
+      if (_multiSlides.has(i) && _multiSlides.size > 1) {
+        dragSet = [..._multiSlides].sort((a,b) => a-b);
+      } else {
+        dragSet = [i];
+        // 다중 밖 thumb을 단순 드래그하면 다중 해제
+        if (_multiSlides.size && !_multiSlides.has(i)) clearMultiSlides();
+      }
+      e.dataTransfer.setData('application/x-slide-indices', JSON.stringify(dragSet));
       e.dataTransfer.setData('text/plain', String(i));
       e.dataTransfer.effectAllowed = 'move';
       thumb.style.opacity = '0.4';
+      // 드래그 중인 다중 thumbs 모두 시각적 표시
+      if (dragSet.length > 1) {
+        document.querySelectorAll('.s-thumb').forEach((t, idx) => {
+          if (dragSet.includes(idx)) t.style.opacity = '0.4';
+        });
+      }
     });
-    thumb.addEventListener('dragend', () => { thumb.style.opacity = ''; });
+    thumb.addEventListener('dragend', () => {
+      document.querySelectorAll('.s-thumb').forEach(t => { t.style.opacity = ''; });
+    });
     thumb.addEventListener('dragover', (e) => {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
@@ -923,6 +964,16 @@ function renderStrip() {
       e.preventDefault();
       thumb.style.borderTopColor = '';
       thumb.style.borderTopWidth = '';
+      // 다중 드래그 우선
+      let dragSet = null;
+      try {
+        const json = e.dataTransfer.getData('application/x-slide-indices');
+        if (json) dragSet = JSON.parse(json);
+      } catch(_) {}
+      if (dragSet && dragSet.length > 1) {
+        reorderMultipleSlides(dragSet, i);
+        return;
+      }
       const from = parseInt(e.dataTransfer.getData('text/plain'));
       if (!Number.isNaN(from)) reorderSlides(from, i);
     });
@@ -1304,6 +1355,95 @@ function reorderSlides(fromIdx, toIdx) {
   toast(`슬라이드 ${fromIdx+1} → ${toIdx+1} · 페이지 번호 자동 갱신`);
 }
 
+// ============================================================
+// 슬라이드 썸네일 다중 선택 (Phase 1)
+// ============================================================
+let _multiSlides = new Set();   // 다중 선택된 슬라이드 인덱스
+let _lastClickedSlide = -1;     // shift+클릭 anchor
+
+function refreshThumbMulti() {
+  document.querySelectorAll('.s-thumb').forEach((t, i) => {
+    t.classList.toggle('multi-selected', _multiSlides.has(i));
+  });
+}
+
+function clearMultiSlides() {
+  _multiSlides.clear();
+  refreshThumbMulti();
+}
+
+// 다중 일괄 삭제 (인덱스 배열)
+function bulkDeleteSlides(indices) {
+  if (!indices || !indices.length) return;
+  const n = indices.length;
+  if (n === 1) {
+    deleteIdx = indices[0];
+    document.getElementById('confirmMsg').textContent = `슬라이드 ${indices[0]+1}을(를) 삭제하시겠습니까?`;
+    document.getElementById('confirmBg').classList.add('show');
+    return;
+  }
+  if (!confirm(`선택된 슬라이드 ${n}장을 삭제하시겠습니까?\n되돌리기(Ctrl+Z) 가능.`)) return;
+  // 큰 인덱스부터 제거 — 인덱스 어긋나지 않게
+  const sorted = [...indices].sort((a,b) => b-a);
+  const removed = sorted.map(idx => ({idx, slide: S.slides[idx]}));
+  sorted.forEach(idx => S.slides.splice(idx, 1));
+  pushUndo({type:'bulk-delete', removed: removed.reverse()});
+  updateAllPageNumbers();
+  S.dirty = true;
+  clearMultiSlides();
+  renderStrip();
+  selectSlide(Math.min(sorted[sorted.length-1], S.slides.length - 1));
+  toast(`슬라이드 ${n}장 삭제 — 페이지 번호 자동 갱신 · Ctrl+Z로 되돌리기`);
+}
+
+// 다중 일괄 복제 — 마지막 인덱스 다음에 모두 삽입
+function bulkDuplicateSlides(indices) {
+  if (!indices || !indices.length) return;
+  const sorted = [...indices].sort((a,b) => a-b);
+  const insertAt = sorted[sorted.length - 1] + 1;
+  const clones = sorted.map(idx => {
+    const orig = S.slides[idx];
+    return {
+      id: 'slide-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).slice(2,7),
+      html: orig.html,
+      source: 'added',
+      dataTitle: (orig.dataTitle || '') + ' (사본)',
+      palette: orig.palette,
+    };
+  });
+  S.slides.splice(insertAt, 0, ...clones);
+  updateAllPageNumbers();
+  S.dirty = true;
+  // 새 사본들로 다중 선택 갱신
+  _multiSlides.clear();
+  clones.forEach((_, k) => _multiSlides.add(insertAt + k));
+  renderStrip();
+  selectSlide(insertAt);
+  toast(`슬라이드 ${sorted.length}장 복제 → ${insertAt+1}~${insertAt+clones.length}번 위치`);
+}
+
+// 여러 슬라이드를 한꺼번에 toIdx 위치로 이동
+function reorderMultipleSlides(fromIndices, toIdx) {
+  if (!fromIndices || !fromIndices.length) return;
+  if (fromIndices.length === 1) return reorderSlides(fromIndices[0], toIdx);
+  const sorted = [...fromIndices].sort((a,b) => a-b);
+  const cut = sorted.map(i => S.slides[i]);
+  // toIdx보다 작은 인덱스가 제거되면 toIdx도 그만큼 앞당겨짐
+  const beforeCount = sorted.filter(i => i < toIdx).length;
+  const adjustedTo = Math.max(0, toIdx - beforeCount);
+  // 큰 인덱스부터 제거
+  for (let k = sorted.length - 1; k >= 0; k--) S.slides.splice(sorted[k], 1);
+  S.slides.splice(adjustedTo, 0, ...cut);
+  updateAllPageNumbers();
+  S.dirty = true;
+  // 다중 선택을 새 위치로 갱신
+  _multiSlides.clear();
+  for (let k = 0; k < cut.length; k++) _multiSlides.add(adjustedTo + k);
+  renderStrip();
+  selectSlide(adjustedTo);
+  toast(`슬라이드 ${cut.length}장 일괄 이동 → ${adjustedTo+1}번 위치부터`);
+}
+
 let deleteIdx = -1;
 function showSlideMenu(idx, e) {
   // Simple: just confirm delete
@@ -1626,6 +1766,9 @@ function undo() {
     S.slides.splice(a.idx, 1);
   } else if (a.type === 'delete') {
     S.slides.splice(a.idx, 0, a.slide);
+  } else if (a.type === 'bulk-delete') {
+    // 인덱스 오름차순으로 다시 삽입
+    [...a.removed].sort((x,y) => x.idx - y.idx).forEach(r => S.slides.splice(r.idx, 0, r.slide));
   }
   S.redoStack.push(a);
   S.dirty = true;
@@ -1641,6 +1784,9 @@ function redo() {
     S.slides.splice(a.idx, 0, a.slide);
   } else if (a.type === 'delete') {
     S.slides.splice(a.idx, 1);
+  } else if (a.type === 'bulk-delete') {
+    // 큰 인덱스부터 제거 — 인덱스 어긋나지 않게
+    [...a.removed].sort((x,y) => y.idx - x.idx).forEach(r => S.slides.splice(r.idx, 1));
   }
   S.undoStack.push(a);
   S.dirty = true;
@@ -1686,7 +1832,23 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); selectSlide(S.selectedIdx - 1); }
   else if (e.key === 'z' && (e.ctrlKey||e.metaKey)) { e.preventDefault(); undo(); }
   else if (e.key === 'y' && (e.ctrlKey||e.metaKey)) { e.preventDefault(); redo(); }
-  else if (e.key === 'Delete' && S.selectedIdx >= 0 && !S.editMode) { showSlideMenu(S.selectedIdx); }
+  // 다중 슬라이드 일괄 작업 (편집 모드 아닐 때만 — 편집 모드에선 자유 개체용 단축키와 충돌)
+  else if (e.key === 'Delete' && !S.editMode) {
+    if (_multiSlides && _multiSlides.size > 1) { e.preventDefault(); bulkDeleteSlides([..._multiSlides]); }
+    else if (S.selectedIdx >= 0) { showSlideMenu(S.selectedIdx); }
+  }
+  else if ((e.ctrlKey||e.metaKey) && (e.key === 'a' || e.key === 'A') && !S.editMode && S.slides.length > 0) {
+    // Ctrl+A: 전체 선택 (편집 모드 아닐 때)
+    e.preventDefault();
+    _multiSlides = new Set(S.slides.map((_, k) => k));
+    refreshThumbMulti();
+    toast(`${S.slides.length}장 모두 선택 — Delete 또는 Ctrl+D`);
+  }
+  else if ((e.ctrlKey||e.metaKey) && (e.key === 'd' || e.key === 'D') && !S.editMode && _multiSlides && _multiSlides.size > 0) {
+    // Ctrl+D: 다중 슬라이드 일괄 복제
+    e.preventDefault();
+    bulkDuplicateSlides([..._multiSlides]);
+  }
 });
 
 // DRAG & DROP file on window
