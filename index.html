@@ -57,7 +57,7 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
 .s-insert:last-child{opacity:0.4}
 
 /* CENTER: CANVAS */
-.canvas{background:#d5cfc7;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:24px}
+.canvas{background:#d5cfc7;overflow:hidden;display:flex;align-items:flex-start;justify-content:center;padding:24px}
 .canvas-frame{background:#fff;box-shadow:0 2px 20px rgba(0,0,0,0.12);border-radius:4px;overflow:hidden;flex-shrink:0;position:relative}
 .canvas-frame iframe{border:none;display:block}
 .canvas-edit-overlay{position:absolute;inset:0;cursor:text}
@@ -1278,6 +1278,11 @@ function ensureCanvasResizeObserver() {
     _canvasRO._raf = requestAnimationFrame(fitCanvasFrame);
   });
   _canvasRO.observe(canvas);
+  // 윈도우 리사이즈도 백업 리스너로 — 일부 환경에서 ResizeObserver 미발화 대비
+  window.addEventListener('resize', () => {
+    if (_canvasRO._raf) cancelAnimationFrame(_canvasRO._raf);
+    _canvasRO._raf = requestAnimationFrame(fitCanvasFrame);
+  });
 }
 
 function selectSlide(idx) {
@@ -1339,6 +1344,8 @@ function selectSlide(idx) {
       }
     } catch (e) {}
     if (S.editMode) makeEditable(iframe);
+    // iframe 로드 후에도 한 번 더 fit (DOM 안정 후)
+    requestAnimationFrame(fitCanvasFrame);
   };
   
   // Status
