@@ -12,3 +12,4 @@ _supabase.local.json
 
 bump_fonts_backup_*.json
 session1_backup_*.json
+session1_closing_backup_*.json
