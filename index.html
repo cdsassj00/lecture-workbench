@@ -141,7 +141,191 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
 .confirm{background:#fff;border-radius:8px;padding:24px;width:360px;text-align:center}
 .confirm h3{font-size:14px;margin-bottom:8px}
 .confirm p{font-size:12px;color:var(--wink2);margin-bottom:16px}
+
+/* ============================================================
+   수강생 열람 비밀번호 게이트 — 다크 스플래시
+   ============================================================ */
+html.gate-locked { overflow: hidden; }
+html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
+#viewer-gate {
+  position: fixed; inset: 0; z-index: 99999;
+  background: linear-gradient(180deg, #1a1612 0%, #0e0a06 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'EB Garamond', 'Noto Serif KR', 'Batang', serif;
+  color: #ede4d3;
+  visibility: visible !important;
+}
+#viewer-gate .gate-card {
+  background: #2a241e; border: 1px solid #3a322a; border-radius: 8px;
+  padding: 44px 52px; max-width: 440px; width: 90%;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  text-align: center;
+}
+#viewer-gate .gate-icon { font-size: 30px; color: #b8532a; margin-bottom: 16px; line-height: 1; }
+#viewer-gate h1 {
+  font-family: 'Nanum Myeongjo', 'EB Garamond', serif;
+  font-size: 22px; font-weight: 800; line-height: 1.4;
+  margin: 0 0 6px; letter-spacing: -0.02em;
+  color: #ede4d3;
+}
+#viewer-gate .sub {
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  font-size: 11px; color: #8a7e68; letter-spacing: 1.5px;
+  margin-bottom: 22px;
+  text-transform: uppercase;
+}
+#viewer-gate .notice {
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  font-size: 12.5px; color: #c5b89e; line-height: 1.65;
+  padding: 12px 16px; background: rgba(184, 83, 42, 0.08);
+  border-left: 2px solid #b8532a; margin-bottom: 22px;
+  text-align: left;
+}
+#viewer-gate .notice b { color: #f0d090; }
+#viewer-gate input {
+  width: 100%; padding: 11px 14px;
+  background: #1a1612; border: 1px solid #3a322a; border-radius: 4px;
+  color: #ede4d3; font-family: 'Pretendard', 'Noto Sans KR', sans-serif; font-size: 14px;
+  letter-spacing: 1px; outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+#viewer-gate input:focus { border-color: #b8532a; }
+#viewer-gate input::placeholder { color: #5a4e3e; letter-spacing: 0.5px; }
+#viewer-gate button.gate-submit {
+  width: 100%; padding: 11px;
+  background: #b8532a; border: 0; border-radius: 4px;
+  color: #fff; font-family: 'Pretendard', 'Noto Sans KR', sans-serif; font-size: 13px;
+  font-weight: 700; cursor: pointer; margin-top: 10px;
+  letter-spacing: 4px;
+  transition: background 0.15s;
+}
+#viewer-gate button.gate-submit:hover { background: #9a4420; }
+#viewer-gate button.gate-submit:disabled { background: #5a4e3e; cursor: wait; }
+#viewer-gate .err {
+  color: #ff6b4a; font-size: 11.5px; margin-top: 10px;
+  min-height: 16px;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+}
+#viewer-gate .footer {
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif; font-size: 10px;
+  color: #5a4e3e; margin-top: 22px; letter-spacing: 1.5px;
+}
+@keyframes gateShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-7px); }
+  40%, 80% { transform: translateX(7px); }
+}
+.gate-shake { animation: gateShake 0.4s ease; }
 </style>
+
+<!-- 비밀번호 게이트 — head에서 즉시 실행하여 본문 콘텐츠 flash 방지 -->
+<script>
+(function() {
+  // SHA-256 of '거점리더2026'
+  const PASS_HASH = '3b1b29d78cbf4116f6588a1fd47eae26dbaba84f3e3d9835168420ea32d64672';
+  const STORAGE_KEY = 'wb_viewer_pass_v1';
+  const EXPIRY_DAYS = 30;
+  const DEV_BYPASS = 'devmode2026'; // ?nopass=devmode2026 으로 우회
+
+  // 우회 옵션 검사
+  let cleared = false;
+  try {
+    const params = new URLSearchParams(location.search);
+    if (params.get('nopass') === DEV_BYPASS) cleared = true;
+  } catch (_) {}
+
+  // 기존 인증 검사
+  if (!cleared) {
+    try {
+      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      if (stored && stored.ok && stored.expires > Date.now()) cleared = true;
+    } catch (_) {}
+  }
+
+  if (cleared) return; // 통과 — 본문 그대로 노출
+
+  // 잠금 상태 — html에 클래스 즉시 부여 → CSS가 본문 콘텐츠 시각적 차단
+  document.documentElement.classList.add('gate-locked');
+
+  // DOM 준비되면 스플래시 삽입
+  const inject = () => {
+    const gate = document.createElement('div');
+    gate.id = 'viewer-gate';
+    gate.innerHTML =
+      '<div class="gate-card">' +
+        '<div class="gate-icon">🔒</div>' +
+        '<h1>AI 챔피언 고급 과정</h1>' +
+        '<div class="sub">AI 데이터분석 전문인재 과정</div>' +
+        '<div class="notice">본 강의안은 <b>전문인재 과정 등록자 전용</b>입니다.<br>출입을 위한 비밀번호를 입력해 주세요.</div>' +
+        '<input type="password" class="gate-input" autocomplete="off" placeholder="비밀번호" autofocus>' +
+        '<button class="gate-submit">입 장</button>' +
+        '<div class="err"></div>' +
+        '<div class="footer">행정안전부 2026 · 거점리더 전용 열람</div>' +
+      '</div>';
+    document.body.appendChild(gate);
+
+    const inp = gate.querySelector('.gate-input');
+    const sub = gate.querySelector('.gate-submit');
+    const err = gate.querySelector('.err');
+    const card = gate.querySelector('.gate-card');
+
+    // 자동 포커스 — 일부 브라우저는 autofocus 무시
+    setTimeout(() => inp && inp.focus(), 50);
+
+    const sha256 = async (s) => {
+      const buf = new TextEncoder().encode(s);
+      const h = await crypto.subtle.digest('SHA-256', buf);
+      return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('');
+    };
+
+    const tryPass = async () => {
+      const v = inp.value;
+      if (!v) return;
+      sub.disabled = true;
+      sub.textContent = '확인 중…';
+      try {
+        const h = await sha256(v);
+        if (h === PASS_HASH) {
+          // 성공 — 저장 + 페이드아웃
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            ok: true,
+            expires: Date.now() + EXPIRY_DAYS * 24 * 3600 * 1000
+          }));
+          gate.style.transition = 'opacity 0.45s ease';
+          gate.style.opacity = '0';
+          setTimeout(() => {
+            gate.remove();
+            document.documentElement.classList.remove('gate-locked');
+          }, 450);
+        } else {
+          // 실패
+          card.classList.add('gate-shake');
+          err.textContent = '비밀번호가 일치하지 않습니다';
+          inp.value = '';
+          inp.focus();
+          sub.disabled = false;
+          sub.textContent = '입 장';
+          setTimeout(() => card.classList.remove('gate-shake'), 400);
+        }
+      } catch (e) {
+        sub.disabled = false;
+        sub.textContent = '입 장';
+        err.textContent = '오류: ' + (e && e.message || '확인 실패');
+      }
+    };
+
+    sub.addEventListener('click', tryPass);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') tryPass(); });
+  };
+
+  if (document.body) {
+    inject();
+  } else {
+    document.addEventListener('DOMContentLoaded', inject);
+  }
+})();
+</script>
 </head>
 <body>
 <div class="app">
