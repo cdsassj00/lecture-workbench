@@ -2413,7 +2413,18 @@ async function dbSaveCurrentSession() {
       saved = Math.min(start + batchSize, total);
       setProgress(saved);
     }
-    setProgress(total, `✓ 저장 완료 ${total}장`);
+    // 3) 잉여 row 정리 — 클라이언트에서 슬라이드 삭제 후 저장 시,
+    //    DB에 slide_idx >= total인 옛 행이 남아 있으면 제거
+    setProgress(total, '⏳ 잉여 행 정리 중...');
+    const { error: delError, count: delCount } = await sb.from('slides')
+      .delete({ count: 'exact' })
+      .eq('session_num', sessionNum)
+      .gte('slide_idx', total);
+    if (delError) {
+      console.warn('잉여 row 정리 실패:', delError);
+      // 치명적 에러 아님 — 저장 자체는 성공한 상태
+    }
+    setProgress(total, `✓ 저장 완료 ${total}장${delCount ? ` (잉여 ${delCount}장 정리)` : ''}`);
     S.dirty = false;
     document.getElementById('stDirty').textContent = '저장 완료';
     toast(`Session ${sessionNum} 저장 완료 — ${total}장`);
