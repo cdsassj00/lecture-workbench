@@ -379,6 +379,7 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
     <span class="tb-sep"></span>
     <select id="paletteSelect" onchange="applySlidePalette(this.value)" title="현재 슬라이드 팔레트" style="font-family:inherit;font-size:11px;padding:5px 8px;border:1px solid var(--wln);border-radius:3px;background:#fff;cursor:pointer">
       <option value="">팔레트 (기본)</option>
+      <option value="public-blue">🔷 Public Blue</option>
       <option value="vintage">🟫 Vintage</option>
       <option value="dark">⬛ Dark</option>
       <option value="light-brown">🟤 Light Brown</option>
@@ -1214,6 +1215,11 @@ function mkInsert(idx) {
 
 function buildSlidePreview(slide) {
   const PALETTE_INLINE = `
+.slide[data-palette="public-blue"]{--bg:#ffffff!important;--bg2:#f0f5fa!important;--ink:#0d2d5c!important;--ink2:#2c3e58!important;--ink3:#6b7891!important;--acc:#1c5cab!important;--acc2:#0a3d80!important;--acc3:#4d8fd6!important;--ln:#d8e1ed!important;--dk:#0d2d5c!important;--on:#ffffff!important;--serif:'Pretendard','Noto Sans KR','Noto Sans CJK KR',sans-serif!important;--sans:'Pretendard','Noto Sans KR','Noto Sans CJK KR',sans-serif!important;background:#ffffff!important;color:#2c3e58;font-family:'Pretendard','Noto Sans KR','Noto Sans CJK KR',sans-serif!important}
+.slide[data-palette="public-blue"] *{font-family:'Pretendard','Noto Sans KR','Noto Sans CJK KR',sans-serif!important}
+.slide[data-palette="public-blue"] .hl-title,.slide[data-palette="public-blue"] h1,.slide[data-palette="public-blue"] h2,.slide[data-palette="public-blue"] h3,.slide[data-palette="public-blue"] .hero-t{letter-spacing:-0.025em!important;font-weight:800!important}
+.slide[data-palette="public-blue"]{--mono:'JetBrains Mono','D2Coding','Consolas',monospace!important}
+.slide[data-palette="public-blue"] code,.slide[data-palette="public-blue"] .cblk,.slide[data-palette="public-blue"] .cm,.slide[data-palette="public-blue"] .fbar-label,.slide[data-palette="public-blue"] [style*="var(--mono)"]{font-family:'JetBrains Mono','D2Coding','Consolas',monospace!important}
 .slide[data-palette="vintage"]{--bg:#f5ecd9!important;--bg2:#ebe0c8!important;--ink:#3a2d1d!important;--ink2:#5a4a35!important;--ink3:#8a7a60!important;--acc:#b8532a!important;--acc2:#9a4420!important;--acc3:#d4a574!important;--ln:#d8c8a8!important;--dk:#2a1d10!important;--on:#f5ecd9!important;background:#f5ecd9!important}
 .slide[data-palette="dark"]{--bg:#1a1612!important;--bg2:#2a241e!important;--ink:#ede4d3!important;--ink2:#c5b89e!important;--ink3:#8a7e68!important;--acc:#d4a574!important;--acc2:#b8532a!important;--acc3:#f0d090!important;--ln:#3a3228!important;--dk:#0e0a06!important;--on:#ede4d3!important;background:#1a1612!important;color:#ede4d3}
 .slide[data-palette="dark"] *{color:inherit}
