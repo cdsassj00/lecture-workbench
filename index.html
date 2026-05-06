@@ -518,6 +518,19 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- LOAD OVERLAY — 교안 로딩 중앙 진행률 -->
+<div id="loadOverlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(20,15,10,0.55);backdrop-filter:blur(2px);align-items:center;justify-content:center;font-family:'Pretendard','Noto Sans KR',sans-serif">
+  <div style="background:#fff;border:2px solid #b8532a;border-radius:8px;padding:32px 44px;min-width:380px;max-width:520px;box-shadow:0 12px 40px rgba(0,0,0,0.35);text-align:center">
+    <div style="font-size:11px;color:#b8532a;letter-spacing:3px;font-weight:700;margin-bottom:12px;font-family:monospace">LOADING</div>
+    <div id="loadOverlayTitle" style="font-family:'Nanum Myeongjo','Noto Serif KR',serif;font-size:22px;font-weight:800;color:#1a1612;margin-bottom:10px;letter-spacing:-0.02em">교안 불러오는 중...</div>
+    <div id="loadOverlayMsg" style="font-size:12.5px;color:#6a5a4a;margin-bottom:22px;line-height:1.6;min-height:32px">DB에서 슬라이드 데이터를 받고 있습니다.</div>
+    <div style="height:8px;background:#f0e8d8;border-radius:4px;overflow:hidden;margin-bottom:8px">
+      <div id="loadOverlayBar" style="height:100%;width:0%;background:linear-gradient(90deg,#b8532a 0%,#d4a574 100%);transition:width 0.3s ease;border-radius:4px"></div>
+    </div>
+    <div id="loadOverlayPct" style="font-family:monospace;font-size:10.5px;color:#8a7a60;letter-spacing:1.5px;font-weight:700">0%</div>
+  </div>
+</div>
+
 <!-- LOGIN MODAL -->
 <div class="modal-bg" id="loginModalBg" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal" style="position:relative;width:380px">
@@ -2826,12 +2839,44 @@ async function dbMigrateAllStaticFiles() {
 window.dbMigrateAllStaticFiles = dbMigrateAllStaticFiles;
 
 // === Hook into existing fetchSession to prefer DB ===
+// === 로딩 오버레이 헬퍼 ===
+function showLoadOverlay(title, msg) {
+  const ov = document.getElementById('loadOverlay');
+  if (!ov) return;
+  document.getElementById('loadOverlayTitle').textContent = title || '교안 불러오는 중...';
+  document.getElementById('loadOverlayMsg').textContent = msg || '';
+  document.getElementById('loadOverlayBar').style.width = '0%';
+  document.getElementById('loadOverlayPct').textContent = '0%';
+  ov.style.display = 'flex';
+}
+function setLoadProgress(pct, msg) {
+  pct = Math.max(0, Math.min(100, pct));
+  const bar = document.getElementById('loadOverlayBar');
+  const pctEl = document.getElementById('loadOverlayPct');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+  if (msg) document.getElementById('loadOverlayMsg').textContent = msg;
+}
+function hideLoadOverlay() {
+  const ov = document.getElementById('loadOverlay');
+  if (ov) ov.style.display = 'none';
+}
+// rAF 한 번 양보 (브라우저가 UI 업데이트 후 다음 단계 실행)
+const _yieldUI = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
 const _originalFetchSession = fetchSession;
 fetchSession = async function(s) {
   document.getElementById('sessionModalBg').classList.remove('show');
+  showLoadOverlay(`Session ${s.num} 불러오는 중...`, 'DB에서 슬라이드 데이터를 받고 있습니다.');
+  setLoadProgress(5, 'DB 연결 중...');
+  await _yieldUI();
   if (sb) {
+    setLoadProgress(15, `Session ${s.num} 슬라이드 데이터 요청 중...`);
     const result = await dbLoadSession(s.num);
     if (result && result.slides && result.slides.length) {
+      const total = result.slides.length;
+      setLoadProgress(50, `데이터 수신 완료 — ${total}장 처리 중...`);
+      await _yieldUI();
       S.css = (result.meta && result.meta.css) || '';
       S.js = (result.meta && result.meta.js) || '';
       S.slides = result.slides.map((row, i) => ({
@@ -2840,14 +2885,18 @@ fetchSession = async function(s) {
         source: 'original',
         dataTitle: row.data_title || `Slide ${i+1}`
       }));
-      // 로드 직후 페이지 번호 자동 정렬 (DB 저장 당시 번호와 무관)
+      setLoadProgress(65, '페이지 번호 자동 정렬...');
       updateAllPageNumbers();
       S.coverOriginal = S.slides.length ? S.slides[0].html : null;
       S.filename = s.file;
       S.currentSessionNum = s.num;
       S.dirty = false;
       S.undoStack = []; S.redoStack = [];
+      setLoadProgress(75, `썸네일 렌더 중 — ${total}장...`);
+      await _yieldUI();
       renderStrip();
+      setLoadProgress(90, '첫 슬라이드 표시...');
+      await _yieldUI();
       selectSlide(0);
       document.getElementById('btnExport').disabled = false;
       const btn2 = document.getElementById('btnExport2'); if (btn2) btn2.disabled = false;
@@ -2857,14 +2906,23 @@ fetchSession = async function(s) {
       document.getElementById('tbInfo').textContent = `Session ${s.num} · DB · ${S.slides.length}장`;
       const stf = document.getElementById('stFile'); if (stf) stf.textContent = `Session ${s.num} (DB)`;
       updateAuthUI();
+      setLoadProgress(100, '완료');
+      setTimeout(hideLoadOverlay, 320);
       toast(`Session ${s.num} DB에서 로드 — ${S.slides.length}장`);
       return;
     }
+    setLoadProgress(40, 'DB에 데이터 없음 — 정적 파일로 대체...');
   }
   // Fallback: original file fetch
-  await _originalFetchSession(s);
-  S.currentSessionNum = s.num;
-  updateAuthUI();
+  setLoadProgress(50, '정적 HTML 파일에서 로드 중...');
+  try {
+    await _originalFetchSession(s);
+    S.currentSessionNum = s.num;
+    updateAuthUI();
+    setLoadProgress(100, '완료');
+  } finally {
+    setTimeout(hideLoadOverlay, 320);
+  }
 };
 
 // === Wrap loadFile to clear sessionNum (file-loaded sessions don't have a num) ===
