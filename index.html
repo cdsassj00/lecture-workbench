@@ -32,6 +32,8 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
 
 /* MAIN 3-PANEL */
 .main{display:grid;grid-template-columns:200px 1fr 280px;overflow:hidden}
+body:not(.editing) .main{grid-template-columns:200px 1fr}
+body:not(.editing) .settings{display:none}
 
 /* LEFT: SLIDE STRIP */
 .strip{background:var(--wb2);border-right:1px solid var(--wln);overflow-y:auto;padding:8px}
@@ -1845,6 +1847,8 @@ function toggleEdit() {
   btn.textContent = S.editMode ? '편집 중 ✎' : '편집 모드';
   btn.style.background = S.editMode ? 'var(--wacc)' : '';
   btn.style.color = S.editMode ? '#fff' : '';
+  // 우측 settings 패널은 편집 모드일 때만 노출 (CSS rule로 자동 hide)
+  document.body.classList.toggle('editing', S.editMode);
   // 컴포넌트 버튼 활성화
   document.querySelectorAll('.comp-btn').forEach(b => b.disabled = !S.editMode);
   // 툴바 추가 버튼(PPTX 등) 표시·숨김으로 인한 레이아웃 변동 후 scale 재계산
