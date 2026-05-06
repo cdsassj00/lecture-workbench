@@ -280,12 +280,16 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
     };
 
     const tryPass = async () => {
-      const v = inp.value;
+      // 한글 IME에 따라 NFC/NFD 형이 다를 수 있어 NFC로 정규화 후 비교
+      // 양 끝 공백도 제거 (오타 방지)
+      const v = (inp.value || '').normalize('NFC').trim();
       if (!v) return;
       sub.disabled = true;
       sub.textContent = '확인 중…';
       try {
         const h = await sha256(v);
+        // 디버그용 로그 — 비번 자체는 출력하지 않고 해시만 (안전)
+        console.log('[GATE] input length:', v.length, 'hash:', h.substring(0, 16) + '...', 'expected:', PASS_HASH.substring(0, 16) + '...');
         if (h === PASS_HASH) {
           // 성공 — 저장 + 페이드아웃
           localStorage.setItem(STORAGE_KEY, JSON.stringify({
