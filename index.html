@@ -1009,7 +1009,7 @@ function buildSlidePreview(slide) {
 .slide[data-palette="dark"] *{color:inherit}
 .slide[data-palette="light-brown"]{--bg:#f0e6d2!important;--bg2:#e0d0b0!important;--ink:#4a3520!important;--ink2:#6a553a!important;--ink3:#9a8060!important;--acc:#a06030!important;--acc2:#804820!important;--acc3:#c08850!important;--ln:#d0b890!important;--dk:#2a1a08!important;--on:#f0e6d2!important;background:#f0e6d2!important}
 `;
-  return `<!DOCTYPE html><html><head><style>${S.css}\nbody{margin:0;overflow:hidden}\n.stage{width:1600px;height:900px;position:relative}\n.slide{position:absolute;inset:0}\n.deck{}\n.hbar{position:absolute;top:0;left:0;right:0;z-index:50}\n.fbar{position:absolute;bottom:0;left:0;right:0;z-index:50}\n${PALETTE_INLINE}</style></head><body><div class="stage">${slide.html}</div></body></html>`;
+  return `<!DOCTYPE html><html><head><style>${S.css}\nbody{margin:0;overflow:hidden}\n.stage{width:1600px;height:900px;position:relative;overflow:hidden}\n.slide{position:absolute;inset:0}\n.deck{}\n.hbar{position:absolute;top:0;left:0;right:0;z-index:50}\n.fbar{position:absolute;bottom:0;left:0;right:0;z-index:50}\n${PALETTE_INLINE}</style></head><body><div class="stage">${slide.html}</div></body></html>`;
 }
 
 // 슬라이드 HTML에서 강의 운영용 시간 라벨 제거 (공유 강의안 톤 일관)
@@ -1590,7 +1590,12 @@ function toggleEdit() {
   btn.style.color = S.editMode ? '#fff' : '';
   // 컴포넌트 버튼 활성화
   document.querySelectorAll('.comp-btn').forEach(b => b.disabled = !S.editMode);
-  if (S.selectedIdx >= 0) selectSlide(S.selectedIdx);
+  // 툴바 추가 버튼(PPTX 등) 표시·숨김으로 인한 레이아웃 변동 후 scale 재계산
+  if (S.selectedIdx >= 0) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => selectSlide(S.selectedIdx));
+    });
+  }
   toast(S.editMode ? '편집 모드 ON — 슬라이드 텍스트를 클릭하세요' : '편집 모드 OFF');
 }
 
