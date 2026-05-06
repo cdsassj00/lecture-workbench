@@ -451,6 +451,7 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
             <button class="btn btn-o" onclick="addFreeText()" style="flex:1;font-size:11px">+ 텍스트</button>
             <button class="btn btn-o" onclick="document.getElementById('freeImgIn').click()" style="flex:1;font-size:11px">+ 이미지</button>
           </div>
+          <button class="btn btn-p" onclick="openSlideGenModal()" style="margin-top:8px;width:100%;font-size:12px;padding:8px;background:linear-gradient(90deg,#b8532a 0%,#d4a574 100%);color:#fff;font-weight:700">✨ AI 슬라이드 생성 (실험적)</button>
           <button class="btn btn-o" onclick="clearAllFreeElements()" style="width:100%;font-size:11px;margin-top:6px;color:#c33;border-color:#f3c0c0">🧹 자유 개체 모두 삭제</button>
           <input type="file" id="freeImgIn" accept="image/*" style="display:none">
           <div class="hint" style="margin-top:8px">드래그=이동 · <b>방향키=1px 이동</b> · <b>Shift+방향키=10px 이동</b> · 더블클릭=텍스트편집 · Del=삭제 · Ctrl+D=복제 · Ctrl+C/V=복사붙여넣기 · <b>Ctrl+]/[=맨앞/맨뒤</b> · 외부 이미지/텍스트도 Ctrl+V로 직접 붙여넣기 가능</div>
@@ -621,6 +622,55 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
       <b style="color:var(--wacc)">📥 PDF</b>(교안 인쇄용 · 다운로드 즉시 시작)
     </p>
     <div id="genCurList" style="overflow-y:auto;flex:1;padding-right:6px"></div>
+  </div>
+</div>
+
+<!-- AI SLIDE GENERATION MODAL — 빈 슬라이드 자동 생성 -->
+<div class="modal-bg" id="slideGenModalBg" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="position:relative;width:760px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column">
+    <button class="modal-close" onclick="document.getElementById('slideGenModalBg').classList.remove('show')">×</button>
+    <h2 style="margin-bottom:6px">✨ AI 슬라이드 생성 <span style="font-size:11px;color:var(--wink3);font-weight:400;letter-spacing:0">Claude Sonnet 4.5 · 실험적 기능</span></h2>
+    <p style="font-size:11.5px;color:var(--wink3);margin-bottom:14px;padding:7px 11px;background:#f5f0e8;border-radius:3px;line-height:1.65">
+      현재 선택된 슬라이드의 <b>본문(.bd)</b>을 자동 생성합니다. 도구명·숫자·일정·예시·핵심 메시지 등 구체적으로 적을수록 결과가 좋습니다. <b>비유·메거진 어조 금지</b> 원칙은 자동 적용됨.
+    </p>
+    <div style="margin-bottom:10px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:4px;letter-spacing:1px">슬라이드 의도·내용</label>
+      <textarea id="slideGenInput" rows="6" placeholder="예: 5회차 마무리 — 다음 회차(어시스트 바이브 코딩 ② 업무 자동화) 미리보기.&#10;다섯 영역 다룸: 파일 자동화·HWP·VBA+Ollama·Node.js·어시스트 한계.&#10;준비물: 비식별 HWP 1개 + 비식별 엑셀 1개. 사전: ollama pull gemma2:2b.&#10;핵심 메시지: '엑셀 함수처럼 로컬 AI 호출'." style="width:100%;padding:10px 12px;border:1px solid var(--wln);border-radius:3px;font-family:inherit;font-size:12.5px;line-height:1.6;resize:vertical"></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:4px;letter-spacing:1px">스타일 프리셋</label>
+        <select id="slideGenPreset" style="width:100%;padding:7px 9px;border:1px solid var(--wln);border-radius:3px;font-family:inherit;font-size:12px">
+          <option value="auto">자동 (Claude 판단)</option>
+          <option value="closing">CLOSING — 회차 마무리·다음 회차 안내</option>
+          <option value="opening">OPENING — 회차 시작·맥락</option>
+          <option value="cards">컴포넌트 카드 그리드 (.icard 등)</option>
+          <option value="table">표 중심 (mtbl)</option>
+          <option value="callout">본문 + 강조 박스 (.co/.pit)</option>
+          <option value="hero">단일 키 메시지 (hero)</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:4px;letter-spacing:1px">옵션</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:11.5px;cursor:pointer;user-select:none;padding:7px 0">
+          <input type="checkbox" id="slideGenSearch" style="margin:0">
+          <span>🌐 웹검색 활성화 (최신 정보 — 5~10초 추가)</span>
+        </label>
+      </div>
+    </div>
+    <button class="btn btn-p" onclick="runSlideGen()" id="slideGenRunBtn" style="width:100%;margin-bottom:10px">생성하기</button>
+    <div id="slideGenResultArea" style="display:none;flex:1;overflow-y:auto;padding-right:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <label style="font-size:11px;font-weight:700;color:var(--wacc);letter-spacing:1px">생성된 본문 HTML</label>
+        <span id="slideGenUsage" style="font-size:10px;color:var(--wink3)"></span>
+      </div>
+      <div id="slideGenPreview" style="background:#fff;padding:10px 12px;border:2px solid var(--wacc);border-radius:3px;font-size:11px;line-height:1.55;white-space:pre-wrap;word-break:break-all;max-height:240px;overflow-y:auto;font-family:'JetBrains Mono','Consolas',monospace;color:#1a1612"></div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;margin-top:10px">
+        <button class="btn btn-p" onclick="applySlideGen()">✓ 본문에 적용</button>
+        <button class="btn btn-o" onclick="runSlideGen()">↻ 다시 생성</button>
+        <button class="btn btn-o" onclick="document.getElementById('slideGenModalBg').classList.remove('show')">취소</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4041,6 +4091,208 @@ window.runAIRewrite = async function(quickInstruction) {
     console.error(e);
   }
 };
+
+// ============================================================
+// AI 슬라이드 생성 — 빈 슬라이드의 본문(.bd)을 사용자 설명으로 자동 생성
+// ============================================================
+let _slideGenResult = null; // 마지막 생성 결과(본문 HTML) 저장
+
+const SLIDE_GEN_INSTRUCTION_TEMPLATE = (userDesc, preset) => `현재 슬라이드의 본문(.bd) 내부에 들어갈 HTML을 생성하세요.
+
+[사용자 요청]
+${userDesc}
+
+[스타일 프리셋]
+${{
+  auto: '자동 (Claude가 내용에 맞게 적절한 컴포넌트 조합 판단)',
+  closing: 'CLOSING — 회차 마무리. NEXT 미리보기·QUOTE·준비물·PREREQ 같은 다음 회차 안내 톤. 다크 박스(.dstrip 또는 어두운 div)와 인용 박스 조합.',
+  opening: 'OPENING — 회차 시작. 회차 맥락·핵심 메시지·다룰 영역 3~5개 카드.',
+  cards: '컴포넌트 카드 그리드 — .icard 또는 자체 카드 div를 2~4개 그리드로 배치.',
+  table: '표 중심 — table.mtbl 사용. 헤더(thead) + 행 5~8개. 비교·매트릭스용.',
+  callout: '본문 + 강조 박스 — .bth 소제목·p.bt 본문 + .co/.pit 강조박스 1~2개.',
+  hero: '단일 키 메시지 — 큰 제목 + 한 문장 강조 + 보조 설명. 중앙 배치.'
+}[preset] || '자동'}
+
+[디자인 시스템 — 사용 가능한 컴포넌트 클래스]
+- .co (콜아웃 강조박스): .co-lb(라벨) + .co-main(강조문) + p(설명)
+- .cod (다크 콜아웃): .cod-lb + .cod-main + p
+- .pit (주의·경고): .pit-lb + .pit-h + .pit-d
+- .icard (정보 카드): .icard-top(.icard-lb·.icard-sess) + .bth + p.bt
+- .quote (인용문): .quote-src + .quote-q + .quote-a
+- .cblk (코드블록): .cm(주석) + 코드 + .cap(설명)
+- .dstrip (데이터 스트립): 3개 .ds-c(.ds-a·.ds-n·.ds-d)
+- .bth (소제목) + p.bt (본문 — 강의안 표준 텍스트 페어)
+- table.mtbl (표): thead/tbody/tr/th/td 표준 구조
+
+[CSS 변수 — inline style에 var(--xxx)로 사용 가능]
+--bg, --bg2, --ink, --ink2, --ink3, --acc(테라코타 강조색), --serif(명조), --mono(코드), --ln(테두리)
+
+[작성 원칙 — 강의안 voice]
+- 한국어 존댓말 ("~합니다")
+- 비유·은유·메거진 어조 절대 금지 ("~의 무기는", "여섯 칸을 채우는 설계자" 류 X)
+- 추상 역할 라벨 금지 (기획자·아키텍트·코치·확산자 X)
+- 구체 도구명·버전·숫자·시간·파일명 우선
+- 첫째·둘째·셋째 열거 권장 (1)2)3) ①②③ 금지)
+- 짧은 문장, 정보 밀도 높게
+- 슬라이드 1장 분량 — 본문 6~12줄 + 컴포넌트 1~3개 정도
+
+[출력 형식 — 매우 중요]
+- 본문 .bd 내부에 들어갈 HTML만 출력 (외곽 .bd 또는 .slide div 제외)
+- 다른 설명·인사·코드블록(\`\`\`)·따옴표·주석 절대 출력 금지
+- 첫 글자부터 HTML 태그로 시작, 마지막도 닫는 태그로 끝
+- 절대 위치(position:absolute) 사용 금지 — 자연 흐름 레이아웃만`;
+
+function openSlideGenModal() {
+  if (S.selectedIdx < 0) return toast('슬라이드를 먼저 선택');
+  if (!isEditor) { openLoginModal(openSlideGenModal); return; }
+  document.getElementById('slideGenInput').value = '';
+  document.getElementById('slideGenResultArea').style.display = 'none';
+  document.getElementById('slideGenModalBg').classList.add('show');
+  setTimeout(() => document.getElementById('slideGenInput').focus(), 80);
+}
+
+async function runSlideGen() {
+  if (!sb) return toast('Supabase 연결 안 됨');
+  if (!isEditor) return toast('잠금 해제 후 사용');
+  const userDesc = document.getElementById('slideGenInput').value.trim();
+  if (!userDesc) return toast('슬라이드 내용 설명을 입력하세요');
+  const preset = document.getElementById('slideGenPreset').value;
+  const useSearch = document.getElementById('slideGenSearch').checked;
+  const runBtn = document.getElementById('slideGenRunBtn');
+  const area = document.getElementById('slideGenResultArea');
+  const preview = document.getElementById('slideGenPreview');
+  const usageEl = document.getElementById('slideGenUsage');
+
+  runBtn.disabled = true;
+  runBtn.textContent = useSearch ? '🌐 검색·생성 중...' : '⏳ Claude가 작성 중...';
+  area.style.display = '';
+  preview.textContent = '⏳ 생성 시작 대기...';
+  preview.style.color = '#888';
+  usageEl.textContent = useSearch ? '🌐 검색 시작 대기...' : '⏳ 시작 대기...';
+
+  try {
+    const { data: sessData } = await sb.auth.getSession();
+    if (!sessData || !sessData.session) {
+      toast('인증 만료 — 다시 잠금해제');
+      runBtn.disabled = false; runBtn.textContent = '생성하기';
+      return;
+    }
+    const slideTitle = (S.slides[S.selectedIdx] && S.slides[S.selectedIdx].dataTitle) || '';
+    const ctx = `현재 슬라이드 제목: ${slideTitle}. 8주 AI 챔피언 고급 과정 (AI 데이터분석 전문인재 과정). 한국어 강의안.`;
+    const instruction = SLIDE_GEN_INSTRUCTION_TEMPLATE(userDesc, preset);
+    const resp = await fetch(`${SB_URL}/functions/v1/rewrite-text`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${sessData.session.access_token}`,
+        'apikey': SB_ANON,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        current_text: '<!-- empty body — generate from scratch -->',
+        instruction,
+        context_hint: ctx,
+        max_tokens: useSearch ? 4096 : 3072,
+        stream: true,
+        useWebSearch: useSearch
+      })
+    });
+    if (!resp.ok) {
+      let err = `HTTP ${resp.status}`;
+      try { const d = await resp.json(); err = (d.error || err).substring(0,80); } catch(_) {}
+      preview.textContent = `에러: ${err}`;
+      preview.style.color = '#c33';
+      runBtn.disabled = false; runBtn.textContent = '생성하기';
+      usageEl.textContent = '';
+      return;
+    }
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '', fullText = '', usage = null, firstDelta = true, searchCount = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let nl;
+      while ((nl = buffer.indexOf('\n')) >= 0) {
+        const line = buffer.slice(0, nl).trim();
+        buffer = buffer.slice(nl + 1);
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === '[DONE]') continue;
+        try {
+          const ev = JSON.parse(payload);
+          if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') {
+            const t = ev.delta.text || '';
+            if (t) {
+              if (firstDelta) { preview.style.color = '#1a1612'; firstDelta = false; usageEl.textContent = '✍️ 생성 중...'; }
+              fullText += t;
+              preview.textContent = fullText;
+              preview.scrollTop = preview.scrollHeight;
+            }
+          } else if (ev.type === 'content_block_start' && ev.content_block) {
+            const cbType = ev.content_block.type || '';
+            if (cbType === 'server_tool_use' || cbType === 'tool_use') {
+              searchCount++;
+              const q = (ev.content_block.input && ev.content_block.input.query) || '';
+              usageEl.textContent = `🔍 웹검색 ${searchCount}회: "${q.substring(0,30)}"`;
+            }
+          } else if (ev.type === 'message_delta' && ev.usage) {
+            usage = Object.assign(usage || {}, ev.usage);
+          } else if (ev.type === 'message_start' && ev.message && ev.message.usage) {
+            usage = Object.assign(usage || {}, ev.message.usage);
+          }
+        } catch(_) {}
+      }
+    }
+    _slideGenResult = fullText.trim();
+    // 코드블록 마커 제거 (Claude가 가끔 ```html ... ``` 감쌈)
+    _slideGenResult = _slideGenResult.replace(/^```(?:html|HTML)?\s*\n?/, '').replace(/\n?```\s*$/, '');
+    preview.textContent = _slideGenResult;
+    runBtn.disabled = false;
+    runBtn.textContent = '생성하기';
+    if (usage) {
+      const inT = usage.input_tokens || 0, outT = usage.output_tokens || 0;
+      const cost = (inT * 3 / 1e6 + outT * 15 / 1e6).toFixed(4);
+      const sNote = searchCount ? ` · 🔍 ${searchCount}회 (+약 ${searchCount*13}원)` : '';
+      usageEl.textContent = `토큰: ${inT}/${outT} · 약 $${cost} (≈${Math.round(cost*1380)}원)${sNote}`;
+    } else {
+      usageEl.textContent = '';
+    }
+  } catch (e) {
+    runBtn.disabled = false; runBtn.textContent = '생성하기';
+    preview.textContent = `네트워크 에러: ${e.message}`;
+    preview.style.color = '#c33';
+    usageEl.textContent = '';
+  }
+}
+
+function applySlideGen() {
+  if (!_slideGenResult) return toast('생성된 결과 없음');
+  if (S.selectedIdx < 0) return toast('슬라이드 선택 안 됨');
+  const slide = S.slides[S.selectedIdx];
+  if (!slide) return;
+  // 현재 슬라이드 HTML에서 .bd 영역 통째로 교체
+  let html = slide.html;
+  // 패턴: <div class="bd...">...</div> (가장 바깥의 .bd) — fbar 직전까지
+  const pattern = /(<div class="bd[^"]*"[^>]*>)([\s\S]*?)(<\/div>(?=\s*<div class="fbar"))/;
+  if (!pattern.test(html)) {
+    // .bd 없으면 .slide 안 hbar 바로 뒤에 새로 삽입
+    if (/<div class="hbar"/.test(html)) {
+      html = html.replace(/(<\/div>\s*)(?=(?!<div class="hbar"))/, `$1<div class="bd">${_slideGenResult}</div>`);
+      toast('새 .bd 본문 삽입');
+    } else {
+      return toast('슬라이드 구조 인식 실패 — .bd 영역 없음');
+    }
+  } else {
+    html = html.replace(pattern, (_, open, _body, close) => open + _slideGenResult + close);
+  }
+  slide.html = html;
+  S.dirty = true;
+  renderStrip();
+  selectSlide(S.selectedIdx);
+  document.getElementById('slideGenModalBg').classList.remove('show');
+  toast('AI 본문 적용 — 💾 DB 저장으로 영구 보존');
+}
 
 window.applyAIResult = function() {
   if (!aiTarget || aiResult === null) return toast('적용할 결과가 없음');
