@@ -1217,7 +1217,13 @@ function buildSlidePreview(slide) {
 .slide[data-palette="dark"] *{color:inherit}
 .slide[data-palette="light-brown"]{--bg:#f0e6d2!important;--bg2:#e0d0b0!important;--ink:#4a3520!important;--ink2:#6a553a!important;--ink3:#9a8060!important;--acc:#a06030!important;--acc2:#804820!important;--acc3:#c08850!important;--ln:#d0b890!important;--dk:#2a1a08!important;--on:#f0e6d2!important;background:#f0e6d2!important}
 `;
-  return `<!DOCTYPE html><html><head><style>${S.css}\nbody{margin:0;overflow:hidden}\n.stage{width:1600px;height:900px;position:relative;overflow:hidden}\n.slide{position:absolute;inset:0}\n.deck{}\n.hbar{position:absolute;top:0;left:0;right:0;z-index:50}\n.fbar{position:absolute;bottom:0;left:0;right:0;z-index:50}\n${PALETTE_INLINE}</style></head><body><div class="stage">${slide.html}</div></body></html>`;
+  // 자유 캔버스 요소 CSS — 보기 모드에서도 inject 보장 (특히 .free-image > img가
+  // wrapper에 맞춰져야 native PNG 크기로 펼쳐지지 않음)
+  const FREE_INLINE_CSS = `
+.free-text, .free-image, .free-comp { box-sizing: border-box; position: absolute; }
+.free-image > img { width: 100%; height: 100%; display: block; user-select: none; pointer-events: none; -webkit-user-drag: none; }
+`;
+  return `<!DOCTYPE html><html><head><style>${S.css}\nbody{margin:0;overflow:hidden}\n.stage{width:1600px;height:900px;position:relative;overflow:hidden}\n.slide{position:absolute;inset:0}\n.deck{}\n.hbar{position:absolute;top:0;left:0;right:0;z-index:50}\n.fbar{position:absolute;bottom:0;left:0;right:0;z-index:50}\n${FREE_INLINE_CSS}\n${PALETTE_INLINE}</style></head><body><div class="stage">${slide.html}</div></body></html>`;
 }
 
 // 슬라이드 HTML에서 강의 운영용 시간 라벨 제거 (공유 강의안 톤 일관)
