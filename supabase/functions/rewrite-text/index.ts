@@ -19,7 +19,14 @@ const SYSTEM_PROMPT = `당신은 한국 공공 행정 강의안 「AI 챔피언 
 출력 형식 규칙:
 - 사용자가 보낸 원본이 HTML 태그를 포함하면 동일한 태그 구조 유지하고 텍스트 노드만 수정
 - 사용자가 보낸 원본이 평문이면 평문으로 출력
-- 다른 설명·인사·코드블록·따옴표 없이 수정된 텍스트만 출력`;
+- 다른 설명·인사·코드블록·따옴표 없이 수정된 텍스트만 출력
+
+웹검색 도구 사용 시 추가 규칙 (use_web_search=true일 때만):
+- "최신/2026/올해/이번/현재" 등 시점성 있는 정보 요청에만 검색 활용
+- 검색 결과의 핵심 사실(도구명·버전·숫자·일정·발표일)을 본문에 자연스럽게 녹이기
+- [1], [n] 같은 인라인 인용 표시 절대 출력하지 말 것
+- URL·"출처:" 라벨도 출력 금지 — 강의안 본문은 깔끔해야 함
+- 검색해도 확실하지 않은 정보는 추가하지 않음 (잘못된 사실 기재 금지)`;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,7 +47,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { current_text, instruction, context_hint, max_tokens, stream } = await req.json();
+    const { current_text, instruction, context_hint, max_tokens, stream, useWebSearch } = await req.json();
 
     if (!current_text || typeof current_text !== "string") {
       return new Response(JSON.stringify({ error: "current_text required" }), {
@@ -75,6 +82,21 @@ Deno.serve(async (req) => {
     const userMsg = userParts.join("\n\n");
 
     const wantStream = stream === true;
+    const wantSearch = useWebSearch === true;
+
+    const requestBody: Record<string, unknown> = {
+      model: MODEL,
+      max_tokens: max_tokens ?? 2048,
+      system: SYSTEM_PROMPT,
+      stream: wantStream,
+      messages: [{ role: "user", content: userMsg }],
+    };
+    if (wantSearch) {
+      // Anthropic 공식 웹검색 server-tool — 모델이 필요할 때만 자동 호출
+      requestBody.tools = [
+        { type: "web_search_20250305", name: "web_search", max_uses: 3 },
+      ];
+    }
 
     const claudeResp = await fetch(ANTHROPIC_URL, {
       method: "POST",
@@ -83,13 +105,7 @@ Deno.serve(async (req) => {
         "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: max_tokens ?? 2048,
-        system: SYSTEM_PROMPT,
-        stream: wantStream,
-        messages: [{ role: "user", content: userMsg }],
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!claudeResp.ok) {

@@ -348,6 +348,10 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:11px;font-weight:700;color:var(--wink3);margin-bottom:4px;letter-spacing:1px">또는 직접 지시</label>
       <textarea id="aiInstruction" rows="2" placeholder="예: 이 부분을 빠른 파악 루틴 관점으로 풀어줘" style="width:100%;padding:8px 10px;border:1px solid var(--wln);border-radius:3px;font-family:inherit;font-size:12px;resize:vertical"></textarea>
+      <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11.5px;color:var(--wink2);cursor:pointer;user-select:none">
+        <input type="checkbox" id="aiUseSearch" style="margin:0">
+        <span>🌐 <b>웹검색 활성화</b> (최신 정보 반영 · 5~10초 추가 소요 · 약 +20원/회 — "최신/2026/올해" 같은 시점성 정보가 필요할 때만)</span>
+      </label>
       <button class="btn btn-p" onclick="runAIRewrite()" id="aiRunBtn" style="margin-top:8px;width:100%">수정안 받기</button>
     </div>
     <div id="aiLoading" style="display:none;text-align:center;padding:20px;color:var(--wink3);font-size:12px">⏳ Claude가 작성 중…</div>
@@ -3288,7 +3292,7 @@ function injectAIPopup(doc) {
   const popup = doc.createElement('div');
   popup.id = 'wb-ai-popup';
   popup.style.cssText = 'position:absolute;display:none;z-index:9999;background:#fff;border:2px solid #b8532a;border-radius:6px;padding:10px;box-shadow:0 6px 24px rgba(0,0,0,0.25);font-family:Pretendard,system-ui,sans-serif;font-size:12px;min-width:340px;max-width:520px;line-height:1.5';
-  popup.innerHTML = '\n<div data-stage="1">\n  <div style="font-size:10px;color:#888;margin-bottom:6px">선택 텍스트: "<span data-orig-preview style="color:#1a1612"></span>"</div>\n  <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">\n    <button data-q="이 문장을 더 짧고 간결하게 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">짧게</button>\n    <button data-q="이 문장을 더 자세하게, 구체 도구·숫자·일정 추가해 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">자세히</button>\n    <button data-q="이 문장을 비개발자도 이해할 수 있도록 더 쉽게 풀어주세요. 전문용어는 괄호로 짧은 정의 첨부" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">쉽게</button>\n    <button data-q="이 문장에서 메거진 어조·비유·은유·vision casting을 모두 제거하고 사실 진술로 다시 써주세요. 강의 voice 유지" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">정화</button>\n    <button data-q="이 문장에 공공 부서 실무 예시 1개를 자연스럽게 추가해 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">예시</button>\n    <button data-q="첫째·둘째·셋째 열거 구조로 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">열거</button>\n  </div>\n  <div style="display:flex;gap:4px">\n    <input type="text" data-input placeholder="자유 지시 (Enter)" style="flex:1;padding:6px 9px;border:1px solid #ccc;border-radius:3px;font-family:inherit;font-size:11.5px">\n    <button data-submit style="background:#b8532a;color:#fff;border:0;padding:6px 14px;border-radius:3px;cursor:pointer;font-weight:700;font-family:inherit">✨</button>\n  </div>\n</div>\n<div data-stage="2" style="display:none">\n  <div style="font-size:12px;color:#888;text-align:center;padding:14px">⏳ Claude Sonnet 4.5 작성 중...</div>\n</div>\n<div data-stage="3" style="display:none">\n  <div style="font-size:10px;color:#888;margin-bottom:3px">원본:</div>\n  <div data-orig style="font-size:11.5px;background:#f5f0e8;padding:7px 9px;border-radius:3px;margin-bottom:7px;color:#1a1612;max-height:120px;overflow-y:auto;white-space:pre-wrap"></div>\n  <div style="font-size:10px;color:#b8532a;margin-bottom:3px">수정안:</div>\n  <div data-new style="font-size:11.5px;background:#fff8f0;padding:7px 9px;border:1px solid #b8532a;border-radius:3px;margin-bottom:6px;color:#1a1612;max-height:200px;overflow-y:auto;white-space:pre-wrap"></div>\n  <div data-usage style="font-size:9.5px;color:#888;text-align:right;margin-bottom:6px"></div>\n  <div style="display:flex;gap:4px">\n    <button data-apply style="flex:2;background:#b8532a;color:#fff;border:0;padding:6px 0;border-radius:3px;cursor:pointer;font-weight:700;font-family:inherit">✓ 적용</button>\n    <button data-redo style="flex:1;background:#f5f0e8;color:#1a1612;border:1px solid #ddd6cc;padding:6px 0;border-radius:3px;cursor:pointer;font-family:inherit">↻ 다시</button>\n    <button data-cancel style="flex:1;background:#fff;color:#888;border:1px solid #ddd;padding:6px 0;border-radius:3px;cursor:pointer;font-family:inherit">취소</button>\n  </div>\n</div>\n';
+  popup.innerHTML = '\n<div data-stage="1">\n  <div style="font-size:10px;color:#888;margin-bottom:6px">선택 텍스트: "<span data-orig-preview style="color:#1a1612"></span>"</div>\n  <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">\n    <button data-q="이 문장을 더 짧고 간결하게 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">짧게</button>\n    <button data-q="이 문장을 더 자세하게, 구체 도구·숫자·일정 추가해 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">자세히</button>\n    <button data-q="이 문장을 비개발자도 이해할 수 있도록 더 쉽게 풀어주세요. 전문용어는 괄호로 짧은 정의 첨부" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">쉽게</button>\n    <button data-q="이 문장에서 메거진 어조·비유·은유·vision casting을 모두 제거하고 사실 진술로 다시 써주세요. 강의 voice 유지" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">정화</button>\n    <button data-q="이 문장에 공공 부서 실무 예시 1개를 자연스럽게 추가해 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">예시</button>\n    <button data-q="첫째·둘째·셋째 열거 구조로 다시 써주세요" style="font-size:10px;padding:4px 9px;background:#f5f0e8;border:1px solid #ddd6cc;border-radius:3px;cursor:pointer;font-family:inherit">열거</button>\n    <button data-q="이 문장을 2026년 기준 최신 정보(도구·버전·일정·통계)를 반영하여 다시 써주세요. 강의 voice·메거진 금지" data-search="1" title="🌐 웹검색 활성화 — 5~10초 소요·약 20원/회" style="font-size:10px;padding:4px 9px;background:#fff3e8;border:1px solid #b8532a;border-radius:3px;cursor:pointer;font-family:inherit;color:#b8532a;font-weight:600">🌐 최신정보</button>\n  </div>\n  <div style="display:flex;gap:4px;align-items:center">\n    <input type="text" data-input placeholder="자유 지시 (Enter)" style="flex:1;padding:6px 9px;border:1px solid #ccc;border-radius:3px;font-family:inherit;font-size:11.5px">\n    <label title="자유 지시에도 웹검색 사용" style="display:flex;align-items:center;gap:3px;font-size:10px;color:#888;cursor:pointer;user-select:none"><input type="checkbox" data-free-search style="margin:0;cursor:pointer"> 🌐</label>\n    <button data-submit style="background:#b8532a;color:#fff;border:0;padding:6px 14px;border-radius:3px;cursor:pointer;font-weight:700;font-family:inherit">✨</button>\n  </div>\n</div>\n<div data-stage="2" style="display:none">\n  <div style="font-size:12px;color:#888;text-align:center;padding:14px">⏳ Claude Sonnet 4.5 작성 중...</div>\n</div>\n<div data-stage="3" style="display:none">\n  <div style="font-size:10px;color:#888;margin-bottom:3px">원본:</div>\n  <div data-orig style="font-size:11.5px;background:#f5f0e8;padding:7px 9px;border-radius:3px;margin-bottom:7px;color:#1a1612;max-height:120px;overflow-y:auto;white-space:pre-wrap"></div>\n  <div style="font-size:10px;color:#b8532a;margin-bottom:3px">수정안:</div>\n  <div data-new style="font-size:11.5px;background:#fff8f0;padding:7px 9px;border:1px solid #b8532a;border-radius:3px;margin-bottom:6px;color:#1a1612;max-height:200px;overflow-y:auto;white-space:pre-wrap"></div>\n  <div data-usage style="font-size:9.5px;color:#888;text-align:right;margin-bottom:6px"></div>\n  <div style="display:flex;gap:4px">\n    <button data-apply style="flex:2;background:#b8532a;color:#fff;border:0;padding:6px 0;border-radius:3px;cursor:pointer;font-weight:700;font-family:inherit">✓ 적용</button>\n    <button data-redo style="flex:1;background:#f5f0e8;color:#1a1612;border:1px solid #ddd6cc;padding:6px 0;border-radius:3px;cursor:pointer;font-family:inherit">↻ 다시</button>\n    <button data-cancel style="flex:1;background:#fff;color:#888;border:1px solid #ddd;padding:6px 0;border-radius:3px;cursor:pointer;font-family:inherit">취소</button>\n  </div>\n</div>\n';
   doc.body.appendChild(popup);
 
   let savedRange = null;
@@ -3307,20 +3311,28 @@ function injectAIPopup(doc) {
     b.addEventListener('mousedown', e => e.preventDefault());
   });
 
-  const callAI = async (instruction) => {
+  const callAI = async (instruction, useWebSearch) => {
     if (!savedText || !savedRange) return;
     // 즉시 stage 3 진입 — 수정안 영역에 토큰 단위로 스트리밍
     popup.querySelector('[data-orig]').textContent = savedText;
     const newEl = popup.querySelector('[data-new]');
     const usageEl = popup.querySelector('[data-usage]');
     newEl.textContent = '';
-    usageEl.textContent = '⏳ Claude Sonnet 4.5 작성 중...';
+    usageEl.textContent = useWebSearch
+      ? '🌐 Claude Sonnet 4.5 + 웹검색 준비 중...'
+      : '⏳ Claude Sonnet 4.5 작성 중...';
     popup.dataset.newText = '';
     stage(3);
     const par = (window.parent && window.parent !== window) ? window.parent : window;
     const result = await par.aiRewriteSelection(savedText, instruction, (delta, full) => {
       newEl.textContent = full;
       newEl.scrollTop = newEl.scrollHeight;
+    }, {
+      useWebSearch: !!useWebSearch,
+      onSearch: (count, query) => {
+        const q = (query || '').substring(0, 40);
+        usageEl.textContent = `🔍 웹검색 ${count}회 진행 중${q ? ': "' + q + '"' : '...'}`;
+      }
     });
     if (result.error) {
       newEl.textContent = `에러: ${result.error}`;
@@ -3335,21 +3347,23 @@ function injectAIPopup(doc) {
       const inT = result.usage.input_tokens || 0;
       const outT = result.usage.output_tokens || 0;
       const cost = (inT * 3 / 1e6 + outT * 15 / 1e6);
-      usageEl.textContent = `토큰 ${inT} in / ${outT} out · 약 ${Math.round(cost * 1380)}원`;
+      const searchNote = result.searchCount ? ` · 🔍 ${result.searchCount}회 (+약 ${result.searchCount * 13}원)` : '';
+      usageEl.textContent = `토큰 ${inT} in / ${outT} out · 약 ${Math.round(cost * 1380)}원${searchNote}`;
     } else {
       usageEl.textContent = '';
     }
   };
 
   popup.querySelectorAll('[data-q]').forEach(btn => {
-    btn.addEventListener('click', () => callAI(btn.dataset.q));
+    btn.addEventListener('click', () => callAI(btn.dataset.q, btn.dataset.search === '1'));
   });
+  const freeSearchCb = popup.querySelector('[data-free-search]');
   popup.querySelector('[data-submit]').addEventListener('click', () => {
     const v = inputEl.value.trim();
-    if (v) callAI(v);
+    if (v) callAI(v, freeSearchCb && freeSearchCb.checked);
   });
   inputEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); const v = inputEl.value.trim(); if (v) callAI(v); }
+    if (e.key === 'Enter') { e.preventDefault(); const v = inputEl.value.trim(); if (v) callAI(v, freeSearchCb && freeSearchCb.checked); }
   });
   popup.querySelector('[data-apply]').addEventListener('click', () => {
     if (!savedRange) return hide();
@@ -3423,11 +3437,13 @@ function injectAIPopup(doc) {
 }
 
 // 팝업이 부모를 통해 호출하는 함수 — Edge Function 호출 후 결과 반환
-window.aiRewriteSelection = async function(selectedText, instruction, onDelta) {
+window.aiRewriteSelection = async function(selectedText, instruction, onDelta, opts) {
+  // opts = { useWebSearch?: boolean, onSearch?: (count, query?) => void }
+  opts = opts || {};
   if (!isEditor) {
     return new Promise(resolve => {
       pendingAfterLogin = async () => {
-        const r = await window.aiRewriteSelection(selectedText, instruction, onDelta);
+        const r = await window.aiRewriteSelection(selectedText, instruction, onDelta, opts);
         resolve(r);
       };
       openLoginModal();
@@ -3451,8 +3467,9 @@ window.aiRewriteSelection = async function(selectedText, instruction, onDelta) {
         current_text: selectedText,
         instruction: instruction,
         context_hint: ctx,
-        max_tokens: 1024,
-        stream: useStream
+        max_tokens: opts.useWebSearch ? 2048 : 1024,
+        stream: useStream,
+        useWebSearch: !!opts.useWebSearch
       })
     });
     if (!resp.ok) {
@@ -3464,12 +3481,13 @@ window.aiRewriteSelection = async function(selectedText, instruction, onDelta) {
       const data = await resp.json();
       return { rewritten: data.rewritten, usage: data.usage };
     }
-    // SSE 스트림 파싱 (Anthropic 표준 이벤트)
+    // SSE 스트림 파싱 (Anthropic 표준 이벤트 + server-tool 이벤트)
     const reader = resp.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let buffer = '';
     let fullText = '';
     let usage = null;
+    let searchCount = 0;
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -3486,6 +3504,14 @@ window.aiRewriteSelection = async function(selectedText, instruction, onDelta) {
           if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') {
             const t = ev.delta.text || '';
             if (t) { fullText += t; try { onDelta(t, fullText); } catch (_) {} }
+          } else if (ev.type === 'content_block_start' && ev.content_block) {
+            const cbType = ev.content_block.type || '';
+            // server_tool_use(검색 시작) / web_search_tool_result(결과)
+            if (cbType === 'server_tool_use' || cbType === 'tool_use') {
+              searchCount++;
+              const q = (ev.content_block.input && ev.content_block.input.query) || '';
+              if (typeof opts.onSearch === 'function') { try { opts.onSearch(searchCount, q); } catch (_) {} }
+            }
           } else if (ev.type === 'message_delta' && ev.usage) {
             usage = Object.assign(usage || {}, ev.usage);
           } else if (ev.type === 'message_start' && ev.message && ev.message.usage) {
@@ -3494,7 +3520,7 @@ window.aiRewriteSelection = async function(selectedText, instruction, onDelta) {
         } catch (_) {}
       }
     }
-    return { rewritten: fullText.trim(), usage };
+    return { rewritten: fullText.trim(), usage, searchCount };
   } catch (e) {
     return { error: e.message };
   }
@@ -3536,20 +3562,26 @@ window.runAIRewrite = async function(quickInstruction) {
   if (!instruction) return toast('수정 지시 입력 또는 빠른 옵션 선택');
 
   const original = aiTarget.innerHTML;
+  const useWebSearch = !!(document.getElementById('aiUseSearch') && document.getElementById('aiUseSearch').checked);
   // 스트리밍: 로딩 영역 대신 결과 영역을 즉시 열어 실시간 텍스트 표시
   document.getElementById('aiLoading').style.display = 'none';
   document.getElementById('aiResultArea').style.display = '';
   const runBtn = document.getElementById('aiRunBtn');
   runBtn.disabled = true;
-  runBtn.textContent = '⏳ Claude Sonnet 4.5 작성 중... (스트리밍)';
+  runBtn.textContent = useWebSearch
+    ? '🌐 Claude + 웹검색 진행 중... (스트리밍)'
+    : '⏳ Claude Sonnet 4.5 작성 중... (스트리밍)';
   document.getElementById('aiCompareOrig').textContent = (aiTarget.textContent || '').trim();
   const newEl = document.getElementById('aiCompareNew');
   const usageEl = document.getElementById('aiUsage');
-  newEl.textContent = '⏳ Claude가 응답 중입니다... 첫 토큰 도착하면 여기에 글자가 한 자씩 흐르며 채워집니다.';
+  newEl.textContent = useWebSearch
+    ? '🌐 Claude가 웹검색을 준비 중입니다... 검색 후 글자가 흐르듯 채워집니다.'
+    : '⏳ Claude가 응답 중입니다... 첫 토큰 도착하면 여기에 글자가 한 자씩 흐르며 채워집니다.';
   newEl.style.color = '#888';
-  usageEl.textContent = '⏳ 스트리밍 시작 대기...';
+  usageEl.textContent = useWebSearch ? '🌐 검색 시작 대기...' : '⏳ 스트리밍 시작 대기...';
   aiResult = null;
   let firstDelta = true;
+  let searchCount = 0;
 
   try {
     const { data: sessData } = await sb.auth.getSession();
@@ -3572,8 +3604,9 @@ window.runAIRewrite = async function(quickInstruction) {
         current_text: original,
         instruction: instruction,
         context_hint: ctx,
-        max_tokens: 2048,
-        stream: true
+        max_tokens: useWebSearch ? 3072 : 2048,
+        stream: true,
+        useWebSearch: useWebSearch
       })
     });
     if (!resp.ok) {
@@ -3608,6 +3641,13 @@ window.runAIRewrite = async function(quickInstruction) {
               if (firstDelta) { newEl.style.color = ''; firstDelta = false; usageEl.textContent = '✍️ 작성 중...'; }
               fullText += t; newEl.textContent = fullText; newEl.scrollTop = newEl.scrollHeight;
             }
+          } else if (ev.type === 'content_block_start' && ev.content_block) {
+            const cbType = ev.content_block.type || '';
+            if (cbType === 'server_tool_use' || cbType === 'tool_use') {
+              searchCount++;
+              const q = (ev.content_block.input && ev.content_block.input.query) || '';
+              usageEl.textContent = `🔍 웹검색 ${searchCount}회 진행 중${q ? ': "' + q.substring(0,40) + '"' : '...'}`;
+            }
           } else if (ev.type === 'message_delta' && ev.usage) {
             usage = Object.assign(usage || {}, ev.usage);
           } else if (ev.type === 'message_start' && ev.message && ev.message.usage) {
@@ -3625,7 +3665,8 @@ window.runAIRewrite = async function(quickInstruction) {
       const inT = usage.input_tokens || 0;
       const outT = usage.output_tokens || 0;
       const cost = (inT * 3 / 1e6 + outT * 15 / 1e6).toFixed(4);
-      usageEl.textContent = `토큰: ${inT} in / ${outT} out · 약 $${cost} (≈${Math.round(cost * 1380)}원)`;
+      const searchNote = searchCount ? ` · 🔍 ${searchCount}회 (+약 ${searchCount * 13}원)` : '';
+      usageEl.textContent = `토큰: ${inT} in / ${outT} out · 약 $${cost} (≈${Math.round(cost * 1380)}원)${searchNote}`;
     } else {
       usageEl.textContent = '';
     }
