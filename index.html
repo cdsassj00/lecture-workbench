@@ -222,9 +222,10 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
 <!-- 비밀번호 게이트 — head에서 즉시 실행하여 본문 콘텐츠 flash 방지 -->
 <script>
 (function() {
-  // SHA-256 of '거점리더2026'
-  const PASS_HASH = '3b1b29d78cbf4116f6588a1fd47eae26dbaba84f3e3d9835168420ea32d64672';
-  const STORAGE_KEY = 'wb_viewer_pass_v1';
+  // 비밀번호 — 평문 비교 (소스 노출 위험 vs 한글 IME 정규화 신뢰성 트레이드오프)
+  // 전자가 더 안전하지만 한글 NFC/NFD/호환자모 등 IME 변형이 너무 많음 → 후자 선택
+  const PASS_PLAIN = '거점리더2026';
+  const STORAGE_KEY = 'wb_viewer_pass_v2';
   const EXPIRY_DAYS = 30;
   const DEV_BYPASS = 'devmode2026'; // ?nopass=devmode2026 으로 우회
 
@@ -273,49 +274,67 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
     // 자동 포커스 — 일부 브라우저는 autofocus 무시
     setTimeout(() => inp && inp.focus(), 50);
 
-    const sha256 = async (s) => {
-      const buf = new TextEncoder().encode(s);
-      const h = await crypto.subtle.digest('SHA-256', buf);
-      return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('');
+    // 호환 자모 → 한글 음절로 변환 (ㄱㅓ → 거)
+    // U+3131-U+3163 호환 자모를 U+1100-U+1175 한글 자모로 매핑 후 NFC
+    const COMPAT_TO_JAMO = {
+      'ㄱ':'ᄀ','ㄲ':'ᄁ','ㄴ':'ᄂ','ㄷ':'ᄃ','ㄸ':'ᄄ',
+      'ㄹ':'ᄅ','ㅁ':'ᄆ','ㅂ':'ᄇ','ㅃ':'ᄈ','ㅅ':'ᄉ',
+      'ㅆ':'ᄊ','ㅇ':'ᄋ','ㅈ':'ᄌ','ㅉ':'ᄍ','ㅊ':'ᄎ',
+      'ㅋ':'ᄏ','ㅌ':'ᄐ','ㅍ':'ᄑ','ㅎ':'ᄒ',
+      'ㅏ':'ᅡ','ㅐ':'ᅢ','ㅑ':'ᅣ','ㅒ':'ᅤ','ㅓ':'ᅥ',
+      'ㅔ':'ᅦ','ㅕ':'ᅧ','ㅖ':'ᅨ','ㅗ':'ᅩ','ㅛ':'ᅭ',
+      'ㅜ':'ᅮ','ㅠ':'ᅲ','ㅡ':'ᅳ','ㅣ':'ᅵ'
+    };
+    const compatToJamo = (s) => s.split('').map(c => COMPAT_TO_JAMO[c] || c).join('');
+    // 모든 변형 후보 생성: NFC, NFD, 호환자모→한글자모→NFC, 원본 등
+    const allVariants = (raw) => {
+      const t = (raw || '').trim();
+      const set = new Set([
+        t,
+        t.normalize('NFC'),
+        t.normalize('NFD'),
+        t.normalize('NFKC'),
+        t.normalize('NFKD'),
+        compatToJamo(t).normalize('NFC'),
+        compatToJamo(t).normalize('NFD'),
+      ]);
+      return [...set];
     };
 
-    const tryPass = async () => {
-      // 한글 IME에 따라 NFC/NFD 형이 다를 수 있어 NFC로 정규화 후 비교
-      // 양 끝 공백도 제거 (오타 방지)
-      const v = (inp.value || '').normalize('NFC').trim();
-      if (!v) return;
+    const tryPass = () => {
+      const raw = inp.value || '';
+      if (!raw.trim()) return;
       sub.disabled = true;
       sub.textContent = '확인 중…';
-      try {
-        const h = await sha256(v);
-        // 디버그용 로그 — 비번 자체는 출력하지 않고 해시만 (안전)
-        console.log('[GATE] input length:', v.length, 'hash:', h.substring(0, 16) + '...', 'expected:', PASS_HASH.substring(0, 16) + '...');
-        if (h === PASS_HASH) {
-          // 성공 — 저장 + 페이드아웃
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({
-            ok: true,
-            expires: Date.now() + EXPIRY_DAYS * 24 * 3600 * 1000
-          }));
-          gate.style.transition = 'opacity 0.45s ease';
-          gate.style.opacity = '0';
-          setTimeout(() => {
-            gate.remove();
-            document.documentElement.classList.remove('gate-locked');
-          }, 450);
-        } else {
-          // 실패
-          card.classList.add('gate-shake');
-          err.textContent = '비밀번호가 일치하지 않습니다';
-          inp.value = '';
-          inp.focus();
-          sub.disabled = false;
-          sub.textContent = '입 장';
-          setTimeout(() => card.classList.remove('gate-shake'), 400);
-        }
-      } catch (e) {
+      // 입력 진단 — 코드포인트 노출 (사용자가 콘솔에서 본인 입력 확인 가능)
+      const cps = [...raw].map(c => 'U+' + c.codePointAt(0).toString(16).toUpperCase().padStart(4,'0')).join(' ');
+      console.log('[GATE] raw length:', raw.length, 'codepoints:', cps);
+      const variants = allVariants(raw);
+      const targets = allVariants(PASS_PLAIN);
+      console.log('[GATE] variants:', variants.map(v => v.length + 'ch'), '/ targets:', targets.map(v => v.length + 'ch'));
+      // 어느 변형 1개라도 매칭되면 통과
+      const match = variants.some(v => targets.includes(v));
+      if (match) {
+        // 성공 — 저장 + 페이드아웃
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          ok: true,
+          expires: Date.now() + EXPIRY_DAYS * 24 * 3600 * 1000
+        }));
+        gate.style.transition = 'opacity 0.45s ease';
+        gate.style.opacity = '0';
+        setTimeout(() => {
+          gate.remove();
+          document.documentElement.classList.remove('gate-locked');
+        }, 450);
+      } else {
+        // 실패
+        card.classList.add('gate-shake');
+        err.textContent = '비밀번호가 일치하지 않습니다';
+        inp.value = '';
+        inp.focus();
         sub.disabled = false;
         sub.textContent = '입 장';
-        err.textContent = '오류: ' + (e && e.message || '확인 실패');
+        setTimeout(() => card.classList.remove('gate-shake'), 400);
       }
     };
 
