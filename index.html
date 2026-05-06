@@ -240,7 +240,7 @@ body{font-family:'Pretendard',system-ui,sans-serif;background:#e8e2da;color:var(
           </div>
           <button class="btn btn-o" onclick="clearAllFreeElements()" style="width:100%;font-size:11px;margin-top:6px;color:#c33;border-color:#f3c0c0">🧹 자유 개체 모두 삭제</button>
           <input type="file" id="freeImgIn" accept="image/*" style="display:none">
-          <div class="hint" style="margin-top:8px">드래그=이동 · 더블클릭=텍스트편집 · Del=삭제 · Ctrl+D=복제 · Ctrl+C/V=복사붙여넣기 · 외부 이미지/텍스트도 Ctrl+V로 직접 붙여넣기 가능</div>
+          <div class="hint" style="margin-top:8px">드래그=이동 · <b>방향키=1px 이동</b> · <b>Shift+방향키=10px 이동</b> · 더블클릭=텍스트편집 · Del=삭제 · Ctrl+D=복제 · Ctrl+C/V=복사붙여넣기 · <b>Ctrl+]/[=맨앞/맨뒤</b> · 외부 이미지/텍스트도 Ctrl+V로 직접 붙여넣기 가능</div>
         </div>
         <div class="sec" style="margin-top:12px">
           <div class="sec-t">사용법</div>
@@ -2841,12 +2841,44 @@ function bindFreeCanvasDeselect(doc) {
   if (doc._freeDeselectBound) return;
   doc._freeDeselectBound = true;
 
-  // doc 레벨 keydown — Delete / Ctrl+D / Ctrl+C / Ctrl+V (focus 의존 X)
+  // doc 레벨 keydown — Delete / Ctrl+D / Ctrl+C / Ctrl+V / 방향키 nudge / 레이어 단축키
+  let _nudgeSaveTimer = null;
   doc.addEventListener('keydown', (e) => {
     // 텍스트 편집 중이면 일반 키 입력 보호 (텍스트로 들어가야 함)
     const ae = doc.activeElement;
     if (ae && ae.contentEditable === 'true') return;
-    // 다중 선택 일괄 처리 우선
+    // 방향키 nudge — 다중 또는 단일
+    const ARROWS = {ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1]};
+    if (ARROWS[e.key]) {
+      const targets = _multiSelected.length ? _multiSelected : (_freeSelected ? [_freeSelected] : []);
+      if (!targets.length) return;
+      e.preventDefault();
+      const step = e.shiftKey ? 10 : 1;
+      const [dx, dy] = ARROWS[e.key];
+      targets.forEach(el => {
+        const l = parseInt(el.style.left) || 0;
+        const t = parseInt(el.style.top)  || 0;
+        el.style.left = (l + dx * step) + 'px';
+        el.style.top  = (t + dy * step) + 'px';
+      });
+      if (_freeSelected) positionFreeToolbar(_freeSelected);
+      // 저장은 디바운스 — 키 누르고 있는 동안 매번 저장하면 무거움
+      clearTimeout(_nudgeSaveTimer);
+      _nudgeSaveTimer = setTimeout(() => saveSlideState(doc), 220);
+      return;
+    }
+    // 레이어 z-order 단축키: Ctrl+] 앞으로, Ctrl+[ 뒤로
+    if ((e.ctrlKey || e.metaKey) && (e.key === ']' || e.key === '[')) {
+      const sel = _freeSelected;
+      if (!sel || !sel.parentNode) return;
+      e.preventDefault();
+      if (e.key === ']') sel.parentNode.appendChild(sel);
+      else sel.parentNode.insertBefore(sel, sel.parentNode.firstChild);
+      saveSlideState(doc);
+      toast(e.key === ']' ? '맨 앞으로' : '맨 뒤로');
+      return;
+    }
+    // 다중 선택 일괄 삭제 우선
     if (_multiSelected.length > 0) {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
