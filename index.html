@@ -1423,6 +1423,9 @@ function makeEditable(iframe) {
       // 자유 wrapper 자체(.free-text/.free-image/.free-comp)는 SEL 처리에서 제외
       // 단, .free-comp 안의 내부 텍스트는 편집 가능 유지 — 빠짐없이
       if (el.classList && (el.classList.contains('free-text') || el.classList.contains('free-image') || el.classList.contains('free-comp'))) return;
+      // nested contentEditable 충돌 방지 — 조상이 이미 CE면 skip (가장 바깥 요소만 CE)
+      // querySelectorAll은 DOM 순서로 결과를 주므로 부모가 먼저 처리됨 → 자식 시점엔 부모 CE 상태
+      if (el.parentElement && el.parentElement.closest('[contenteditable="true"]')) return;
       el.contentEditable = 'true';
       // outline·cursor는 인라인 대신 CSS class로 처리 (편집모드 종료 시 잔존 방지)
       el.addEventListener('input', () => saveSlideState(doc));
