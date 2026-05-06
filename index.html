@@ -4097,21 +4097,52 @@ window.runAIRewrite = async function(quickInstruction) {
 // ============================================================
 let _slideGenResult = null; // 마지막 생성 결과(본문 HTML) 저장
 
-const SLIDE_GEN_INSTRUCTION_TEMPLATE = (userDesc, preset) => `현재 슬라이드의 본문(.bd) 내부에 들어갈 HTML을 생성하세요.
+// 프리셋별 본문 영역 가이드 — 각 프리셋의 .bd 내부 콘텐츠 스타일
+const PRESET_BODY_GUIDE = {
+  auto:    '본문은 자연 흐름. .bth + p.bt 본문 단락 1~2개 + .co/.pit 강조 박스 1~2개. flex column으로 자연 적층.',
+  closing: '본문은 정확히 2개 자식 div (좌·우 그리드 1fr 1fr). 좌측: NEXT/SUMMARY 박스 — 다음 회차 미리보기 또는 회차 요약. 라벨(LABEL) + 큰 제목(.bth) + 본문(p.bt) + 작은 박스(.co 또는 .pit) 1개. 우측: CORE/QUOTE — 다크 배경 div 또는 .quote 또는 .co. 핵심 메시지 1줄 + 인용 부속.',
+  opening: '본문은 정확히 2개 자식 div (좌·우 그리드). 좌측: 회차 맥락·다룰 영역 3~5개 — .icard 카드 또는 .ladder-step 리스트. 우측: 핵심 메시지 박스 — .co 또는 .cod (다크 강조).',
+  cards:   '본문은 정확히 3개 또는 6개 자식 div (3열 그리드). 각 카드: 라벨 + 제목 + 1~2줄 설명. .icard 사용 권장.',
+  table:   '본문은 단일 컬럼. 상단 .bth + p.bt 인트로 1줄, 그 아래 table.mtbl (thead 헤더 + tbody 행 5~8개), 필요 시 표 아래 .co/.pit 강조박스 1개.',
+  callout: '본문은 단일 컬럼 흐름. .bth 소제목 + p.bt 본문 2~3 단락. .co/.pit 강조박스 1~2개로 핵심 강조.',
+  hero:    '본문은 중앙 정렬. 큰 강조 텍스트(font-size:48~64px, font-weight:800, var(--serif)) + 짧은 부속 설명 1~2줄. 박스 없이 텍스트만으로 임팩트.'
+};
+
+// 프리셋별 .bd wrapper inline style — 적용 시 사용
+const PRESET_BD_STYLE = {
+  auto:    'position:absolute;left:60px;right:60px;top:280px;bottom:80px;display:flex;flex-direction:column;gap:18px;align-content:start',
+  closing: 'position:absolute;left:60px;right:60px;top:280px;bottom:80px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-content:start',
+  opening: 'position:absolute;left:60px;right:60px;top:280px;bottom:80px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-content:start',
+  cards:   'position:absolute;left:60px;right:60px;top:280px;bottom:80px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-content:start',
+  table:   'position:absolute;left:80px;right:80px;top:300px;bottom:80px;display:flex;flex-direction:column;gap:14px',
+  callout: 'position:absolute;left:60px;right:60px;top:280px;bottom:80px;display:flex;flex-direction:column;gap:18px',
+  hero:    'position:absolute;left:80px;right:80px;top:240px;bottom:80px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:24px',
+};
+
+const SLIDE_GEN_INSTRUCTION_TEMPLATE = (userDesc, preset) => `슬라이드의 헤드라인(.hl)과 본문(.bd) HTML을 생성하세요. 외곽 .slide·.hbar(헤더)·.fbar(푸터)는 클라이언트가 자동 유지하므로 절대 출력하지 마세요.
 
 [사용자 요청]
 ${userDesc}
 
-[스타일 프리셋]
-${{
-  auto: '자동 (Claude가 내용에 맞게 적절한 컴포넌트 조합 판단)',
-  closing: 'CLOSING — 회차 마무리. NEXT 미리보기·QUOTE·준비물·PREREQ 같은 다음 회차 안내 톤. 다크 박스(.dstrip 또는 어두운 div)와 인용 박스 조합.',
-  opening: 'OPENING — 회차 시작. 회차 맥락·핵심 메시지·다룰 영역 3~5개 카드.',
-  cards: '컴포넌트 카드 그리드 — .icard 또는 자체 카드 div를 2~4개 그리드로 배치.',
-  table: '표 중심 — table.mtbl 사용. 헤더(thead) + 행 5~8개. 비교·매트릭스용.',
-  callout: '본문 + 강조 박스 — .bth 소제목·p.bt 본문 + .co/.pit 강조박스 1~2개.',
-  hero: '단일 키 메시지 — 큰 제목 + 한 문장 강조 + 보조 설명. 중앙 배치.'
-}[preset] || '자동'}
+[필수 출력 구조 — 정확히 두 블록만 출력]
+1) 헤드라인 (.hl) — 슬라이드 상단 제목·맥락 영역
+2) 본문 (.bd) — 메인 콘텐츠 영역
+
+다음 정확한 구조 따를 것:
+
+<div class="hl">
+  <div class="hl-kicker">PART X · 짧은 토픽 라벨 (대문자 권장)</div>
+  <div class="hl-title">슬라이드 제목 (큰 명조 — 한 줄 또는 두 줄)</div>
+  <div class="hl-sub">슬라이드 맥락·다루는 내용을 1~3문장으로 요약. 비유 없이 구체 사실만.</div>
+  <div class="hl-bar"></div>
+</div>
+<div class="hl-rule"></div>
+<div class="bd" style="${PRESET_BD_STYLE[preset] || PRESET_BD_STYLE.auto}">
+  [여기에 본문 콘텐츠 — 아래 본문 가이드 참고]
+</div>
+
+[본문 (.bd) 콘텐츠 가이드 — 선택한 프리셋 "${preset}"]
+${PRESET_BODY_GUIDE[preset] || PRESET_BODY_GUIDE.auto}
 
 [디자인 시스템 — 사용 가능한 컴포넌트 클래스]
 - .co (콜아웃 강조박스): .co-lb(라벨) + .co-main(강조문) + p(설명)
@@ -4137,10 +4168,11 @@ ${{
 - 슬라이드 1장 분량 — 본문 6~12줄 + 컴포넌트 1~3개 정도
 
 [출력 형식 — 매우 중요]
-- 본문 .bd 내부에 들어갈 HTML만 출력 (외곽 .bd 또는 .slide div 제외)
-- 다른 설명·인사·코드블록(\`\`\`)·따옴표·주석 절대 출력 금지
-- 첫 글자부터 HTML 태그로 시작, 마지막도 닫는 태그로 끝
-- 절대 위치(position:absolute) 사용 금지 — 자연 흐름 레이아웃만`;
+- 정확히 위 구조 따라 출력: <div class="hl">...</div><div class="hl-rule"></div><div class="bd" style="...">...</div>
+- 외곽 .slide·.hbar·.fbar는 절대 포함 금지 (클라이언트가 자동 유지)
+- 코드블록 마커(\`\`\`), 인사·설명·주석 절대 출력 금지
+- 첫 글자가 <div class="hl">로 시작, 마지막은 </div>로 끝
+- .hl과 .bd 외부의 .bd 안에서는 position:absolute 금지 — 자식은 자연 흐름·flex·grid만 사용`;
 
 function openSlideGenModal() {
   if (S.selectedIdx < 0) return toast('슬라이드를 먼저 선택');
@@ -4271,27 +4303,38 @@ function applySlideGen() {
   if (S.selectedIdx < 0) return toast('슬라이드 선택 안 됨');
   const slide = S.slides[S.selectedIdx];
   if (!slide) return;
-  // 현재 슬라이드 HTML에서 .bd 영역 통째로 교체
   let html = slide.html;
-  // 패턴: <div class="bd...">...</div> (가장 바깥의 .bd) — fbar 직전까지
-  const pattern = /(<div class="bd[^"]*"[^>]*>)([\s\S]*?)(<\/div>(?=\s*<div class="fbar"))/;
-  if (!pattern.test(html)) {
-    // .bd 없으면 .slide 안 hbar 바로 뒤에 새로 삽입
-    if (/<div class="hbar"/.test(html)) {
-      html = html.replace(/(<\/div>\s*)(?=(?!<div class="hbar"))/, `$1<div class="bd">${_slideGenResult}</div>`);
-      toast('새 .bd 본문 삽입');
-    } else {
-      return toast('슬라이드 구조 인식 실패 — .bd 영역 없음');
-    }
+  // 결과는 .hl + .hl-rule + .bd 구조. hbar~fbar 사이의 모든 콘텐츠를 결과로 교체.
+  // 1) hbar 끝 위치 찾기
+  // 2) fbar 시작 위치 찾기
+  // 3) 그 사이를 _slideGenResult로 교체
+  const hbarMatch = html.match(/<div class="hbar"[\s\S]*?<\/div>\s*(?=<)/);
+  const fbarIdx = html.search(/<div class="fbar"/);
+  if (hbarMatch && fbarIdx > 0) {
+    const hbarEnd = hbarMatch.index + hbarMatch[0].length;
+    html = html.slice(0, hbarEnd) + '\n  ' + _slideGenResult + '\n  ' + html.slice(fbarIdx);
   } else {
-    html = html.replace(pattern, (_, open, _body, close) => open + _slideGenResult + close);
+    // 폴백: .bd만 교체 (옛 방식)
+    const pattern = /(<div class="bd[^"]*"[^>]*>)([\s\S]*?)(<\/div>(?=\s*<div class="fbar"))/;
+    if (pattern.test(html)) {
+      html = html.replace(pattern, (_, open, _body, close) => {
+        // _slideGenResult 안에서 .bd 부분만 추출 시도
+        const bdMatch = _slideGenResult.match(/<div class="bd"[^>]*>([\s\S]*?)<\/div>(?=\s*$|\s*<div class="fbar")/);
+        const inner = bdMatch ? bdMatch[1] : _slideGenResult;
+        return open + inner + close;
+      });
+    } else if (/<div class="hbar"/.test(html)) {
+      html = html.replace(/(<\/div>\s*)(?=(?!<div class="hbar"))/, `$1${_slideGenResult}`);
+    } else {
+      return toast('슬라이드 구조 인식 실패');
+    }
   }
   slide.html = html;
   S.dirty = true;
   renderStrip();
   selectSlide(S.selectedIdx);
   document.getElementById('slideGenModalBg').classList.remove('show');
-  toast('AI 본문 적용 — 💾 DB 저장으로 영구 보존');
+  toast('AI 슬라이드 적용 — 💾 DB 저장으로 영구 보존');
 }
 
 window.applyAIResult = function() {
