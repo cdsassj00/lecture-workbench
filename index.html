@@ -224,10 +224,9 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
 <!-- 비밀번호 게이트 — head에서 즉시 실행하여 본문 콘텐츠 flash 방지 -->
 <script>
 (function() {
-  // 비밀번호 — 평문 비교 (소스 노출 위험 vs 한글 IME 정규화 신뢰성 트레이드오프)
-  // 전자가 더 안전하지만 한글 NFC/NFD/호환자모 등 IME 변형이 너무 많음 → 후자 선택
-  const PASS_PLAIN = '거점리더2026';
-  const STORAGE_KEY = 'wb_viewer_pass_v2';
+  // 비밀번호 — 한글 IME 변형 문제 회피 위해 ASCII 숫자로 단순화
+  const PASS_PLAIN = '2026';
+  const STORAGE_KEY = 'wb_viewer_pass_v3';
   const EXPIRY_DAYS = 30;
   const DEV_BYPASS = 'devmode2026'; // ?nopass=devmode2026 으로 우회
 
