@@ -954,7 +954,7 @@ function buildSlidePreview(slide) {
 .slide[data-palette="dark"] *{color:inherit}
 .slide[data-palette="light-brown"]{--bg:#f0e6d2!important;--bg2:#e0d0b0!important;--ink:#4a3520!important;--ink2:#6a553a!important;--ink3:#9a8060!important;--acc:#a06030!important;--acc2:#804820!important;--acc3:#c08850!important;--ln:#d0b890!important;--dk:#2a1a08!important;--on:#f0e6d2!important;background:#f0e6d2!important}
 `;
-  return `<!DOCTYPE html><html><head><style>${S.css}\nbody{margin:0;overflow:hidden}\n.stage{width:1600px;height:900px;position:relative}\n.slide{position:absolute;inset:0}\n.deck{}\n.fbar{position:absolute;bottom:0;left:0;right:0}\n${PALETTE_INLINE}</style></head><body><div class="stage">${slide.html}</div></body></html>`;
+  return `<!DOCTYPE html><html><head><style>${S.css}\nbody{margin:0;overflow:hidden}\n.stage{width:1600px;height:900px;position:relative}\n.slide{position:absolute;inset:0}\n.deck{}\n.hbar{position:absolute;top:0;left:0;right:0;z-index:50}\n.fbar{position:absolute;bottom:0;left:0;right:0;z-index:50}\n${PALETTE_INLINE}</style></head><body><div class="stage">${slide.html}</div></body></html>`;
 }
 
 // 슬라이드 HTML에서 강의 운영용 시간 라벨 제거 (공유 강의안 톤 일관)
@@ -1482,6 +1482,8 @@ function _renderSlideForExport(iframe, slide) {
 ${css}
 body{margin:0;overflow:hidden;background:#F5EFE4;font-family:Pretendard,'Noto Sans KR',sans-serif}
 .stage{width:1600px;height:900px;position:relative;overflow:hidden}
+.hbar{position:absolute;top:0;left:0;right:0;z-index:50}
+.fbar{position:absolute;bottom:0;left:0;right:0;z-index:50}
 </style></head><body><div class="stage">${slide.html}</div></body></html>`;
     iframe.srcdoc = html;
     iframe.onload = () => setTimeout(resolve, 180);
@@ -1582,7 +1584,10 @@ function presentMode() {
     slidesHtml += `<div class="stage">${h}</div>\n`;
   });
   // 인쇄/PDF 전용 CSS — 단면, 슬라이드 1장당 정확히 1페이지, 빈 페이지 방지
+  // 헤더·푸터는 항상 z-index 50으로 자유 캔버스 위에 보장
   const PRINT_CSS = `
+.hbar{position:absolute;top:0;left:0;right:0;z-index:50}
+.fbar{position:absolute;bottom:0;left:0;right:0;z-index:50}
 @page { size: 1600px 900px; margin: 0; }
 @media print {
   html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
