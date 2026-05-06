@@ -1249,6 +1249,37 @@ function cleanEditModeArtifacts(html) {
     });
 }
 
+// 캔버스 크기에 맞춰 frame·iframe scale 재계산 + 적용 (iframe 재로드 X)
+function fitCanvasFrame() {
+  const canvas = document.getElementById('canvas');
+  if (!canvas) return;
+  const frame = canvas.querySelector('.canvas-frame');
+  const iframe = canvas.querySelector('#canvasIframe');
+  if (!frame || !iframe) return;
+  const cw = canvas.clientWidth - 48;
+  const ch = canvas.clientHeight - 48;
+  if (cw <= 0 || ch <= 0) return;
+  const scale = Math.min(cw / 1600, ch / 900, 1);
+  frame.style.width  = (1600 * scale) + 'px';
+  frame.style.height = (900 * scale)  + 'px';
+  iframe.style.transform = `scale(${scale})`;
+  iframe.style.transformOrigin = 'top left';
+}
+
+// 캔버스 크기 변경 감지 → 자동 재계산 (한 번만 등록)
+let _canvasRO = null;
+function ensureCanvasResizeObserver() {
+  if (_canvasRO) return;
+  const canvas = document.getElementById('canvas');
+  if (!canvas || typeof ResizeObserver === 'undefined') return;
+  _canvasRO = new ResizeObserver(() => {
+    // rAF로 throttle
+    if (_canvasRO._raf) cancelAnimationFrame(_canvasRO._raf);
+    _canvasRO._raf = requestAnimationFrame(fitCanvasFrame);
+  });
+  _canvasRO.observe(canvas);
+}
+
 function selectSlide(idx) {
   if (idx < 0 || idx >= S.slides.length) return;
   // 슬라이드별 1회 자동 정리 (시간 라벨 + 편집 잔여물)
@@ -1272,19 +1303,24 @@ function selectSlide(idx) {
   // Render canvas
   const canvas = document.getElementById('canvas');
   const slide = S.slides[idx];
-  
-  // Calculate scale to fit
-  const cw = canvas.clientWidth - 48;
-  const ch = canvas.clientHeight - 48;
-  const scale = Math.min(cw / 1600, ch / 900, 1);
-  
+
+  // 초기 scale 계산 (레이아웃 미정 시점에 잘못 측정될 수 있음 → 아래 fitCanvasFrame이 곧 재계산)
+  const cw0 = canvas.clientWidth - 48;
+  const ch0 = canvas.clientHeight - 48;
+  const scale0 = Math.min(cw0 / 1600, ch0 / 900, 1);
+
   canvas.innerHTML = `
-    <div class="canvas-frame" style="width:${1600*scale}px;height:${900*scale}px">
-      <iframe id="canvasIframe" style="width:1600px;height:900px;transform:scale(${scale});transform-origin:top left" ></iframe>
+    <div class="canvas-frame" style="width:${1600*scale0}px;height:${900*scale0}px">
+      <iframe id="canvasIframe" style="width:1600px;height:900px;transform:scale(${scale0});transform-origin:top left" ></iframe>
     </div>`;
-  
+
   const iframe = document.getElementById('canvasIframe');
   iframe.srcdoc = buildSlidePreview(slide);
+
+  // 다음 두 프레임 후 정확한 canvas 크기로 재측정 — 초기 레이아웃 race 보정
+  requestAnimationFrame(() => requestAnimationFrame(fitCanvasFrame));
+  // 또한 canvas 크기 변경 시 자동 재계산 (윈도우 리사이즈·패널 상태 변경 등)
+  ensureCanvasResizeObserver();
 
   iframe.onload = () => {
     // 페이지 번호를 iframe DOM에 직접 set
