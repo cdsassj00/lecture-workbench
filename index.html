@@ -2416,13 +2416,21 @@ async function dbSaveCurrentSession() {
     // 3) 잉여 row 정리 — 클라이언트에서 슬라이드 삭제 후 저장 시,
     //    DB에 slide_idx >= total인 옛 행이 남아 있으면 제거
     setProgress(total, '⏳ 잉여 행 정리 중...');
-    const { error: delError, count: delCount } = await sb.from('slides')
+    console.log('[DB SAVE] orphan cleanup: DELETE WHERE session_num=' + sessionNum + ' AND slide_idx >= ' + total);
+    const delResp = await sb.from('slides')
       .delete({ count: 'exact' })
       .eq('session_num', sessionNum)
       .gte('slide_idx', total);
+    const delError = delResp.error;
+    const delCount = typeof delResp.count === 'number' ? delResp.count : null;
+    console.log('[DB SAVE] orphan cleanup result:', { error: delError, count: delCount });
     if (delError) {
-      console.warn('잉여 row 정리 실패:', delError);
-      // 치명적 에러 아님 — 저장 자체는 성공한 상태
+      // 사용자가 알 수 있도록 toast로 에러 노출
+      toast(`잉여 행 정리 실패 — 삭제한 슬라이드가 다시 보일 수 있음: ${(delError.message || delError).toString().substring(0, 80)}`);
+      console.error('[DB SAVE] DELETE 실패:', delError);
+    } else if (delCount === null) {
+      // count 응답이 없으면 사용자에게 안내
+      console.warn('[DB SAVE] DELETE 응답에 count 없음. 서버는 OK 응답했지만 실제 삭제 여부 미확인. 슬라이드 다시 보이면 알려주세요.');
     }
     setProgress(total, `✓ 저장 완료 ${total}장${delCount ? ` (잉여 ${delCount}장 정리)` : ''}`);
     S.dirty = false;
