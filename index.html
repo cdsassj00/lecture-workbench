@@ -1496,15 +1496,23 @@ function makeEditable(iframe) {
     // 슬라이드 안 어디든 클릭 → 커서 진입, 키보드 입력 정상.
     const slideRoot = doc.querySelector('.slide');
     if (slideRoot) {
-      slideRoot.contentEditable = 'true';
-      slideRoot.style.outline = 'none';
-      // 자유 캔버스 요소는 자체 동작(드래그·리사이즈) — 루트 CE 상속에서 명시적 제외
-      slideRoot.querySelectorAll('.free-text, .free-image, .free-comp').forEach(el => {
-        el.contentEditable = 'false';
-      });
-      // input·blur 이벤트 — 변경 감지 + AI 대상 추적
-      slideRoot.addEventListener('input', () => saveSlideState(doc));
-      slideRoot.addEventListener('blur', () => saveSlideState(doc), true);
+      // 자유 캔버스 슬라이드면 root CE 비활성 — 텍스트 편집 차단, 붙여넣기는 자유 개체 모드로
+      const hasFreeCanvas = !!doc.querySelector('.free-canvas');
+      if (hasFreeCanvas) {
+        slideRoot.contentEditable = 'false';
+        slideRoot.style.outline = 'none';
+        slideRoot.style.caretColor = 'transparent';
+      } else {
+        slideRoot.contentEditable = 'true';
+        slideRoot.style.outline = 'none';
+        // 자유 캔버스 요소는 자체 동작(드래그·리사이즈) — 루트 CE 상속에서 명시적 제외
+        slideRoot.querySelectorAll('.free-text, .free-image, .free-comp').forEach(el => {
+          el.contentEditable = 'false';
+        });
+        // input·blur 이벤트 — 변경 감지 + AI 대상 추적
+        slideRoot.addEventListener('input', () => saveSlideState(doc));
+        slideRoot.addEventListener('blur', () => saveSlideState(doc), true);
+      }
     }
     // SEL 매칭 요소는 이제 시각적 인디케이터(outline·cursor)와 focus 리스너만 등록
     // (CE는 root에서 상속되므로 개별 설정 불필요)
