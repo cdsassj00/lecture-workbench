@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 전문인재 과정 · 1일차 SLM 모델 조사 보고서</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#faf4e6;--paper-2:#f1e8d2;--paper-3:#e9dcc0;
+  --ink:#1f1810;--ink-soft:#3a2e20;--ink-mute:#6a5a44;
+  --dark:#2b2015;--dark-2:#1a1208;--dark-ink:#f5ecd6;--dark-mute:#c8b895;
+  --accent:#8a3d1f;--accent-warm:#c96238;--accent-soft:#e07a4a;
+  --line:#c8b898;--line-soft:#e5d9bf;--code-bg:#ede0c3;
+  --serif:'Fraunces','Noto Serif KR',Georgia,serif;
+  --sans:'Pretendard Variable','Pretendard','Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{
+  background:linear-gradient(180deg,#c9bfa8 0%,#b8ac92 100%);
+  min-height:100vh;
+  font-family:var(--sans);color:var(--ink-soft);
+  font-size:10.5pt;line-height:1.75;
+}
+
+/* ========== TOOLBAR ========== */
+.tb{
+  position:fixed;top:0;left:0;right:0;height:52px;z-index:200;
+  background:rgba(43,32,21,.92);backdrop-filter:blur(12px);
+  display:flex;align-items:center;gap:10px;padding:0 22px;
+  border-bottom:1px solid rgba(201,184,149,.25);
+}
+.tb-brand{
+  font-family:var(--serif);font-weight:700;font-size:13pt;
+  color:var(--dark-ink);letter-spacing:-.2px;
+}
+.tb-brand .sub{
+  font-family:var(--sans);font-size:8.5pt;font-weight:500;
+  letter-spacing:2pt;text-transform:uppercase;color:var(--dark-mute);
+  margin-left:6px;
+}
+.tb-spacer{flex:1}
+.tb button{
+  height:34px;padding:0 14px;border-radius:4px;cursor:pointer;
+  font:700 11px var(--sans);letter-spacing:1.4px;text-transform:uppercase;
+  border:1px solid rgba(245,236,214,.35);background:transparent;color:var(--dark-ink);
+  transition:.15s;
+}
+.tb button:hover{background:rgba(245,236,214,.12)}
+.tb .tb-edit.active{background:var(--accent-warm);border-color:var(--accent-warm);color:#fff}
+.tb .tb-save{background:var(--accent-warm);border-color:var(--accent-warm);color:#fff}
+.tb .tb-save:hover{background:var(--accent);border-color:var(--accent)}
+.tb .tb-print{background:#111;color:#fff;border-color:#111}
+
+/* ========== PAGE STACK ========== */
+.stack{padding:84px 0 60px;display:flex;flex-direction:column;align-items:center;gap:16mm}
+.sheet{
+  width:210mm;min-height:297mm;background:var(--paper);color:var(--ink-soft);
+  padding:22mm 20mm 24mm;position:relative;overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,.08),0 18px 56px rgba(0,0,0,.26),0 40px 100px rgba(0,0,0,.14);
+}
+
+/* ========== COVER ========== */
+.cv{padding:0;background:var(--dark);color:var(--dark-ink);display:flex;flex-direction:column;overflow:hidden}
+.cv::before{content:"";position:absolute;top:0;left:0;right:0;height:5mm;background:var(--accent-warm);z-index:3}
+.cv-content{flex:1;padding:24mm 22mm 12mm;display:flex;flex-direction:column;justify-content:space-between}
+.cv-top .cv-org{
+  font-family:var(--sans);font-size:8pt;letter-spacing:3pt;
+  text-transform:uppercase;color:var(--dark-mute);line-height:2;
+}
+.cv-top .cv-org strong{display:block;color:var(--accent-soft);font-weight:700;font-size:8.5pt;margin-bottom:3mm}
+.cv-center .cv-year{
+  font-family:var(--serif);font-weight:300;font-size:22pt;
+  color:var(--accent-soft);margin-bottom:4mm;letter-spacing:-.5pt;
+}
+.cv-center .cv-title{
+  font-family:var(--serif);font-weight:700;font-size:34pt;
+  color:var(--dark-ink);line-height:1.18;letter-spacing:-1.2pt;margin:0 0 6mm;
+}
+.cv-center .cv-rule{width:48mm;height:1.2mm;background:var(--accent-warm);margin:6mm 0}
+.cv-center .cv-doctype{
+  font-family:var(--serif);font-weight:400;font-size:22pt;
+  color:var(--paper-2);margin-bottom:3mm;
+}
+.cv-center .cv-sub{
+  font-family:var(--serif);font-weight:400;font-size:12pt;
+  color:var(--paper-2);line-height:1.7;max-width:130mm;
+}
+.cv-bottom .cv-meta{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  border-top:.4mm solid rgba(245,236,214,.25);padding-top:6mm;gap:8mm;
+}
+.cv-meta .m-l{font:700 7pt/1 var(--sans);letter-spacing:2.5pt;text-transform:uppercase;color:var(--accent-soft);margin-bottom:3mm}
+.cv-meta .m-v{font-family:var(--serif);font-size:12pt;font-weight:500;color:var(--dark-ink)}
+.cv-foot{
+  background:#fff;color:var(--dark);padding:9mm 22mm 11mm;
+  display:flex;justify-content:space-between;align-items:center;position:relative;
+}
+.cv-foot::before{content:"";position:absolute;top:0;left:0;right:0;height:.8mm;background:var(--accent-warm)}
+.cv-foot-l{font-family:var(--serif);font-weight:700;font-size:14pt;color:var(--ink);letter-spacing:-.2pt}
+.cv-foot-l .sub{display:block;font-family:var(--sans);font-size:9pt;font-weight:500;color:var(--ink-mute);letter-spacing:1.2pt;text-transform:uppercase;margin-top:2mm}
+.cv-foot-r{
+  text-align:right;font:600 7.5pt/1.6 var(--sans);
+  letter-spacing:1.8pt;color:var(--ink-mute);text-transform:uppercase;max-width:80mm;
+}
+
+/* ========== STUDENT INFO BLOCK ========== */
+.id-block{
+  background:var(--paper-2);border-left:4pt solid var(--accent-warm);
+  padding:7mm 9mm;margin:0 0 8mm;
+}
+.id-block .lbl{
+  font:700 8pt/1 var(--sans);letter-spacing:2.5pt;text-transform:uppercase;
+  color:var(--accent);margin-bottom:5mm;
+}
+.id-grid{display:grid;grid-template-columns:1fr 1fr;gap:5mm 8mm}
+.id-cell{display:flex;flex-direction:column;gap:2mm}
+.id-cell .k{font:700 8pt/1 var(--sans);letter-spacing:1.8pt;color:var(--ink-mute);text-transform:uppercase}
+.id-cell .v{
+  font-family:var(--serif);font-weight:600;font-size:13pt;color:var(--ink);
+  border-bottom:.3mm solid var(--line);padding:1mm 0 2mm;letter-spacing:-.3pt;
+  min-height:8mm;
+}
+.id-cell .v[contenteditable=true]:empty::before{
+  content:attr(data-ph);color:var(--ink-mute);font-style:italic;font-weight:400;
+}
+
+/* ========== SECTION ========== */
+.sec{margin:7mm 0 4mm;page-break-inside:avoid}
+.sec h2{
+  font-family:var(--sans);font-weight:700;font-size:11.5pt;color:var(--ink);
+  letter-spacing:-.2px;padding:3mm 0 2.5mm 4mm;
+  border-left:3pt solid var(--accent-warm);
+  display:flex;align-items:baseline;gap:5mm;
+}
+.sec h2 .num{
+  font:700 8pt/1 var(--sans);letter-spacing:2.5pt;text-transform:uppercase;
+  color:var(--accent);min-width:14mm;
+}
+.sec p,.sec .body{
+  font-size:10pt;line-height:1.85;color:var(--ink-soft);
+  margin:3mm 0;text-align:justify;
+}
+.sec .body[contenteditable=true]:empty::before,
+.sec p[contenteditable=true]:empty::before{
+  content:attr(data-ph);color:var(--ink-mute);font-style:italic;
+}
+
+/* ========== TABLES ========== */
+.kv-table{
+  width:100%;border-collapse:collapse;margin:3mm 0 4mm;
+  background:#fff;border:1px solid var(--line-soft);
+}
+.kv-table tr{border-bottom:.3mm dashed var(--line-soft)}
+.kv-table tr:last-child{border-bottom:none}
+.kv-table td{padding:3mm 5mm;font-size:9.6pt;line-height:1.6;vertical-align:top}
+.kv-table td.k{
+  font-family:var(--sans);font-weight:700;color:var(--ink);
+  width:42mm;background:var(--paper-3);
+  letter-spacing:-.1pt;font-size:9.4pt;
+}
+.kv-table td.v{color:var(--ink-soft);min-height:6mm}
+.kv-table td.v[contenteditable=true]:empty::before{
+  content:attr(data-ph);color:var(--ink-mute);font-style:italic;
+}
+
+/* ========== CALLOUT ========== */
+.callout{
+  background:var(--paper-2);border-left:3pt solid var(--accent-warm);
+  padding:5mm 7mm;margin:5mm 0;page-break-inside:avoid;
+}
+.callout .label{
+  font:700 7.5pt/1 var(--sans);letter-spacing:2.5pt;text-transform:uppercase;
+  color:var(--accent);margin-bottom:3mm;
+}
+.callout p{margin:1mm 0;font-size:9.5pt;color:var(--ink);line-height:1.7}
+
+/* ========== LINK LIST ========== */
+.link-list{margin:3mm 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:1.5mm}
+.link-list li{
+  position:relative;padding:1.5mm 0 1.5mm 7mm;
+  font-size:9.6pt;line-height:1.6;color:var(--ink-soft);
+  border-bottom:.2mm dashed var(--line-soft);
+}
+.link-list li:last-child{border-bottom:none}
+.link-list li::before{
+  content:"";position:absolute;left:2mm;top:4mm;
+  width:2mm;height:2mm;background:var(--accent-warm);
+}
+
+/* ========== EDIT MODE ========== */
+[contenteditable=true]{
+  outline:1px dashed rgba(184,83,42,.35);outline-offset:2px;
+  background:rgba(255,243,200,.6);
+  border-radius:2px;cursor:text;caret-color:var(--accent);
+}
+[contenteditable=true]:focus{
+  outline:2px solid var(--accent);background:rgba(255,236,170,.95);
+}
+body:not(.edit-mode) [contenteditable=true]{
+  outline:none;background:transparent;
+}
+body.edit-mode::after{
+  content:"편집 모드 · 텍스트 클릭 후 입력 · ESC 또는 EDIT 다시 누르면 종료 · Ctrl+S 로 HTML 저장";
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:var(--dark);color:var(--dark-ink);padding:10px 22px;border-radius:24px;
+  font:700 10.5px var(--sans);letter-spacing:1.5px;text-transform:uppercase;
+  box-shadow:0 8px 30px rgba(0,0,0,.3);z-index:300;pointer-events:none;
+  border:1px solid rgba(201,98,56,.5);
+}
+
+/* ========== PRINT ========== */
+@media print{
+  @page{size:A4 portrait;margin:14mm 14mm 16mm 14mm}
+  @page :first{margin:0}
+  html,body{background:#fff!important}
+  .tb{display:none!important}
+  .stack{padding:0;gap:0}
+  .sheet{
+    width:auto;min-height:auto;box-shadow:none!important;
+    margin:0;padding:0 0 6mm;page-break-after:always;
+  }
+  .sheet:last-child{page-break-after:auto}
+  .cv{margin:0;padding:0;min-height:297mm;page-break-after:always}
+  .sheet:not(.cv){padding:18mm 18mm 18mm}
+  [contenteditable=true]{outline:none!important;background:transparent!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- TOOLBAR -->
+<!-- ============================================================ -->
+<div class="tb">
+  <div class="tb-brand">SLM 모델 조사 보고서<span class="sub">Day 1 · Assignment</span></div>
+  <div class="tb-spacer"></div>
+  <button class="tb-edit" id="btnEdit" onclick="toggleEdit()">✎ EDIT</button>
+  <button class="tb-save" onclick="saveHtml()">⬇ HTML 저장</button>
+  <button class="tb-print" onclick="window.print()">⬇ PDF 인쇄</button>
+</div>
+
+<div class="stack">
+
+<!-- ============================================================ -->
+<!-- COVER PAGE -->
+<!-- ============================================================ -->
+<section class="sheet cv">
+  <div class="cv-content">
+    <div class="cv-top">
+      <div class="cv-org">
+        <strong>AI 전문인재 과정 · 2026</strong>
+        Public AI Expert Program · Hugging Face SLM Research Report
+      </div>
+    </div>
+
+    <div class="cv-center">
+      <div class="cv-year">Day 1 · Assignment 01</div>
+      <h1 class="cv-title">Hugging Face SLM<br>모델 조사 보고서</h1>
+      <div class="cv-rule"></div>
+      <div class="cv-doctype">기술 분석 · 모델 카드 분해 리포트</div>
+      <div class="cv-sub">Hugging Face에서 1B~7B 규모의 Small Language Model을 선택해 모델 스펙·학습 데이터·튜닝 방식·파라미터 구조·활용 가능성을 분석한 1인 1리포트입니다.</div>
+    </div>
+
+    <div class="cv-bottom">
+      <div class="cv-meta">
+        <div class="m"><div class="m-l">Track</div><div class="m-v">SLM Research</div></div>
+        <div class="m"><div class="m-l">Format</div><div class="m-v">HTML Report</div></div>
+        <div class="m"><div class="m-l">Submission</div><div class="m-v">GitHub Public Repo</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cv-foot">
+    <div class="cv-foot-l">
+      AI 전문인재 과정
+      <span class="sub">Day 1 · 1B~7B Small Language Model</span>
+    </div>
+    <div class="cv-foot-r">Hugging Face Model Card Analysis · Technical Report Template</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- BODY PAGE -->
+<!-- ============================================================ -->
+<section class="sheet">
+
+  <!-- ========== STUDENT IDENTITY ========== -->
+  <div class="id-block">
+    <div class="lbl">Student Identity · 수강생 정보</div>
+    <div class="id-grid">
+      <div class="id-cell">
+        <span class="k">수강생 번호</span>
+        <span class="v" contenteditable="true" data-ph="예: 03"></span>
+      </div>
+      <div class="id-cell">
+        <span class="k">수강생 이름</span>
+        <span class="v" contenteditable="true" data-ph="예: 홍길동"></span>
+      </div>
+      <div class="id-cell">
+        <span class="k">선택 모델명</span>
+        <span class="v" contenteditable="true" data-ph="예: Qwen2.5-3B-Instruct"></span>
+      </div>
+      <div class="id-cell">
+        <span class="k">Hugging Face 모델 링크</span>
+        <span class="v" contenteditable="true" data-ph="https://huggingface.co/..."></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SECTION 1 ========== -->
+  <div class="sec">
+    <h2><span class="num">01</span>모델 선택 이유</h2>
+    <div class="body" contenteditable="true" data-ph="이 모델을 선택한 이유를 작성합니다. 특정 산업, 공공 업무, 행정, 문서처리, 질의응답 등 어떤 관점에서 적합하다고 판단했는지 설명합니다."></div>
+  </div>
+
+  <!-- ========== SECTION 2 ========== -->
+  <div class="sec">
+    <h2><span class="num">02</span>모델 기본 정보</h2>
+    <table class="kv-table">
+      <tr><td class="k">모델명</td><td class="v" contenteditable="true" data-ph="모델 카드 상단의 정식 명칭을 입력하세요."></td></tr>
+      <tr><td class="k">개발 주체</td><td class="v" contenteditable="true" data-ph="개발 회사·기관·연구팀·개인 개발자 등"></td></tr>
+      <tr><td class="k">모델 규모</td><td class="v" contenteditable="true" data-ph="예: 1.5B / 3B / 7B"></td></tr>
+      <tr><td class="k">라이선스</td><td class="v" contenteditable="true" data-ph="예: Apache-2.0 / MIT / Llama 3 Community / 기타"></td></tr>
+      <tr><td class="k">모델 유형</td><td class="v" contenteditable="true" data-ph="Base / Instruct / Chat / Domain-specific 등"></td></tr>
+    </table>
+  </div>
+
+  <!-- ========== SECTION 3 ========== -->
+  <div class="sec">
+    <h2><span class="num">03</span>학습 데이터와 튜닝 방식</h2>
+    <div class="body" contenteditable="true" data-ph="모델이 어떤 데이터로 사전학습되었는지, 공개 데이터인지, 특정 산업·언어·도메인 데이터가 포함되었는지, Instruction Tuning · SFT · RLHF · DPO · LoRA · QLoRA 등 어떤 튜닝이 적용되었는지 정리합니다. 모델 카드에 명확히 공개되어 있지 않다면 '공개 범위 내에서는 확인 어려움'이라고 작성합니다."></div>
+  </div>
+
+  <!-- ========== SECTION 4 ========== -->
+  <div class="sec">
+    <h2><span class="num">04</span>파라미터 및 구조적 특징</h2>
+    <table class="kv-table">
+      <tr><td class="k">Architecture</td><td class="v" contenteditable="true" data-ph="예: Llama / Qwen2 / Mistral / Phi 등"></td></tr>
+      <tr><td class="k">Context Length</td><td class="v" contenteditable="true" data-ph="예: 4096 / 8192 / 32768 / 128000 토큰"></td></tr>
+      <tr><td class="k">Hidden Size</td><td class="v" contenteditable="true" data-ph="config.json의 hidden_size 값"></td></tr>
+      <tr><td class="k">Layers</td><td class="v" contenteditable="true" data-ph="num_hidden_layers 값"></td></tr>
+      <tr><td class="k">Attention Heads</td><td class="v" contenteditable="true" data-ph="num_attention_heads · num_key_value_heads"></td></tr>
+      <tr><td class="k">Tokenizer</td><td class="v" contenteditable="true" data-ph="BPE / SentencePiece / Tiktoken 등 + vocab size"></td></tr>
+    </table>
+  </div>
+
+  <!-- ========== SECTION 5 ========== -->
+  <div class="sec">
+    <h2><span class="num">05</span>모델 파일 구성</h2>
+    <div class="body" contenteditable="true" data-ph="Hugging Face 저장소에 있는 config.json · tokenizer.json · model.safetensors · generation_config.json · special_tokens_map.json 등 주요 파일이 어떤 역할을 하는지 정리합니다."></div>
+  </div>
+
+  <!-- ========== SECTION 6 ========== -->
+  <div class="sec">
+    <h2><span class="num">06</span>활용 가능 업무</h2>
+    <div class="body" contenteditable="true" data-ph="공공기관 행정·민원 응대·내부 문서 분석·질의응답·요약·RAG 검색·챗봇·보고서 초안 작성 등 어떤 업무에 어떻게 활용 가능한지 구체 시나리오로 작성합니다."></div>
+  </div>
+
+  <!-- ========== SECTION 7 ========== -->
+  <div class="sec">
+    <h2><span class="num">07</span>한계와 주의사항</h2>
+    <div class="body" contenteditable="true" data-ph="성능 한계 · 환각 가능성 · 한국어 지원 수준 · 보안 이슈 · 라이선스 제한 · 상업적 활용 가능 여부 · 평가 데이터 한계 등을 정리합니다."></div>
+  </div>
+
+  <!-- ========== SECTION 8 ========== -->
+  <div class="sec">
+    <h2><span class="num">08</span>종합 의견</h2>
+    <div class="body" contenteditable="true" data-ph="이 모델을 실제 조직 업무에 도입한다면 어떤 조건에서 적합한지, 어떤 추가 검증·POC가 필요한지 본인 의견을 작성합니다."></div>
+  </div>
+
+  <!-- ========== SECTION 9 ========== -->
+  <div class="sec">
+    <h2><span class="num">09</span>참고 링크</h2>
+    <ul class="link-list" id="refList">
+      <li contenteditable="true" data-ph="Hugging Face 모델 페이지: https://huggingface.co/..."></li>
+      <li contenteditable="true" data-ph="모델 논문 또는 기술 블로그: https://..."></li>
+      <li contenteditable="true" data-ph="GitHub 저장소: https://github.com/..."></li>
+    </ul>
+  </div>
+
+  <!-- ========== SUBMISSION ========== -->
+  <div class="callout">
+    <div class="label">Submission · 제출 정보</div>
+    <p><strong>GitHub Repository 주소:</strong> <span contenteditable="true" data-ph="https://github.com/본인아이디/slm-model-report-번호-이름">&nbsp;</span></p>
+    <p><strong>파일명 예시:</strong> 03_김민수_slm_report.html</p>
+    <p style="margin-top:3mm;font-size:8.8pt;color:var(--ink-mute)">최종 제출 시 EDIT 버튼을 눌러 모든 항목을 채운 뒤, [HTML 저장] 버튼으로 파일을 다운로드해 GitHub Repository에 업로드하세요.</p>
+  </div>
+
+</section>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SCRIPT -->
+<!-- ============================================================ -->
+<script>
+let editMode = false;
+
+function toggleEdit(){
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  const btn = document.getElementById('btnEdit');
+  if(editMode){
+    btn.classList.add('active');
+    btn.textContent = '✎ EDITING';
+  } else {
+    btn.classList.remove('active');
+    btn.textContent = '✎ EDIT';
+  }
+}
+
+// 초기 진입은 편집 모드 OFF — 학생이 EDIT 누르면 켜짐
+// (편집 표시가 거슬리지 않도록)
+
+// HTML 저장 — 현재 DOM 상태 그대로 다운로드
+function saveHtml(){
+  // 본인 번호·이름 가져와 파일명 생성
+  const idCells = document.querySelectorAll('.id-cell .v');
+  const num = (idCells[0]?.textContent || '').trim() || 'XX';
+  const name = (idCells[1]?.textContent || '').trim() || '이름';
+  const fname = `${num}_${name}_slm_report.html`.replace(/[\/\\?%*:|"<>]/g, '');
+
+  // EDIT 모드 OFF 상태로 저장 (인쇄·공유 시 깔끔)
+  const wasEdit = editMode;
+  if(wasEdit) toggleEdit();
+
+  const doctype = '<!DOCTYPE html>\n';
+  const html = doctype + document.documentElement.outerHTML;
+  const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  if(wasEdit) toggleEdit();
+  showToast(`✓ ${fname} 다운로드 완료`);
+}
+
+function showToast(msg){
+  let t = document.getElementById('__toast');
+  if(!t){
+    t = document.createElement('div'); t.id='__toast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2b2015;color:#f5ecd6;padding:12px 24px;border-radius:24px;font:700 11px Pretendard,sans-serif;letter-spacing:1.4px;text-transform:uppercase;box-shadow:0 8px 30px rgba(0,0,0,.3);z-index:400;border:1px solid rgba(201,98,56,.5);opacity:0;transition:.3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  requestAnimationFrame(() => t.style.opacity = '1');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.style.opacity = '0', 3500);
+}
+
+// 키보드: Ctrl+S 저장, Esc 또는 E 로 편집 토글
+document.addEventListener('keydown', (e) => {
+  if(e.key === 's' && (e.ctrlKey || e.metaKey)){
+    e.preventDefault(); saveHtml();
+  } else if(e.key === 'Escape' && editMode){
+    if(document.activeElement && document.activeElement.contentEditable === 'true'){
+      document.activeElement.blur();
+    } else {
+      toggleEdit();
+    }
+  } else if((e.key === 'e' || e.key === 'E') && !e.ctrlKey && !e.metaKey){
+    if(!document.activeElement || document.activeElement === document.body){
+      toggleEdit();
+    }
+  }
+});
+</script>
+
+</body>
+</html>
