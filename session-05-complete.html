@@ -1249,7 +1249,7 @@ const allSlides = document.querySelectorAll('.slide');
 const allStages = document.querySelectorAll('.stage');
 const deck = document.getElementById('deck');
 
-function fitSlides(){const vw=innerWidth,vh=innerHeight;const r=Math.min(vw/1600,vh/900);allSlides.forEach(s=>{s.style.transform=`scale(${r})`;s.style.transformOrigin='center center'})}
+function fitSlides(){const vw=innerWidth,vh=innerHeight;const r=Math.min(1,Math.min(vw/1600,vh/900));allSlides.forEach(s=>{s.style.transform=`scale(${r})`;s.style.transformOrigin='center center'})}
 addEventListener('resize',fitSlides);fitSlides();
 
 function curIdx(){let i=0,m=1e9;allStages.forEach((s,x)=>{const d=Math.abs(s.getBoundingClientRect().top+s.getBoundingClientRect().height/2-innerHeight/2);if(d<m){m=d;i=x}});return i}
