@@ -34,7 +34,14 @@
 .toolbar button{background:rgba(255,255,255,0.08);color:#ccc;border:1px solid rgba(255,255,255,0.12);padding:5px 14px;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;cursor:pointer;border-radius:3px;text-transform:uppercase;font-weight:600}
 .toolbar button:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
 .toolbar .pg{color:rgba(255,255,255,0.55);font-size:11px;padding:5px 10px;min-width:80px;text-align:center;font-family:var(--mono);letter-spacing:1px}
-@media print{@page{size:423.33mm 237.5mm;margin:0}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{overflow:visible!important;height:auto!important;background:#fff!important}.deck{overflow:visible!important;height:auto!important;scroll-snap-type:none!important;background:#fff!important}.stage{min-height:0!important;height:auto!important;page-break-after:always;page-break-inside:avoid;padding:0!important;margin:0!important;background:#fff!important;display:block!important}.stage:last-child{page-break-after:avoid}.slide{transform:none!important;box-shadow:none!important;width:1600px!important;height:900px!important}.toolbar{display:none!important}}</style>
+@media print{@page{size:423.33mm 237.5mm;margin:0}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{overflow:visible!important;height:auto!important;background:#fff!important}.deck{overflow:visible!important;height:auto!important;scroll-snap-type:none!important;background:#fff!important}.stage{min-height:0!important;height:auto!important;page-break-after:always;page-break-inside:avoid;padding:0!important;margin:0!important;background:#fff!important;display:block!important}.stage:last-child{page-break-after:avoid}.slide{transform:none!important;box-shadow:none!important;width:1600px!important;height:900px!important}.toolbar{display:none!important}}
+/* === FREE-CANVAS 개체 — 프레젠테이션 모드에서도 wrapper 크기 강제 === */
+.free-text, .free-image, .free-comp { box-sizing: border-box; position: absolute; overflow: hidden; }
+.free-image > img { width: 100% !important; height: 100% !important; display: block; user-select: none; pointer-events: none; -webkit-user-drag: none; object-fit: contain; }
+.free-canvas { position: absolute; inset: 0; overflow: hidden; }
+.slide { overflow: hidden !important; }
+.bd { overflow: hidden; }
+</style>
 </head>
 <body>
 <div class="deck" id="deck">
