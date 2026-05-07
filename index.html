@@ -678,7 +678,7 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
 <div class="modal-bg" id="assignModalBg" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal" style="position:relative;width:1080px;max-width:95vw;max-height:90vh;overflow:hidden;display:flex;flex-direction:column">
     <button class="modal-close" onclick="document.getElementById('assignModalBg').classList.remove('show')">×</button>
-    <h2 style="margin-bottom:6px">📝 회차별 실습과제 <span style="font-size:11px;color:var(--wink3);font-weight:400;letter-spacing:0">1회차 SLM 모델 조사 보고서 (템플릿 제공) · 2~8회차는 회차 시작 직전 공지</span></h2>
+    <h2 style="margin-bottom:6px">📝 회차별 실습과제 <span style="font-size:11px;color:var(--wink3);font-weight:400;letter-spacing:0">1회차 SLM 모델 조사 보고서 (템플릿 제공) · 2~8회차는 회차 종료 시 공지</span></h2>
     <div style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap" id="assignTabs"></div>
     <div style="font-size:11px;color:var(--wink3);margin-bottom:8px;padding:6px 10px;background:#f5f0e8;border-radius:3px">
       🎯 난이도 ★(입문) ~ ★★★★★(도전) · 배점은 강사 재량 조정 · 산출물 형식·분량 명시 · 클릭 시 본 슬라이드 또는 새 슬라이드에 자동 삽입
@@ -768,22 +768,22 @@ const ASSIGNMENTS = {
      templateLabel:'⬇ 보고서 템플릿'},
   ]},
   2: { name:'프론티어 모델 + AI 도구 50선', items:[
-    {num:1, title:'공개 예정', desc:'2회차 시작 직전, 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
+    {num:1, title:'공개 예정', desc:'2회차 종료 시 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
   ]},
   3: { name:'메타 프롬프트 + 6가지 워크플로우', items:[
-    {num:1, title:'공개 예정', desc:'3회차 시작 직전, 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
+    {num:1, title:'공개 예정', desc:'3회차 종료 시 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
   ]},
   4: { name:'데이터 시각화 · 분석 바이브 코딩', items:[
-    {num:1, title:'공개 예정', desc:'4회차 시작 직전, 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
+    {num:1, title:'공개 예정', desc:'4회차 종료 시 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
   ]},
   5: { name:'업무 자동화 · 로컬 AI 연동', items:[
-    {num:1, title:'공개 예정', desc:'5회차 시작 직전, 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
+    {num:1, title:'공개 예정', desc:'5회차 종료 시 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
   ]},
   6: { name:'AI 에이전트 툴 마스터리', items:[
-    {num:1, title:'공개 예정', desc:'6회차 시작 직전, 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
+    {num:1, title:'공개 예정', desc:'6회차 종료 시 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
   ]},
   7: { name:'RAG 파이프라인 · 웹서비스 구축', items:[
-    {num:1, title:'공개 예정', desc:'7회차 시작 직전, 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
+    {num:1, title:'공개 예정', desc:'7회차 종료 시 운영진이 강의 진행 상황과 수강생 수준에 맞춰 최종 과제 내용·제출 형식·마감을 공지합니다.', tba:true},
   ]},
   8: { name:'API · MCP · 멀티 에이전트', items:[
     {num:1, title:'공개 예정', desc:'종강 회차 과제는 운영진이 강의 진행 상황을 바탕으로 별도 공지합니다.', tba:true},
