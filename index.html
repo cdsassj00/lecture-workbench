@@ -2083,9 +2083,16 @@ function presentMode() {
     h = h.replace(/(<div class="fbar-r">[\s\S]*?<span class="fbar-title">)[^<]*(<\/span>)/, `$1${String(i+1).padStart(3,'0')} / ${String(S.slides.length).padStart(3,'0')}$2`);
     slidesHtml += `<div class="stage">${h}</div>\n`;
   });
-  // 인쇄/PDF 전용 CSS — 단면, 슬라이드 1장당 정확히 1페이지, 빈 페이지 방지
+  // 화면 표시용 CSS (프레젠테이션 모드) + 인쇄/PDF 전용 CSS
   // 헤더·푸터는 항상 z-index 50으로 자유 캔버스 위에 보장
   const PRINT_CSS = `
+/* === SCREEN MODE — 프레젠테이션 화면 표시 (콘텐츠 슬라이드 밖 넘침 차단) === */
+.stage {
+  width: 1600px; height: 900px;
+  position: relative; overflow: hidden;
+  background: #F5EFE4;
+}
+.slide { position: absolute; inset: 0; overflow: hidden; }
 .hbar{position:absolute;top:0;left:0;right:0;z-index:50}
 .fbar{position:absolute;bottom:0;left:0;right:0;z-index:50}
 @page { size: 1600px 900px; margin: 0; }
