@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Session 07 (v2) · 풀스택 바이브코딩 심화 I</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5efe4;--bg2:#ede4d3;--ink:#2b2015;--ink2:#5a4a38;--ink3:#8a7659;--acc:#b8532a;--acc3:#d49575;--ln:#d8c8ae;--ln2:#e6d9bf;--dk:#1a1612;--dk2:#241e17;--on:#ede4d3;--on2:#a89172;--serif:'Fraunces','Noto Serif KR',Georgia,serif;--sans:'Pretendard Variable',Pretendard,sans-serif;--mono:'JetBrains Mono',ui-monospace,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background:#0e0a06;font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;background:#0e0a06}
+.deck::-webkit-scrollbar{display:none}
+.stage{width:100vw;min-height:100vh;display:flex;align-items:center;justify-content:center;scroll-snap-align:start;padding:0;background:#0e0a06}
+.slide{width:1600px;height:900px;background:var(--bg);position:relative;overflow:hidden;transform-origin:center;box-shadow:0 40px 90px -30px rgba(0,0,0,0.7);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.08  0 0 0 0.025 0'/%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")}
+.slide.dark{background:var(--dk);color:var(--on)}
+.slide.dark::before{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.03 0'/%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none}
+
+/* ───── Header / Footer bars ───── */
+.hbar{position:absolute;top:0;left:0;right:0;height:52px;background:var(--dk);display:flex;align-items:center;justify-content:space-between;padding:0 80px;z-index:2}
+.hbar-l{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:10.5px;color:#fff;letter-spacing:2.5px;font-weight:600}
+.hbar-l::before{content:"";width:22px;height:8px;background:var(--acc)}
+.hbar-r{font-family:var(--mono);font-size:10.5px;color:#bbb;letter-spacing:1.5px}
+.fbar{position:absolute;bottom:0;left:0;right:0;height:52px;background:#f0e8d8;border-top:3px solid var(--ln);display:flex;align-items:center;justify-content:space-between;padding:0 80px;z-index:2}
+.slide.dark .fbar{background:var(--dk2);border-top-color:var(--acc)}
+.fbar-l,.fbar-r{display:flex;flex-direction:column;gap:2px}
+.fbar-r{align-items:flex-end}
+.fbar-label{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2.5px;font-weight:700}
+.slide.dark .fbar-label{color:var(--acc3)}
+.fbar-title{font-size:13px;color:var(--ink)}
+.slide.dark .fbar-title{color:var(--on)}
+
+/* ───── Headline block ───── */
+.hl{position:absolute;left:80px;right:80px;top:86px}
+.hl-kicker{font-family:var(--mono);font-size:15px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:14px}
+.hl-title{font-family:var(--serif);font-weight:700;font-size:36px;line-height:1.22;letter-spacing:-0.5px;color:var(--ink)}
+.hl-sub{font-size:15.5px;color:var(--ink2);margin-top:12px;line-height:1.6}
+.hl-bar{width:60px;height:3px;background:var(--ink);margin-top:16px}
+.hl-rule{position:absolute;left:80px;right:80px;top:248px;height:1px;background:var(--ln2)}
+
+/* ───── Body grid ───── */
+.bd{position:absolute;left:80px;right:80px;top:264px;bottom:72px;display:grid;gap:1px;background:var(--ln2)}
+.bd.col2{grid-template-columns:1fr 1fr}
+.bd.col2w{grid-template-columns:1.25fr 1fr}
+.bd.col3{grid-template-columns:1fr 1fr 1fr}
+.col{background:var(--bg);padding:30px 34px;display:flex;flex-direction:column;overflow:hidden;min-width:0;gap:14px}
+
+/* ───── Card ───── */
+.card{background:var(--bg);padding:34px 36px;display:flex;flex-direction:column;gap:16px;overflow:hidden;min-width:0}
+.card.dk{background:var(--dk);color:var(--on)}
+.card-k{font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:2.5px;font-weight:700}
+.card.dk .card-k{color:var(--acc3)}
+.card-anchor{font-family:var(--serif);font-size:24px;font-weight:700;line-height:1.25;color:var(--ink);letter-spacing:-0.4px}
+.card.dk .card-anchor{color:var(--on)}
+.card-anchor em{color:var(--acc);font-style:normal}
+.card.dk .card-anchor em{color:var(--acc3)}
+.card-body{font-size:14px;line-height:1.75;color:var(--ink2)}
+.card.dk .card-body{color:var(--on2)}
+.card-body strong{color:var(--ink);font-weight:700}
+.card.dk .card-body strong{color:var(--on)}
+.card-spacer{flex:1;min-height:8px}
+.card-note{font-size:13px;color:var(--ink3);font-style:italic;line-height:1.6}
+.card.dk .card-note{color:var(--on2)}
+
+/* ───── Placeholder marker ───── */
+.ph{border:1.5px dashed var(--ln);background:rgba(184,83,42,0.04);border-radius:4px;padding:18px 22px;color:var(--ink3);font-style:italic;line-height:1.7;font-size:13.5px}
+.ph-tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--acc);font-weight:700;font-style:normal;padding:2px 8px;background:#fff;border:1px solid var(--acc);border-radius:2px;margin-bottom:8px}
+.ph ul{margin-top:8px;padding-left:18px;font-size:13px;color:var(--ink2)}
+.ph ul li{margin-bottom:4px;font-style:normal}
+
+/* ───── Agenda list ───── */
+.agenda{display:flex;flex-direction:column;gap:1px;background:var(--ln2)}
+.agenda-row{display:grid;grid-template-columns:90px 1fr 220px;gap:18px;align-items:center;background:var(--bg);padding:14px 22px}
+.agenda-num{font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:2px;font-weight:700}
+.agenda-h{font-family:var(--serif);font-size:18px;color:var(--ink);font-weight:700;line-height:1.35;letter-spacing:-0.3px}
+.agenda-d{font-size:13px;color:var(--ink2);margin-top:3px;line-height:1.55}
+.agenda-tag{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;text-align:right}
+
+/* ───── Toolbar ───── */
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 20px;background:rgba(14,10,6,0.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08)}
+.toolbar button{background:rgba(255,255,255,0.08);color:#ccc;border:1px solid rgba(255,255,255,0.12);padding:5px 14px;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;cursor:pointer;border-radius:3px;text-transform:uppercase;font-weight:600}
+.toolbar button:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
+.toolbar .pg{color:rgba(255,255,255,0.55);font-size:11px;padding:5px 10px;min-width:80px;text-align:center;font-family:var(--mono);letter-spacing:1px}
+
+@media print{
+  @page{size:423.33mm 237.5mm;margin:0}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  html,body{overflow:visible!important;height:auto!important;background:#fff!important}
+  .deck{overflow:visible!important;height:auto!important;scroll-snap-type:none!important;background:#fff!important}
+  .stage{min-height:0!important;height:auto!important;page-break-after:always;page-break-inside:avoid;padding:0!important;margin:0!important;background:#fff!important;display:block!important}
+  .stage:last-child{page-break-after:avoid}
+  .slide{transform:none!important;box-shadow:none!important;width:1600px!important;height:900px!important}
+  .toolbar{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ═══ COVER ═══ -->
+<div class="stage"><div class="slide" data-title="Cover">
+  <div class="hbar"><div class="hbar-l">SESSION 07 · LECTURE COVER · v2 SKELETON</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07 of 08</div></div>
+
+  <div style="position:absolute;top:140px;right:72px;font-family:var(--serif);font-size:280px;line-height:1;color:var(--acc);font-weight:300;opacity:0.08;letter-spacing:-0.06em;pointer-events:none;font-style:italic">07</div>
+
+  <div style="position:absolute;top:92px;left:80px;display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;color:var(--acc);letter-spacing:3px;font-weight:700">
+    <div style="width:26px;height:2px;background:var(--acc)"></div>
+    PUBLIC AI EXPERT PROGRAM · 2026 · v2
+  </div>
+
+  <div style="position:absolute;top:150px;left:80px;max-width:1200px">
+    <div style="font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:16px">SESSION 07 · 8H · v2 골격</div>
+    <h1 style="font-family:var(--serif);font-weight:700;font-size:58px;line-height:1.06;letter-spacing:-0.04em;color:var(--ink);margin-bottom:18px">풀스택 바이브코딩 심화 I</h1>
+    <div style="width:72px;height:3px;background:var(--ink);margin-bottom:20px"></div>
+    <div style="font-family:var(--serif);font-size:21px;color:var(--ink);font-weight:600;line-height:1.5;letter-spacing:-0.01em">거점 미션 MVP 다듬기 — 운영 가능한 형태로</div>
+    <p style="margin-top:22px;font-size:13.5px;color:var(--ink2);line-height:1.85;max-width:1050px">본 회차의 v2 골격은 <strong style="color:var(--ink)">이론·개념 설명</strong>과 <strong style="color:var(--ink)">실습 시나리오</strong>의 하이브리드 오프라인 강의안 구조를 따른다. 각 PART는 (1) 파트 표지 (2) 이론·개념 (3) 실습 시나리오 세 슬라이드로 구성되며, 본문은 <strong style="color:var(--ink)">강사 작성 영역</strong>으로 비어 있다. 기존 session-07-complete.html은 보존되며 v2는 별도 파일로 운용한다.</p>
+  </div>
+
+  <div style="position:absolute;top:340px;right:80px;width:380px;border-top:2px solid var(--ink);padding-top:18px">
+    <div style="font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:18px">COURSE METADATA</div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13px"><span style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700">PROGRAM</span><span style="color:var(--ink);font-weight:600">AI 챔피언 고급 과정</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13px"><span style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700">SESSION</span><span style="color:var(--ink);font-weight:600">07 / 08 · 8시간</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13px"><span style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700">TARGET</span><span style="color:var(--ink);font-weight:600">공공 거점리더 후보</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13px"><span style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700">FORMAT</span><span style="color:var(--ink);font-weight:600">이론 + 실습 시나리오</span></div>
+    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;font-size:13px"><span style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700">STATUS</span><span style="color:var(--acc);font-weight:700">v2 SKELETON</span></div>
+  </div>
+
+  <div style="position:absolute;bottom:80px;left:80px;right:80px;display:grid;grid-template-columns:repeat(7,1fr);gap:8px">
+    <div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">OPENING</div><div style="font-size:13px;color:var(--ink);font-weight:700;line-height:1.4">6주차 산출물 점검</div></div><div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART 1</div><div style="font-size:13px;color:var(--ink);font-weight:700;line-height:1.4">코딩에이전트 운영 패턴</div></div><div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART 2</div><div style="font-size:13px;color:var(--ink);font-weight:700;line-height:1.4">RAG · 벡터DB 결합</div></div><div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART 3</div><div style="font-size:13px;color:var(--ink);font-weight:700;line-height:1.4">API / MCP 연동 실습</div></div><div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART 4</div><div style="font-size:13px;color:var(--ink);font-weight:700;line-height:1.4">권한 · 로그 · 보안 점검</div></div><div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">PART 5</div><div style="font-size:13px;color:var(--ink);font-weight:700;line-height:1.4">동료 인계용 README</div></div><div style="border-top:2px solid var(--acc);padding-top:10px"><div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:5px">CLOSING</div><div style="font-size:13px;color:var(--ink);font-weight:700;line-height:1.4">다음 주차 발표 준비</div></div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">001 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ AGENDA ═══ -->
+<div class="stage"><div class="slide" data-title="Agenda">
+  <div class="hbar"><div class="hbar-l">AGENDA · 본 회차 흐름</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">AGENDA · 오늘의 8시간을 한 장에</div>
+    <div class="hl-title">목차 — 본 회차의 PART 흐름</div>
+    <div class="hl-sub">각 PART는 (1) 파트 표지 (2) 이론·개념 (3) 실습 시나리오 세 슬라이드로 구성된다. 강사 작성 영역에는 회차 직전에 수강생 수준·현업 이슈를 반영해 본문을 채운다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd" style="grid-template-columns:1fr;gap:0;background:transparent">
+    <div class="agenda" style="overflow:auto"><div class="agenda-row"><div class="agenda-num">01 · OPENING</div><div><div class="agenda-h">6주차 산출물 점검</div><div class="agenda-d">각자 만든 MVP를 짧게 시연한다. 막힌 지점을 모아 이번 주차 학습 메뉴에 반영.</div></div><div class="agenda-tag">3 SLIDES · 이론 / 실습</div></div><div class="agenda-row"><div class="agenda-num">02 · PART 1</div><div><div class="agenda-h">코딩에이전트 운영 패턴</div><div class="agenda-d">Plan → Edit → Verify 루프. 에이전트가 스스로 점검하게 만드는 지시법.</div></div><div class="agenda-tag">3 SLIDES · 이론 / 실습</div></div><div class="agenda-row"><div class="agenda-num">03 · PART 2</div><div><div class="agenda-h">RAG · 벡터DB 결합</div><div class="agenda-d">조례·매뉴얼·내부 문서를 벡터스토어에 넣고 검색·요약 라인으로 쓴다. 공공 도메인의 RAG 패턴.</div></div><div class="agenda-tag">3 SLIDES · 이론 / 실습</div></div><div class="agenda-row"><div class="agenda-num">04 · PART 3</div><div><div class="agenda-h">API / MCP 연동 실습</div><div class="agenda-d">외부 API와 MCP 서버를 붙인다. 거점 미션을 다른 시스템과 연결하는 표준 인터페이스.</div></div><div class="agenda-tag">3 SLIDES · 이론 / 실습</div></div><div class="agenda-row"><div class="agenda-num">05 · PART 4</div><div><div class="agenda-h">권한 · 로그 · 보안 점검</div><div class="agenda-d">공공 운영의 기본기. 누가 무엇을 했는지 남기고, 누가 무엇을 볼 수 있는지 분리한다.</div></div><div class="agenda-tag">3 SLIDES · 이론 / 실습</div></div><div class="agenda-row"><div class="agenda-num">06 · PART 5</div><div><div class="agenda-h">동료 인계용 README</div><div class="agenda-d">산출물 4종(프롬프트.md / 도구체인 README / 결과물 / 1페이지 가이드)의 1페이지 가이드 작성법.</div></div><div class="agenda-tag">3 SLIDES · 이론 / 실습</div></div><div class="agenda-row"><div class="agenda-num">07 · CLOSING</div><div><div class="agenda-h">다음 주차 발표 준비</div><div class="agenda-d">8주차 종강 발표용 5~7분 데모 시나리오를 잡는다. 어시스트·에이전트 두 결과물의 비교 포인트.</div></div><div class="agenda-tag">3 SLIDES · 이론 / 실습</div></div></div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">002 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 01 DIVIDER ═══ -->
+<div class="stage"><div class="slide dark" data-title="P1 Divider">
+  <div class="hbar"><div class="hbar-l">OPENING · 파트 표지 · 01 of 07</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+
+  <div style="position:absolute;top:160px;left:80px;right:80px">
+    <div style="font-family:var(--mono);font-size:13px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:24px">PART 01 · OPENING</div>
+    <h2 style="font-family:var(--serif);font-weight:700;font-size:72px;line-height:1.08;letter-spacing:-0.04em;color:var(--on);margin-bottom:28px">6주차 산출물 점검</h2>
+    <div style="width:120px;height:3px;background:var(--acc);margin-bottom:32px"></div>
+    <p style="font-size:18px;color:var(--on2);line-height:1.7;max-width:1100px">각자 만든 MVP를 짧게 시연한다. 막힌 지점을 모아 이번 주차 학습 메뉴에 반영.</p>
+  </div>
+
+  <div style="position:absolute;bottom:120px;left:80px;right:80px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE A · THEORY</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">이론 · 개념 설명</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">왜 이 도구·기법을 다루는가, 핵심 개념과 작동 원리를 한 장으로 정리.</div>
+    </div>
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE B · PRACTICE</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">실습 시나리오</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">수강생이 직접 손을 움직이는 실습. 입력·과정·산출물을 명시.</div>
+    </div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">003 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 01 · THEORY ═══ -->
+<div class="stage"><div class="slide" data-title="P1 Theory">
+  <div class="hbar"><div class="hbar-l">OPENING · 이론 · 개념</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 01 · THEORY · 이론 · 개념</div>
+    <div class="hl-title">6주차 산출물 점검 — 핵심 개념과 작동 원리</div>
+    <div class="hl-sub">각자 만든 MVP를 짧게 시연한다. 막힌 지점을 모아 이번 주차 학습 메뉴에 반영.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="card">
+      <div class="card-k">CONCEPT · 핵심 개념</div>
+      <div class="card-anchor"><em>6주차 산출물 점검</em>의 핵심 한 줄</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        이 도구·기법이 무엇이고 왜 다루는가를 1~2문단으로 정리.
+        <ul>
+          <li>핵심 정의 한 줄</li>
+          <li>왜 이 자리에 들어가는가 (앞 PART와의 연결)</li>
+          <li>거점리더가 알아야 할 최소 원리</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수강생 수준에 맞춰 1) 비유 1개 2) 1문장 정의 3) 시각 자료 1개로 압축한다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">MECHANICS · 작동 원리</div>
+      <div class="card-anchor"><em>이렇게</em> 동작한다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        도구 또는 기법의 작동 원리·구성요소·데이터 흐름을 한 장으로 정리.
+        <ul style="color:var(--on2)">
+          <li>구성요소 3~5개</li>
+          <li>입력 → 처리 → 출력 흐름</li>
+          <li>거점리더가 자주 만날 함정 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수식·코드는 최소화. 박스·화살표 다이어그램으로 한 장 안에 끝낸다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">004 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 01 · PRACTICE ═══ -->
+<div class="stage"><div class="slide" data-title="P1 Practice">
+  <div class="hbar"><div class="hbar-l">OPENING · 실습 시나리오</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 01 · PRACTICE · 실습 시나리오</div>
+    <div class="hl-title">6주차 산출물 점검 — 손을 움직이는 시간</div>
+    <div class="hl-sub">이 슬라이드는 수강생이 직접 따라하거나 도전하는 실습 단위 한 장. 입력·과정·산출물·검증 기준을 명시한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">SCENARIO · 시나리오</div>
+      <div class="card-anchor"><em>오늘 만들 것</em>을 한 줄로</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        실습 미션을 1문장으로 정의. 누가, 무엇을, 어디까지 만드는가.
+        <ul>
+          <li>대상 사용자(거점리더 자신/동료/시민)</li>
+          <li>입력 데이터·자료</li>
+          <li>완성 기준 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — '만들 산출물 파일 형식'이 정해져야 시간 계산이 가능하다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">STEPS · 손길 단계</div>
+      <div class="card-anchor"><em>3~5단계</em>로 끊어 쓴다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        실제 손길 단계 3~5개. 각 단계는 한 줄로 끊는다.
+        <ul style="color:var(--on2)">
+          <li>STEP 1 — 입력 준비</li>
+          <li>STEP 2 — 도구 호출 / 프롬프트</li>
+          <li>STEP 3 — 결과 검증</li>
+          <li>STEP 4 — 정리 / 공유</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 쉬는 시간 빼고 25~40분 안에 끝나는 단위.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">CHECK · 검증 / 산출물</div>
+      <div class="card-anchor"><em>어디까지 되면</em> 통과인가</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        통과 기준과 산출물 위치를 명시.
+        <ul>
+          <li>완성 기준(예: 동료가 같은 입력으로 같은 결과)</li>
+          <li>산출물 저장 위치(공용 폴더/GitHub Org)</li>
+          <li>흔한 실패 패턴 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 통과 기준이 1줄로 안 적히면 실습이 흐릿해진다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">005 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 02 DIVIDER ═══ -->
+<div class="stage"><div class="slide dark" data-title="P2 Divider">
+  <div class="hbar"><div class="hbar-l">PART 1 · 파트 표지 · 02 of 07</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+
+  <div style="position:absolute;top:160px;left:80px;right:80px">
+    <div style="font-family:var(--mono);font-size:13px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:24px">PART 02 · PART 1</div>
+    <h2 style="font-family:var(--serif);font-weight:700;font-size:72px;line-height:1.08;letter-spacing:-0.04em;color:var(--on);margin-bottom:28px">코딩에이전트 운영 패턴</h2>
+    <div style="width:120px;height:3px;background:var(--acc);margin-bottom:32px"></div>
+    <p style="font-size:18px;color:var(--on2);line-height:1.7;max-width:1100px">Plan → Edit → Verify 루프. 에이전트가 스스로 점검하게 만드는 지시법.</p>
+  </div>
+
+  <div style="position:absolute;bottom:120px;left:80px;right:80px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE A · THEORY</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">이론 · 개념 설명</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">왜 이 도구·기법을 다루는가, 핵심 개념과 작동 원리를 한 장으로 정리.</div>
+    </div>
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE B · PRACTICE</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">실습 시나리오</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">수강생이 직접 손을 움직이는 실습. 입력·과정·산출물을 명시.</div>
+    </div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">006 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 02 · THEORY ═══ -->
+<div class="stage"><div class="slide" data-title="P2 Theory">
+  <div class="hbar"><div class="hbar-l">PART 1 · 이론 · 개념</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 02 · THEORY · 이론 · 개념</div>
+    <div class="hl-title">코딩에이전트 운영 패턴 — 핵심 개념과 작동 원리</div>
+    <div class="hl-sub">Plan → Edit → Verify 루프. 에이전트가 스스로 점검하게 만드는 지시법.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="card">
+      <div class="card-k">CONCEPT · 핵심 개념</div>
+      <div class="card-anchor"><em>코딩에이전트 운영 패턴</em>의 핵심 한 줄</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        이 도구·기법이 무엇이고 왜 다루는가를 1~2문단으로 정리.
+        <ul>
+          <li>핵심 정의 한 줄</li>
+          <li>왜 이 자리에 들어가는가 (앞 PART와의 연결)</li>
+          <li>거점리더가 알아야 할 최소 원리</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수강생 수준에 맞춰 1) 비유 1개 2) 1문장 정의 3) 시각 자료 1개로 압축한다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">MECHANICS · 작동 원리</div>
+      <div class="card-anchor"><em>이렇게</em> 동작한다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        도구 또는 기법의 작동 원리·구성요소·데이터 흐름을 한 장으로 정리.
+        <ul style="color:var(--on2)">
+          <li>구성요소 3~5개</li>
+          <li>입력 → 처리 → 출력 흐름</li>
+          <li>거점리더가 자주 만날 함정 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수식·코드는 최소화. 박스·화살표 다이어그램으로 한 장 안에 끝낸다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">007 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 02 · PRACTICE ═══ -->
+<div class="stage"><div class="slide" data-title="P2 Practice">
+  <div class="hbar"><div class="hbar-l">PART 1 · 실습 시나리오</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 02 · PRACTICE · 실습 시나리오</div>
+    <div class="hl-title">코딩에이전트 운영 패턴 — 손을 움직이는 시간</div>
+    <div class="hl-sub">이 슬라이드는 수강생이 직접 따라하거나 도전하는 실습 단위 한 장. 입력·과정·산출물·검증 기준을 명시한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">SCENARIO · 시나리오</div>
+      <div class="card-anchor"><em>오늘 만들 것</em>을 한 줄로</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        실습 미션을 1문장으로 정의. 누가, 무엇을, 어디까지 만드는가.
+        <ul>
+          <li>대상 사용자(거점리더 자신/동료/시민)</li>
+          <li>입력 데이터·자료</li>
+          <li>완성 기준 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — '만들 산출물 파일 형식'이 정해져야 시간 계산이 가능하다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">STEPS · 손길 단계</div>
+      <div class="card-anchor"><em>3~5단계</em>로 끊어 쓴다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        실제 손길 단계 3~5개. 각 단계는 한 줄로 끊는다.
+        <ul style="color:var(--on2)">
+          <li>STEP 1 — 입력 준비</li>
+          <li>STEP 2 — 도구 호출 / 프롬프트</li>
+          <li>STEP 3 — 결과 검증</li>
+          <li>STEP 4 — 정리 / 공유</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 쉬는 시간 빼고 25~40분 안에 끝나는 단위.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">CHECK · 검증 / 산출물</div>
+      <div class="card-anchor"><em>어디까지 되면</em> 통과인가</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        통과 기준과 산출물 위치를 명시.
+        <ul>
+          <li>완성 기준(예: 동료가 같은 입력으로 같은 결과)</li>
+          <li>산출물 저장 위치(공용 폴더/GitHub Org)</li>
+          <li>흔한 실패 패턴 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 통과 기준이 1줄로 안 적히면 실습이 흐릿해진다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">008 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 03 DIVIDER ═══ -->
+<div class="stage"><div class="slide dark" data-title="P3 Divider">
+  <div class="hbar"><div class="hbar-l">PART 2 · 파트 표지 · 03 of 07</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+
+  <div style="position:absolute;top:160px;left:80px;right:80px">
+    <div style="font-family:var(--mono);font-size:13px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:24px">PART 03 · PART 2</div>
+    <h2 style="font-family:var(--serif);font-weight:700;font-size:72px;line-height:1.08;letter-spacing:-0.04em;color:var(--on);margin-bottom:28px">RAG · 벡터DB 결합</h2>
+    <div style="width:120px;height:3px;background:var(--acc);margin-bottom:32px"></div>
+    <p style="font-size:18px;color:var(--on2);line-height:1.7;max-width:1100px">조례·매뉴얼·내부 문서를 벡터스토어에 넣고 검색·요약 라인으로 쓴다. 공공 도메인의 RAG 패턴.</p>
+  </div>
+
+  <div style="position:absolute;bottom:120px;left:80px;right:80px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE A · THEORY</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">이론 · 개념 설명</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">왜 이 도구·기법을 다루는가, 핵심 개념과 작동 원리를 한 장으로 정리.</div>
+    </div>
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE B · PRACTICE</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">실습 시나리오</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">수강생이 직접 손을 움직이는 실습. 입력·과정·산출물을 명시.</div>
+    </div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">009 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 03 · THEORY ═══ -->
+<div class="stage"><div class="slide" data-title="P3 Theory">
+  <div class="hbar"><div class="hbar-l">PART 2 · 이론 · 개념</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 03 · THEORY · 이론 · 개념</div>
+    <div class="hl-title">RAG · 벡터DB 결합 — 핵심 개념과 작동 원리</div>
+    <div class="hl-sub">조례·매뉴얼·내부 문서를 벡터스토어에 넣고 검색·요약 라인으로 쓴다. 공공 도메인의 RAG 패턴.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="card">
+      <div class="card-k">CONCEPT · 핵심 개념</div>
+      <div class="card-anchor"><em>RAG · 벡터DB 결합</em>의 핵심 한 줄</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        이 도구·기법이 무엇이고 왜 다루는가를 1~2문단으로 정리.
+        <ul>
+          <li>핵심 정의 한 줄</li>
+          <li>왜 이 자리에 들어가는가 (앞 PART와의 연결)</li>
+          <li>거점리더가 알아야 할 최소 원리</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수강생 수준에 맞춰 1) 비유 1개 2) 1문장 정의 3) 시각 자료 1개로 압축한다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">MECHANICS · 작동 원리</div>
+      <div class="card-anchor"><em>이렇게</em> 동작한다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        도구 또는 기법의 작동 원리·구성요소·데이터 흐름을 한 장으로 정리.
+        <ul style="color:var(--on2)">
+          <li>구성요소 3~5개</li>
+          <li>입력 → 처리 → 출력 흐름</li>
+          <li>거점리더가 자주 만날 함정 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수식·코드는 최소화. 박스·화살표 다이어그램으로 한 장 안에 끝낸다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">010 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 03 · PRACTICE ═══ -->
+<div class="stage"><div class="slide" data-title="P3 Practice">
+  <div class="hbar"><div class="hbar-l">PART 2 · 실습 시나리오</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 03 · PRACTICE · 실습 시나리오</div>
+    <div class="hl-title">RAG · 벡터DB 결합 — 손을 움직이는 시간</div>
+    <div class="hl-sub">이 슬라이드는 수강생이 직접 따라하거나 도전하는 실습 단위 한 장. 입력·과정·산출물·검증 기준을 명시한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">SCENARIO · 시나리오</div>
+      <div class="card-anchor"><em>오늘 만들 것</em>을 한 줄로</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        실습 미션을 1문장으로 정의. 누가, 무엇을, 어디까지 만드는가.
+        <ul>
+          <li>대상 사용자(거점리더 자신/동료/시민)</li>
+          <li>입력 데이터·자료</li>
+          <li>완성 기준 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — '만들 산출물 파일 형식'이 정해져야 시간 계산이 가능하다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">STEPS · 손길 단계</div>
+      <div class="card-anchor"><em>3~5단계</em>로 끊어 쓴다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        실제 손길 단계 3~5개. 각 단계는 한 줄로 끊는다.
+        <ul style="color:var(--on2)">
+          <li>STEP 1 — 입력 준비</li>
+          <li>STEP 2 — 도구 호출 / 프롬프트</li>
+          <li>STEP 3 — 결과 검증</li>
+          <li>STEP 4 — 정리 / 공유</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 쉬는 시간 빼고 25~40분 안에 끝나는 단위.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">CHECK · 검증 / 산출물</div>
+      <div class="card-anchor"><em>어디까지 되면</em> 통과인가</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        통과 기준과 산출물 위치를 명시.
+        <ul>
+          <li>완성 기준(예: 동료가 같은 입력으로 같은 결과)</li>
+          <li>산출물 저장 위치(공용 폴더/GitHub Org)</li>
+          <li>흔한 실패 패턴 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 통과 기준이 1줄로 안 적히면 실습이 흐릿해진다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">011 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 04 DIVIDER ═══ -->
+<div class="stage"><div class="slide dark" data-title="P4 Divider">
+  <div class="hbar"><div class="hbar-l">PART 3 · 파트 표지 · 04 of 07</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+
+  <div style="position:absolute;top:160px;left:80px;right:80px">
+    <div style="font-family:var(--mono);font-size:13px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:24px">PART 04 · PART 3</div>
+    <h2 style="font-family:var(--serif);font-weight:700;font-size:72px;line-height:1.08;letter-spacing:-0.04em;color:var(--on);margin-bottom:28px">API / MCP 연동 실습</h2>
+    <div style="width:120px;height:3px;background:var(--acc);margin-bottom:32px"></div>
+    <p style="font-size:18px;color:var(--on2);line-height:1.7;max-width:1100px">외부 API와 MCP 서버를 붙인다. 거점 미션을 다른 시스템과 연결하는 표준 인터페이스.</p>
+  </div>
+
+  <div style="position:absolute;bottom:120px;left:80px;right:80px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE A · THEORY</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">이론 · 개념 설명</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">왜 이 도구·기법을 다루는가, 핵심 개념과 작동 원리를 한 장으로 정리.</div>
+    </div>
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE B · PRACTICE</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">실습 시나리오</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">수강생이 직접 손을 움직이는 실습. 입력·과정·산출물을 명시.</div>
+    </div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">012 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 04 · THEORY ═══ -->
+<div class="stage"><div class="slide" data-title="P4 Theory">
+  <div class="hbar"><div class="hbar-l">PART 3 · 이론 · 개념</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 04 · THEORY · 이론 · 개념</div>
+    <div class="hl-title">API / MCP 연동 실습 — 핵심 개념과 작동 원리</div>
+    <div class="hl-sub">외부 API와 MCP 서버를 붙인다. 거점 미션을 다른 시스템과 연결하는 표준 인터페이스.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="card">
+      <div class="card-k">CONCEPT · 핵심 개념</div>
+      <div class="card-anchor"><em>API / MCP 연동 실습</em>의 핵심 한 줄</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        이 도구·기법이 무엇이고 왜 다루는가를 1~2문단으로 정리.
+        <ul>
+          <li>핵심 정의 한 줄</li>
+          <li>왜 이 자리에 들어가는가 (앞 PART와의 연결)</li>
+          <li>거점리더가 알아야 할 최소 원리</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수강생 수준에 맞춰 1) 비유 1개 2) 1문장 정의 3) 시각 자료 1개로 압축한다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">MECHANICS · 작동 원리</div>
+      <div class="card-anchor"><em>이렇게</em> 동작한다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        도구 또는 기법의 작동 원리·구성요소·데이터 흐름을 한 장으로 정리.
+        <ul style="color:var(--on2)">
+          <li>구성요소 3~5개</li>
+          <li>입력 → 처리 → 출력 흐름</li>
+          <li>거점리더가 자주 만날 함정 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수식·코드는 최소화. 박스·화살표 다이어그램으로 한 장 안에 끝낸다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">013 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 04 · PRACTICE ═══ -->
+<div class="stage"><div class="slide" data-title="P4 Practice">
+  <div class="hbar"><div class="hbar-l">PART 3 · 실습 시나리오</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 04 · PRACTICE · 실습 시나리오</div>
+    <div class="hl-title">API / MCP 연동 실습 — 손을 움직이는 시간</div>
+    <div class="hl-sub">이 슬라이드는 수강생이 직접 따라하거나 도전하는 실습 단위 한 장. 입력·과정·산출물·검증 기준을 명시한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">SCENARIO · 시나리오</div>
+      <div class="card-anchor"><em>오늘 만들 것</em>을 한 줄로</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        실습 미션을 1문장으로 정의. 누가, 무엇을, 어디까지 만드는가.
+        <ul>
+          <li>대상 사용자(거점리더 자신/동료/시민)</li>
+          <li>입력 데이터·자료</li>
+          <li>완성 기준 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — '만들 산출물 파일 형식'이 정해져야 시간 계산이 가능하다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">STEPS · 손길 단계</div>
+      <div class="card-anchor"><em>3~5단계</em>로 끊어 쓴다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        실제 손길 단계 3~5개. 각 단계는 한 줄로 끊는다.
+        <ul style="color:var(--on2)">
+          <li>STEP 1 — 입력 준비</li>
+          <li>STEP 2 — 도구 호출 / 프롬프트</li>
+          <li>STEP 3 — 결과 검증</li>
+          <li>STEP 4 — 정리 / 공유</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 쉬는 시간 빼고 25~40분 안에 끝나는 단위.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">CHECK · 검증 / 산출물</div>
+      <div class="card-anchor"><em>어디까지 되면</em> 통과인가</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        통과 기준과 산출물 위치를 명시.
+        <ul>
+          <li>완성 기준(예: 동료가 같은 입력으로 같은 결과)</li>
+          <li>산출물 저장 위치(공용 폴더/GitHub Org)</li>
+          <li>흔한 실패 패턴 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 통과 기준이 1줄로 안 적히면 실습이 흐릿해진다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">014 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 05 DIVIDER ═══ -->
+<div class="stage"><div class="slide dark" data-title="P5 Divider">
+  <div class="hbar"><div class="hbar-l">PART 4 · 파트 표지 · 05 of 07</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+
+  <div style="position:absolute;top:160px;left:80px;right:80px">
+    <div style="font-family:var(--mono);font-size:13px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:24px">PART 05 · PART 4</div>
+    <h2 style="font-family:var(--serif);font-weight:700;font-size:72px;line-height:1.08;letter-spacing:-0.04em;color:var(--on);margin-bottom:28px">권한 · 로그 · 보안 점검</h2>
+    <div style="width:120px;height:3px;background:var(--acc);margin-bottom:32px"></div>
+    <p style="font-size:18px;color:var(--on2);line-height:1.7;max-width:1100px">공공 운영의 기본기. 누가 무엇을 했는지 남기고, 누가 무엇을 볼 수 있는지 분리한다.</p>
+  </div>
+
+  <div style="position:absolute;bottom:120px;left:80px;right:80px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE A · THEORY</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">이론 · 개념 설명</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">왜 이 도구·기법을 다루는가, 핵심 개념과 작동 원리를 한 장으로 정리.</div>
+    </div>
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE B · PRACTICE</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">실습 시나리오</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">수강생이 직접 손을 움직이는 실습. 입력·과정·산출물을 명시.</div>
+    </div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">015 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 05 · THEORY ═══ -->
+<div class="stage"><div class="slide" data-title="P5 Theory">
+  <div class="hbar"><div class="hbar-l">PART 4 · 이론 · 개념</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 05 · THEORY · 이론 · 개념</div>
+    <div class="hl-title">권한 · 로그 · 보안 점검 — 핵심 개념과 작동 원리</div>
+    <div class="hl-sub">공공 운영의 기본기. 누가 무엇을 했는지 남기고, 누가 무엇을 볼 수 있는지 분리한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="card">
+      <div class="card-k">CONCEPT · 핵심 개념</div>
+      <div class="card-anchor"><em>권한 · 로그 · 보안 점검</em>의 핵심 한 줄</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        이 도구·기법이 무엇이고 왜 다루는가를 1~2문단으로 정리.
+        <ul>
+          <li>핵심 정의 한 줄</li>
+          <li>왜 이 자리에 들어가는가 (앞 PART와의 연결)</li>
+          <li>거점리더가 알아야 할 최소 원리</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수강생 수준에 맞춰 1) 비유 1개 2) 1문장 정의 3) 시각 자료 1개로 압축한다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">MECHANICS · 작동 원리</div>
+      <div class="card-anchor"><em>이렇게</em> 동작한다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        도구 또는 기법의 작동 원리·구성요소·데이터 흐름을 한 장으로 정리.
+        <ul style="color:var(--on2)">
+          <li>구성요소 3~5개</li>
+          <li>입력 → 처리 → 출력 흐름</li>
+          <li>거점리더가 자주 만날 함정 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수식·코드는 최소화. 박스·화살표 다이어그램으로 한 장 안에 끝낸다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">016 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 05 · PRACTICE ═══ -->
+<div class="stage"><div class="slide" data-title="P5 Practice">
+  <div class="hbar"><div class="hbar-l">PART 4 · 실습 시나리오</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 05 · PRACTICE · 실습 시나리오</div>
+    <div class="hl-title">권한 · 로그 · 보안 점검 — 손을 움직이는 시간</div>
+    <div class="hl-sub">이 슬라이드는 수강생이 직접 따라하거나 도전하는 실습 단위 한 장. 입력·과정·산출물·검증 기준을 명시한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">SCENARIO · 시나리오</div>
+      <div class="card-anchor"><em>오늘 만들 것</em>을 한 줄로</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        실습 미션을 1문장으로 정의. 누가, 무엇을, 어디까지 만드는가.
+        <ul>
+          <li>대상 사용자(거점리더 자신/동료/시민)</li>
+          <li>입력 데이터·자료</li>
+          <li>완성 기준 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — '만들 산출물 파일 형식'이 정해져야 시간 계산이 가능하다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">STEPS · 손길 단계</div>
+      <div class="card-anchor"><em>3~5단계</em>로 끊어 쓴다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        실제 손길 단계 3~5개. 각 단계는 한 줄로 끊는다.
+        <ul style="color:var(--on2)">
+          <li>STEP 1 — 입력 준비</li>
+          <li>STEP 2 — 도구 호출 / 프롬프트</li>
+          <li>STEP 3 — 결과 검증</li>
+          <li>STEP 4 — 정리 / 공유</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 쉬는 시간 빼고 25~40분 안에 끝나는 단위.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">CHECK · 검증 / 산출물</div>
+      <div class="card-anchor"><em>어디까지 되면</em> 통과인가</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        통과 기준과 산출물 위치를 명시.
+        <ul>
+          <li>완성 기준(예: 동료가 같은 입력으로 같은 결과)</li>
+          <li>산출물 저장 위치(공용 폴더/GitHub Org)</li>
+          <li>흔한 실패 패턴 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 통과 기준이 1줄로 안 적히면 실습이 흐릿해진다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">017 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 06 DIVIDER ═══ -->
+<div class="stage"><div class="slide dark" data-title="P6 Divider">
+  <div class="hbar"><div class="hbar-l">PART 5 · 파트 표지 · 06 of 07</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+
+  <div style="position:absolute;top:160px;left:80px;right:80px">
+    <div style="font-family:var(--mono);font-size:13px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:24px">PART 06 · PART 5</div>
+    <h2 style="font-family:var(--serif);font-weight:700;font-size:72px;line-height:1.08;letter-spacing:-0.04em;color:var(--on);margin-bottom:28px">동료 인계용 README</h2>
+    <div style="width:120px;height:3px;background:var(--acc);margin-bottom:32px"></div>
+    <p style="font-size:18px;color:var(--on2);line-height:1.7;max-width:1100px">산출물 4종(프롬프트.md / 도구체인 README / 결과물 / 1페이지 가이드)의 1페이지 가이드 작성법.</p>
+  </div>
+
+  <div style="position:absolute;bottom:120px;left:80px;right:80px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE A · THEORY</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">이론 · 개념 설명</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">왜 이 도구·기법을 다루는가, 핵심 개념과 작동 원리를 한 장으로 정리.</div>
+    </div>
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE B · PRACTICE</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">실습 시나리오</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">수강생이 직접 손을 움직이는 실습. 입력·과정·산출물을 명시.</div>
+    </div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">018 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 06 · THEORY ═══ -->
+<div class="stage"><div class="slide" data-title="P6 Theory">
+  <div class="hbar"><div class="hbar-l">PART 5 · 이론 · 개념</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 06 · THEORY · 이론 · 개념</div>
+    <div class="hl-title">동료 인계용 README — 핵심 개념과 작동 원리</div>
+    <div class="hl-sub">산출물 4종(프롬프트.md / 도구체인 README / 결과물 / 1페이지 가이드)의 1페이지 가이드 작성법.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="card">
+      <div class="card-k">CONCEPT · 핵심 개념</div>
+      <div class="card-anchor"><em>동료 인계용 README</em>의 핵심 한 줄</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        이 도구·기법이 무엇이고 왜 다루는가를 1~2문단으로 정리.
+        <ul>
+          <li>핵심 정의 한 줄</li>
+          <li>왜 이 자리에 들어가는가 (앞 PART와의 연결)</li>
+          <li>거점리더가 알아야 할 최소 원리</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수강생 수준에 맞춰 1) 비유 1개 2) 1문장 정의 3) 시각 자료 1개로 압축한다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">MECHANICS · 작동 원리</div>
+      <div class="card-anchor"><em>이렇게</em> 동작한다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        도구 또는 기법의 작동 원리·구성요소·데이터 흐름을 한 장으로 정리.
+        <ul style="color:var(--on2)">
+          <li>구성요소 3~5개</li>
+          <li>입력 → 처리 → 출력 흐름</li>
+          <li>거점리더가 자주 만날 함정 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수식·코드는 최소화. 박스·화살표 다이어그램으로 한 장 안에 끝낸다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">019 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 06 · PRACTICE ═══ -->
+<div class="stage"><div class="slide" data-title="P6 Practice">
+  <div class="hbar"><div class="hbar-l">PART 5 · 실습 시나리오</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 06 · PRACTICE · 실습 시나리오</div>
+    <div class="hl-title">동료 인계용 README — 손을 움직이는 시간</div>
+    <div class="hl-sub">이 슬라이드는 수강생이 직접 따라하거나 도전하는 실습 단위 한 장. 입력·과정·산출물·검증 기준을 명시한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">SCENARIO · 시나리오</div>
+      <div class="card-anchor"><em>오늘 만들 것</em>을 한 줄로</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        실습 미션을 1문장으로 정의. 누가, 무엇을, 어디까지 만드는가.
+        <ul>
+          <li>대상 사용자(거점리더 자신/동료/시민)</li>
+          <li>입력 데이터·자료</li>
+          <li>완성 기준 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — '만들 산출물 파일 형식'이 정해져야 시간 계산이 가능하다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">STEPS · 손길 단계</div>
+      <div class="card-anchor"><em>3~5단계</em>로 끊어 쓴다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        실제 손길 단계 3~5개. 각 단계는 한 줄로 끊는다.
+        <ul style="color:var(--on2)">
+          <li>STEP 1 — 입력 준비</li>
+          <li>STEP 2 — 도구 호출 / 프롬프트</li>
+          <li>STEP 3 — 결과 검증</li>
+          <li>STEP 4 — 정리 / 공유</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 쉬는 시간 빼고 25~40분 안에 끝나는 단위.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">CHECK · 검증 / 산출물</div>
+      <div class="card-anchor"><em>어디까지 되면</em> 통과인가</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        통과 기준과 산출물 위치를 명시.
+        <ul>
+          <li>완성 기준(예: 동료가 같은 입력으로 같은 결과)</li>
+          <li>산출물 저장 위치(공용 폴더/GitHub Org)</li>
+          <li>흔한 실패 패턴 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 통과 기준이 1줄로 안 적히면 실습이 흐릿해진다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">020 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 07 DIVIDER ═══ -->
+<div class="stage"><div class="slide dark" data-title="P7 Divider">
+  <div class="hbar"><div class="hbar-l">CLOSING · 파트 표지 · 07 of 07</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+
+  <div style="position:absolute;top:160px;left:80px;right:80px">
+    <div style="font-family:var(--mono);font-size:13px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:24px">PART 07 · CLOSING</div>
+    <h2 style="font-family:var(--serif);font-weight:700;font-size:72px;line-height:1.08;letter-spacing:-0.04em;color:var(--on);margin-bottom:28px">다음 주차 발표 준비</h2>
+    <div style="width:120px;height:3px;background:var(--acc);margin-bottom:32px"></div>
+    <p style="font-size:18px;color:var(--on2);line-height:1.7;max-width:1100px">8주차 종강 발표용 5~7분 데모 시나리오를 잡는다. 어시스트·에이전트 두 결과물의 비교 포인트.</p>
+  </div>
+
+  <div style="position:absolute;bottom:120px;left:80px;right:80px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE A · THEORY</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">이론 · 개념 설명</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">왜 이 도구·기법을 다루는가, 핵심 개념과 작동 원리를 한 장으로 정리.</div>
+    </div>
+    <div style="border-left:3px solid var(--acc3);padding:16px 22px;background:rgba(255,255,255,0.04)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:8px">SLIDE B · PRACTICE</div>
+      <div style="color:var(--on);font-size:15px;line-height:1.6;font-weight:600">실습 시나리오</div>
+      <div style="color:var(--on2);font-size:13px;line-height:1.65;margin-top:6px">수강생이 직접 손을 움직이는 실습. 입력·과정·산출물을 명시.</div>
+    </div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">021 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 07 · THEORY ═══ -->
+<div class="stage"><div class="slide" data-title="P7 Theory">
+  <div class="hbar"><div class="hbar-l">CLOSING · 이론 · 개념</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 07 · THEORY · 이론 · 개념</div>
+    <div class="hl-title">다음 주차 발표 준비 — 핵심 개념과 작동 원리</div>
+    <div class="hl-sub">8주차 종강 발표용 5~7분 데모 시나리오를 잡는다. 어시스트·에이전트 두 결과물의 비교 포인트.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col2w">
+    <div class="card">
+      <div class="card-k">CONCEPT · 핵심 개념</div>
+      <div class="card-anchor"><em>다음 주차 발표 준비</em>의 핵심 한 줄</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        이 도구·기법이 무엇이고 왜 다루는가를 1~2문단으로 정리.
+        <ul>
+          <li>핵심 정의 한 줄</li>
+          <li>왜 이 자리에 들어가는가 (앞 PART와의 연결)</li>
+          <li>거점리더가 알아야 할 최소 원리</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수강생 수준에 맞춰 1) 비유 1개 2) 1문장 정의 3) 시각 자료 1개로 압축한다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">MECHANICS · 작동 원리</div>
+      <div class="card-anchor"><em>이렇게</em> 동작한다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        도구 또는 기법의 작동 원리·구성요소·데이터 흐름을 한 장으로 정리.
+        <ul style="color:var(--on2)">
+          <li>구성요소 3~5개</li>
+          <li>입력 → 처리 → 출력 흐름</li>
+          <li>거점리더가 자주 만날 함정 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 수식·코드는 최소화. 박스·화살표 다이어그램으로 한 장 안에 끝낸다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">022 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ PART 07 · PRACTICE ═══ -->
+<div class="stage"><div class="slide" data-title="P7 Practice">
+  <div class="hbar"><div class="hbar-l">CLOSING · 실습 시나리오</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+  <div class="hl">
+    <div class="hl-kicker">PART 07 · PRACTICE · 실습 시나리오</div>
+    <div class="hl-title">다음 주차 발표 준비 — 손을 움직이는 시간</div>
+    <div class="hl-sub">이 슬라이드는 수강생이 직접 따라하거나 도전하는 실습 단위 한 장. 입력·과정·산출물·검증 기준을 명시한다.</div>
+    <div class="hl-bar"></div>
+  </div>
+  <div class="hl-rule"></div>
+  <div class="bd col3">
+    <div class="card">
+      <div class="card-k">SCENARIO · 시나리오</div>
+      <div class="card-anchor"><em>오늘 만들 것</em>을 한 줄로</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        실습 미션을 1문장으로 정의. 누가, 무엇을, 어디까지 만드는가.
+        <ul>
+          <li>대상 사용자(거점리더 자신/동료/시민)</li>
+          <li>입력 데이터·자료</li>
+          <li>완성 기준 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — '만들 산출물 파일 형식'이 정해져야 시간 계산이 가능하다.</div>
+    </div>
+    <div class="card dk">
+      <div class="card-k">STEPS · 손길 단계</div>
+      <div class="card-anchor"><em>3~5단계</em>로 끊어 쓴다</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        실제 손길 단계 3~5개. 각 단계는 한 줄로 끊는다.
+        <ul style="color:var(--on2)">
+          <li>STEP 1 — 입력 준비</li>
+          <li>STEP 2 — 도구 호출 / 프롬프트</li>
+          <li>STEP 3 — 결과 검증</li>
+          <li>STEP 4 — 정리 / 공유</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 쉬는 시간 빼고 25~40분 안에 끝나는 단위.</div>
+    </div>
+    <div class="card">
+      <div class="card-k">CHECK · 검증 / 산출물</div>
+      <div class="card-anchor"><em>어디까지 되면</em> 통과인가</div>
+      <div class="ph">
+        <span class="ph-tag">강사 작성 영역</span>
+        통과 기준과 산출물 위치를 명시.
+        <ul>
+          <li>완성 기준(예: 동료가 같은 입력으로 같은 결과)</li>
+          <li>산출물 저장 위치(공용 폴더/GitHub Org)</li>
+          <li>흔한 실패 패턴 1~2개</li>
+        </ul>
+      </div>
+      <div class="card-spacer"></div>
+      <div class="card-note">팁 — 통과 기준이 1줄로 안 적히면 실습이 흐릿해진다.</div>
+    </div>
+  </div>
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">023 / 024</span></div></div>
+</div></div>
+
+<!-- ═══ CLOSING ═══ -->
+<div class="stage"><div class="slide dark" data-title="Closing">
+  <div class="hbar"><div class="hbar-l">CLOSING · 마무리</div><div class="hbar-r">AI 챔피언 고급 과정 · Session 07</div></div>
+
+  <div style="position:absolute;top:140px;left:80px;right:80px">
+    <div style="font-family:var(--mono);font-size:13px;color:var(--acc3);letter-spacing:3px;font-weight:700;margin-bottom:24px">CLOSING · 본 회차를 닫는 한 장</div>
+    <h2 style="font-family:var(--serif);font-weight:700;font-size:54px;line-height:1.1;letter-spacing:-0.03em;color:var(--on);margin-bottom:24px">오늘 만든 것 · 가져갈 것 · 다음 회차</h2>
+    <div style="width:80px;height:3px;background:var(--acc);margin-bottom:24px"></div>
+  </div>
+
+  <div style="position:absolute;top:380px;left:80px;right:80px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#3a2f24">
+    <div style="background:var(--dk2);padding:24px 28px">
+      <div style="font-family:var(--mono);font-size:12px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:14px">RECAP · 오늘 만든 것</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        본 회차 PART별 산출물을 1줄씩.
+      </div>
+    </div>
+    <div style="background:var(--dk2);padding:24px 28px">
+      <div style="font-family:var(--mono);font-size:12px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:14px">TAKEAWAY · 가져갈 것</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        다음 주차까지 거점리더가 자기 부서에서 시도해볼 1~2가지.
+      </div>
+    </div>
+    <div style="background:var(--dk2);padding:24px 28px">
+      <div style="font-family:var(--mono);font-size:12px;color:var(--acc3);letter-spacing:2.5px;font-weight:700;margin-bottom:14px">NEXT · 다음 회차</div>
+      <div class="ph" style="border-color:rgba(212,149,117,0.5);background:rgba(212,149,117,0.06);color:var(--on2)">
+        <span class="ph-tag" style="background:transparent;color:var(--acc3);border-color:var(--acc3)">강사 작성 영역</span>
+        다음 회차 예고 + 다음 주차까지의 과제(있다면) 한 줄
+      </div>
+    </div>
+  </div>
+
+  <div class="fbar"><div class="fbar-l"><span class="fbar-label">MODULE</span><span class="fbar-title">07 · 풀스택 바이브코딩 심화 I</span></div><div class="fbar-r"><span class="fbar-label">PAGE</span><span class="fbar-title">024 / 024</span></div></div>
+</div></div>
+
+</div>
+<script>
+(function(){
+  document.querySelectorAll('.toolbar,.deck-nav').forEach(e=>e.remove());
+  const tb = document.createElement('div');
+  tb.className = 'toolbar';
+  tb.innerHTML = `<button onclick="pNav(-1)">◀</button><span class="pg" id="pgInd">1 / 1</span><button onclick="pNav(1)">▶</button><button onclick="window.open(location.protocol==='blob:'?'https://cdsassj00.github.io/lecture-workbench/curriculum.html':'curriculum.html','_blank')">📋 CURRICULUM</button><button onclick="window.print()">⬇ PDF</button><button onclick="tFull()">⛶ FULL</button><button id="editBtn" onclick="tEdit()">✎ EDIT</button>`;
+  document.body.appendChild(tb);
+})();
+
+const allSlides = document.querySelectorAll('.slide');
+const allStages = document.querySelectorAll('.stage');
+const deck = document.getElementById('deck');
+
+function fitSlides(){const vw=innerWidth,vh=innerHeight;const r=Math.min(1,Math.min(vw/1600,vh/900));allSlides.forEach(s=>{s.style.transform=`scale(${r})`;s.style.transformOrigin='center center'})}
+addEventListener('resize',fitSlides);fitSlides();
+
+function curIdx(){let i=0,m=1e9;allStages.forEach((s,x)=>{const d=Math.abs(s.getBoundingClientRect().top+s.getBoundingClientRect().height/2-innerHeight/2);if(d<m){m=d;i=x}});return i}
+function pNav(dir){const i=curIdx()+dir;if(i>=0&&i<allStages.length)allStages[i].scrollIntoView({behavior:'smooth'})}
+function updPg(){document.getElementById('pgInd').textContent=`${curIdx()+1} / ${allStages.length}`}
+deck.addEventListener('scroll',updPg);updPg();
+function tFull(){if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}
+
+let editMode=false;
+function tEdit(){
+  editMode=!editMode;
+  const btn=document.getElementById('editBtn'),tb=document.querySelector('.toolbar');
+  const SEL='.hl-kicker,.hl-title,.hl-sub,.card-k,.card-anchor,.card-body,.card-note,.hbar-l,.hbar-r,.fbar-title,.agenda-h,.agenda-d,.agenda-tag,.ph,h1,h2,p';
+  if(editMode){btn.textContent='✎ EDITING';btn.style.background='#b8532a';btn.style.color='#fff';tb.style.borderBottom='2px solid #b8532a';
+    document.querySelectorAll(SEL).forEach(el=>{el.contentEditable='true';el.style.outline='1px dashed rgba(184,83,42,0.3)';el.style.cursor='text'});
+    deck.style.scrollSnapType='none';
+    sToast('EDIT ON — 텍스트 클릭 수정 · Ctrl+S 저장 · E 또는 ESC로 종료');
+  }else{btn.textContent='✎ EDIT';btn.style.background='';btn.style.color='';tb.style.borderBottom='';
+    document.querySelectorAll('[contenteditable="true"]').forEach(el=>{el.contentEditable='false';el.style.outline='';el.style.cursor=''});
+    deck.style.scrollSnapType='y mandatory';
+    sToast('EDIT OFF — 프레젠테이션 모드');
+  }
+}
+function sToast(m){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(14,10,6,0.92);color:#ede4d3;font-family:var(--mono,monospace);font-size:13px;letter-spacing:1.5px;padding:10px 24px;border-radius:4px;z-index:300;pointer-events:none;opacity:0;transition:opacity 0.4s';document.body.appendChild(t)}t.textContent=m;t.style.opacity='1';clearTimeout(t._tid);t._tid=setTimeout(()=>{t.style.opacity='0'},3000)}
+
+document.addEventListener('keydown',e=>{
+  if(editMode){
+    if(e.key==='s'&&(e.ctrlKey||e.metaKey)){e.preventDefault();const b=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=document.title.replace(/[^a-zA-Z0-9가-힣\s·_-]/g,'')+'.html';a.click();URL.revokeObjectURL(a.href);sToast('HTML 파일 저장 완료')}
+    if(e.key==='Escape'||e.key==='e'||e.key==='E'){if(!document.activeElement||document.activeElement===document.body)tEdit()}
+    return;
+  }
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '||e.key==='PageDown'){e.preventDefault();pNav(1)}
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();pNav(-1)}
+  else if(e.key==='Home'){e.preventDefault();allStages[0].scrollIntoView({behavior:'smooth'})}
+  else if(e.key==='End'){e.preventDefault();allStages[allStages.length-1].scrollIntoView({behavior:'smooth'})}
+  else if(e.key==='f'||e.key==='F11'){e.preventDefault();tFull()}
+  else if(e.key==='Escape'){if(document.fullscreenElement)document.exitFullscreen()}
+  else if(e.key==='e'||e.key==='E'){tEdit()}
+});
+</script>
+</body>
+</html>
