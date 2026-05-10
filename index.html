@@ -2486,42 +2486,208 @@ const SESSION_FILES = [
   {file:'session-08-complete.html', num:'08', title:'API · MCP · 아키텍처 캔버스'},
 ];
 
-function openSessionList() {
-  const grid = document.getElementById('sessionListGrid');
-  grid.innerHTML = '';
-  SESSION_FILES.forEach(s => {
-    const card = document.createElement('div');
-    card.style.cssText = 'border:1px solid var(--wln);border-radius:var(--rad);padding:10px 12px;background:#fff;transition:all 0.12s;display:flex;flex-direction:column;gap:6px';
-    const main = document.createElement('div');
-    main.style.cssText = 'cursor:pointer';
-    main.innerHTML = `<div style="font-size:10px;font-weight:700;color:var(--wacc);letter-spacing:1px;margin-bottom:3px">SESSION ${s.num}</div><div style="font-size:12px;font-weight:600;color:var(--wink);line-height:1.3">${s.title}</div>`;
-    main.onclick = () => fetchSession(s);
-    card.appendChild(main);
-    // 참고자료 영역 (있을 때만)
-    if (s.refs && s.refs.length) {
-      const refBox = document.createElement('div');
-      refBox.style.cssText = 'border-top:1px dashed var(--wln);padding-top:6px;margin-top:2px;display:flex;flex-direction:column;gap:4px';
-      const refLbl = document.createElement('div');
-      refLbl.style.cssText = 'font-family:monospace;font-size:9px;color:var(--wink3);letter-spacing:2px;font-weight:700';
-      refLbl.textContent = '📎 참고자료 ' + s.refs.length + '건';
-      refBox.appendChild(refLbl);
-      s.refs.forEach(r => {
-        const a = document.createElement('a');
-        a.href = r.href; a.target = '_blank'; a.rel = 'noopener';
-        a.style.cssText = 'display:block;font-size:11px;color:var(--wacc);text-decoration:none;padding:4px 6px;border:1px solid rgba(184,83,42,0.25);border-radius:3px;background:rgba(184,83,42,0.04)';
-        a.innerHTML = '🔗 ' + r.label + (r.desc ? `<div style="font-size:9.5px;color:var(--wink3);font-weight:400;margin-top:1px;line-height:1.4">${r.desc}</div>` : '');
-        a.onclick = (e) => e.stopPropagation(); // 카드 클릭(세션 열기)과 분리
-        a.onmouseenter = () => { a.style.background = 'rgba(184,83,42,0.12)'; };
-        a.onmouseleave = () => { a.style.background = 'rgba(184,83,42,0.04)'; };
-        refBox.appendChild(a);
-      });
-      card.appendChild(refBox);
-    }
-    card.onmouseenter = () => { card.style.borderColor = 'var(--wacc)'; };
-    card.onmouseleave = () => { card.style.borderColor = 'var(--wln)'; };
-    grid.appendChild(card);
+// ============================================================
+// SESSION REFS · DB 동적 참고자료 (Supabase Storage 기반)
+// ============================================================
+const _sessionRefsCache = {}; // session_num → [refs]
+
+async function fetchSessionRefs() {
+  if (!sb) return {};
+  try {
+    const { data, error } = await sb.from('session_refs').select('*').order('created_at', {ascending: false});
+    if (error) throw error;
+    const grouped = {};
+    (data||[]).forEach(r => {
+      grouped[r.session_num] = grouped[r.session_num] || [];
+      grouped[r.session_num].push(r);
+    });
+    Object.assign(_sessionRefsCache, grouped);
+    return grouped;
+  } catch (e) {
+    console.warn('session_refs fetch 실패:', e.message);
+    return {};
+  }
+}
+
+async function uploadSessionRef(sessionNum, file, label) {
+  if (!sb) throw new Error('Supabase 연결 안 됨');
+  const { data: sessData } = await sb.auth.getSession();
+  if (!sessData?.session) throw new Error('편집자 로그인 필요');
+
+  // Storage 업로드
+  const safeName = file.name.replace(/[^a-zA-Z0-9가-힣._\-]/g, '_');
+  const path = `s${String(sessionNum).padStart(2,'0')}/${Date.now()}_${safeName}`;
+  const { error: upErr } = await sb.storage.from('session-refs').upload(path, file, {
+    cacheControl: '3600', upsert: false, contentType: file.type || 'application/octet-stream'
   });
+  if (upErr) throw new Error('업로드 실패: ' + upErr.message);
+
+  // public URL 가져오기
+  const { data: urlData } = sb.storage.from('session-refs').getPublicUrl(path);
+
+  // 메타 row 삽입
+  const { data: row, error: insErr } = await sb.from('session_refs').insert({
+    session_num: sessionNum,
+    label: label || file.name,
+    filename: file.name,
+    url: urlData.publicUrl,
+    content_type: file.type || null,
+    size: file.size,
+    created_by: sessData.session.user?.email || null
+  }).select().single();
+  if (insErr) throw new Error('메타 저장 실패: ' + insErr.message);
+  return row;
+}
+
+async function deleteSessionRef(refId, url) {
+  if (!sb) throw new Error('Supabase 연결 안 됨');
+  // Storage path 추출 — URL 뒤에서 'session-refs/' 이후
+  const m = url.match(/session-refs\/(.+?)(?:\?|$)/);
+  if (m) {
+    const path = decodeURIComponent(m[1]);
+    await sb.storage.from('session-refs').remove([path]);
+  }
+  const { error } = await sb.from('session_refs').delete().eq('id', refId);
+  if (error) throw new Error('삭제 실패: ' + error.message);
+}
+
+function fmtBytes(n) {
+  if (!n) return '';
+  if (n < 1024) return n + 'B';
+  if (n < 1024*1024) return (n/1024).toFixed(1) + 'KB';
+  return (n/1024/1024).toFixed(1) + 'MB';
+}
+
+async function openSessionList() {
+  const grid = document.getElementById('sessionListGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--wink3);font-size:12px">참고자료 불러오는 중...</div>';
   document.getElementById('sessionModalBg').classList.add('show');
+
+  // DB에서 동적 refs 일괄 fetch
+  await fetchSessionRefs();
+
+  grid.innerHTML = '';
+  SESSION_FILES.forEach(s => grid.appendChild(buildSessionCard(s)));
+}
+
+function buildSessionCard(s) {
+  const card = document.createElement('div');
+  card.style.cssText = 'border:1px solid var(--wln);border-radius:var(--rad);padding:10px 12px;background:#fff;transition:all 0.12s;display:flex;flex-direction:column;gap:6px';
+  card.dataset.sessionNum = s.num;
+
+  const main = document.createElement('div');
+  main.style.cssText = 'cursor:pointer';
+  main.innerHTML = `<div style="font-size:10px;font-weight:700;color:var(--wacc);letter-spacing:1px;margin-bottom:3px">SESSION ${s.num}</div><div style="font-size:12px;font-weight:600;color:var(--wink);line-height:1.3">${s.title}</div>`;
+  main.onclick = () => fetchSession(s);
+  card.appendChild(main);
+
+  // 참고자료 영역 (정적 refs + 동적 refs)
+  const sessionNum = parseInt(s.num, 10);
+  const dynamicRefs = _sessionRefsCache[sessionNum] || [];
+  const staticRefs = s.refs || [];
+  const totalRefs = staticRefs.length + dynamicRefs.length;
+
+  const refBox = document.createElement('div');
+  refBox.style.cssText = 'border-top:1px dashed var(--wln);padding-top:6px;margin-top:2px;display:flex;flex-direction:column;gap:4px';
+
+  if (totalRefs > 0 || isEditor) {
+    const refLbl = document.createElement('div');
+    refLbl.style.cssText = 'font-family:monospace;font-size:9px;color:var(--wink3);letter-spacing:2px;font-weight:700;display:flex;justify-content:space-between;align-items:center';
+    refLbl.innerHTML = `<span>📎 참고자료 ${totalRefs}건</span>`;
+    refBox.appendChild(refLbl);
+  }
+
+  // 정적 refs (SESSION_FILES에 박힌 링크)
+  staticRefs.forEach(r => refBox.appendChild(buildRefLink(r, false)));
+
+  // 동적 refs (DB 업로드)
+  dynamicRefs.forEach(r => refBox.appendChild(buildRefLink({
+    label: r.label, href: r.url, desc: r.description || `${r.filename} · ${fmtBytes(r.size)}`,
+    _id: r.id, _url: r.url, _dynamic: true
+  }, true)));
+
+  // 편집 모드 — 드롭존
+  if (isEditor) {
+    const dropZone = document.createElement('div');
+    dropZone.style.cssText = 'margin-top:4px;padding:10px 8px;border:1.5px dashed var(--wln);border-radius:3px;text-align:center;font-size:10px;color:var(--wink3);cursor:pointer;transition:all 0.12s;background:rgba(184,83,42,0.02)';
+    dropZone.innerHTML = '⬆ 파일 드롭 또는 클릭해서 업로드 (HTML·PDF·DOCX·이미지 등)';
+    dropZone.onclick = () => {
+      const fi = document.createElement('input');
+      fi.type = 'file';
+      fi.onchange = e => handleSessionRefUpload(sessionNum, Array.from(e.target.files), card);
+      fi.click();
+    };
+    dropZone.ondragover = e => { e.preventDefault(); e.stopPropagation(); dropZone.style.borderColor = 'var(--wacc)'; dropZone.style.background = 'rgba(184,83,42,0.08)'; };
+    dropZone.ondragleave = e => { e.preventDefault(); e.stopPropagation(); dropZone.style.borderColor = 'var(--wln)'; dropZone.style.background = 'rgba(184,83,42,0.02)'; };
+    dropZone.ondrop = async (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dropZone.style.borderColor = 'var(--wln)';
+      dropZone.style.background = 'rgba(184,83,42,0.02)';
+      const files = Array.from(e.dataTransfer.files);
+      await handleSessionRefUpload(sessionNum, files, card);
+    };
+    refBox.appendChild(dropZone);
+  }
+
+  if (totalRefs > 0 || isEditor) card.appendChild(refBox);
+  card.onmouseenter = () => { card.style.borderColor = 'var(--wacc)'; };
+  card.onmouseleave = () => { card.style.borderColor = 'var(--wln)'; };
+  return card;
+}
+
+function buildRefLink(r, isDynamic) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;align-items:stretch;gap:0';
+  const a = document.createElement('a');
+  a.href = r.href; a.target = '_blank'; a.rel = 'noopener';
+  a.style.cssText = 'flex:1;display:block;font-size:11px;color:var(--wacc);text-decoration:none;padding:4px 6px;border:1px solid rgba(184,83,42,0.25);border-radius:3px;background:rgba(184,83,42,0.04)';
+  if (isDynamic) a.style.borderRadius = '3px 0 0 3px';
+  a.innerHTML = (isDynamic ? '📄 ' : '🔗 ') + r.label + (r.desc ? `<div style="font-size:9.5px;color:var(--wink3);font-weight:400;margin-top:1px;line-height:1.4">${r.desc}</div>` : '');
+  a.onclick = (e) => e.stopPropagation();
+  a.onmouseenter = () => { a.style.background = 'rgba(184,83,42,0.12)'; };
+  a.onmouseleave = () => { a.style.background = 'rgba(184,83,42,0.04)'; };
+  wrap.appendChild(a);
+
+  if (isDynamic && isEditor && r._id) {
+    const del = document.createElement('button');
+    del.textContent = '×';
+    del.title = '삭제';
+    del.style.cssText = 'width:24px;border:1px solid rgba(184,83,42,0.25);border-left:none;border-radius:0 3px 3px 0;background:rgba(184,83,42,0.04);color:var(--wink3);cursor:pointer;font-size:14px;font-weight:700;line-height:1';
+    del.onclick = async (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (!confirm(`'${r.label}' 삭제?`)) return;
+      try {
+        await deleteSessionRef(r._id, r._url);
+        delete _sessionRefsCache[parseInt(wrap.closest('[data-session-num]').dataset.sessionNum, 10)];
+        await openSessionList();
+        toast('삭제 완료');
+      } catch (err) { toast(err.message); }
+    };
+    del.onmouseenter = () => { del.style.background = 'rgba(184,83,42,0.16)'; del.style.color = 'var(--wacc)'; };
+    del.onmouseleave = () => { del.style.background = 'rgba(184,83,42,0.04)'; del.style.color = 'var(--wink3)'; };
+    wrap.appendChild(del);
+  }
+  return wrap;
+}
+
+async function handleSessionRefUpload(sessionNum, files, card) {
+  if (!files.length) return;
+  if (!isEditor) { toast('편집자 로그인 후 사용'); return; }
+  for (const f of files) {
+    const sizeStr = fmtBytes(f.size);
+    const labelInput = prompt(`참고자료 라벨 (취소 시 파일명 사용):\n${f.name} · ${sizeStr}`, f.name.replace(/\.[^.]+$/, ''));
+    const label = (labelInput == null) ? f.name : (labelInput.trim() || f.name);
+    toast(`업로드 중... ${f.name}`);
+    try {
+      await uploadSessionRef(sessionNum, f, label);
+      toast(`✓ ${label} 업로드`);
+    } catch (e) {
+      toast('실패: ' + e.message);
+    }
+  }
+  // 캐시 무효화 + 모달 재렌더
+  delete _sessionRefsCache[sessionNum];
+  await openSessionList();
 }
 
 async function fetchSession(s) {
