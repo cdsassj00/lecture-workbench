@@ -2484,6 +2484,16 @@ const SESSION_FILES = [
   ]},
   {file:'session-07-complete.html', num:'07', title:'RAG 파이프라인과 웹서비스'},
   {file:'session-08-complete.html', num:'08', title:'API · MCP · 아키텍처 캔버스'},
+
+  // ── v2 신규 골격 (텍스트 위주 강의안) ─────────────────────────
+  {file:'session-01-v2.html', num:'01', title:'AI 에이전트 시대의 개막과 공공 구현 지형도', v2:true},
+  {file:'session-02-v2.html', num:'02', title:'LLM 사용 서비스 마스터리', v2:true},
+  {file:'session-03-v2.html', num:'03', title:'바이브코딩 워크플로우', v2:true},
+  {file:'session-04-v2.html', num:'04', title:'데이터분석 — 코딩에이전트 트랙', v2:true},
+  {file:'session-05-v2.html', num:'05', title:'공공 9유형 — 코딩에이전트 구현 6선', v2:true},
+  {file:'session-06-v2.html', num:'06', title:'외부 서비스 풀스택 바이브코딩', v2:true},
+  {file:'session-07-v2.html', num:'07', title:'풀스택 바이브코딩 심화 I', v2:true},
+  {file:'session-08-v2.html', num:'08', title:'풀스택 바이브코딩 심화 II — 종강 발표', v2:true},
 ];
 
 function openSessionList() {
@@ -2492,9 +2502,16 @@ function openSessionList() {
   SESSION_FILES.forEach(s => {
     const card = document.createElement('div');
     card.style.cssText = 'border:1px solid var(--wln);border-radius:var(--rad);padding:10px 12px;background:#fff;transition:all 0.12s;display:flex;flex-direction:column;gap:6px';
+    if (s.v2) {
+      card.style.borderColor = 'rgba(184,83,42,0.45)';
+      card.style.background = 'linear-gradient(180deg,#fff 0%,rgba(184,83,42,0.04) 100%)';
+    }
     const main = document.createElement('div');
     main.style.cssText = 'cursor:pointer';
-    main.innerHTML = `<div style="font-size:10px;font-weight:700;color:var(--wacc);letter-spacing:1px;margin-bottom:3px">SESSION ${s.num}</div><div style="font-size:12px;font-weight:600;color:var(--wink);line-height:1.3">${s.title}</div>`;
+    const badge = s.v2
+      ? `<span style="display:inline-block;font-family:monospace;font-size:9px;font-weight:700;color:#fff;background:var(--wacc);padding:1px 6px;border-radius:2px;letter-spacing:1.5px;margin-right:6px;vertical-align:1px">V2</span>`
+      : '';
+    main.innerHTML = `<div style="font-size:10px;font-weight:700;color:var(--wacc);letter-spacing:1px;margin-bottom:3px">${badge}SESSION ${s.num}</div><div style="font-size:12px;font-weight:600;color:var(--wink);line-height:1.3">${s.title}</div>`;
     main.onclick = () => fetchSession(s);
     card.appendChild(main);
     // 참고자료 영역 (있을 때만)
