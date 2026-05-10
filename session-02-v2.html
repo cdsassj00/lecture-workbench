@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Session 02 (v2) · LLM 사용 서비스 마스터리</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f5efe4; --bg2:#ede4d3; --paper:#f8f2e6;
-  --ink:#2b2015; --ink2:#5a4a38; --ink3:#8a7659;
-  --acc:#b8532a; --acc2:#c96238; --acc3:#d49575;
-  --ln:#d8c8ae; --ln2:#e6d9bf;
-  --dk:#1a1612; --dk2:#241e17; --on:#ede4d3; --on2:#a89172;
+  --bg:#f7f3ea; --bg2:#ede5d3;
+  --ink:#16110b; --ink2:#3a2f22; --ink3:#7a6a52;
+  --acc:#a3431f;
+  --ln:#cfc1a3; --ln2:#e3d6b9;
+  --dk:#0e0a06; --on:#f1e9d6;
   --serif:'Fraunces','Noto Serif KR',Georgia,serif;
   --sans:'Pretendard Variable',Pretendard,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
@@ -22,96 +22,80 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
 .deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;background:#0e0a06}
 .deck::-webkit-scrollbar{display:none}
 .stage{width:100vw;min-height:100vh;display:flex;align-items:center;justify-content:center;scroll-snap-align:start;padding:0;background:#0e0a06}
-.slide{width:1600px;height:900px;background:var(--paper);position:relative;overflow:hidden;transform-origin:center;box-shadow:0 40px 90px -30px rgba(0,0,0,0.7);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.08  0 0 0 0.025 0'/%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")}
-.slide.dark{background:var(--dk);color:var(--on)}
+.slide{width:1600px;height:900px;background:var(--bg);position:relative;overflow:hidden;transform-origin:center;box-shadow:0 40px 90px -30px rgba(0,0,0,0.7)}
+.slide.dk{background:var(--dk);color:var(--on)}
 
-/* Header / footer thin bars */
-.hbar{position:absolute;top:0;left:0;right:0;height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 80px;border-bottom:1px solid var(--ln)}
-.slide.dark .hbar{border-bottom-color:rgba(255,255,255,0.08)}
-.hbar-l{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;display:flex;align-items:center;gap:12px}
-.hbar-l::before{content:"";width:18px;height:2px;background:var(--acc)}
-.slide.dark .hbar-l{color:var(--on2)}
-.hbar-r{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:1.5px}
-.slide.dark .hbar-r{color:var(--on2)}
+/* Slim header bar — letter, page only */
+.hb{position:absolute;top:0;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 64px;font-family:var(--mono);font-size:11px;letter-spacing:2.5px;color:var(--ink3);font-weight:700;text-transform:uppercase}
+.slide.dk .hb{color:#7a6a52}
+.hb-l span{color:var(--acc);margin-right:8px}
 
-.fbar{position:absolute;bottom:0;left:0;right:0;height:42px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 80px 14px;border-top:1px solid var(--ln)}
-.slide.dark .fbar{border-top-color:rgba(255,255,255,0.08)}
-.fbar-l{font-size:11px;color:var(--ink3);font-family:var(--mono);letter-spacing:1.5px}
-.slide.dark .fbar-l{color:var(--on2)}
-.fbar-r{font-size:11px;color:var(--ink3);font-family:var(--mono);letter-spacing:1.5px}
-.slide.dark .fbar-r{color:var(--on2)}
+.fb{position:absolute;bottom:0;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 64px 8px;font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:600}
+.slide.dk .fb{color:#7a6a52}
 
-/* Body container */
-.body{position:absolute;left:80px;right:80px;top:80px;bottom:60px;display:flex;flex-direction:column}
+/* Body — full width */
+.body{position:absolute;left:64px;right:64px;top:64px;bottom:54px;display:flex;flex-direction:column}
 
-/* Typography blocks */
-.kicker{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--acc);font-weight:700;text-transform:uppercase;margin-bottom:18px}
-.slide.dark .kicker{color:var(--acc3)}
-.title{font-family:var(--serif);font-weight:700;font-size:48px;line-height:1.15;letter-spacing:-0.02em;color:var(--ink);margin-bottom:18px}
-.slide.dark .title{color:var(--on)}
-.title em{color:var(--acc);font-style:italic;font-weight:600}
-.slide.dark .title em{color:var(--acc3)}
-.subtitle{font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.5;color:var(--ink2);margin-bottom:24px;font-style:italic}
-.slide.dark .subtitle{color:var(--on2)}
-.rule{width:64px;height:3px;background:var(--ink);margin:8px 0 24px}
-.slide.dark .rule{background:var(--acc3)}
+/* Index number — large left rail */
+.idx{position:absolute;left:64px;top:64px;font-family:var(--serif);font-style:italic;font-weight:300;font-size:120px;line-height:0.85;color:var(--acc);letter-spacing:-0.04em}
+.slide.dk .idx{color:var(--acc)}
 
-.lead{font-size:18px;line-height:1.75;color:var(--ink2);max-width:1100px;margin-bottom:18px}
-.slide.dark .lead{color:var(--on2)}
-.lead strong{color:var(--ink);font-weight:700}
-.slide.dark .lead strong{color:var(--on)}
+/* Title block */
+.kicker{font-family:var(--mono);font-size:13px;letter-spacing:3.5px;color:var(--acc);font-weight:700;text-transform:uppercase;margin-bottom:24px}
+.title{font-family:var(--serif);font-weight:700;font-size:78px;line-height:1.05;letter-spacing:-0.025em;color:var(--ink)}
+.slide.dk .title{color:var(--on)}
+.title-sm{font-size:64px}
+.title-md{font-size:72px}
+.lede{font-family:var(--serif);font-weight:300;font-size:30px;line-height:1.3;color:var(--ink2);letter-spacing:-0.015em;margin-top:26px;max-width:1300px}
+.slide.dk .lede{color:#c9bda3}
 
-.prose{font-size:16px;line-height:1.85;color:var(--ink2);max-width:1100px}
-.prose p{margin-bottom:14px}
-.prose strong{color:var(--ink);font-weight:700}
-.prose em{color:var(--acc);font-style:italic;font-weight:500}
+/* Content blocks */
+.h2{font-family:var(--serif);font-weight:700;font-size:34px;line-height:1.15;color:var(--ink);letter-spacing:-0.015em;margin-bottom:14px}
+.slide.dk .h2{color:var(--on)}
+.p{font-size:21px;line-height:1.6;color:var(--ink2);max-width:1200px;font-weight:400}
+.slide.dk .p{color:#c9bda3}
+.p strong{color:var(--ink);font-weight:600}
+.slide.dk .p strong{color:var(--on)}
 
-/* Lists */
-.list{display:flex;flex-direction:column;gap:14px;margin-top:8px}
-.list-item{display:grid;grid-template-columns:46px 1fr;gap:18px;align-items:start}
-.list-num{font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;padding-top:4px}
-.slide.dark .list-num{color:var(--acc3)}
-.list-text{font-size:16px;line-height:1.7;color:var(--ink2)}
-.slide.dark .list-text{color:var(--on2)}
-.list-text strong{color:var(--ink);font-weight:700}
-.slide.dark .list-text strong{color:var(--on)}
-.list-text small{font-size:13.5px;color:var(--ink3);display:block;margin-top:3px;line-height:1.6}
-.slide.dark .list-text small{color:var(--on2)}
+/* Plain bullet/numbered list — no boxes */
+.bl{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px}
+.bl li{position:relative;padding-left:38px;font-size:21px;line-height:1.55;color:var(--ink2)}
+.slide.dk .bl li{color:#c9bda3}
+.bl li::before{content:"";position:absolute;left:0;top:14px;width:18px;height:1.5px;background:var(--acc)}
+.bl li b{color:var(--ink);font-weight:600}
+.slide.dk .bl li b{color:var(--on)}
+.bl li small{font-size:17px;color:var(--ink3);display:block;margin-top:4px;line-height:1.55}
+.slide.dk .bl li small{color:#7a6a52}
 
-/* Inline link/code styling */
-.link{color:var(--acc);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;font-family:var(--mono);font-size:0.92em}
-.slide.dark .link{color:var(--acc3)}
-.code{font-family:var(--mono);font-size:0.92em;background:var(--bg2);padding:2px 7px;border-radius:3px;color:var(--ink)}
-.slide.dark .code{background:rgba(255,255,255,0.08);color:var(--on)}
+/* Numbered scenarios */
+.sc{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.sc li{position:relative;padding-left:54px;font-size:20px;line-height:1.55;color:var(--ink2);font-weight:400}
+.slide.dk .sc li{color:#c9bda3}
+.sc li::before{counter-increment:scn;content:counter(scn,decimal-leading-zero);position:absolute;left:0;top:0;font-family:var(--mono);font-size:14px;color:var(--acc);letter-spacing:1.5px;font-weight:700;padding-top:6px}
+.sc{counter-reset:scn}
 
-/* Sections within a slide (h-divider style) */
-.sec{margin-top:22px;padding-top:18px;border-top:1px solid var(--ln)}
-.slide.dark .sec{border-top-color:rgba(255,255,255,0.08)}
-.sec-h{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin-bottom:10px;letter-spacing:-0.01em}
-.slide.dark .sec-h{color:var(--on)}
-.sec-h .num{font-family:var(--mono);font-size:14px;color:var(--ink3);letter-spacing:2px;font-weight:700;margin-right:10px}
-.slide.dark .sec-h .num{color:var(--acc3)}
+/* Two-column row when needed */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:64px}
+.row2-w{display:grid;grid-template-columns:1.4fr 1fr;gap:64px}
 
-/* Two-column layout */
-.cols2{display:grid;grid-template-columns:1fr 1fr;gap:48px;flex:1;min-height:0}
-.cols2-w{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;flex:1;min-height:0}
+/* Section divider */
+.div{height:1px;background:var(--ln);margin:28px 0}
+.slide.dk .div{background:rgba(255,255,255,0.1)}
 
-/* Compact 9-type table */
-.types{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 28px;margin-top:14px}
-.type-row{display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:start}
-.type-n{font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;padding-top:3px}
-.type-h{font-size:14.5px;color:var(--ink);font-weight:700;line-height:1.4;margin-bottom:3px}
-.type-d{font-size:13px;color:var(--ink2);line-height:1.55}
+/* mono inline */
+code{font-family:var(--mono);font-size:0.88em;background:transparent;padding:0;color:var(--ink);font-weight:500}
+.slide.dk code{color:var(--on)}
 
-/* Quote / pull aside */
-.aside{margin-top:auto;padding:18px 22px;background:var(--bg2);border-left:3px solid var(--acc);font-family:var(--serif);font-size:17px;line-height:1.65;color:var(--ink);font-style:italic;letter-spacing:-0.01em}
-.aside strong{font-style:normal;font-weight:700}
-
-/* Cover-specific */
-.cover-num{position:absolute;top:120px;right:80px;font-family:var(--serif);font-size:280px;line-height:0.9;color:var(--acc);font-weight:300;opacity:0.1;font-style:italic;letter-spacing:-0.06em;pointer-events:none}
-.cover-meta{margin-top:auto;display:grid;grid-template-columns:repeat(4,auto);gap:48px}
-.cm-l{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:2.5px;font-weight:700;margin-bottom:6px}
-.cm-v{font-size:14px;color:var(--ink);font-weight:600}
+/* Spec line — for tech details */
+.spec{display:grid;grid-template-columns:160px 1fr;gap:24px;padding:10px 0;border-top:1px solid var(--ln2);font-size:19px;line-height:1.5}
+.slide.dk .spec{border-top-color:rgba(255,255,255,0.08)}
+.spec:last-child{border-bottom:1px solid var(--ln2)}
+.slide.dk .spec:last-child{border-bottom-color:rgba(255,255,255,0.08)}
+.spec-l{font-family:var(--mono);font-size:13px;letter-spacing:1.5px;color:var(--ink3);font-weight:700;padding-top:5px;text-transform:uppercase}
+.spec-r{color:var(--ink2)}
+.slide.dk .spec-r{color:#c9bda3}
+.spec-r b{color:var(--ink);font-weight:600}
+.slide.dk .spec-r b{color:var(--on)}
 
 /* Toolbar */
 .toolbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 20px;background:rgba(14,10,6,0.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08)}
@@ -134,467 +118,549 @@ html,body{margin:0;padding:0;overflow:hidden;height:100vh;width:100vw;background
 <body>
 <div class="deck" id="deck">
 
-<!-- ═══════════════════════════════════════════════════════════════
-     01 · COVER
-═══════════════════════════════════════════════════════════════ -->
+<!-- ═══ 01 COVER ═══ -->
 <div class="stage"><div class="slide" data-title="Cover">
-  <div class="hbar"><div class="hbar-l">PUBLIC AI EXPERT PROGRAM · 2026</div><div class="hbar-r">Session 02 of 08 · v2</div></div>
-
-  <div class="cover-num">02</div>
-
-  <div class="body">
-    <div class="kicker">Session 02 · 8시간</div>
-    <h1 class="title">LLM 사용 서비스 <em>마스터리</em></h1>
-    <div class="rule"></div>
-    <div class="subtitle">ChatGPT · Claude · Gemini, 그리고 노코드 바이브코딩 — 외부망에서 가능한 모든 것을 한 번에 정리한다.</div>
-
-    <p class="lead" style="margin-top:24px">2회차는 외부망에서 거점리더가 가장 많이 만나게 될 <strong>프론티어 LLM 3종(ChatGPT · Claude · Gemini)</strong>의 사용법을 손에 익히는 시간이다. 자기소개 코너에서는 강사가 만든 <strong>Fuse.js 챗봇 흉내내기</strong> 사이트를 함께 분해해보고, 1주차 과제(Hugging Face SLM 조사)를 합쳐 <strong>48개 SLM 매뉴얼 페이지</strong>를 만들 준비를 한다. 후반부는 노코드 바이브코딩 도구(Lovable · Bolt · v0 · Replit)와 GitHub 연동까지 한 자리에서 비교한다.</p>
-
-    <div class="cover-meta">
-      <div><div class="cm-l">FOCUS</div><div class="cm-v">프론티어 LLM 3종 + 노코드</div></div>
-      <div><div class="cm-l">FORMAT</div><div class="cm-v">강의 + 즉석 실습 + 토의</div></div>
-      <div><div class="cm-l">OUTPUT</div><div class="cm-v">자주 쓰는 AI 툴 구글시트</div></div>
-      <div><div class="cm-l">NEXT</div><div class="cm-v">3회차 · 바이브코딩 워크플로우</div></div>
+  <div class="hb"><div class="hb-l"><span>S02</span>PUBLIC AI EXPERT PROGRAM · 2026 · v2</div><div>001 / 019</div></div>
+  <div class="body" style="justify-content:center">
+    <div class="kicker">Session 02 · 8 hours</div>
+    <h1 class="title" style="font-size:104px;line-height:1.0">LLM 사용 서비스<br>마스터리</h1>
+    <div class="lede" style="margin-top:36px">ChatGPT · Claude · Gemini, Hugging Face SLM, 그리고 노코드 바이브코딩 도구.<br>외부망에서 사용 가능한 LLM 서비스의 기능과 활용 범위를 정리한다.</div>
+    <div class="div" style="margin:48px 0 36px"></div>
+    <div style="display:grid;grid-template-columns:repeat(4,auto);gap:80px;font-size:18px">
+      <div><div style="font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:8px">PROGRAM</div><div style="font-weight:600">AI 챔피언 고급 과정</div></div>
+      <div><div style="font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:8px">SESSION</div><div style="font-weight:600">02 / 08 · 8H</div></div>
+      <div><div style="font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:8px">FORMAT</div><div style="font-weight:600">강의 + 실습 시나리오 선택</div></div>
+      <div><div style="font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:8px">NEXT</div><div style="font-weight:600">S03 · 바이브코딩 워크플로우</div></div>
     </div>
   </div>
-
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">001 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>v2 · 2026</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     02 · AGENDA
-═══════════════════════════════════════════════════════════════ -->
+<!-- ═══ 02 AGENDA ═══ -->
 <div class="stage"><div class="slide" data-title="Agenda">
-  <div class="hbar"><div class="hbar-l">AGENDA · 오늘의 흐름</div><div class="hbar-r">Session 02</div></div>
+  <div class="hb"><div class="hb-l"><span>S02</span>AGENDA</div><div>002 / 019</div></div>
   <div class="body">
-    <div class="kicker">Agenda · 오늘 8시간</div>
-    <h2 class="title">목차 — 한 장에 보는 오늘</h2>
-    <div class="rule"></div>
-    <p class="lead">자기소개 1시간으로 호흡을 맞추고, 1주차 과제를 거점리더 공동 자산(48개 SLM 사이트)으로 옮긴 뒤, 9유형 지도 위에 오늘 깔 도구를 매핑한다. 이후 ChatGPT · Gemini · Claude 세 모델의 강점을 빠르게 훑고, 노코드 바이브코딩 도구로 마무리한다.</p>
-
-    <div class="list" style="margin-top:18px">
-      <div class="list-item"><div class="list-num">01</div><div class="list-text"><strong>자기소개 + Fuse.js 챗봇 리버스엔지니어링</strong> · 60분<small>강사 사이트 <span class="link">cdsassj00.github.io/2026-proposals-rss</span>를 함께 분해 — '챗봇 흉내내기'가 어떤 부품으로 돌아가는지 본다.</small></div></div>
-      <div class="list-item"><div class="list-num">02</div><div class="list-text"><strong>1주차 과제 리뷰 — Hugging Face SLM</strong> · 30분<small>각자 조사한 SLM 스펙을 모아 48개 카드 사이트로 정리. 본 강의의 매뉴얼로 계속 활용한다.</small></div></div>
-      <div class="list-item"><div class="list-num">03</div><div class="list-text"><strong>공공 9유형 맛보기 + 사전 설치</strong> · 60분<small>유형 01~09를 한 장의 지도로 본다. 오늘 필요한 프로그램(Python · Node.js · Ollama · VS Code 등)을 같이 깐다.</small></div></div>
-      <div class="list-item"><div class="list-num">04</div><div class="list-text"><strong>ChatGPT 팁 + 약간의 바이브코딩</strong> · 50분<small>SVG · HTML · Mermaid를 ChatGPT로 즉석에서 만들어 화면에서 검증하는 흐름.</small></div></div>
-      <div class="list-item"><div class="list-num">05</div><div class="list-text"><strong>Gemini 팁</strong> · 50분<small>NotebookLM · AI Studio · Flow · labs.google. 특히 AI Studio가 지금 어디까지 왔는지 라이브로 본다.</small></div></div>
-      <div class="list-item"><div class="list-num">06</div><div class="list-text"><strong>Claude 팁</strong> · 40분<small>Projects · Artifacts · MCP. 거점리더 워크플로우에 맞는 사용 패턴.</small></div></div>
-      <div class="list-item"><div class="list-num">07</div><div class="list-text"><strong>토의 — "만약 이 기능이 있다면"</strong> · 30분<small>보안망 · 외부망 가리지 말고, 우리 기관·내 업무 어디에 붙이고 싶은지 한 사람씩 한 줄.</small></div></div>
-      <div class="list-item"><div class="list-num">08</div><div class="list-text"><strong>강사 추천 사이트 + 실습결과 공유</strong> · 40분<small>워크벤치 강의안에 박아둔 사이트들 → 즉시 실습 → 결과물을 구글드라이브 공용 폴더에 업로드.</small></div></div>
-      <div class="list-item"><div class="list-num">09</div><div class="list-text"><strong>GitHub + 노코드 바이브코딩 도구</strong> · 60분<small>1주차 과제로 GitHub은 모두 가입 완료. Lovable · Bolt · v0 · Replit + GitHub 연동을 한 자리에서 비교한다.</small></div></div>
-      <div class="list-item"><div class="list-num">10</div><div class="list-text"><strong>마무리 — 자주 쓰는 AI 툴 구글시트</strong> · 20분<small>각자 자주 쓰는 AI 도구를 구글시트 한 장에 모은다. 거점리더 공동 큐레이션의 시작점.</small></div></div>
-    </div>
+    <div class="kicker">목차</div>
+    <h1 class="title title-sm">오늘 다룰 9개 주제</h1>
+    <div class="div" style="margin:32px 0 8px"></div>
+    <ol class="sc" style="margin-top:8px;font-size:24px">
+      <li><b>자기소개 + Fuse.js 챗봇 코드 분석</b></li>
+      <li><b>1주차 과제 — Hugging Face SLM 정리</b></li>
+      <li><b>공공 적용 9유형 + 사전 설치</b></li>
+      <li><b>ChatGPT</b> · 모델·기능·출력 형식</li>
+      <li><b>Gemini</b> · NotebookLM · AI Studio · Flow · labs.google</li>
+      <li><b>Claude</b> · Projects · Artifacts · MCP</li>
+      <li><b>토의 주제</b> · 적용 후보 발굴</li>
+      <li><b>강사 추천 사이트</b></li>
+      <li><b>GitHub + 노코드 바이브코딩 4종</b> · Lovable · Bolt · v0 · Replit</li>
+    </ol>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">002 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>002 / 019</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     03 · 자기소개 + Fuse.js 챗봇 리버스엔지니어링
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide" data-title="Self Intro & Fuse.js">
-  <div class="hbar"><div class="hbar-l">PART 01 · 자기소개 · 60분</div><div class="hbar-r">Session 02</div></div>
+<!-- ═══ 03 FUSE.JS ═══ -->
+<div class="stage"><div class="slide" data-title="Fuse.js">
+  <div class="hb"><div class="hb-l"><span>01</span>FUSE.JS 챗봇 코드 분석</div><div>003 / 019</div></div>
   <div class="body">
-    <div class="kicker">Part 01 · 09:30 — 10:30</div>
-    <h2 class="title">자기소개 + <em>Fuse.js 챗봇</em> 리버스엔지니어링</h2>
-    <div class="rule"></div>
-
-    <div class="cols2-w">
+    <div class="kicker">01 · 자기소개 + 사례 분석</div>
+    <h1 class="title title-sm">Fuse.js 기반 정적 챗봇</h1>
+    <p class="lede">강사 사이트 <code>cdsassj00.github.io/2026-proposals-rss</code>의 챗봇은 LLM이 아니라 클라이언트 fuzzy search 라이브러리 Fuse.js로 구현된 정적 검색기다.</p>
+    <div class="div"></div>
+    <div class="row2-w" style="margin-top:8px">
       <div>
-        <p class="lead">강사가 만든 사이트 <span class="link">https://cdsassj00.github.io/2026-proposals-rss/</span> 를 함께 연다. 이 사이트의 챗봇은 <strong>진짜 LLM이 아니다</strong>. 검색 라이브러리 <strong>Fuse.js</strong>가 미리 들어있는 문서 더미에서 키워드 점수가 높은 문장을 골라 보여주는 '챗봇 흉내내기'다. 거점리더가 외부망 LLM 없이도 부서 매뉴얼 답변기를 만들 수 있다는 가장 가벼운 증거다.</p>
-
-        <div class="prose">
-          <p><strong>오늘 같이 분해할 것</strong></p>
-          <p>· 사이트가 어떤 데이터(질문·답변 페어, 제안서 본문)를 들고 있는가<br>
-             · 사용자 입력이 어떤 단계로 점수가 매겨지는가 (Fuse.js 옵션)<br>
-             · 왜 답이 매끄럽지 않은가 — LLM이 아니기 때문에 생기는 한계<br>
-             · 같은 구조를 우리 부서 매뉴얼에 어떻게 옮길 수 있는가</p>
-        </div>
+        <div class="h2">구성 요소</div>
+        <div class="spec"><div class="spec-l">DATA</div><div class="spec-r">JSON 형태로 정적 임베딩된 Q·A 페어 + 제안서 본문</div></div>
+        <div class="spec"><div class="spec-l">ENGINE</div><div class="spec-r">Fuse.js · Bitap 알고리즘 기반 fuzzy string match</div></div>
+        <div class="spec"><div class="spec-l">SCORING</div><div class="spec-r">키워드 가중치 + 거리 기반 score (0~1, 낮을수록 일치)</div></div>
+        <div class="spec"><div class="spec-l">UI</div><div class="spec-r">바닐라 JS · 외부 LLM API 호출 없음</div></div>
       </div>
       <div>
-        <div class="prose">
-          <p><strong>왜 첫 시간에 이걸 보는가</strong></p>
-          <p>거점리더 후보가 많은 경우 <em>"AI 챗봇 = LLM"</em>이라는 등식을 갖고 들어온다. 하지만 공공 현장에서는 외부망 LLM을 못 쓰는 자리가 더 많다. Fuse.js 같은 클라이언트 검색 라이브러리만으로도 <strong>매뉴얼 답변 챗봇</strong>은 만들어진다. 첫 시간에 이 차이를 손으로 만져보고 들어가야, 이후 ChatGPT·Claude·Gemini 사용법을 배울 때 <strong>'어디에 진짜 LLM이 필요한지'</strong> 자기 기준이 선다.</p>
-        </div>
-
-        <div class="aside" style="margin-top:24px">
-          오늘 자기소개에서 이름·소속만 말하지 않습니다. <strong>"내 부서에서 매뉴얼 답변기가 필요한 자리"</strong>를 한 줄씩 같이 적습니다.
-        </div>
+        <div class="h2">LLM 챗봇과의 차이</div>
+        <ul class="bl">
+          <li><b>생성 능력 없음</b> — 미리 들어간 답변 풀에서 가장 가까운 항목을 고를 뿐</li>
+          <li><b>오프라인 동작</b> — 인터넷 없이 정적 호스팅에서 그대로 작동</li>
+          <li><b>비용 0원</b> — API 호출 없음, 토큰 과금 없음</li>
+          <li><b>한계</b> — 신규 질문·복합 질의 처리 불가</li>
+        </ul>
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">003 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>003 / 019</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     04 · 1주차 과제 리뷰 (Hugging Face SLM)
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide" data-title="Week1 Review">
-  <div class="hbar"><div class="hbar-l">PART 02 · 1주차 과제 리뷰 · 30분</div><div class="hbar-r">Session 02</div></div>
+<!-- ═══ 04 HF SLM 과제 ═══ -->
+<div class="stage"><div class="slide" data-title="HF SLM">
+  <div class="hb"><div class="hb-l"><span>02</span>HUGGING FACE SLM</div><div>004 / 019</div></div>
   <div class="body">
-    <div class="kicker">Part 02 · 10:30 — 11:00</div>
-    <h2 class="title">1주차 과제 리뷰 — <em>Hugging Face SLM</em></h2>
-    <div class="rule"></div>
-
-    <p class="lead">1주차 과제는 <strong>Hugging Face에서 SLM(Small Language Model) 한 개를 골라 스펙을 정리</strong>하는 것이었다. 각자 조사한 결과를 합쳐 <strong>48개 SLM 카드 사이트</strong>로 정리할 예정이다. 사이트가 완성되면 본 강의 동안 <strong>"내 환경에서 어떤 sLLM을 돌릴 수 있을까"</strong>를 매번 들춰보는 매뉴얼로 쓴다.</p>
-
-    <div class="cols2" style="margin-top:8px">
+    <div class="kicker">02 · 1주차 과제 리뷰</div>
+    <h1 class="title title-sm">Hugging Face SLM 카드 데이터셋</h1>
+    <p class="lede">수강생이 조사한 SLM 스펙을 모아 검색 가능한 카드 사이트로 정리. 5주차(유형 02·07) 모델 선택의 기준 자료가 된다.</p>
+    <div class="div"></div>
+    <div class="row2" style="margin-top:8px">
       <div>
-        <div class="sec-h"><span class="num">A.</span>각 카드에 들어가는 정보</div>
-        <div class="prose">
-          <p>· 모델명 / 베이스 모델 / 파라미터 수<br>
-             · 컨텍스트 길이 · 라이선스 · 한국어 지원 여부<br>
-             · 권장 VRAM (양자화별 4bit · 8bit · 16bit)<br>
-             · 강점 1줄 / 약점 1줄 / 추천 사용처<br>
-             · 다운로드 링크 + 같이 보면 좋은 모델</p>
-          <p style="margin-top:10px;font-style:italic;color:var(--ink3);font-size:14px">조사가 부족한 칸은 비워둡니다. 채워지는 대로 사이트가 자동 갱신되도록 합니다.</p>
-        </div>
+        <div class="h2">카드 1장 = 모델 1개</div>
+        <div class="spec"><div class="spec-l">META</div><div class="spec-r">모델명 · 베이스 · 파라미터 수 · 컨텍스트 길이 · 라이선스</div></div>
+        <div class="spec"><div class="spec-l">RUNTIME</div><div class="spec-r">권장 VRAM (4bit / 8bit / fp16) · GGUF 호환 여부</div></div>
+        <div class="spec"><div class="spec-l">LANG</div><div class="spec-r">한국어 토크나이저 지원 · 한국어 벤치 점수</div></div>
+        <div class="spec"><div class="spec-l">LINK</div><div class="spec-r">HF 페이지 · Ollama 레지스트리 · 추천 사용처</div></div>
       </div>
       <div>
-        <div class="sec-h"><span class="num">B.</span>사이트는 매뉴얼로 쓴다</div>
-        <div class="prose">
-          <p>5주차에 <strong>유형 02 (VBA + 로컬 sLLM)</strong>, <strong>유형 07 (Ollama 로컬 RAG)</strong>를 다룰 때 거점리더 각자가 자기 PC에 맞는 sLLM을 고를 수 있어야 한다. 그때마다 이 48개 카드 사이트를 펼쳐서 <strong>"내 노트북 RAM이 16GB이면 어디까지 돌릴 수 있는가"</strong>를 보고 결정한다.</p>
-          <p>이 사이트는 거점리더 기수가 바뀌어도 <strong>차기 기수의 시드 라이브러리</strong>로 그대로 인계된다. 1주차 과제가 단발성 보고서로 끝나지 않는 이유다.</p>
-        </div>
+        <div class="h2">활용 시점</div>
+        <ul class="bl">
+          <li><b>S05 유형 02</b> — VBA + 로컬 sLLM (Ollama 모델 선택)</li>
+          <li><b>S05 유형 07</b> — Ollama 로컬 RAG (임베딩 모델 선택)</li>
+          <li><b>S07 RAG 심화</b> — 검색·요약 모델 분리 선택</li>
+          <li><b>차기 기수 인계</b> — 시드 라이브러리로 그대로 전수</li>
+        </ul>
       </div>
     </div>
-
-    <div class="aside">오늘 30분 안에는 <strong>발표 5명 × 4분</strong> + 다 같이 사이트 골격 한 번 보기. 미제출자는 다음 주차 직전까지 보강.</div>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">004 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>004 / 019</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     05 · 공공 9유형 지도
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide" data-title="9 Public Patterns">
-  <div class="hbar"><div class="hbar-l">PART 03 · 공공 9유형 지도 · 30분</div><div class="hbar-r">Session 02</div></div>
+<!-- ═══ 05 9 TYPES ═══ -->
+<div class="stage"><div class="slide" data-title="9 Types">
+  <div class="hb"><div class="hb-l"><span>03</span>공공 적용 9유형</div><div>005 / 019</div></div>
   <div class="body">
-    <div class="kicker">Part 03A · 11:00 — 11:30</div>
-    <h2 class="title">공공 적용 <em>9가지 유형</em>을 한 장에</h2>
-    <div class="rule"></div>
-
-    <p class="lead">1회차에서 큰 그림으로 본 9유형을 다시 펼친다. <strong>오늘은 맛보기·설명만</strong>이고, 실제 구현은 5주차(유형 01~06)와 7~8주차(유형 07~09)로 나눠 진행한다. 각자 자기 부서 미션이 어느 유형에 가장 가까운지 가늠해보는 것이 오늘의 목적이다.</p>
-
-    <div class="types">
-      <div class="type-row"><div class="type-n">01</div><div><div class="type-h">AI 코드 내부망 실행</div><div class="type-d">외부망에서 받은 파이썬 코드를 내부망에서 단순 실행. 가장 가벼운 진입.</div></div></div>
-      <div class="type-row"><div class="type-n">02</div><div><div class="type-h">VBA + 로컬 sLLM (Ollama)</div><div class="type-d">엑셀 매크로에 로컬 sLLM 결합. 인터넷 없이도 돌아가는 자동화.</div></div></div>
-      <div class="type-row"><div class="type-n">03</div><div><div class="type-h">Python + PyInstaller (.exe)</div><div class="type-d">독립 실행 파일로 패키징. 동료 PC에 설치 없이 바로 실행.</div></div></div>
-      <div class="type-row"><div class="type-n">04</div><div><div class="type-h">Electron 데스크톱 앱</div><div class="type-d">GUI가 필요한 도구. 비개발자 동료가 쓸 화면을 직접 만든다.</div></div></div>
-      <div class="type-row"><div class="type-n">05</div><div><div class="type-h">HTML+CSS+JS 단일 파일</div><div class="type-d">CDN 로컬화한 단일 HTML 앱. 본 강의안 자체가 이 형식이다.</div></div></div>
-      <div class="type-row"><div class="type-n">06</div><div><div class="type-h">Node.js 로컬 툴 / CLI</div><div class="type-d">자동화 스크립트와 CLI 도구. 정기 작업·일괄 처리에 강하다.</div></div></div>
-      <div class="type-row"><div class="type-n">07</div><div><div class="type-h">Ollama 로컬 RAG</div><div class="type-d">로컬 sLLM + 벡터DB로 부서 문서 답변기. 폐쇄망에서도 동작.</div></div></div>
-      <div class="type-row"><div class="type-n">08</div><div><div class="type-h">백엔드 결합 웹서비스</div><div class="type-d">부서·기관 공용 웹 도구. 인증·권한·DB가 함께 들어간다.</div></div></div>
-      <div class="type-row"><div class="type-n">09</div><div><div class="type-h">API/MCP 풀스택 에이전트</div><div class="type-d">외부 API와 MCP를 결합한 에이전트형 서비스. 8주차 도착점.</div></div></div>
+    <div class="kicker">03 · 공공 적용 9유형 지도</div>
+    <h1 class="title title-sm">9개 구현 유형 한 장 정리</h1>
+    <div class="div" style="margin:24px 0 8px"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px 56px;margin-top:8px">
+      <div><div style="font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;margin-bottom:4px">TYPE 01</div><div style="font-size:21px;color:var(--ink);font-weight:600;margin-bottom:3px">AI 코드 내부망 실행</div><div style="font-size:16px;color:var(--ink3);line-height:1.5">외부망에서 받은 Python 코드를 내부망에서 단순 실행</div></div>
+      <div><div style="font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;margin-bottom:4px">TYPE 02</div><div style="font-size:21px;color:var(--ink);font-weight:600;margin-bottom:3px">VBA + 로컬 sLLM</div><div style="font-size:16px;color:var(--ink3);line-height:1.5">엑셀 매크로 + Ollama. 인터넷 없이 동작</div></div>
+      <div><div style="font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;margin-bottom:4px">TYPE 03</div><div style="font-size:21px;color:var(--ink);font-weight:600;margin-bottom:3px">Python + PyInstaller</div><div style="font-size:16px;color:var(--ink3);line-height:1.5">단일 .exe 패키징. 설치 없이 실행</div></div>
+      <div><div style="font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;margin-bottom:4px">TYPE 04</div><div style="font-size:21px;color:var(--ink);font-weight:600;margin-bottom:3px">Electron 데스크톱 앱</div><div style="font-size:16px;color:var(--ink3);line-height:1.5">Chromium 기반 GUI 도구</div></div>
+      <div><div style="font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;margin-bottom:4px">TYPE 05</div><div style="font-size:21px;color:var(--ink);font-weight:600;margin-bottom:3px">단일 HTML+CSS+JS</div><div style="font-size:16px;color:var(--ink3);line-height:1.5">CDN 로컬화. 본 강의안과 동일 형식</div></div>
+      <div><div style="font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;margin-bottom:4px">TYPE 06</div><div style="font-size:21px;color:var(--ink);font-weight:600;margin-bottom:3px">Node.js 로컬 CLI</div><div style="font-size:16px;color:var(--ink3);line-height:1.5">자동화 스크립트·일괄 처리</div></div>
+      <div><div style="font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;margin-bottom:4px">TYPE 07</div><div style="font-size:21px;color:var(--ink);font-weight:600;margin-bottom:3px">Ollama 로컬 RAG</div><div style="font-size:16px;color:var(--ink3);line-height:1.5">로컬 sLLM + 벡터DB. 폐쇄망 동작</div></div>
+      <div><div style="font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;margin-bottom:4px">TYPE 08</div><div style="font-size:21px;color:var(--ink);font-weight:600;margin-bottom:3px">백엔드 결합 웹서비스</div><div style="font-size:16px;color:var(--ink3);line-height:1.5">DB·인증·권한 포함 풀스택</div></div>
+      <div><div style="font-family:var(--mono);font-size:13px;color:var(--acc);letter-spacing:1.5px;font-weight:700;margin-bottom:4px">TYPE 09</div><div style="font-size:21px;color:var(--ink);font-weight:600;margin-bottom:3px">API/MCP 에이전트</div><div style="font-size:16px;color:var(--ink3);line-height:1.5">외부 API + MCP 도구 결합</div></div>
     </div>
+    <div class="div"></div>
+    <p class="p" style="font-size:18px">구현 일정 — <b>S05</b> 유형 01~06 (코딩에이전트 구현) · <b>S06~S08</b> 유형 07~09 (풀스택)</p>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">005 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>005 / 019</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     06 · 사전 설치
-═══════════════════════════════════════════════════════════════ -->
+<!-- ═══ 06 PRE-INSTALL ═══ -->
 <div class="stage"><div class="slide" data-title="Pre-Install">
-  <div class="hbar"><div class="hbar-l">PART 03 · 사전 설치 · 30분</div><div class="hbar-r">Session 02</div></div>
+  <div class="hb"><div class="hb-l"><span>03</span>사전 설치</div><div>006 / 019</div></div>
   <div class="body">
-    <div class="kicker">Part 03B · 11:30 — 12:00</div>
-    <h2 class="title">오늘 깔 것 — <em>9유형 사전 설치</em></h2>
-    <div class="rule"></div>
-
-    <p class="lead">9유형을 4~7주차에 걸쳐 구현하려면 도구가 미리 깔려 있어야 한다. 오늘 다 같이 깔아두고 한 번씩 실행해본다. 설치 중 막힌 사람은 옆자리와 짝을 이뤄 같이 푼다.</p>
-
-    <div class="cols2" style="margin-top:8px">
+    <div class="kicker">03 · 사전 설치</div>
+    <h1 class="title title-sm">오늘 함께 설치하는 도구</h1>
+    <div class="div" style="margin:24px 0 8px"></div>
+    <div class="row2" style="margin-top:8px">
       <div>
-        <div class="sec-h"><span class="num">A.</span>기본 런타임 · 모두 설치</div>
-        <div class="prose">
-          <p>· <span class="code">Python 3.11+</span> &nbsp; — 유형 01·02·03·07<br>
-             · <span class="code">Node.js 20+</span> &nbsp; — 유형 04·05·06·08·09<br>
-             · <span class="code">Git</span> &nbsp; — 모든 유형의 버전 관리<br>
-             · <span class="code">VS Code</span> + 한국어 / Python / Jupyter 확장</p>
-        </div>
+        <div class="h2">런타임 · 에디터</div>
+        <div class="spec"><div class="spec-l">PYTHON</div><div class="spec-r">3.11 이상 · 유형 01·02·03·07</div></div>
+        <div class="spec"><div class="spec-l">NODE.JS</div><div class="spec-r">20 LTS 이상 · 유형 04·05·06·08·09</div></div>
+        <div class="spec"><div class="spec-l">GIT</div><div class="spec-r">최신 · 모든 유형 버전 관리</div></div>
+        <div class="spec"><div class="spec-l">VS CODE</div><div class="spec-r">Korean · Python · Jupyter 확장</div></div>
 
-        <div class="sec-h" style="margin-top:18px"><span class="num">B.</span>로컬 LLM</div>
-        <div class="prose">
-          <p>· <span class="code">Ollama</span> + 1주차에서 고른 SLM 1개 (4bit 양자화)<br>
-             · 모델 다운로드는 시간이 걸리니 <strong>강의 시작 직후 백그라운드</strong>로 받게 한다</p>
-        </div>
+        <div class="h2" style="margin-top:32px">로컬 LLM</div>
+        <div class="spec"><div class="spec-l">OLLAMA</div><div class="spec-r">최신 · GGUF 모델 실행</div></div>
+        <div class="spec"><div class="spec-l">MODEL</div><div class="spec-r">1주차에서 고른 SLM 1개 (4bit 양자화 권장)</div></div>
       </div>
       <div>
-        <div class="sec-h"><span class="num">C.</span>패키징 · 빌드</div>
-        <div class="prose">
-          <p>· <span class="code">PyInstaller</span> &nbsp; — 유형 03 .exe 빌드<br>
-             · <span class="code">Electron</span> &nbsp; — 유형 04 데스크톱 앱<br>
-             · <span class="code">npm</span> &nbsp; (Node와 함께 자동) — 유형 05·06</p>
-        </div>
+        <div class="h2">패키징 · 빌드</div>
+        <div class="spec"><div class="spec-l">PYINSTALLER</div><div class="spec-r">유형 03 · 단일 실행 파일 빌드</div></div>
+        <div class="spec"><div class="spec-l">ELECTRON</div><div class="spec-r">유형 04 · 데스크톱 앱 프레임워크</div></div>
+        <div class="spec"><div class="spec-l">NPM</div><div class="spec-r">Node 함께 설치됨 · 유형 05·06</div></div>
 
-        <div class="sec-h" style="margin-top:18px"><span class="num">D.</span>외부 서비스 · 계정</div>
-        <div class="prose">
-          <p>· <strong>OpenAI · Anthropic · Google AI</strong> 계정 (무료 티어 가능)<br>
-             · <strong>GitHub</strong> 계정 (1주차 과제로 모두 완료)<br>
-             · <strong>Supabase</strong> · <strong>Vercel</strong> 계정 (6주차 전까지 가입)</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="aside">설치는 부서 PC 보안 정책에 막힐 수 있습니다. <strong>막힌 항목은 그대로 적어두고</strong> 다음 주차 시작 전 IT부서·정보화담당과 협의합니다.</div>
-  </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">006 / 014</div></div>
-</div></div>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     07 · ChatGPT 팁 + 바이브코딩
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide" data-title="ChatGPT Tips">
-  <div class="hbar"><div class="hbar-l">PART 04 · ChatGPT · 50분</div><div class="hbar-r">Session 02</div></div>
-  <div class="body">
-    <div class="kicker">Part 04 · 13:00 — 13:50</div>
-    <h2 class="title">ChatGPT 팁 + <em>약간의 바이브코딩</em></h2>
-    <div class="rule"></div>
-
-    <p class="lead">ChatGPT의 가장 큰 강점은 <strong>'결과물 형태가 다양하다'</strong>는 점이다. 텍스트 답변뿐 아니라 SVG · HTML · Mermaid 같은 <strong>화면에서 바로 검증 가능한 산출물</strong>을 즉석에서 만들 수 있다. 거점리더가 동료에게 '말로 설명' 대신 '한 장 도식'을 빨리 들이밀 수 있게 되는 자리다.</p>
-
-    <div class="cols2" style="margin-top:8px">
-      <div>
-        <div class="sec-h"><span class="num">A.</span>오늘 즉석에서 만들 3가지</div>
-        <div class="prose">
-          <p><strong>① SVG 도식 한 장</strong><br>
-             "우리 부서 민원 처리 흐름을 4단계로, 박스와 화살표로 SVG로 그려줘. 폭 1200, 색은 차분하게."</p>
-          <p><strong>② HTML 한 페이지</strong><br>
-             "방금 SVG를 가운데 두고, 위에 제목, 아래 4단계 설명을 카드 4개로 배치한 단일 HTML 파일로 만들어줘. 외부 라이브러리 쓰지 마."</p>
-          <p><strong>③ Mermaid 다이어그램</strong><br>
-             "위 흐름을 Mermaid flowchart 코드로도 줘. 결정 분기 1개 포함."</p>
-        </div>
-      </div>
-      <div>
-        <div class="sec-h"><span class="num">B.</span>몇 가지 작은 팁</div>
-        <div class="prose">
-          <p><strong>· 캔버스(Canvas) 모드</strong>로 켜면 결과물을 옆 패널에서 계속 다듬을 수 있다. 도식 1개 만들고 끝나지 않고 6~7번 다듬는 것이 정상.</p>
-          <p><strong>· 모델 선택</strong>은 일을 시키기 전에 결정. 도식·코드는 추론 모델, 빠른 글짓기는 일반 모델.</p>
-          <p><strong>· 첨부 파일</strong>은 PDF·엑셀·이미지까지. 첨부 후 "이 파일에서 ~만 뽑아줘"가 가장 쓸모 있다.</p>
-          <p><strong>· "한 번 더 검토해서"</strong>는 거의 항상 결과를 한 단계 끌어올린다. 바로 만족하지 말 것.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="aside">실습 산출물(SVG · HTML · Mermaid 3종)은 구글드라이브 공용 폴더 <strong>02-chatgpt/내이름/</strong>에 업로드. 다음 슬라이드 토의에서 다시 꺼낸다.</div>
-  </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">007 / 014</div></div>
-</div></div>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     08 · Gemini 팁
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide" data-title="Gemini Tips">
-  <div class="hbar"><div class="hbar-l">PART 05 · Gemini · 50분</div><div class="hbar-r">Session 02</div></div>
-  <div class="body">
-    <div class="kicker">Part 05 · 13:50 — 14:40</div>
-    <h2 class="title">Gemini 팁 — <em>NotebookLM · AI Studio · Flow · labs.google</em></h2>
-    <div class="rule"></div>
-
-    <p class="lead">Gemini는 한 모델이 아니라 <strong>구글이 묶어둔 도구 묶음</strong>으로 보는 게 정확하다. 거점리더가 가장 자주 쓰게 될 네 갈래를 빠르게 훑는다. 각각 어디에 강하고 무엇이 막히는지 손으로 만져본다.</p>
-
-    <div class="list" style="margin-top:8px">
-      <div class="list-item"><div class="list-num">01</div><div class="list-text"><strong>NotebookLM</strong> — 부서 문서 더미를 통째로 올리고 그 안에서만 답하게 하는 도구. <em>출처 인용이 자동</em>으로 따라붙는 것이 공공 도메인의 큰 장점이다. 우리 조례·매뉴얼·회의록을 올려두고 동료가 자유롭게 묻게 만드는 가장 가벼운 RAG 사례.<small>오늘 실습 — 본인 부서의 공개 문서 PDF 3~5개 올리고 "이 문서들에서 ~을 정리해줘" 한 번.</small></div></div>
-      <div class="list-item"><div class="list-num">02</div><div class="list-text"><strong>AI Studio</strong> — Gemini API를 코드 없이 시험할 수 있는 콘솔. 시스템 프롬프트 · 온도 · 출력 길이를 즉석에서 바꿔보며 <em>"내 프롬프트가 어디서 깨지는지"</em>를 테스트한다. <strong>지금 어디까지 왔는지 라이브로</strong> 같이 본다 — 멀티모달 입력, 함수 호출, 라이브 비디오 입력까지.<small>오늘 실습 — 시스템 프롬프트에 "공공기관 민원 분류기" 역할을 주고 입력 3개를 분류시킨다.</small></div></div>
-      <div class="list-item"><div class="list-num">03</div><div class="list-text"><strong>Flow</strong> — 영상 생성. 짧은 시연 영상이나 부서 홍보용 클립을 만들 때 활용. 화질·시간 제약은 빠르게 바뀌므로 <em>오늘 시점 기준</em>의 가능한 영역을 짚어둔다.<small>오늘 실습 — 자기 부서 일을 6초 클립으로 묘사. "민원 접수 카운터에 시민이 미소짓는 모습, 따뜻한 톤" 같은 식.</small></div></div>
-      <div class="list-item"><div class="list-num">04</div><div class="list-text"><strong>labs.google</strong> — 구글의 실험 모음. <em>완성된 제품이 아니다</em>는 점을 짚고 들어간다. 거점리더는 여기서 떨어진 도구가 본 제품으로 옮겨갈 때 빠르게 따라잡는 위치.<small>오늘 실습 — 현재 살아있는 실험 1개를 함께 열어 5분간 만져본다. (수업 시점에 골라서 진행)</small></div></div>
-    </div>
-  </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">008 / 014</div></div>
-</div></div>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     09 · Claude 팁
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide" data-title="Claude Tips">
-  <div class="hbar"><div class="hbar-l">PART 06 · Claude · 40분</div><div class="hbar-r">Session 02</div></div>
-  <div class="body">
-    <div class="kicker">Part 06 · 14:50 — 15:30</div>
-    <h2 class="title">Claude 팁 — <em>Projects · Artifacts · MCP</em></h2>
-    <div class="rule"></div>
-
-    <p class="lead">Claude의 강점은 <strong>긴 문서를 안정적으로 다루는 능력</strong>과 <strong>도구 연결(MCP)</strong>이다. 거점리더가 부서 문서·조례·회의록을 묶어 일하는 자리에 잘 맞는다. 6주차 Claude Code 본격 학습 전에, 오늘은 외부망 웹 클라이언트 단에서 쓸 수 있는 부분을 정리한다.</p>
-
-    <div class="cols2" style="margin-top:8px">
-      <div>
-        <div class="sec-h"><span class="num">A.</span>Projects · 작업 단위로 묶는다</div>
-        <div class="prose">
-          <p>한 미션에 쓰이는 문서·지침·지난 대화를 하나의 Project로 묶는다. 매번 "내 부서 상황은 ~"을 다시 설명하지 않아도 된다. <strong>거점 미션 1건 = Project 1개</strong>가 거점리더의 기본 운영 단위가 된다.</p>
-        </div>
-
-        <div class="sec-h" style="margin-top:18px"><span class="num">B.</span>Artifacts · 결과물을 옆 창에서</div>
-        <div class="prose">
-          <p>HTML · React 컴포넌트 · 마크다운 문서 · SVG 등을 본문 답변과 분리된 옆 패널에 띄워 계속 다듬는다. ChatGPT의 Canvas와 가장 비슷한 자리. <strong>한 산출물을 6~10번 다듬는 흐름</strong>에 잘 맞는다.</p>
-        </div>
-      </div>
-      <div>
-        <div class="sec-h"><span class="num">C.</span>MCP · 도구를 붙인다</div>
-        <div class="prose">
-          <p>MCP(Model Context Protocol)는 <em>"Claude가 쓸 수 있는 도구 모음의 표준 인터페이스"</em>다. 외부망 웹 클라이언트에서도 일부 MCP 커넥터(GitHub · 구글드라이브 등)를 직접 켤 수 있다. 6주차에 본격적으로 다룰 주제지만, 오늘은 <strong>"내 클로드가 GitHub 레포를 직접 읽는다"</strong>를 1번 시연한다.</p>
-        </div>
-
-        <div class="sec-h" style="margin-top:18px"><span class="num">D.</span>ChatGPT · Gemini와의 차이</div>
-        <div class="prose">
-          <p>· 긴 컨텍스트 · 안정적 코딩 — Claude<br>
-             · 멀티모달 · 영상 · 구글 생태계 — Gemini<br>
-             · 도구 다양성 · 캔버스 워크플로우 — ChatGPT<br>
-             셋 다 깔아두고 <strong>일에 따라 골라 쓰는 것</strong>이 거점리더 기본기.</p>
-        </div>
+        <div class="h2" style="margin-top:32px">계정 (외부망)</div>
+        <div class="spec"><div class="spec-l">LLM</div><div class="spec-r">OpenAI · Anthropic · Google AI Studio</div></div>
+        <div class="spec"><div class="spec-l">CODE</div><div class="spec-r">GitHub (1주차 과제 시 가입 완료)</div></div>
+        <div class="spec"><div class="spec-l">DEPLOY</div><div class="spec-r">Supabase · Vercel (S06 전까지)</div></div>
       </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">009 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>006 / 019</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     10 · 토의 — 만약 이런 기능이 있다면
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide dark" data-title="What-if Discussion">
-  <div class="hbar"><div class="hbar-l">PART 07 · 토의 · 30분</div><div class="hbar-r">Session 02</div></div>
+<!-- ═══ 07 ChatGPT 설명 ═══ -->
+<div class="stage"><div class="slide" data-title="ChatGPT">
+  <div class="hb"><div class="hb-l"><span>04</span>CHATGPT</div><div>007 / 019</div></div>
   <div class="body">
-    <div class="kicker">Part 07 · 15:30 — 16:00</div>
-    <h2 class="title">"만약에 <em>이 기능이 있다면</em>"<br>우리 기관·내 업무 어디에 붙이고 싶은가</h2>
-    <div class="rule"></div>
+    <div class="kicker">04 · ChatGPT 기능</div>
+    <h1 class="title title-sm">ChatGPT — 기능과 출력 형식</h1>
+    <div class="div" style="margin:28px 0 16px"></div>
+    <div class="row2-w">
+      <div>
+        <div class="h2">모델 라인업 (2026 기준)</div>
+        <div class="spec"><div class="spec-l">REASONING</div><div class="spec-r">o-시리즈 · 다단계 추론·코드·수학에 특화</div></div>
+        <div class="spec"><div class="spec-l">GENERAL</div><div class="spec-r">GPT 시리즈 · 빠른 응답·멀티모달 입력</div></div>
+        <div class="spec"><div class="spec-l">MINI</div><div class="spec-r">빠르고 저비용. 단순 작업·대량 처리</div></div>
 
-    <p class="lead">오전부터 본 ChatGPT·Gemini·Claude·NotebookLM·노코드 도구를 머릿속에 펼쳐둔다. 그리고 <strong>보안망·외부망을 잠시 잊는다</strong>. 우리 부서에서 가장 시간 잡아먹는 작업, 가장 자주 반복되는 답변, 가장 자주 빠뜨리는 점검을 떠올린다. 그 자리에 어떤 기능을 붙이고 싶은가.</p>
-
-    <div class="prose" style="margin-top:18px;color:var(--on2)">
-      <p style="color:var(--on);font-weight:600;font-size:18px">발언 양식 — 한 사람 60초</p>
-      <p>· <strong style="color:var(--on)">누가</strong> 겪는 일인가 (시민 / 민원인 / 동료 공무원 / 본인)<br>
-         · <strong style="color:var(--on)">언제</strong> 일어나는가 (트리거)<br>
-         · 지금 막혀 있는 한 지점<br>
-         · 만약 어떤 기능이 있다면 그 자리에 들어가게 될지</p>
-
-      <p style="margin-top:14px">규칙 하나. <em>"실현 가능한가"는 지금 묻지 않는다.</em> 보안 · 예산 · 권한은 잠시 옆에 두고 결핍을 그대로 말한다. 거점리더의 첫 자산은 <strong style="color:var(--on)">"우리 기관에서 진짜 막혀 있는 자리들의 목록"</strong>이다. 8주 동안 그 목록 위를 다닌다.</p>
-    </div>
-
-    <div class="aside" style="background:rgba(255,255,255,0.05);border-left-color:var(--acc3);color:var(--on);font-style:normal">
-      <strong style="color:var(--acc3);font-family:var(--mono);font-size:11px;letter-spacing:2.5px">RECORD</strong> &nbsp; 발언은 강사가 구글시트 한 장에 그대로 옮겨 적습니다. 다음 회차부터 이 시트가 거점 미션 후보 목록이 됩니다.
+        <div class="h2" style="margin-top:32px">워크플로우 도구</div>
+        <ul class="bl">
+          <li><b>Canvas</b> — 결과물(문서·코드)을 옆 패널에서 반복 편집</li>
+          <li><b>Projects</b> — 작업 단위로 컨텍스트·파일·대화 묶음</li>
+          <li><b>GPTs</b> — 특정 시스템 프롬프트·지식·동작을 갖는 사용자 정의 챗봇</li>
+          <li><b>Memory</b> — 대화 사이에 사용자 정보 유지</li>
+        </ul>
+      </div>
+      <div>
+        <div class="h2">출력 형식</div>
+        <ul class="bl">
+          <li><b>텍스트</b> · 마크다운</li>
+          <li><b>코드</b> · 모든 주요 언어</li>
+          <li><b>SVG</b> · 인라인 벡터 도형</li>
+          <li><b>HTML</b> · 단일 파일 페이지</li>
+          <li><b>Mermaid</b> · 플로우차트·시퀀스·간트</li>
+          <li><b>JSON Schema</b> · 구조화 출력</li>
+        </ul>
+        <div class="div"></div>
+        <div class="h2">입력 형식</div>
+        <ul class="bl">
+          <li><b>첨부</b> · PDF · 엑셀 · CSV · 이미지 · 음성</li>
+          <li><b>URL</b> · 웹페이지 직접 참조</li>
+        </ul>
+      </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">010 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>007 / 019</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     11 · 강사 추천 사이트 + 실습결과 공유
-═══════════════════════════════════════════════════════════════ -->
+<!-- ═══ 08 ChatGPT 시나리오 후보 ═══ -->
+<div class="stage"><div class="slide" data-title="ChatGPT Scenarios">
+  <div class="hb"><div class="hb-l"><span>04</span>CHATGPT 실습 시나리오 후보</div><div>008 / 019</div></div>
+  <div class="body">
+    <div class="kicker">04 · 실습 시나리오 후보 (강사 선택)</div>
+    <h1 class="title title-sm">ChatGPT 실습 — 후보 목록</h1>
+    <p class="lede">아래 후보 중 강사가 시간·수강생 분포에 맞춰 선택한다. 산출물은 구글드라이브 공용 폴더 또는 GitHub 레포에 업로드.</p>
+    <div class="div"></div>
+    <ol class="sc" style="margin-top:8px">
+      <li>SVG 도식 생성 — 부서 업무 흐름·조직도·데이터 구조 중 1개</li>
+      <li>단일 파일 HTML 페이지 — 외부 라이브러리 없이, 부서 안내·체크리스트·공지 페이지 중 1개</li>
+      <li>Mermaid 다이어그램 — 결재 절차·민원 처리 흐름·시스템 구성도 중 1개</li>
+      <li>JSON Schema 작성 — 부서 보고서 양식·민원 분류 체계·점검 항목 중 1개</li>
+      <li>첨부 파일 분석 — PDF·엑셀에서 표·수치·인용문 추출</li>
+      <li>Custom GPT 구성 — 시스템 프롬프트·지식 첨부·동작 정의로 1개 챗봇</li>
+      <li>코드 변환 — 엑셀 수식 → Python · VBA → Python · SQL → Python pandas</li>
+    </ol>
+  </div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>008 / 019</div></div>
+</div></div>
+
+<!-- ═══ 09 Gemini · NotebookLM ═══ -->
+<div class="stage"><div class="slide" data-title="Gemini A">
+  <div class="hb"><div class="hb-l"><span>05</span>GEMINI · NOTEBOOKLM</div><div>009 / 019</div></div>
+  <div class="body">
+    <div class="kicker">05 · Gemini 1부 — NotebookLM</div>
+    <h1 class="title title-sm">NotebookLM — 출처 인용 RAG</h1>
+    <p class="lede">사용자가 업로드한 문서 안에서만 답변하고 인용 출처를 자동으로 표시하는 구글 RAG 도구.</p>
+    <div class="div"></div>
+    <div class="row2-w" style="margin-top:8px">
+      <div>
+        <div class="h2">기능</div>
+        <div class="spec"><div class="spec-l">SOURCE</div><div class="spec-r">PDF · 구글 문서 · 슬라이드 · 텍스트 · 웹 URL · YouTube · 음성</div></div>
+        <div class="spec"><div class="spec-l">QUERY</div><div class="spec-r">자연어 질의 → 인용 출처와 함께 답변</div></div>
+        <div class="spec"><div class="spec-l">SUMMARY</div><div class="spec-r">자동 요약 · FAQ · 학습 가이드 · 타임라인 생성</div></div>
+        <div class="spec"><div class="spec-l">AUDIO</div><div class="spec-r">팟캐스트형 오디오 개요 (Audio Overview)</div></div>
+        <div class="spec"><div class="spec-l">SHARE</div><div class="spec-r">노트북 단위 공유 (보기·편집 권한)</div></div>
+      </div>
+      <div>
+        <div class="h2">공공 적합성</div>
+        <ul class="bl">
+          <li><b>출처 인용 자동</b> — 답변에 원문 위치 표기</li>
+          <li><b>외부망 한정</b> — 보안 등급 낮은 공개 문서 대상</li>
+          <li><b>한국어 지원</b> — 한국어 입력·답변 안정</li>
+          <li><b>비용 0</b> — 무료 사용자 일정 한도</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>009 / 019</div></div>
+</div></div>
+
+<!-- ═══ 10 Gemini · Studio/Flow/Labs ═══ -->
+<div class="stage"><div class="slide" data-title="Gemini B">
+  <div class="hb"><div class="hb-l"><span>05</span>GEMINI · AI STUDIO · FLOW · LABS</div><div>010 / 019</div></div>
+  <div class="body">
+    <div class="kicker">05 · Gemini 2부 — 도구 묶음</div>
+    <h1 class="title title-sm">AI Studio · Flow · labs.google</h1>
+    <div class="div" style="margin:28px 0 16px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:48px">
+      <div>
+        <div class="h2" style="font-size:28px">AI Studio</div>
+        <p class="p" style="font-size:18px">Gemini API를 코드 없이 시험하는 콘솔. 시스템 프롬프트·온도·출력 길이·안전 필터를 즉석에서 조정.</p>
+        <ul class="bl" style="margin-top:14px">
+          <li style="font-size:18px"><b>Function Calling</b></li>
+          <li style="font-size:18px"><b>Structured Output</b> · JSON Schema</li>
+          <li style="font-size:18px"><b>Multimodal</b> · 이미지·영상·음성</li>
+          <li style="font-size:18px"><b>API Key</b> 발급 · 코드 export</li>
+        </ul>
+      </div>
+      <div>
+        <div class="h2" style="font-size:28px">Flow</div>
+        <p class="p" style="font-size:18px">텍스트·이미지 → 영상 생성. 짧은 클립 · 시연 영상 · 부서 홍보용.</p>
+        <ul class="bl" style="margin-top:14px">
+          <li style="font-size:18px">텍스트 프롬프트 → 영상</li>
+          <li style="font-size:18px">이미지 → 영상 (i2v)</li>
+          <li style="font-size:18px">씬 연결 · 카메라 무브 지정</li>
+          <li style="font-size:18px">화질·길이는 시기별 변동</li>
+        </ul>
+      </div>
+      <div>
+        <div class="h2" style="font-size:28px">labs.google</div>
+        <p class="p" style="font-size:18px">구글의 실험 모음. 본 제품 출시 전 단계 도구를 미리 시험.</p>
+        <ul class="bl" style="margin-top:14px">
+          <li style="font-size:18px">실험은 수시 추가·종료</li>
+          <li style="font-size:18px">계정 대기열·승인 필요</li>
+          <li style="font-size:18px">수업 시점에 살아있는 실험 1~2개 선택</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>010 / 019</div></div>
+</div></div>
+
+<!-- ═══ 11 Gemini 시나리오 후보 ═══ -->
+<div class="stage"><div class="slide" data-title="Gemini Scenarios">
+  <div class="hb"><div class="hb-l"><span>05</span>GEMINI 실습 시나리오 후보</div><div>011 / 019</div></div>
+  <div class="body">
+    <div class="kicker">05 · 실습 시나리오 후보 (강사 선택)</div>
+    <h1 class="title title-sm">Gemini 실습 — 후보 목록</h1>
+    <div class="div"></div>
+    <ol class="sc" style="margin-top:16px">
+      <li><b>NotebookLM</b> — 부서 공개 문서 3~5개 업로드 후 자연어 질의·요약·FAQ 생성</li>
+      <li><b>NotebookLM</b> — 회의록·민원 응대 사례를 업로드하고 사례 분류 시도</li>
+      <li><b>AI Studio</b> — 시스템 프롬프트로 분류·검증·번역 중 1개 역할 정의</li>
+      <li><b>AI Studio</b> — Structured Output(JSON Schema)으로 입력 텍스트 → 정형 데이터 변환</li>
+      <li><b>AI Studio</b> — 이미지·영상 입력으로 멀티모달 분석 시도</li>
+      <li><b>Flow</b> — 텍스트 프롬프트로 6초 시연 클립 생성</li>
+      <li><b>labs.google</b> — 수업 시점 살아있는 실험 1개 선택해 5분 체험</li>
+    </ol>
+  </div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>011 / 019</div></div>
+</div></div>
+
+<!-- ═══ 12 Claude ═══ -->
+<div class="stage"><div class="slide" data-title="Claude">
+  <div class="hb"><div class="hb-l"><span>06</span>CLAUDE</div><div>012 / 019</div></div>
+  <div class="body">
+    <div class="kicker">06 · Claude 기능</div>
+    <h1 class="title title-sm">Claude — Projects · Artifacts · MCP</h1>
+    <div class="div" style="margin:28px 0 16px"></div>
+    <div class="row2-w">
+      <div>
+        <div class="h2">모델 라인업 (2026 기준)</div>
+        <div class="spec"><div class="spec-l">OPUS</div><div class="spec-r">최상위 · 복잡 추론·장문·에이전틱 작업</div></div>
+        <div class="spec"><div class="spec-l">SONNET</div><div class="spec-r">균형 · 일반 코딩·문서·분석</div></div>
+        <div class="spec"><div class="spec-l">HAIKU</div><div class="spec-r">빠르고 저비용 · 분류·요약·라우팅</div></div>
+
+        <div class="h2" style="margin-top:32px">웹 클라이언트 핵심 기능</div>
+        <ul class="bl">
+          <li><b>Projects</b> — 시스템 프롬프트 + 지식 파일 + 대화 묶음. 미션 단위 운영.</li>
+          <li><b>Artifacts</b> — HTML · React · 마크다운 · SVG 결과물을 옆 패널에서 반복 편집</li>
+          <li><b>Computer Use</b> — Claude가 데스크톱 화면을 인식·조작 (베타)</li>
+          <li><b>Code Execution</b> — 컨테이너 안에서 Python 실행</li>
+        </ul>
+      </div>
+      <div>
+        <div class="h2">MCP — Model Context Protocol</div>
+        <p class="p">2024년 11월 Anthropic이 공개한 LLM ↔ 외부 도구 표준 프로토콜.</p>
+        <ul class="bl" style="margin-top:14px">
+          <li><b>표준</b> · JSON-RPC 기반</li>
+          <li><b>커넥터</b> · GitHub · 구글드라이브 · Notion · Slack 등</li>
+          <li><b>로컬</b> · stdio · <b>원격</b> · SSE/HTTP</li>
+          <li><b>웹 클라이언트</b>에서 일부 커넥터 직접 활성화 가능</li>
+          <li><b>Claude Code(S06)</b>에서 본격 활용</li>
+        </ul>
+
+        <div class="h2" style="margin-top:32px">3사 비교</div>
+        <div class="spec"><div class="spec-l">CHATGPT</div><div class="spec-r">도구 다양성 · Canvas 워크플로우</div></div>
+        <div class="spec"><div class="spec-l">GEMINI</div><div class="spec-r">멀티모달 · 구글 생태계 · 출처 인용</div></div>
+        <div class="spec"><div class="spec-l">CLAUDE</div><div class="spec-r">긴 컨텍스트 · 코딩 안정성 · MCP</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>012 / 019</div></div>
+</div></div>
+
+<!-- ═══ 13 Claude 시나리오 후보 ═══ -->
+<div class="stage"><div class="slide" data-title="Claude Scenarios">
+  <div class="hb"><div class="hb-l"><span>06</span>CLAUDE 실습 시나리오 후보</div><div>013 / 019</div></div>
+  <div class="body">
+    <div class="kicker">06 · 실습 시나리오 후보 (강사 선택)</div>
+    <h1 class="title title-sm">Claude 실습 — 후보 목록</h1>
+    <div class="div"></div>
+    <ol class="sc" style="margin-top:16px">
+      <li><b>Projects 구성</b> — 부서 미션 1건에 대한 시스템 프롬프트 + 지식 파일 1~3개 등록</li>
+      <li><b>Artifacts</b> — 단일 파일 HTML 대시보드(차트·표) 1개 생성, 반복 수정</li>
+      <li><b>Artifacts</b> — React 컴포넌트 1개 생성 (입력 폼·결과 표시)</li>
+      <li><b>긴 문서 분석</b> — 조례·매뉴얼 PDF 1개 첨부 후 요약·항목 추출·검토 의견</li>
+      <li><b>Code Execution</b> — 엑셀 데이터 첨부 후 Python으로 분석·시각화</li>
+      <li><b>MCP 커넥터</b> — GitHub 또는 구글드라이브 커넥터 활성화 후 1회 호출</li>
+      <li><b>3사 비교</b> — 동일 프롬프트 + 동일 첨부를 ChatGPT·Gemini·Claude에 입력해 결과 비교</li>
+    </ol>
+  </div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>013 / 019</div></div>
+</div></div>
+
+<!-- ═══ 14 토의 ═══ -->
+<div class="stage"><div class="slide dk" data-title="Discussion">
+  <div class="hb"><div class="hb-l"><span>07</span>DISCUSSION</div><div>014 / 019</div></div>
+  <div class="body">
+    <div class="kicker">07 · 토의 주제 (강사 선택)</div>
+    <h1 class="title title-sm">적용 후보 발굴 — 토의 주제</h1>
+    <p class="lede">보안망 · 외부망 제약을 잠시 제외하고 기능과 적용 가능성에만 집중. 강사가 진행 형식(개인 발표 / 그룹 / 화이트보드)을 선택.</p>
+    <div class="div" style="background:rgba(255,255,255,0.1)"></div>
+    <ol class="sc" style="margin-top:16px">
+      <li>본 부서에서 반복도가 가장 높은 작업 1개와, 거기에 적용 가능한 LLM 기능 매칭</li>
+      <li>NotebookLM·RAG로 답변할 수 있는 부서 문서 더미 후보 1~3개</li>
+      <li>현재 수기·복붙으로 처리되는 작업 중 LLM이 줄일 수 있는 시간 추정</li>
+      <li>부서 외부에 공개해도 되는 자료 vs 내부망에서만 다룰 자료 분류</li>
+      <li>3사(ChatGPT·Gemini·Claude) 중 본 부서 1차 도입 후보 선택과 근거</li>
+    </ol>
+  </div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>014 / 019</div></div>
+</div></div>
+
+<!-- ═══ 15 강사 추천 사이트 ═══ -->
 <div class="stage"><div class="slide" data-title="Curated Sites">
-  <div class="hbar"><div class="hbar-l">PART 08 · 큐레이션 · 40분</div><div class="hbar-r">Session 02</div></div>
+  <div class="hb"><div class="hb-l"><span>08</span>강사 추천 사이트</div><div>015 / 019</div></div>
   <div class="body">
-    <div class="kicker">Part 08 · 16:00 — 16:40</div>
-    <h2 class="title">강사 추천 사이트 + <em>실습결과 공유</em></h2>
-    <div class="rule"></div>
-
-    <p class="lead">강사가 매일 만져보고 살아남은 사이트들만 추렸다. 사이트만 소개하고 끝나지 않는다. <strong>한 사이트당 즉석 실습 1개</strong> → 결과물을 구글드라이브 공용 폴더에 올린다. 다른 거점리더가 같은 사이트를 더 잘 활용할 수 있게 만드는 것이 핵심.</p>
-
-    <div class="cols2" style="margin-top:8px">
+    <div class="kicker">08 · 강사 추천 사이트</div>
+    <h1 class="title title-sm">카테고리별 사이트 큐레이션</h1>
+    <p class="lede">상세 목록은 <code>references/02-ai-lecture-sites.html</code>. 매 기수 갱신.</p>
+    <div class="div"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px 64px;margin-top:8px">
       <div>
-        <div class="sec-h"><span class="num">A.</span>오늘 함께 둘러볼 곳</div>
-        <div class="prose">
-          <p>워크벤치 강의안에 미리 박아둔 사이트가 있다. 카테고리는 대략 5갈래.</p>
-          <p>· <strong>대화형 LLM</strong> · ChatGPT · Claude · Gemini · Grok<br>
-             · <strong>문서 / 데이터</strong> · NotebookLM · Perplexity · Felo<br>
-             · <strong>미디어 생성</strong> · Flow · Runway · ElevenLabs<br>
-             · <strong>노코드 / 바이브코딩</strong> · Lovable · Bolt · v0 · Replit<br>
-             · <strong>전문 플랫폼</strong> · Hugging Face · Ollama · LangChain</p>
-          <p style="margin-top:10px;font-style:italic;color:var(--ink3);font-size:14px">목록은 매 기수마다 갱신됩니다. <span class="link">references/02-ai-lecture-sites.html</span> 참고.</p>
-        </div>
+        <div class="h2" style="font-size:26px">대화형 LLM</div>
+        <p class="p" style="font-size:18px">ChatGPT · Claude · Gemini · Grok · Mistral Le Chat · Perplexity</p>
       </div>
       <div>
-        <div class="sec-h"><span class="num">B.</span>실습결과 공유 약속</div>
-        <div class="prose">
-          <p>· 구글드라이브 폴더 <span class="code">02-curated/&lt;사이트명&gt;/&lt;내이름&gt;</span><br>
-             · 결과물 + 사용한 프롬프트 .md 같이 올림<br>
-             · 1줄 후기 — <em>"이 사이트는 ~할 때 좋고, ~할 때는 막힌다"</em></p>
-          <p style="margin-top:14px">거점리더는 산출물을 자기 책상에 두지 않는다. <strong>다른 거점리더가 같은 입력으로 같은 결과를 다시 만들 수 있어야</strong> 산출물이 완성된다.</p>
-        </div>
+        <div class="h2" style="font-size:26px">문서 · 검색 RAG</div>
+        <p class="p" style="font-size:18px">NotebookLM · Perplexity Spaces · Felo · ChatPDF · Humata</p>
+      </div>
+      <div>
+        <div class="h2" style="font-size:26px">미디어 생성</div>
+        <p class="p" style="font-size:18px">Flow (영상) · Runway · Sora · ElevenLabs (음성) · Suno (음악) · Midjourney · Imagen</p>
+      </div>
+      <div>
+        <div class="h2" style="font-size:26px">노코드 · 바이브코딩</div>
+        <p class="p" style="font-size:18px">Lovable · Bolt · v0 · Replit · Cursor · Windsurf · GitHub Spark</p>
+      </div>
+      <div>
+        <div class="h2" style="font-size:26px">전문 플랫폼</div>
+        <p class="p" style="font-size:18px">Hugging Face · Ollama · LangChain · LlamaIndex · OpenRouter</p>
+      </div>
+      <div>
+        <div class="h2" style="font-size:26px">데이터 · 분석</div>
+        <p class="p" style="font-size:18px">Julius AI · Rows · Hex · Jupyter AI · Google Colab</p>
       </div>
     </div>
-
-    <div class="aside">사이트 소개를 듣기만 하지 않습니다. <strong>40분 안에 사이트 3개 × 실습 1개씩</strong>이 기본 목표. 막히면 옆자리와 같이 풉니다.</div>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">011 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>015 / 019</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     12 · GitHub + 노코드 바이브코딩 도구
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide" data-title="GitHub & Nocode Tools">
-  <div class="hbar"><div class="hbar-l">PART 09 · GitHub · 노코드 · 60분</div><div class="hbar-r">Session 02</div></div>
+<!-- ═══ 16 사이트 시나리오 후보 ═══ -->
+<div class="stage"><div class="slide" data-title="Sites Scenarios">
+  <div class="hb"><div class="hb-l"><span>08</span>사이트 실습 시나리오 후보</div><div>016 / 019</div></div>
   <div class="body">
-    <div class="kicker">Part 09 · 16:40 — 17:40</div>
-    <h2 class="title">GitHub + <em>노코드 바이브코딩 도구</em></h2>
-    <div class="rule"></div>
-
-    <p class="lead">1주차 과제(SLM 보고서 GitHub 등록)로 모두 GitHub 가입을 마쳤다. 오늘은 그 위에 <strong>노코드 바이브코딩 도구 4종</strong>을 얹어, 각자 부서 미션의 <em>'가벼운 프로토타입'</em>을 30분 안에 만들 수 있는 손길을 익힌다. 셋업은 끝나 있다 — 이제 손을 움직인다.</p>
-
-    <div class="list" style="margin-top:8px">
-      <div class="list-item"><div class="list-num">①</div><div class="list-text"><strong>Lovable</strong> — 자연어로 풀스택 웹앱을 만든다. <em>Supabase 연결이 자연스럽다</em>는 점이 강점. 부서 내부 도구의 1차 프로토타입에 잘 맞는다.<small>실습 — "민원 분류 입력 폼 + 결과 표시 페이지"를 자연어로 한 번 생성, GitHub 푸쉬까지.</small></div></div>
-      <div class="list-item"><div class="list-num">②</div><div class="list-text"><strong>Bolt</strong> — 브라우저 안에서 풀스택 환경이 통째로 돌아간다. <em>속도가 빠르고 기술 스택이 자유롭다</em>. 단발성 데모 만들 때 가장 가벼움.<small>실습 — "내 부서 안내 한 페이지" 정적 사이트 1개를 5분 안에.</small></div></div>
-      <div class="list-item"><div class="list-num">③</div><div class="list-text"><strong>v0</strong> — Vercel이 만든 도구. <em>UI 컴포넌트를 자연어로 디자인</em>하는 데 특화. 화면 스케치를 즉석에서 React 컴포넌트로 옮길 때 좋다.<small>실습 — "공공기관 민원 대시보드" 한 화면을 컴포넌트로 생성, 미세 조정.</small></div></div>
-      <div class="list-item"><div class="list-num">④</div><div class="list-text"><strong>Replit</strong> — 클라우드 IDE + 에이전트 결합. <em>코드까지 직접 보고 만지고 싶을 때</em> 좋다. 6주차 이후 코딩에이전트로 옮겨가기 전 중간 자리.<small>실습 — Lovable에서 만든 결과물을 Replit으로 가져와 한 부분만 손으로 수정해본다.</small></div></div>
-    </div>
-
-    <div class="aside">네 도구 모두 <strong>GitHub 연동</strong>이 핵심. 오늘 산출물은 모두 자기 GitHub 레포로 푸쉬됩니다. 다음 주차부터는 이 레포가 거점 미션의 본거지가 됩니다.</div>
+    <div class="kicker">08 · 실습 시나리오 후보 (강사 선택)</div>
+    <h1 class="title title-sm">사이트 실습 — 후보 목록</h1>
+    <p class="lede">후보 중 강사가 시간에 맞게 3~5개 선택. 산출물은 구글드라이브 공용 폴더 <code>02-curated/&lt;사이트명&gt;/&lt;수강생명&gt;</code>에 업로드.</p>
+    <div class="div"></div>
+    <ol class="sc" style="margin-top:16px">
+      <li><b>Perplexity</b> — 부서 관련 최신 동향 1건 조사 (출처 5건 이상 포함)</li>
+      <li><b>Felo</b> — 동일 질의를 한국어로 시도, Perplexity와 결과 비교</li>
+      <li><b>ElevenLabs</b> — 부서 안내 음성 30초 합성</li>
+      <li><b>Suno</b> — 부서 행사용 짧은 음악 1곡 생성</li>
+      <li><b>Midjourney / Imagen</b> — 부서 보고서·홍보물 표지 이미지 1장</li>
+      <li><b>Hugging Face Spaces</b> — 데모 1개 실행해 입력·출력 확인</li>
+      <li><b>Julius AI</b> — 엑셀 첨부 후 자연어로 분석·시각화</li>
+      <li><b>OpenRouter</b> — 한 인터페이스로 여러 모델 호출, 응답 차이 비교</li>
+    </ol>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">012 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>016 / 019</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     13 · 마무리 — 자주 쓰는 AI 툴 구글시트
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide" data-title="Closing">
-  <div class="hbar"><div class="hbar-l">CLOSING · 마무리 · 20분</div><div class="hbar-r">Session 02</div></div>
+<!-- ═══ 17 GitHub + 노코드 4종 ═══ -->
+<div class="stage"><div class="slide" data-title="GitHub & Nocode">
+  <div class="hb"><div class="hb-l"><span>09</span>GITHUB · 노코드 바이브코딩 4종</div><div>017 / 019</div></div>
   <div class="body">
-    <div class="kicker">Closing · 17:40 — 18:00</div>
-    <h2 class="title">자주 쓰는 AI 툴 <em>구글시트</em></h2>
-    <div class="rule"></div>
-
-    <p class="lead">오늘의 마지막 20분. 각자 <strong>"내가 자주 쓰는 AI 도구 3개 + 한 줄 후기"</strong>를 구글시트 한 장에 적는다. 이 시트는 본 강의가 끝나도 거점리더 공용 자산으로 살아남는다 — <strong>차기 거점리더 기수의 출발점</strong>이 된다.</p>
-
-    <div class="cols2" style="margin-top:8px">
+    <div class="kicker">09 · GitHub + 노코드 바이브코딩</div>
+    <h1 class="title title-sm">Lovable · Bolt · v0 · Replit</h1>
+    <p class="lede">자연어 입력 → 작동하는 웹앱·UI 컴포넌트. GitHub 레포로 export 가능한 4개 도구를 비교.</p>
+    <div class="div"></div>
+    <div class="row2" style="margin-top:8px">
       <div>
-        <div class="sec-h"><span class="num">A.</span>각 행에 들어가는 정보</div>
-        <div class="prose">
-          <p>· 도구 이름 · 카테고리 (대화 / 문서 / 코드 / 미디어 / 노코드)<br>
-             · 무료 / 유료 / 부서 결제 가능 여부<br>
-             · 자기가 쓰는 사용처 한 줄<br>
-             · 강점 1줄 / 약점 1줄<br>
-             · 추천 정도 (5점 척도)</p>
-        </div>
+        <div class="h2" style="font-size:28px">Lovable</div>
+        <ul class="bl" style="margin-top:8px">
+          <li><b>강점</b> · 자연어 → 풀스택 (React + Tailwind + Vite)</li>
+          <li><b>백엔드</b> · Supabase 연동이 표준 흐름</li>
+          <li><b>출력</b> · GitHub 레포 직접 동기화 · Vercel 배포</li>
+          <li><b>적합</b> · 부서 내부 도구 1차 프로토타입</li>
+        </ul>
+
+        <div class="h2" style="font-size:28px;margin-top:28px">Bolt (StackBlitz)</div>
+        <ul class="bl" style="margin-top:8px">
+          <li><b>강점</b> · 브라우저 안에서 풀스택 환경 실행 (WebContainer)</li>
+          <li><b>스택 자유</b> · React · Vue · Svelte · Next · Astro 등</li>
+          <li><b>출력</b> · GitHub 레포 export</li>
+          <li><b>적합</b> · 단발성 데모·POC</li>
+        </ul>
       </div>
       <div>
-        <div class="sec-h"><span class="num">B.</span>다음 회차로 가져갈 것</div>
-        <div class="prose">
-          <p>· 사전 설치 항목 중 <strong>막혔던 부분</strong> 정리해 오기 (IT부서와 협의 필요한 항목 별표)<br>
-             · 오늘 토의에서 적은 <strong>"만약 이 기능이 있다면"</strong> 자기 항목 한 줄을 다듬어 오기<br>
-             · 3주차에는 <strong>오픈코드(Codex · Antigravity) + 코딩에이전트로 파일·문서 다루기</strong>로 들어간다</p>
-        </div>
-      </div>
-    </div>
+        <div class="h2" style="font-size:28px">v0 (Vercel)</div>
+        <ul class="bl" style="margin-top:8px">
+          <li><b>강점</b> · UI 컴포넌트 자연어 디자인 (shadcn/ui · Tailwind)</li>
+          <li><b>출력</b> · React 컴포넌트 코드 · Next.js 페이지</li>
+          <li><b>배포</b> · Vercel 원클릭</li>
+          <li><b>적합</b> · 화면·컴포넌트 프로토타입</li>
+        </ul>
 
-    <div class="aside" style="margin-top:24px">
-      한 줄 다짐 — <strong>"오늘 본 도구 중에 다음 한 주 동안 한 가지를 매일 5분이라도 만져본다."</strong> 거점리더의 손은 강의실에서 만들어지지 않습니다. 매일의 5분이 만듭니다.
+        <div class="h2" style="font-size:28px;margin-top:28px">Replit</div>
+        <ul class="bl" style="margin-top:8px">
+          <li><b>강점</b> · 클라우드 IDE + Agent · 코드를 직접 보고 수정</li>
+          <li><b>스택 자유</b> · 거의 모든 언어·프레임워크</li>
+          <li><b>출력</b> · GitHub 연동 · Replit 호스팅</li>
+          <li><b>적합</b> · 노코드 → 코드 전환 중간 단계</li>
+        </ul>
+      </div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">013 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>017 / 019</div></div>
 </div></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     14 · BACK COVER
-═══════════════════════════════════════════════════════════════ -->
-<div class="stage"><div class="slide dark" data-title="Back Cover">
-  <div class="hbar"><div class="hbar-l">END OF SESSION 02</div><div class="hbar-r">Next · Session 03</div></div>
-  <div class="body" style="justify-content:center;align-items:flex-start">
-    <div class="kicker">Next Session</div>
-    <h2 class="title" style="font-size:60px">3회차 · <em>바이브코딩 워크플로우</em></h2>
-    <div class="rule"></div>
-    <p class="lead" style="max-width:1100px">오픈코드(Codex · Antigravity) + oh my agent를 깔고, 파이썬으로 파일시스템·hwpx·PDF·엑셀을 다루는 손길을 익힌다. LLM 프롬프트만으로 엑셀을 자동화하는 '엑셀 싱크' 패턴, 외부 GitHub 라이브러리(markitdown 등)를 코딩에이전트가 가져와 작업하게 만드는 흐름까지. 마지막은 그린·블루 연습문제 풀이.</p>
+<!-- ═══ 18 노코드 시나리오 후보 ═══ -->
+<div class="stage"><div class="slide" data-title="Nocode Scenarios">
+  <div class="hb"><div class="hb-l"><span>09</span>노코드 실습 시나리오 후보</div><div>018 / 019</div></div>
+  <div class="body">
+    <div class="kicker">09 · 실습 시나리오 후보 (강사 선택)</div>
+    <h1 class="title title-sm">노코드 4종 실습 — 후보 목록</h1>
+    <div class="div"></div>
+    <ol class="sc" style="margin-top:16px">
+      <li><b>Lovable</b> — 입력 폼 + 결과 표시 페이지 1개. Supabase 테이블 1개 연결.</li>
+      <li><b>Lovable</b> — 부서 안내 단일 페이지를 자연어로 생성, GitHub 푸쉬</li>
+      <li><b>Bolt</b> — 정적 HTML 한 페이지를 5분 안에 생성, 즉시 미리보기</li>
+      <li><b>Bolt</b> — Next.js·Astro 중 하나로 다국어 안내 페이지 1개</li>
+      <li><b>v0</b> — 대시보드 한 화면을 React 컴포넌트로 생성, props 변경으로 변형</li>
+      <li><b>v0</b> — 폼 컴포넌트 1개 생성 후 v0에서 직접 미세 조정</li>
+      <li><b>Replit</b> — Lovable 결과물을 import하고 1개 함수만 손으로 수정</li>
+      <li><b>4종 비교</b> — 동일 요구("부서 민원 입력 폼")를 4개 도구에 같이 입력하고 결과 비교</li>
+    </ol>
+  </div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>018 / 019</div></div>
+</div></div>
 
-    <div class="aside" style="background:rgba(255,255,255,0.05);border-left-color:var(--acc3);color:var(--on);font-style:normal;margin-top:32px">
-      <strong style="color:var(--acc3);font-family:var(--mono);font-size:11px;letter-spacing:2.5px">PREP</strong> &nbsp; 3회차 시작 전까지 — 사전 설치 미완료 항목 정리 / 자주 쓰는 AI 툴 구글시트 작성 / "만약 이 기능이 있다면" 자기 항목 한 줄.
+<!-- ═══ 19 NEXT ═══ -->
+<div class="stage"><div class="slide dk" data-title="Next">
+  <div class="hb"><div class="hb-l"><span>END</span>NEXT SESSION</div><div>019 / 019</div></div>
+  <div class="body" style="justify-content:center">
+    <div class="kicker">다음 회차</div>
+    <h1 class="title" style="font-size:88px">S03 · 바이브코딩<br>워크플로우</h1>
+    <div class="lede" style="margin-top:32px">오픈코드(Codex · Antigravity) + oh my agent 설치, 파이썬으로 파일시스템·hwpx·PDF·엑셀 다루기, 엑셀 싱크, 외부 GitHub 라이브러리 활용, 그린·블루 연습문제.</div>
+    <div class="div" style="margin:48px 0;background:rgba(255,255,255,0.1)"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,auto);gap:80px;font-size:18px">
+      <div><div style="font-family:var(--mono);font-size:12px;letter-spacing:2px;color:#7a6a52;font-weight:700;margin-bottom:8px">PREP 01</div><div style="font-weight:600">사전 설치 미완료 항목 정리</div></div>
+      <div><div style="font-family:var(--mono);font-size:12px;letter-spacing:2px;color:#7a6a52;font-weight:700;margin-bottom:8px">PREP 02</div><div style="font-weight:600">자주 쓰는 AI 툴 구글시트 작성</div></div>
+      <div><div style="font-family:var(--mono);font-size:12px;letter-spacing:2px;color:#7a6a52;font-weight:700;margin-bottom:8px">PREP 03</div><div style="font-weight:600">VS Code · Git 실행 확인</div></div>
     </div>
   </div>
-  <div class="fbar"><div class="fbar-l">02 · LLM 사용 서비스 마스터리</div><div class="fbar-r">014 / 014</div></div>
+  <div class="fb"><div>02 · LLM 사용 서비스 마스터리</div><div>019 / 019 · END</div></div>
 </div></div>
 
 </div>
@@ -624,22 +690,22 @@ let editMode=false;
 function tEdit(){
   editMode=!editMode;
   const btn=document.getElementById('editBtn'),tb=document.querySelector('.toolbar');
-  const SEL='.kicker,.title,.subtitle,.lead,.prose,.prose p,.list-text,.list-text small,.sec-h,.aside,.cm-l,.cm-v,.type-h,.type-d,.hbar-l,.hbar-r,.fbar-l,.fbar-r,h1,h2,p';
-  if(editMode){btn.textContent='✎ EDITING';btn.style.background='#b8532a';btn.style.color='#fff';tb.style.borderBottom='2px solid #b8532a';
-    document.querySelectorAll(SEL).forEach(el=>{el.contentEditable='true';el.style.outline='1px dashed rgba(184,83,42,0.3)';el.style.cursor='text'});
+  const SEL='.kicker,.title,.lede,.h2,.p,.bl li,.sc li,.spec-r,.spec-l,.hb-l,.fb,h1,h2,p';
+  if(editMode){btn.textContent='✎ EDITING';btn.style.background='#a3431f';btn.style.color='#fff';tb.style.borderBottom='2px solid #a3431f';
+    document.querySelectorAll(SEL).forEach(el=>{el.contentEditable='true';el.style.outline='1px dashed rgba(163,67,31,0.3)';el.style.cursor='text'});
     deck.style.scrollSnapType='none';
-    sToast('EDIT ON — 텍스트 클릭 수정 · Ctrl+S 저장 · E 또는 ESC로 종료');
+    sToast('EDIT ON · 텍스트 클릭 수정 · Ctrl+S 저장 · ESC 종료');
   }else{btn.textContent='✎ EDIT';btn.style.background='';btn.style.color='';tb.style.borderBottom='';
     document.querySelectorAll('[contenteditable="true"]').forEach(el=>{el.contentEditable='false';el.style.outline='';el.style.cursor=''});
     deck.style.scrollSnapType='y mandatory';
-    sToast('EDIT OFF — 프레젠테이션 모드');
+    sToast('EDIT OFF');
   }
 }
-function sToast(m){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(14,10,6,0.92);color:#ede4d3;font-family:var(--mono,monospace);font-size:13px;letter-spacing:1.5px;padding:10px 24px;border-radius:4px;z-index:300;pointer-events:none;opacity:0;transition:opacity 0.4s';document.body.appendChild(t)}t.textContent=m;t.style.opacity='1';clearTimeout(t._tid);t._tid=setTimeout(()=>{t.style.opacity='0'},3000)}
+function sToast(m){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(14,10,6,0.92);color:#f1e9d6;font-family:var(--mono,monospace);font-size:13px;letter-spacing:1.5px;padding:10px 24px;border-radius:4px;z-index:300;pointer-events:none;opacity:0;transition:opacity 0.4s';document.body.appendChild(t)}t.textContent=m;t.style.opacity='1';clearTimeout(t._tid);t._tid=setTimeout(()=>{t.style.opacity='0'},3000)}
 
 document.addEventListener('keydown',e=>{
   if(editMode){
-    if(e.key==='s'&&(e.ctrlKey||e.metaKey)){e.preventDefault();const b=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=document.title.replace(/[^a-zA-Z0-9가-힣\s·_-]/g,'')+'.html';a.click();URL.revokeObjectURL(a.href);sToast('HTML 파일 저장 완료')}
+    if(e.key==='s'&&(e.ctrlKey||e.metaKey)){e.preventDefault();const b=new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=document.title.replace(/[^a-zA-Z0-9가-힣\s·_-]/g,'')+'.html';a.click();URL.revokeObjectURL(a.href);sToast('HTML 저장 완료')}
     if(e.key==='Escape'||e.key==='e'||e.key==='E'){if(!document.activeElement||document.activeElement===document.body)tEdit()}
     return;
   }
