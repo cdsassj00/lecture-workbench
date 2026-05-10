@@ -2514,8 +2514,12 @@ async function uploadSessionRef(sessionNum, file, label) {
   const { data: sessData } = await sb.auth.getSession();
   if (!sessData?.session) throw new Error('편집자 로그인 필요');
 
-  // Storage 업로드
-  const safeName = file.name.replace(/[^a-zA-Z0-9가-힣._\-]/g, '_');
+  // Storage 업로드 — Supabase Storage path는 ASCII 안전문자만 허용 (한글 NG)
+  // 한글 파일명은 메타 테이블의 label/filename에 그대로 보존되고, storage path는 ASCII 처리
+  const ext = (file.name.match(/\.[^.]+$/) || [''])[0].toLowerCase();
+  const stem = file.name.slice(0, file.name.length - ext.length);
+  const asciiStem = stem.replace(/[^a-zA-Z0-9._\-]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '') || 'file';
+  const safeName = (asciiStem + ext).slice(0, 80);
   const path = `s${String(sessionNum).padStart(2,'0')}/${Date.now()}_${safeName}`;
   const { error: upErr } = await sb.storage.from('session-refs').upload(path, file, {
     cacheControl: '3600', upsert: false, contentType: file.type || 'application/octet-stream'
