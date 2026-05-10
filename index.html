@@ -2543,10 +2543,30 @@ async function uploadSessionRef(sessionNum, file, label) {
   return row;
 }
 
+async function addSessionRefLink(sessionNum, url, label, description) {
+  if (!sb) throw new Error('Supabase 연결 안 됨');
+  const { data: sessData } = await sb.auth.getSession();
+  if (!sessData?.session) throw new Error('편집자 로그인 필요');
+  // URL 형식 자동 보정
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  const { data: row, error } = await sb.from('session_refs').insert({
+    session_num: sessionNum,
+    label: label || url,
+    filename: '',  // 빈 문자열 = 외부 링크 표시
+    url,
+    content_type: 'link',
+    size: 0,
+    description: description || null,
+    created_by: sessData.session.user?.email || null
+  }).select().single();
+  if (error) throw new Error('링크 저장 실패: ' + error.message);
+  return row;
+}
+
 async function deleteSessionRef(refId, url) {
   if (!sb) throw new Error('Supabase 연결 안 됨');
-  // Storage path 추출 — URL 뒤에서 'session-refs/' 이후
-  const m = url.match(/session-refs\/(.+?)(?:\?|$)/);
+  // Storage 업로드 파일인 경우만 storage 객체 삭제 (외부 링크는 url만 우리 도메인 외부)
+  const m = url && url.match(/\/storage\/v1\/object\/public\/session-refs\/(.+?)(?:\?|$)/);
   if (m) {
     const path = decodeURIComponent(m[1]);
     await sb.storage.from('session-refs').remove([path]);
@@ -2604,17 +2624,24 @@ function buildSessionCard(s) {
   // 정적 refs (SESSION_FILES에 박힌 링크)
   staticRefs.forEach(r => refBox.appendChild(buildRefLink(r, false)));
 
-  // 동적 refs (DB 업로드)
-  dynamicRefs.forEach(r => refBox.appendChild(buildRefLink({
-    label: r.label, href: r.url, desc: r.description || `${r.filename} · ${fmtBytes(r.size)}`,
-    _id: r.id, _url: r.url, _dynamic: true
-  }, true)));
+  // 동적 refs (DB 업로드/링크)
+  dynamicRefs.forEach(r => {
+    const isLink = r.content_type === 'link' || !r.filename;
+    const desc = r.description || (isLink ? '' : `${r.filename} · ${fmtBytes(r.size)}`);
+    refBox.appendChild(buildRefLink({
+      label: r.label, href: r.url, desc,
+      _id: r.id, _url: r.url, _dynamic: true, _isLink: isLink
+    }, true));
+  });
 
-  // 편집 모드 — 드롭존
+  // 편집 모드 — 드롭존 + 링크 추가 버튼
   if (isEditor) {
+    const editRow = document.createElement('div');
+    editRow.style.cssText = 'margin-top:4px;display:flex;gap:6px';
+
     const dropZone = document.createElement('div');
-    dropZone.style.cssText = 'margin-top:4px;padding:10px 8px;border:1.5px dashed var(--wln);border-radius:3px;text-align:center;font-size:10px;color:var(--wink3);cursor:pointer;transition:all 0.12s;background:rgba(184,83,42,0.02)';
-    dropZone.innerHTML = '⬆ 파일 드롭 또는 클릭해서 업로드 (HTML·PDF·DOCX·이미지 등)';
+    dropZone.style.cssText = 'flex:1;padding:10px 8px;border:1.5px dashed var(--wln);border-radius:3px;text-align:center;font-size:10px;color:var(--wink3);cursor:pointer;transition:all 0.12s;background:rgba(184,83,42,0.02)';
+    dropZone.innerHTML = '⬆ 파일 드롭 또는 클릭해 업로드';
     dropZone.onclick = () => {
       const fi = document.createElement('input');
       fi.type = 'file';
@@ -2630,7 +2657,30 @@ function buildSessionCard(s) {
       const files = Array.from(e.dataTransfer.files);
       await handleSessionRefUpload(sessionNum, files, card);
     };
-    refBox.appendChild(dropZone);
+    editRow.appendChild(dropZone);
+
+    const linkBtn = document.createElement('button');
+    linkBtn.style.cssText = 'padding:0 12px;border:1.5px dashed var(--wln);border-radius:3px;background:rgba(184,83,42,0.02);font-size:10px;color:var(--wink3);cursor:pointer;white-space:nowrap;transition:all 0.12s';
+    linkBtn.textContent = '🔗 링크 추가';
+    linkBtn.onmouseenter = () => { linkBtn.style.borderColor = 'var(--wacc)'; linkBtn.style.background = 'rgba(184,83,42,0.08)'; linkBtn.style.color = 'var(--wacc)'; };
+    linkBtn.onmouseleave = () => { linkBtn.style.borderColor = 'var(--wln)'; linkBtn.style.background = 'rgba(184,83,42,0.02)'; linkBtn.style.color = 'var(--wink3)'; };
+    linkBtn.onclick = async () => {
+      const url = prompt('사이트 URL (예: https://example.com)');
+      if (!url || !url.trim()) return;
+      const label = prompt('링크 라벨 (예: 강사 추천 사이트)', url.replace(/^https?:\/\//, '').split('/')[0]);
+      if (label === null) return;
+      const desc = prompt('설명 (선택, Enter로 건너뛰기)') || '';
+      try {
+        toast('링크 추가 중...');
+        await addSessionRefLink(sessionNum, url.trim(), (label||'').trim() || url, desc.trim());
+        delete _sessionRefsCache[sessionNum];
+        await openSessionList();
+        toast('✓ 링크 추가됨');
+      } catch (e) { toast('실패: ' + e.message); }
+    };
+    editRow.appendChild(linkBtn);
+
+    refBox.appendChild(editRow);
   }
 
   if (totalRefs > 0 || isEditor) card.appendChild(refBox);
