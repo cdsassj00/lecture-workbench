@@ -2925,6 +2925,28 @@ const _yieldUI = () => new Promise(r => requestAnimationFrame(() => requestAnima
 const _originalFetchSession = fetchSession;
 fetchSession = async function(s) {
   document.getElementById('sessionModalBg').classList.remove('show');
+
+  // V2 카드는 DB 자동 로드 우회 — 항상 정적 파일에서 최신본 fetch
+  // (DB에는 V1 32장 + 사용자 편집본이 session_num 기준으로 섞여 있어서
+  //  V2 카드가 DB와 같은 session_num을 공유하면 V1 사본이 로드됨)
+  if (s.v2) {
+    showLoadOverlay(`Session ${s.num} v2 불러오는 중...`, '정적 파일에서 최신 V2 강의안을 받고 있습니다.');
+    setLoadProgress(20, '파일 로드 중...');
+    await _yieldUI();
+    try {
+      await _originalFetchSession(s);
+      S.currentSessionNum = null;  // V2는 DB 저장 비활성 (V1 행 덮어쓰기 방지)
+      updateAuthUI();
+      document.getElementById('tbInfo').textContent = `${s.file} · ${S.slides.length}장 · V2 (정적)`;
+      const stf = document.getElementById('stFile'); if (stf) stf.textContent = `${s.file} (V2)`;
+      setLoadProgress(100, '완료');
+      toast(`V2 Session ${s.num} 로드 — ${S.slides.length}장 (정적 파일)`);
+    } finally {
+      setTimeout(hideLoadOverlay, 320);
+    }
+    return;
+  }
+
   showLoadOverlay(`Session ${s.num} 불러오는 중...`, 'DB에서 슬라이드 데이터를 받고 있습니다.');
   setLoadProgress(5, 'DB 연결 중...');
   await _yieldUI();
