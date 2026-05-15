@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lovable 실전 사용 매뉴얼 · 2회차 2기 과제 보조 가이드</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F1F5F9; --paper:#FFFFFF; --surface:#F8FAFC;
+  --border:#E2E8F0; --border-light:#F1F5F9;
+  --ink:#0F172A; --ink-soft:#334155; --ink-mute:#64748B; --ink-faint:#94A3B8;
+  --accent:#2563EB; --accent-deep:#1E40AF; --accent-soft:#EFF6FF; --accent-border:#BFDBFE; --accent-2:#0EA5E9;
+  --warn:#B45309; --warn-bg:#FFFBEB; --warn-border:#FDE68A;
+  --ok:#047857; --ok-bg:#ECFDF5; --ok-border:#A7F3D0;
+  --code-bg:#F1F5F9;
+  --shadow-md:0 2px 4px rgba(15,23,42,.06),0 12px 32px rgba(15,23,42,.08);
+  --sans:'Pretendard Variable','Pretendard','Inter','Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13pt;line-height:1.85;min-height:100vh;-webkit-font-smoothing:antialiased}
+code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:2px 6px;border-radius:4px;color:var(--accent-deep);font-weight:500}
+b{color:var(--ink);font-weight:600}
+
+.tb{position:fixed;top:0;left:0;right:0;height:56px;z-index:200;background:rgba(241,245,249,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 22px}
+.tb-brand{font-weight:700;font-size:14px;letter-spacing:-.2px;color:var(--ink)}
+.tb-brand .sub{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:600;letter-spacing:1.8pt;text-transform:uppercase;color:var(--ink-mute)}
+.tb-spacer{flex:1}
+.tb a, .tb button{height:36px;padding:0 14px;border-radius:7px;cursor:pointer;font:600 12.5px var(--sans);letter-spacing:-.1px;background:var(--paper);border:1px solid var(--border);color:var(--ink-soft);display:inline-flex;align-items:center;gap:6px;transition:all .15s;text-decoration:none}
+.tb a:hover, .tb button:hover{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent-deep)}
+.tb .tb-print{background:var(--ink);border-color:var(--ink);color:#fff}
+.tb .tb-print:hover{background:#000;border-color:#000;color:#fff}
+
+.stack{padding:80px 0 60px;display:flex;flex-direction:column;align-items:center;gap:24px}
+.sheet{width:210mm;min-height:297mm;background:var(--paper);color:var(--ink);padding:22mm 22mm 24mm;position:relative;overflow:hidden;border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow-md)}
+
+.cv{padding:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;overflow:hidden;border:none}
+.cv::before{content:"";position:absolute;top:0;left:0;right:0;height:4mm;background:var(--accent);z-index:3}
+.cv-content{flex:1;padding:26mm 22mm 14mm;display:flex;flex-direction:column;justify-content:space-between}
+.cv-top .cv-org{font-family:var(--mono);font-size:8.5pt;letter-spacing:2.8pt;text-transform:uppercase;color:var(--ink-faint);line-height:2}
+.cv-top .cv-org strong{display:block;color:var(--accent-2);font-weight:700;font-size:9pt;margin-bottom:3mm}
+.cv-center .cv-year{font-family:var(--sans);font-weight:500;font-size:18pt;color:var(--accent-2);margin-bottom:5mm;letter-spacing:-.3pt}
+.cv-center .cv-title{font-family:var(--sans);font-weight:800;font-size:38pt;color:#fff;line-height:1.15;letter-spacing:-1.6pt;margin:0 0 6mm}
+.cv-center .cv-rule{width:48mm;height:1.2mm;background:var(--accent);margin:6mm 0}
+.cv-center .cv-doctype{font-family:var(--sans);font-weight:600;font-size:18pt;color:#CBD5E1;margin-bottom:4mm;letter-spacing:-.3pt}
+.cv-center .cv-sub{font-family:var(--sans);font-weight:400;font-size:11.5pt;color:#CBD5E1;line-height:1.7;max-width:135mm}
+.cv-bottom .cv-meta{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid rgba(255,255,255,.18);padding-top:7mm;gap:8mm}
+.cv-meta .m-l{font:700 7.5pt/1 var(--mono);letter-spacing:2.2pt;text-transform:uppercase;color:var(--accent-2);margin-bottom:3mm}
+.cv-meta .m-v{font-family:var(--sans);font-size:11.5pt;font-weight:600;color:#fff;letter-spacing:-.2pt}
+.cv-foot{background:#fff;color:var(--ink);padding:10mm 22mm 12mm;display:flex;justify-content:space-between;align-items:center;position:relative}
+.cv-foot::before{content:"";position:absolute;top:0;left:0;right:0;height:.6mm;background:var(--accent)}
+.cv-foot-l{font-family:var(--sans);font-weight:700;font-size:13pt;color:var(--ink);letter-spacing:-.2pt}
+.cv-foot-l .sub{display:block;font-size:8.5pt;font-weight:600;color:var(--ink-mute);letter-spacing:1.5pt;text-transform:uppercase;margin-top:2mm;font-family:var(--mono)}
+.cv-foot-r{text-align:right;font:600 7.5pt/1.7 var(--mono);letter-spacing:1.6pt;color:var(--ink-mute);text-transform:uppercase;max-width:80mm}
+
+.sec-kicker{font:700 8.5pt/1 var(--mono);letter-spacing:2.2pt;text-transform:uppercase;color:var(--accent);margin-top:9mm;margin-bottom:3mm;display:inline-block;background:var(--accent-soft);padding:3pt 8pt;border-radius:4pt}
+.sec h2{font-family:var(--sans);font-weight:700;font-size:14pt;color:var(--ink);letter-spacing:-.3px;padding:0 0 3mm;margin-bottom:5mm;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5mm}
+.sec h2::before{content:"";display:inline-block;width:3.5pt;height:18pt;background:var(--accent);border-radius:2pt}
+.sec h3{font-family:var(--sans);font-weight:700;font-size:12pt;color:var(--ink);margin-top:6mm;margin-bottom:3mm;letter-spacing:-.2pt}
+
+.sec p{font-size:11.5pt;line-height:1.95;color:var(--ink-soft);margin:0 0 3mm;letter-spacing:-.05pt}
+.sec ul, .sec ol{margin:3mm 0 4mm;padding:0;list-style:none;counter-reset:olc}
+.sec ul li, .sec ol li{position:relative;padding:2.5mm 0 2.5mm 9mm;font-size:11pt;line-height:1.75;color:var(--ink-soft);border-bottom:1px solid var(--border-light)}
+.sec ul li:last-child, .sec ol li:last-child{border-bottom:none}
+.sec ul li::before{content:"";position:absolute;left:1.5mm;top:5.5mm;width:8pt;height:8pt;background:var(--accent);border-radius:50%}
+.sec ol li{counter-increment:olc}
+.sec ol li::before{content:counter(olc);position:absolute;left:0;top:2.5mm;width:6mm;height:6mm;background:var(--accent);color:#fff;border-radius:50%;font:700 9pt/6mm var(--mono);text-align:center}
+
+.flow{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin:5mm 0 6mm;background:var(--surface);padding:4mm 5mm;border-radius:6px;border:1px solid var(--border)}
+.fb{background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:2.5mm 4mm;font-family:var(--sans);font-size:10pt;font-weight:600;color:var(--ink-soft);min-width:22mm;text-align:center;letter-spacing:-.1pt}
+.fb.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.fa{color:var(--ink-faint);padding:0 1.5mm;font-size:11pt}
+
+.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin:4mm 0 5mm}
+.ai-card{background:var(--paper);border:1px solid var(--border);border-radius:5px;padding:4mm 5mm}
+.ai-card .ai-name{font:700 9.5pt/1 var(--mono);letter-spacing:1.5pt;color:var(--accent-deep);background:var(--accent-soft);padding:2pt 6pt;border-radius:3pt;display:inline-block;margin-bottom:3mm;text-transform:uppercase}
+.ai-card p{font-size:10pt;color:var(--ink-soft);line-height:1.65;margin:0}
+
+table.dt{width:100%;border-collapse:collapse;margin:4mm 0 5mm;background:var(--paper);border:1px solid var(--border);border-radius:5px;overflow:hidden;font-size:10.5pt}
+table.dt thead th{background:var(--surface);color:var(--ink);font:700 9.5pt/1.4 var(--sans);letter-spacing:-.1pt;text-align:left;padding:3mm 5mm;border-bottom:1px solid var(--border)}
+table.dt tbody td{padding:3mm 5mm;border-bottom:1px solid var(--border-light);vertical-align:top;color:var(--ink-soft);line-height:1.65}
+table.dt tbody tr:last-child td{border-bottom:none}
+table.dt tbody td:first-child{font-weight:600;color:var(--ink);font-family:var(--sans)}
+
+.tag{display:inline-block;font:700 8pt/1 var(--mono);letter-spacing:.6pt;padding:1.5pt 5pt;border-radius:3pt;margin-left:3pt;vertical-align:middle;text-transform:uppercase}
+.tag-blue{background:var(--accent-soft);color:var(--accent-deep);border:1px solid var(--accent-border)}
+.tag-ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border)}
+.tag-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
+
+.pblock{background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:9.5pt;line-height:1.7;border-radius:5px;padding:4mm 5mm;margin:2mm 0 5mm;white-space:pre-wrap;word-break:break-word}
+.pblock .cm{color:#64748B}
+.pblock .hl{color:#FCD34D}
+.p-label{font:700 8.5pt/1 var(--mono);letter-spacing:1.5pt;text-transform:uppercase;color:var(--ink-mute);margin-top:5mm;margin-bottom:1.5mm;display:flex;align-items:center;gap:2mm}
+.p-label span{color:var(--accent);font-weight:700}
+
+.callout{border:1px solid var(--accent-border);border-left:4px solid var(--accent);background:var(--accent-soft);padding:5mm 6mm;margin:5mm 0;border-radius:5px;page-break-inside:avoid}
+.callout .label{font:700 8pt/1 var(--mono);letter-spacing:2pt;text-transform:uppercase;color:var(--accent-deep);margin-bottom:3mm;display:flex;align-items:center;gap:2mm}
+.callout .label::before{content:"●";font-size:7pt;color:var(--accent)}
+.callout p{font-size:10.5pt;color:var(--ink);line-height:1.75;margin:1.5mm 0}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-border);border-left-color:var(--warn)}
+.callout.warn .label{color:var(--warn)}
+.callout.warn .label::before{color:var(--warn)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-border);border-left-color:var(--ok)}
+.callout.ok .label{color:var(--ok)}
+.callout.ok .label::before{color:var(--ok)}
+
+.step{background:var(--paper);border:1px solid var(--border);border-left:4px solid var(--accent);padding:5mm 6mm;margin:4mm 0;border-radius:5px}
+.step .st{font:700 8pt/1 var(--mono);letter-spacing:2pt;text-transform:uppercase;color:var(--accent);margin-bottom:3mm}
+.step p{font-size:10.5pt;color:var(--ink-soft);line-height:1.75;margin:1.5mm 0}
+
+.ck{margin:4mm 0 5mm;padding:0;list-style:none}
+.ck li{display:flex;align-items:flex-start;gap:3mm;padding:3mm 0;border-bottom:1px solid var(--border-light);font-size:11pt;color:var(--ink-soft);line-height:1.7}
+.ck li:last-child{border-bottom:none}
+.cb{width:5mm;height:5mm;border:1.5px solid var(--accent-border);border-radius:1mm;flex-shrink:0;margin-top:1.5mm;background:var(--paper)}
+
+@media print{
+  @page{size:A4 portrait;margin:14mm 14mm 16mm 14mm}
+  @page :first{margin:0}
+  html,body{background:#fff !important}
+  .tb{display:none !important}
+  .stack{padding:0;gap:0}
+  .sheet{width:auto;min-height:auto;box-shadow:none !important;border:none !important;margin:0;padding:0 0 6mm;page-break-after:always;border-radius:0}
+  .sheet:last-child{page-break-after:auto}
+  .cv{margin:0;padding:0;min-height:297mm;page-break-after:always}
+  .sheet:not(.cv){padding:18mm 18mm 18mm}
+}
+</style>
+</head>
+<body>
+
+<div class="tb">
+  <div class="tb-brand">Lovable 실전 사용 매뉴얼<span class="sub">Day 2 · 2기 보조 가이드</span></div>
+  <div class="tb-spacer"></div>
+  <a href="assignment-day2-webapp-2nd.html">⬅ 과제 안내</a>
+  <a href="assignments.html">📋 과제 허브</a>
+  <button class="tb-print" onclick="window.print()">⬇ PDF 인쇄</button>
+</div>
+
+<div class="stack">
+
+<!-- COVER -->
+<section class="sheet cv">
+  <div class="cv-content">
+    <div class="cv-top">
+      <div class="cv-org">
+        <strong>AI 전문인재 과정 · 2026 · 2기</strong>
+        Public AI Expert Program · Day 2 Companion Guide
+      </div>
+    </div>
+    <div class="cv-center">
+      <div class="cv-year">Day 2 · Companion Guide · 2기</div>
+      <h1 class="cv-title">Lovable 실전<br>사용 매뉴얼</h1>
+      <div class="cv-rule"></div>
+      <div class="cv-doctype">아이디어 → AI 프롬프트 → Lovable 배포</div>
+      <div class="cv-sub">ChatGPT·Gemini·Claude로 Lovable 프롬프트를 설계하고, Lovable Cloud 내장 백엔드(인증 없음)로 사이트를 만든 뒤 GitHub Integration → Publish까지 완성하는 단계별 실전 가이드입니다.</div>
+    </div>
+    <div class="cv-bottom">
+      <div class="cv-meta">
+        <div class="m"><div class="m-l">기준</div><div class="m-v">Lovable 2.0 · 2026.05.07</div></div>
+        <div class="m"><div class="m-l">백엔드</div><div class="m-v">Lovable Cloud (인증 X)</div></div>
+        <div class="m"><div class="m-l">크레딧</div><div class="m-v">1일 5개</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cv-foot">
+    <div class="cv-foot-l">
+      AI 전문인재 과정 · 2기
+      <span class="sub">Day 2 · Lovable Full-Stack Guide</span>
+    </div>
+    <div class="cv-foot-r">Companion Guide · For Reference Only</div>
+  </div>
+</section>
+
+<!-- BODY 1: Step 1 -->
+<section class="sheet">
+  <div class="sec">
+    <div class="flow">
+      <div class="fb on">① 아이디어</div><div class="fa">→</div>
+      <div class="fb on">② AI 프롬프트</div><div class="fa">→</div>
+      <div class="fb">③ Lovable 생성</div><div class="fa">→</div>
+      <div class="fb">④ Cloud 백엔드</div><div class="fa">→</div>
+      <div class="fb">⑤ GitHub</div><div class="fa">→</div>
+      <div class="fb">⑥ Publish</div>
+    </div>
+
+    <span class="sec-kicker">STEP 01 · PROMPT DESIGN</span>
+    <h2>ChatGPT · Gemini · Claude로 Lovable 프롬프트 만들기</h2>
+    <p>Lovable에 바로 입력하기 전에, 먼저 범용 AI 챗봇에 <b>Lovable용 프롬프트 초안</b>을 요청합니다. 기획 의도를 구체화하고 빠뜨린 기능을 잡아내는 데 효과적입니다. 이 단계는 Lovable 크레딧을 전혀 소모하지 않습니다.</p>
+
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="ai-name">ChatGPT</div>
+        <p>chat.openai.com · GPT-5.5 Instant<br>구조적 기능 명세 작성에 강함</p>
+      </div>
+      <div class="ai-card">
+        <div class="ai-name">Gemini</div>
+        <p>gemini.google.com · Gemini 3 Pro<br>Google 계정 즉시 사용 · 간결한 출력</p>
+      </div>
+      <div class="ai-card">
+        <div class="ai-name">Claude</div>
+        <p>claude.ai · Sonnet 4.6<br>UX 흐름 설계와 화면 구조 설명에 강함</p>
+      </div>
+    </div>
+
+    <h3>AI에게 프롬프트를 요청하는 방법</h3>
+    <p>아래 틀에 본인의 아이디어를 채워 ChatGPT·Gemini·Claude 중 하나에 입력합니다.</p>
+    <div class="p-label"><span>→ 공통 입력 템플릿</span> 아이디어만 교체</div>
+<div class="pblock"><span class="hl">저는 [아이디어 설명]을 만들고 싶습니다.</span>
+
+예를 들어 제가 만들고 싶은 것은:
+- [핵심 기능 1]
+- [핵심 기능 2]
+- [핵심 기능 3]
+
+이걸 Lovable이라는 AI 바이브코딩 툴에서 만들려고 합니다.
+Lovable에 입력할 프롬프트를 작성해주세요.
+조건:
+- 백엔드는 Lovable 내장 Cloud(Supabase 기반)를 사용합니다
+- 로그인/인증은 사용하지 않습니다 (누구나 바로 사용 가능한 앱)
+- DB에 저장해야 할 데이터 구조도 포함해주세요
+- 화면 목록도 명시해주세요
+- 한국어로 작성해주세요</div>
+
+    <h3>아이디어 유형별 예시</h3>
+
+    <div class="p-label"><span>예시 A</span> 사진 갤러리</div>
+<div class="pblock">저는 사진 갤러리 웹앱을 만들고 싶습니다.
+누구나 사진을 업로드하고 카드 그리드로 갤러리를 보는 앱입니다.
+로그인 없이 바로 사용할 수 있어야 합니다.
+
+Lovable이라는 AI 바이브코딩 툴에 입력할 프롬프트를 달라고 요청합니다.
+백엔드는 Lovable 내장 Cloud를 쓰고, 사진 Storage 업로드 기능이 필요합니다.
+한국어로 써주세요.</div>
+
+    <div class="p-label"><span>예시 B</span> 할 일 관리 앱</div>
+<div class="pblock">저는 할 일 관리 앱을 만들고 싶습니다.
+할 일 추가, 완료 체크, 삭제 기능이 핵심입니다.
+로그인 없이 바로 사용 가능하고, 데이터는 DB에 저장되어야 합니다.
+
+Lovable이라는 AI 바이브코딩 툴에 입력할 프롬프트를 써주세요.
+Lovable Cloud 내장 백엔드를 씁니다. 한국어로 써주세요.</div>
+
+    <div class="p-label"><span>예시 C</span> 게스트북·방명록</div>
+<div class="pblock">저는 간단한 게스트북(방명록) 웹앱을 만들고 싶습니다.
+닉네임과 메시지를 입력하면 방명록에 표시되는 앱입니다.
+비로그인도 글을 쓸 수 있지만, 로그인한 사람만 삭제 권한이 있습니다.
+
+Lovable 바이브코딩 툴에 입력할 프롬프트를 써주세요.
+Lovable Cloud 내장 백엔드 사용 기준입니다.</div>
+
+    <div class="callout ok">
+      <div class="label">✓ AI가 프롬프트를 생성해주면</div>
+      <p>그대로 Lovable에 붙여넣어도 되고, 마음에 들지 않는 부분은 직접 수정해도 됩니다. AI가 준 프롬프트를 다시 다른 AI에게 검토받는 것도 좋습니다. 예: "이 Lovable 프롬프트에서 빠진 기능이 있으면 추가해줘"</p>
+    </div>
+  </div>
+</section>
+
+<!-- BODY 2: Step 2 -->
+<section class="sheet">
+  <div class="sec">
+    <span class="sec-kicker">STEP 02 · PROJECT START</span>
+    <h2>Lovable 프로젝트 생성 및 초기 빌드</h2>
+
+    <h3>2-1. 프로젝트 생성</h3>
+    <ol>
+      <li><b>lovable.dev</b> 로그인 → 대시보드 → <code>+ New Project</code> 클릭</li>
+      <li>프로젝트 이름 입력 — 영문 권장 (GitHub 저장소 이름이 됨)</li>
+      <li>빈 에디터 하단 채팅창에 AI로 만든 프롬프트 붙여넣기 → 전송</li>
+    </ol>
+
+    <h3>2-2. Lovable 에디터 핵심 모드</h3>
+    <table class="dt">
+      <thead><tr><th style="width:30%">모드</th><th>용도</th><th style="width:22%">크레딧</th></tr></thead>
+      <tbody>
+        <tr><td>Agent Mode <span class="tag tag-blue">기본</span></td><td>프롬프트 입력 → AI가 코드 자동 생성·수정. 모든 기능 구현에 사용</td><td>소모 ●</td></tr>
+        <tr><td>Chat Mode</td><td>코드 작성 없이 질문·설계·오류 원인 분석. 대화 전용</td><td>무료 ○</td></tr>
+        <tr><td>Plan Mode</td><td>복잡한 요청 전 단계별 계획 먼저 제시. 승인 후 실행</td><td>계획 무료 / 실행 소모</td></tr>
+        <tr><td>Visual Edits</td><td>Figma처럼 UI 요소 클릭 후 색상·여백·폰트 직접 수정</td><td>무료 ○</td></tr>
+        <tr><td>Dev Mode</td><td>Lovable 내에서 코드 직접 열람·편집 (2026.05 신규)</td><td>무료 ○</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <div class="label">⚠ 크레딧 절약 원칙</div>
+      <p>오류가 반복되면 "Try to Fix" 버튼을 계속 누르지 마세요. 크레딧만 소모됩니다. 오류 발생 시 → <b>Chat Mode</b>에서 원인 파악 → <b>Plan Mode</b>로 수정 계획 수립 → 실행. 아니면 히스토리에서 <b>롤백</b>으로 정상 버전으로 되돌리세요.</p>
+    </div>
+
+    <h3>2-3. 추가 기능 요청 프롬프트 작성법</h3>
+    <p>초기 생성 이후 기능을 하나씩 추가할 때는 짧고 명확하게 요청합니다.</p>
+
+    <div class="p-label"><span>Good</span> 구체적·단일 요청</div>
+<div class="pblock">게시글 목록 화면에서 각 카드 클릭 시
+상세 보기 페이지(/posts/:id)로 이동하게 해줘.</div>
+
+    <div class="p-label"><span>Bad</span> 한 번에 너무 많은 요청</div>
+<div class="pblock"><span class="cm">// 이렇게 하면 AI가 중간에 실수할 확률 높음</span>
+게시글 CRUD 만들고, 댓글 기능도 넣고,
+좋아요 버튼도 추가하고, 파일 업로드도 해줘.</div>
+
+    <p>기능은 한 번에 하나씩 요청하는 것이 크레딧 효율과 안정성 모두에 유리합니다.</p>
+  </div>
+</section>
+
+<!-- BODY 3: Step 3 -->
+<section class="sheet">
+  <div class="sec">
+    <span class="sec-kicker">STEP 03 · LOVABLE CLOUD BACKEND</span>
+    <h2>Lovable Cloud 내장 백엔드 설정</h2>
+    <p>Lovable Cloud는 Supabase 기술 기반의 <b>내장 백엔드</b>입니다. 별도 Supabase 계정 없이 Lovable 에디터 안에서 DB·Storage를 바로 사용할 수 있습니다. 이번 과제에서는 인증 없이 개발합니다.</p>
+
+    <div class="callout ok">
+      <div class="label">✓ Lovable Cloud의 장점</div>
+      <p>외부 계정 연결 없이 즉시 사용 가능. 에디터 내 패널에서 테이블 확인. Storage도 프롬프트 한 줄로 설정. 코드 내 환경변수 자동 처리.</p>
+    </div>
+
+    <h3>3-1. Cloud 활성화</h3>
+    <ol>
+      <li>Lovable 에디터 상단 <b><code>+</code> 버튼</b> → <code>Cloud</code> 선택</li>
+      <li><code>Enable Lovable Cloud</code> 클릭 → 내장 DB·Storage 자동 생성</li>
+      <li>에디터 사이드패널에 <b>Database / Storage</b> 탭이 생기면 완료</li>
+    </ol>
+
+    <div class="callout warn">
+      <div class="label">⚠ 2026년 3월 이후 변경사항</div>
+      <p>2026년 3월 24일부터 신규 Cloud 프로젝트에서 Test/Live 환경 분리 기능은 제공되지 않습니다. 기존 프로젝트는 계속 사용 가능하지만, 지금 새로 만드는 프로젝트는 단일 환경으로 운영됩니다.</p>
+    </div>
+
+    <h3>3-2. 기능별 활성화 (프롬프트)</h3>
+    <p>Cloud 활성화 후 필요한 기능을 Agent Mode에서 프롬프트로 요청합니다.</p>
+
+    <h3>데이터베이스 (DB 테이블 생성)</h3>
+    <div class="p-label"><span>Agent Mode</span> 예시: 할 일 앱</div>
+<div class="pblock">Lovable Cloud DB에 tasks 테이블을 만들어줘.
+컬럼: id(UUID, 기본키), title(텍스트),
+completed(불리언, 기본값 false), created_at(타임스탬프)
+누구나 데이터를 읽고 쓸 수 있어야 해. 로그인 없이 사용하는 앱이야.</div>
+    <p>생성 후 에디터 사이드패널 → <b>Database</b> 탭에서 테이블 구조 확인 가능합니다.</p>
+
+    <h3>Storage (파일·이미지 업로드)</h3>
+    <div class="p-label"><span>Agent Mode</span> 예시: 사진 갤러리</div>
+<div class="pblock">Lovable Cloud Storage에 'photos' 버킷을 만들고,
+사진 업로드 버튼을 메인 화면에 추가해줘.
+업로드 후 갤러리 그리드에 바로 표시해줘.
+로그인 없이 누구나 업로드 가능하게 해줘.</div>
+
+    <h3>Edge Function (서버리스 로직)</h3>
+    <div class="p-label"><span>Agent Mode</span> 예시: 자동 처리 함수</div>
+<div class="pblock">게시글이 저장될 때 글자 수를 자동으로 계산해서
+DB의 char_count 컬럼에 저장하는 Edge Function을 만들어줘.
+Lovable Cloud Edge Function을 사용해.</div>
+
+    <div class="callout">
+      <div class="label">외부 API Key가 필요한 경우 (예: OpenAI)</div>
+      <p>Lovable 에디터 상단 <code>+</code> → <code>Cloud</code> → <code>Secrets</code> → <code>+</code> 버튼으로 키 추가. 코드에 직접 키를 입력하면 GitHub에 노출되므로 반드시 Secrets를 사용하세요. Secrets에 저장한 이름(<code>OPENAI_KEY</code>)과 함수 코드 내 참조 이름이 <b>대소문자까지 동일</b>해야 합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BODY 4: Step 4 & 5 -->
+<section class="sheet">
+  <div class="sec">
+    <span class="sec-kicker">STEP 04 · GITHUB INTEGRATION</span>
+    <h2>GitHub Integration 연동</h2>
+    <p>Lovable ↔ GitHub는 양방향 자동 동기화입니다. Lovable에서 변경하면 GitHub 커밋이 자동 생성됩니다. 반대로 GitHub에서 코드를 수정해도 Lovable에 반영됩니다.</p>
+
+    <h3>4-1. 연동 절차</h3>
+    <ol>
+      <li>에디터 우측 상단 <b>GitHub 아이콘</b> 클릭 (또는 상단 메뉴 → GitHub)</li>
+      <li><code>Connect to GitHub</code> → 브라우저 팝업에서 GitHub 로그인·권한 허용</li>
+      <li>저장소 이름 확인 (프로젝트 이름 자동 입력) → <code>Create Repository</code></li>
+      <li>"Connected to GitHub" 표시 확인</li>
+      <li>github.com → 본인 계정 → 저장소 검색 → 코드 파일 목록 확인</li>
+    </ol>
+
+    <h3>4-2. 제출용 GitHub URL 확인</h3>
+    <div class="step">
+      <div class="st">URL 형식 확인</div>
+      <p>github.com 접속 → 해당 저장소 클릭 → 브라우저 주소창의 URL 복사</p>
+      <p>형식: <code>https://github.com/본인아이디/저장소이름</code></p>
+      <p>저장소가 <b>Public</b>으로 설정되어 있는지 확인 (기본값이 Public이지만 확인 필요)</p>
+    </div>
+
+    <div class="callout warn">
+      <div class="label">⚠ 팝업 차단 주의</div>
+      <p>GitHub 연동 시 팝업이 열려야 합니다. 브라우저에서 팝업이 차단되면 주소창 오른쪽 팝업 차단 아이콘 클릭 → 허용 후 재시도합니다.</p>
+    </div>
+
+    <h3>4-3. Dev Mode로 코드 직접 확인</h3>
+    <p>에디터 상단 <code>Dev Mode</code> 토글 → 생성된 TypeScript/React 코드를 에디터 내에서 직접 볼 수 있습니다. 구경하거나 간단한 텍스트 수정에 사용하세요. 크레딧 소모 없음.</p>
+
+    <span class="sec-kicker" style="margin-top:11mm">STEP 05 · PUBLISH</span>
+    <h2>Publish — 배포 URL 확보</h2>
+
+    <h3>5-1. 배포 전 점검</h3>
+    <ul>
+      <li>미리보기 패널에서 핵심 기능 사용 → 데이터 반영 흐름 테스트</li>
+      <li>빨간 에러 콘솔이 있으면 Chat Mode에서 원인 파악 후 수정</li>
+      <li>DB 데이터가 실제 저장되는지 에디터 → Database 탭에서 확인</li>
+    </ul>
+
+    <h3>5-2. Publish 실행</h3>
+    <ol>
+      <li>에디터 우측 상단 <b><code>Publish</code></b> 버튼 클릭</li>
+      <li>Cloud가 연결된 경우 → <b>Security Scan</b> 자동 실행 (2026.05 신기능). 경고가 있으면 내용 확인. 심각하지 않으면 무시 가능</li>
+      <li><code>Publish</code> 클릭 → 빌드 1~3분 대기</li>
+      <li>완료 후 배포 URL 표시: <code>https://프로젝트이름.lovable.app</code></li>
+      <li>배포 URL 복사 → 이것이 제출용 Lovable URL</li>
+    </ol>
+
+    <h3>5-3. 배포 후 실제 테스트</h3>
+    <ul>
+      <li><b>시크릿 창(비공개 탭)</b>에서 배포 URL 접속 — 캐시 없는 상태로 테스트</li>
+      <li>핵심 기능 사용 → 데이터가 실제로 저장되는지 확인</li>
+      <li>모바일 브라우저에서도 레이아웃 확인</li>
+    </ul>
+
+    <h3>5-4. 재배포</h3>
+    <p>기능을 수정하거나 추가한 뒤에는 <code>Publish</code> 버튼을 다시 클릭하면 됩니다. 같은 URL 그대로 업데이트됩니다.</p>
+  </div>
+</section>
+
+<!-- BODY 5: Credit + Troubleshooting + Checklist -->
+<section class="sheet">
+  <div class="sec">
+    <span class="sec-kicker">CREDIT MANAGEMENT</span>
+    <h2>크레딧 절약 전략 (1일 5개 기준)</h2>
+
+    <table class="dt">
+      <thead><tr><th style="width:24%">상황</th><th>낭비하는 방법</th><th>절약하는 방법</th></tr></thead>
+      <tbody>
+        <tr><td>기능 설계</td><td>Agent Mode에서 바로 시도</td><td>Chat Mode 설계 확정 후 1회 실행</td></tr>
+        <tr><td>오류 반복</td><td>"Try to Fix" 반복 클릭</td><td>Chat Mode 원인 파악 → Plan Mode 계획 수립</td></tr>
+        <tr><td>UI 스타일 수정</td><td>매번 AI 프롬프트로 색상·크기 수정</td><td>Visual Edits에서 직접 클릭 수정 (크레딧 0)</td></tr>
+        <tr><td>코드 확인</td><td>AI에게 코드 설명 요청</td><td>Dev Mode에서 직접 열람 (크레딧 0)</td></tr>
+        <tr><td>심각한 오류</td><td>계속 수정 시도로 상황 악화</td><td>히스토리 패널 → 정상 버전으로 즉시 롤백</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="label">3일 크레딧 분배 예시</div>
+      <p><b>1일차 (5크레딧)</b>: 전체 화면 구조 생성 2개 + Cloud 활성화 및 DB 테이블 생성 1개 + 데이터 연결 1개 + 여유 1개</p>
+      <p><b>2일차 (5크레딧)</b>: Storage 업로드 기능 1개 + 화면 연결 및 라우팅 1개 + 데이터 표시 UI 1개 + 수정 2개</p>
+      <p><b>3일차 (5크레딧)</b>: 최종 UI 정리 1개 + 엣지케이스 수정 2개 + GitHub 확인 + Publish</p>
+    </div>
+
+    <span class="sec-kicker" style="margin-top:9mm">TROUBLESHOOTING</span>
+    <h2>자주 발생하는 문제 해결</h2>
+
+    <h3>데이터가 저장되지 않는다</h3>
+    <div class="step">
+      <div class="st">원인 및 해결</div>
+      <p><b>원인 A</b> · 테이블의 행 수준 보안(RLS) 정책이 public 접근을 막고 있음 → Chat Mode: "tasks 테이블에 데이터가 저장 안 되는 이유를 분석해줘. 로그인 없이 누구나 쓸 수 있어야 해"</p>
+      <p><b>원인 B</b> · Cloud가 활성화되지 않은 상태 → 에디터 <code>+</code> → Cloud → 활성화 여부 확인</p>
+      <p><b>원인 C</b> · 테이블 컬럼명이 코드와 불일치 → Database 탭에서 실제 컬럼명 확인 후 프롬프트로 수정 요청</p>
+    </div>
+
+    <h3>AI가 같은 오류를 반복한다 (루핑)</h3>
+    <div class="step">
+      <div class="st">해결 순서</div>
+      <p>1. 히스토리 패널에서 마지막 정상 버전으로 롤백</p>
+      <p>2. Chat Mode: "지금 [오류 내용]이 발생하고 있어. 원인이 뭔지 분석해줘"</p>
+      <p>3. Plan Mode: "이 오류를 고치는 단계별 계획을 세워줘. 바로 코드 수정하지 말고 계획만 먼저 보여줘"</p>
+      <p>4. 계획 확인 후 승인 → 실행</p>
+    </div>
+
+    <h3>GitHub 연동이 안 된다</h3>
+    <div class="step">
+      <div class="st">해결 순서</div>
+      <p>1. 브라우저 팝업 허용 설정 확인 (주소창 우측 팝업 차단 아이콘)</p>
+      <p>2. 새 탭에서 github.com 접속 → 로그인 상태 확인</p>
+      <p>3. Lovable 에디터 새로고침 후 재시도</p>
+      <p>4. GitHub → Settings → Applications → Lovable 권한 재승인</p>
+    </div>
+
+    <h3>Edge Function이 오류를 반환한다</h3>
+    <div class="step">
+      <div class="st">해결 순서</div>
+      <p>에디터 → Cloud 패널 → Functions → 해당 함수 → Logs 탭에서 오류 내용 확인</p>
+      <p>Secrets 이름이 코드와 대소문자까지 동일한지 확인 (<code>OPENAI_KEY</code> ≠ <code>openai_key</code>)</p>
+      <p>Chat Mode: "Edge Function [함수이름]이 오류를 반환하고 있어. Logs에 [오류내용]이라고 나오는데 원인이 뭔지 알려줘"</p>
+    </div>
+
+    <span class="sec-kicker" style="margin-top:9mm">FINAL CHECKLIST</span>
+    <h2>제출 전 최종 체크리스트</h2>
+    <ul class="ck">
+      <li><div class="cb"></div><span>ChatGPT·Gemini·Claude 중 하나로 Lovable 프롬프트를 생성하여 첫 빌드를 실행했다</span></li>
+      <li><div class="cb"></div><span>Lovable Cloud를 활성화했다 (에디터 <code>+</code> → Cloud → Enable)</span></li>
+      <li><div class="cb"></div><span>DB / Storage / Edge Function 중 1개 이상이 실제로 작동한다 (인증 불필요)</span></li>
+      <li><div class="cb"></div><span>GitHub Integration을 연결했고 저장소에 코드가 push되어 있다</span></li>
+      <li><div class="cb"></div><span>GitHub 저장소 URL을 복사해 두었다 (<code>github.com/아이디/저장소명</code>)</span></li>
+      <li><div class="cb"></div><span>Publish를 실행하여 <code>.lovable.app</code> 배포 URL을 확보했다</span></li>
+      <li><div class="cb"></div><span>시크릿 창에서 배포 URL 접속 → 핵심 기능 정상 동작 확인</span></li>
+      <li><div class="cb"></div><span>구글시트에 소속·이름·Lovable URL·GitHub URL 4개 항목 입력 완료</span></li>
+    </ul>
+
+    <div class="callout ok">
+      <div class="label">✓ 완성도보다 기획 의도가 핵심</div>
+      <p>크레딧 한계로 미완성이 되어도 감점 없습니다. Publish URL과 GitHub URL 2개가 있고, 만들고자 했던 것이 무엇인지 보이면 충분합니다.</p>
+    </div>
+
+    <p style="margin-top:6mm;font-size:10pt;color:var(--ink-mute)">Lovable 2.0 (2026.05.07 출시) · Lovable Cloud Backend 기준. 기능·크레딧 정책은 수시 업데이트됩니다. 최신 정보: <code>docs.lovable.dev/changelog</code></p>
+  </div>
+</section>
+
+</div>
+
+</body>
+</html>

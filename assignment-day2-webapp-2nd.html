@@ -30,6 +30,25 @@ code{font-family:var(--mono);font-size:.9em;background:var(--code-bg);padding:2p
 .tb .tb-print{background:var(--ink);border-color:var(--ink);color:#fff}
 .tb .tb-print:hover{background:#000;border-color:#000;color:#fff}
 
+/* ===== 빨간 깜빡 배너 ===== */
+.alert-banner{position:fixed;top:56px;left:0;right:0;z-index:199;background:linear-gradient(90deg,#DC2626 0%,#EF4444 50%,#DC2626 100%);color:#fff;padding:12px 22px;display:flex;align-items:center;gap:14px;justify-content:center;border-bottom:2px solid #991B1B;box-shadow:0 4px 16px rgba(220,38,38,.35);animation:pulse 1.4s ease-in-out infinite;text-decoration:none}
+.alert-banner:hover{filter:brightness(1.05)}
+.alert-banner .ab-dot{width:10px;height:10px;background:#FEF3C7;border-radius:50%;box-shadow:0 0 0 0 rgba(254,243,199,.8);animation:dot 1s ease-out infinite;flex-shrink:0}
+.alert-banner .ab-tag{font:800 10pt/1 var(--mono);letter-spacing:2pt;text-transform:uppercase;background:rgba(0,0,0,.25);padding:5px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.3);flex-shrink:0}
+.alert-banner .ab-text{font-family:var(--sans);font-weight:700;font-size:14px;letter-spacing:-.2px}
+.alert-banner .ab-text b{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:2px}
+.alert-banner .ab-arrow{font-size:18px;font-weight:800}
+@keyframes pulse{
+  0%,100%{box-shadow:0 4px 16px rgba(220,38,38,.35),inset 0 0 0 0 rgba(255,255,255,0)}
+  50%{box-shadow:0 6px 24px rgba(220,38,38,.65),inset 0 0 60px rgba(255,255,255,.08)}
+}
+@keyframes dot{
+  0%{box-shadow:0 0 0 0 rgba(254,243,199,.9);transform:scale(1)}
+  70%{box-shadow:0 0 0 14px rgba(254,243,199,0);transform:scale(1.2)}
+  100%{box-shadow:0 0 0 0 rgba(254,243,199,0);transform:scale(1)}
+}
+.stack{padding-top:128px !important}
+
 .stack{padding:80px 0 60px;display:flex;flex-direction:column;align-items:center;gap:24px}
 .sheet{width:210mm;min-height:297mm;background:var(--paper);color:var(--ink);padding:22mm 22mm 24mm;position:relative;overflow:hidden;border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow-md)}
 
@@ -83,7 +102,8 @@ code{font-family:var(--mono);font-size:.9em;background:var(--code-bg);padding:2p
   @page{size:A4 portrait;margin:14mm 14mm 16mm 14mm}
   @page :first{margin:0}
   html,body{background:#fff !important}
-  .tb{display:none !important}
+  .tb, .alert-banner{display:none !important}
+  .stack{padding-top:0 !important}
   .stack{padding:0;gap:0}
   .sheet{width:auto;min-height:auto;box-shadow:none !important;border:none !important;margin:0;padding:0 0 6mm;page-break-after:always;border-radius:0}
   .sheet:last-child{page-break-after:auto}
@@ -100,6 +120,14 @@ code{font-family:var(--mono);font-size:.9em;background:var(--code-bg);padding:2p
   <a href="assignments.html">⬅ 과제 허브</a>
   <button class="tb-print" onclick="window.print()">⬇ PDF 인쇄</button>
 </div>
+
+<!-- 빨간 깜빡 배너 -->
+<a class="alert-banner" href="assignment-day2-lovable-guide.html">
+  <span class="ab-dot"></span>
+  <span class="ab-tag">필독</span>
+  <span class="ab-text">Lovable 실전 사용 매뉴얼 · <b>아이디어 → AI 프롬프트 → Cloud 백엔드 → GitHub → Publish</b> 단계별 가이드 열기</span>
+  <span class="ab-arrow">→</span>
+</a>
 
 <div class="stack">
 
