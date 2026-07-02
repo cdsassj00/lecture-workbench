@@ -658,6 +658,11 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
         </label>
       </div>
     </div>
+    <div style="margin-bottom:10px">
+      <input type="file" id="slideGenPdfIn" accept="application/pdf,.pdf" style="display:none">
+      <button class="btn btn-o" onclick="pickSlideGenPdf()" id="slideGenPdfBtn" style="width:100%;font-size:12px;padding:9px;border-style:dashed;font-weight:700">📄 PDF 업로드 → 자동 생성·즉시 적용</button>
+      <div class="hint" style="margin-top:4px">PDF 텍스트를 추출해 <b>위 설명 없이</b> 현재 슬라이드 본문을 AI가 자동 생성하고 바로 교체합니다. (검토 단계 없음)</div>
+    </div>
     <button class="btn btn-p" onclick="runSlideGen()" id="slideGenRunBtn" style="width:100%;margin-bottom:10px">생성하기</button>
     <div id="slideGenResultArea" style="display:none;flex:1;overflow-y:auto;padding-right:6px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -4387,6 +4392,89 @@ function openSlideGenModal() {
   document.getElementById('slideGenResultArea').style.display = 'none';
   document.getElementById('slideGenModalBg').classList.add('show');
   setTimeout(() => document.getElementById('slideGenInput').focus(), 80);
+}
+
+// ── PDF 업로드 → 자동 생성·즉시 적용 경로 (기존 AI 슬라이드 생성 파이프라인 재사용) ──
+let _pdfJsLoading = null;
+function _ensurePdfJs() {
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if (_pdfJsLoading) return _pdfJsLoading;
+  _pdfJsLoading = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
+    s.onload = () => {
+      if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        resolve(window.pdfjsLib);
+      } else reject(new Error('pdf.js 로드 실패'));
+    };
+    s.onerror = () => reject(new Error('pdf.js 다운로드 실패 — 네트워크 확인'));
+    document.head.appendChild(s);
+  });
+  return _pdfJsLoading;
+}
+
+async function _extractPdfText(file) {
+  const pdfjsLib = await _ensurePdfJs();
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  const maxPages = Math.min(pdf.numPages, 40);
+  let out = '';
+  for (let p = 1; p <= maxPages; p++) {
+    const page = await pdf.getPage(p);
+    const content = await page.getTextContent();
+    out += content.items.map(it => it.str).join(' ').replace(/\s+/g, ' ').trim() + '\n\n';
+    if (out.length > 8000) break; // 슬라이드 1장 분량 — 토큰 폭주 방지
+  }
+  return out.trim();
+}
+
+function pickSlideGenPdf() {
+  if (S.selectedIdx < 0) return toast('슬라이드를 먼저 선택');
+  if (!isEditor) return toast('잠금 해제 후 사용');
+  const fi = document.getElementById('slideGenPdfIn');
+  fi.value = '';
+  fi.onchange = e => {
+    const f = e.target.files && e.target.files[0];
+    if (f) runSlideGenFromPdf(f);
+  };
+  fi.click();
+}
+
+async function runSlideGenFromPdf(file) {
+  if (!sb) return toast('Supabase 연결 안 됨');
+  if (!isEditor) return toast('잠금 해제 후 사용');
+  if (S.selectedIdx < 0) return toast('슬라이드를 먼저 선택');
+  const name = (file.name || '').toLowerCase();
+  if (file.type !== 'application/pdf' && !name.endsWith('.pdf')) return toast('PDF 파일만 가능');
+
+  const btn = document.getElementById('slideGenPdfBtn');
+  const input = document.getElementById('slideGenInput');
+  const prevText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '📄 PDF 텍스트 추출 중...';
+  try {
+    const text = await _extractPdfText(file);
+    if (!text) {
+      toast('PDF에서 텍스트를 찾지 못함 — 스캔 이미지 PDF일 수 있음');
+      return;
+    }
+    // 추출 텍스트를 생성 소스로 사용 (기존 설명 대체) → 텍스트영역에 표시해 투명하게
+    input.value = `다음은 업로드된 PDF 교안 내용입니다. 이 내용을 슬라이드 한 장의 본문으로 재구성하세요.\n\n${text}`;
+    _slideGenResult = null;
+    btn.textContent = '✨ AI 생성 중...';
+    await runSlideGen();
+    if (_slideGenResult) {
+      applySlideGen(); // 완전 자동 — 검토 없이 현재 슬라이드 본문 즉시 교체 (모달 자동 닫힘)
+    } else {
+      toast('생성 실패 — 다시 시도해 주세요');
+    }
+  } catch (e) {
+    toast('PDF 처리 실패: ' + (e.message || e));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prevText;
+  }
 }
 
 async function runSlideGen() {
