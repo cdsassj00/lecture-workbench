@@ -660,8 +660,8 @@ html.gate-locked body > *:not(#viewer-gate) { visibility: hidden !important; }
     </div>
     <div style="margin-bottom:10px">
       <input type="file" id="slideGenPdfIn" accept="application/pdf,.pdf" style="display:none">
-      <button class="btn btn-o" onclick="pickSlideGenPdf()" id="slideGenPdfBtn" style="width:100%;font-size:12px;padding:9px;border-style:dashed;font-weight:700">📄 PDF 업로드 → 자동 생성·즉시 적용</button>
-      <div class="hint" style="margin-top:4px">PDF 텍스트를 추출해 <b>위 설명 없이</b> 현재 슬라이드 본문을 AI가 자동 생성하고 바로 교체합니다. (검토 단계 없음)</div>
+      <button class="btn btn-o" onclick="pickSlideGenPdf()" id="slideGenPdfBtn" style="width:100%;font-size:12px;padding:9px;border-style:dashed;font-weight:700">🖼 PDF 업로드 → 페이지별 이미지로 교안 교체</button>
+      <div class="hint" style="margin-top:4px">AI 없이 PDF <b>각 페이지를 이미지 1장</b>으로 변환해 현재 교안을 통째로 교체합니다. 이미지라 <b>편집은 불가</b>하고, Ctrl+Z로 되돌릴 수 있습니다. (💾 DB 저장 전까지 서버 미반영)</div>
     </div>
     <button class="btn btn-p" onclick="runSlideGen()" id="slideGenRunBtn" style="width:100%;margin-bottom:10px">생성하기</button>
     <div id="slideGenResultArea" style="display:none;flex:1;overflow-y:auto;padding-right:6px">
@@ -2094,6 +2094,8 @@ function undo() {
   } else if (a.type === 'bulk-delete') {
     // 인덱스 오름차순으로 다시 삽입
     [...a.removed].sort((x,y) => x.idx - y.idx).forEach(r => S.slides.splice(r.idx, 0, r.slide));
+  } else if (a.type === 'replace-all') {
+    S.slides = a.prev.slice();
   }
   S.redoStack.push(a);
   S.dirty = true;
@@ -2112,6 +2114,8 @@ function redo() {
   } else if (a.type === 'bulk-delete') {
     // 큰 인덱스부터 제거 — 인덱스 어긋나지 않게
     [...a.removed].sort((x,y) => y.idx - x.idx).forEach(r => S.slides.splice(r.idx, 1));
+  } else if (a.type === 'replace-all') {
+    S.slides = a.next.slice();
   }
   S.undoStack.push(a);
   S.dirty = true;
@@ -4394,7 +4398,7 @@ function openSlideGenModal() {
   setTimeout(() => document.getElementById('slideGenInput').focus(), 80);
 }
 
-// ── PDF 업로드 → 자동 생성·즉시 적용 경로 (기존 AI 슬라이드 생성 파이프라인 재사용) ──
+// ── PDF 업로드 → 각 페이지를 이미지 슬라이드로 변환해 교안 전체 교체 (편집 불가·AI 미사용) ──
 let _pdfJsLoading = null;
 function _ensurePdfJs() {
   if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
@@ -4414,63 +4418,78 @@ function _ensurePdfJs() {
   return _pdfJsLoading;
 }
 
-async function _extractPdfText(file) {
+// PDF 각 페이지를 1600px 폭 JPEG로 렌더 → 편집 불가 이미지 슬라이드 배열 반환
+async function _renderPdfToImageSlides(file, onProgress) {
   const pdfjsLib = await _ensurePdfJs();
   const buf = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-  const maxPages = Math.min(pdf.numPages, 40);
-  let out = '';
-  for (let p = 1; p <= maxPages; p++) {
+  const n = pdf.numPages;
+  const TARGET_W = 1600; // 슬라이드 스테이지 폭과 동일
+  const safeName = (file.name || 'PDF').replace(/"/g, '&quot;');
+  const slides = [];
+  for (let p = 1; p <= n; p++) {
     const page = await pdf.getPage(p);
-    const content = await page.getTextContent();
-    out += content.items.map(it => it.str).join(' ').replace(/\s+/g, ' ').trim() + '\n\n';
-    if (out.length > 8000) break; // 슬라이드 1장 분량 — 토큰 폭주 방지
+    const base = page.getViewport({ scale: 1 });
+    const viewport = page.getViewport({ scale: TARGET_W / base.width });
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(viewport.width);
+    canvas.height = Math.round(viewport.height);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85); // JPEG로 용량 축소
+    slides.push({
+      id: 'slide-pdf-' + Date.now() + '-' + p,
+      source: 'added',
+      dataTitle: `${safeName} · p.${p}`,
+      // 자체 완결 이미지 슬라이드 — S.css와 무관하게 렌더, 편집 불가
+      html: `<div class="slide" data-title="${safeName} p.${p}"><img src="${dataUrl}" alt="PDF page ${p}" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;pointer-events:none;user-select:none"></div>`
+    });
+    if (onProgress) onProgress(p, n);
   }
-  return out.trim();
+  return slides;
 }
 
 function pickSlideGenPdf() {
-  if (S.selectedIdx < 0) return toast('슬라이드를 먼저 선택');
   if (!isEditor) return toast('잠금 해제 후 사용');
+  if (!S.slides.length) return toast('교안을 먼저 열어주세요');
   const fi = document.getElementById('slideGenPdfIn');
   fi.value = '';
   fi.onchange = e => {
     const f = e.target.files && e.target.files[0];
-    if (f) runSlideGenFromPdf(f);
+    if (f) importPdfAsImageSlides(f);
   };
   fi.click();
 }
 
-async function runSlideGenFromPdf(file) {
-  if (!sb) return toast('Supabase 연결 안 됨');
+async function importPdfAsImageSlides(file) {
   if (!isEditor) return toast('잠금 해제 후 사용');
-  if (S.selectedIdx < 0) return toast('슬라이드를 먼저 선택');
+  if (!S.slides.length) return toast('교안을 먼저 열어주세요');
   const name = (file.name || '').toLowerCase();
   if (file.type !== 'application/pdf' && !name.endsWith('.pdf')) return toast('PDF 파일만 가능');
+  if (!confirm(`PDF의 모든 페이지를 이미지로 변환해 현재 교안(${S.slides.length}장)을 통째로 교체합니다.\n각 페이지 = 편집 불가 이미지 1장 · AI 미사용.\nCtrl+Z로 되돌릴 수 있고, 💾 DB 저장 전까지는 서버에 반영되지 않습니다.\n\n계속할까요?`)) return;
 
   const btn = document.getElementById('slideGenPdfBtn');
-  const input = document.getElementById('slideGenInput');
   const prevText = btn.textContent;
   btn.disabled = true;
-  btn.textContent = '📄 PDF 텍스트 추출 중...';
+  btn.textContent = '🖼 변환 준비 중...';
   try {
-    const text = await _extractPdfText(file);
-    if (!text) {
-      toast('PDF에서 텍스트를 찾지 못함 — 스캔 이미지 PDF일 수 있음');
-      return;
-    }
-    // 추출 텍스트를 생성 소스로 사용 (기존 설명 대체) → 텍스트영역에 표시해 투명하게
-    input.value = `다음은 업로드된 PDF 교안 내용입니다. 이 내용을 슬라이드 한 장의 본문으로 재구성하세요.\n\n${text}`;
-    _slideGenResult = null;
-    btn.textContent = '✨ AI 생성 중...';
-    await runSlideGen();
-    if (_slideGenResult) {
-      applySlideGen(); // 완전 자동 — 검토 없이 현재 슬라이드 본문 즉시 교체 (모달 자동 닫힘)
-    } else {
-      toast('생성 실패 — 다시 시도해 주세요');
-    }
+    const newSlides = await _renderPdfToImageSlides(file, (p, n) => {
+      btn.textContent = `🖼 이미지 변환 중... ${p}/${n}`;
+    });
+    if (!newSlides.length) { toast('PDF 페이지를 찾지 못함'); return; }
+    const prevSlides = S.slides.slice();
+    pushUndo({ type: 'replace-all', prev: prevSlides, next: newSlides.slice() });
+    S.slides = newSlides;
+    S.dirty = true;
+    updateAllPageNumbers();
+    renderStrip();
+    selectSlide(0);
+    document.getElementById('slideGenModalBg').classList.remove('show');
+    toast(`✓ PDF ${newSlides.length}장 이미지로 교체 — 💾 DB 저장으로 영구 보존 (Ctrl+Z 되돌리기)`);
   } catch (e) {
-    toast('PDF 처리 실패: ' + (e.message || e));
+    toast('PDF 변환 실패: ' + (e.message || e));
   } finally {
     btn.disabled = false;
     btn.textContent = prevText;
