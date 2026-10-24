@@ -1,0 +1,545 @@
+[
+  {
+    "num": 1,
+    "title": "AI 에이전트 시대의 개막과 공공 구현 지형도",
+    "page": "session-01-complete.html",
+    "slides": 55,
+    "references": [
+      {
+        "id": "26",
+        "session_num": "1",
+        "label": "신경망 행렬 시각화 (인터랙티브)",
+        "filename": "",
+        "url": "references/01-neural-net-matrix-viz.html",
+        "content_type": "link",
+        "size": "0",
+        "description": "Attention·Q·K·V 행렬 연산을 인터랙티브로 체험",
+        "created_at": "2026-05-16 13:55:26.035358+00",
+        "created_by": "system"
+      },
+      {
+        "id": "27",
+        "session_num": "1",
+        "label": "민첩한 AI · 거시적 혁신에서 미시적 혁신으로",
+        "filename": "",
+        "url": "references/01-agile-ai-lecture-transcript.html",
+        "content_type": "link",
+        "size": "0",
+        "description": "신성진 강연 전문 — 소버린 AI·VIBE 코딩·폐쇄망에서 돌아가는 8가지 기술",
+        "created_at": "2026-05-16 13:55:26.035358+00",
+        "created_by": "system"
+      }
+    ]
+  },
+  {
+    "num": 2,
+    "title": "프론티어 모델 심층 탐구와 AI 도구 카탈로그",
+    "page": "session-02-complete.html",
+    "slides": 39,
+    "references": [
+      {
+        "id": "1",
+        "session_num": "2",
+        "label": "C01-C08_통합교재",
+        "filename": "C01-C08_통합교재.pdf",
+        "url": "assets/refs/0212c778c3a0beeb.pdf",
+        "content_type": "application/pdf",
+        "size": "45279771",
+        "description": "",
+        "created_at": "2026-05-10 16:55:33.153109+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "2",
+        "session_num": "2",
+        "label": "퍼지챗봇(LLM FREE)",
+        "filename": "",
+        "url": "https://cdsassj00.github.io/2026-proposals-rss/",
+        "content_type": "link",
+        "size": "0",
+        "description": "",
+        "created_at": "2026-05-10 16:56:18.553381+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "28",
+        "session_num": "2",
+        "label": "강사 추천 AI 사이트 모음 (방문 기록 기반)",
+        "filename": "",
+        "url": "references/02-ai-lecture-sites.html",
+        "content_type": "link",
+        "size": "0",
+        "description": "대화형 LLM·문서/데이터·미디어·노코드·전문 플랫폼 5개 카테고리 큐레이션",
+        "created_at": "2026-05-16 13:55:26.035358+00",
+        "created_by": "system"
+      }
+    ]
+  },
+  {
+    "num": 3,
+    "title": "메타 프롬프트 설계와 AI 서비스 워크플로우 오케스트레이션",
+    "page": "session-03-complete.html",
+    "slides": 54,
+    "references": []
+  },
+  {
+    "num": 4,
+    "title": "어시스트 코딩 ① 시각화·분석",
+    "page": "session-04-complete.html",
+    "slides": 58,
+    "references": [
+      {
+        "id": "29",
+        "session_num": "4",
+        "label": "ezmlsimulation.netlify.app",
+        "filename": "",
+        "url": "https://ezmlsimulation.netlify.app/",
+        "content_type": "link",
+        "size": "0",
+        "description": "ML/DL",
+        "created_at": "2026-05-28 00:46:19.788675+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "30",
+        "session_num": "4",
+        "label": "스탠포드 Transformer",
+        "filename": "",
+        "url": "https://youtube.com/playlist?list=PLoROMvodv4rOCXd21gf0CF4xr35yINeOy&si=w25TUyPENw_XHDZk",
+        "content_type": "link",
+        "size": "0",
+        "description": "",
+        "created_at": "2026-05-28 00:47:44.557858+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "31",
+        "session_num": "4",
+        "label": "스탠포드 앤드류 응 (한글 번역/인사이트)",
+        "filename": "",
+        "url": "https://youtu.be/vENN6-d_3AQ?si=ctvbV_jW3-X5GPGv",
+        "content_type": "link",
+        "size": "0",
+        "description": "앤드류 응의 AI 시대 제언",
+        "created_at": "2026-05-28 00:49:55.519099+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "32",
+        "session_num": "4",
+        "label": "GOOGLE IO 컨퍼런스",
+        "filename": "",
+        "url": "https://io.google/2026/",
+        "content_type": "link",
+        "size": "0",
+        "description": "GOOGLE IO 컨퍼런스",
+        "created_at": "2026-05-28 01:39:08.38549+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "33",
+        "session_num": "4",
+        "label": "paperswithcode.co",
+        "filename": "",
+        "url": "https://paperswithcode.co/",
+        "content_type": "link",
+        "size": "0",
+        "description": "AI 모델 논문과 코드를 한번에 보는곳",
+        "created_at": "2026-05-28 03:45:55.856711+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "34",
+        "session_num": "4",
+        "label": "www.fusejs.io",
+        "filename": "",
+        "url": "https://www.fusejs.io/",
+        "content_type": "link",
+        "size": "0",
+        "description": "Fuzzy Search",
+        "created_at": "2026-05-28 08:20:29.891436+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "35",
+        "session_num": "4",
+        "label": "can i run ai locally?]",
+        "filename": "",
+        "url": "https://www.canirun.ai/",
+        "content_type": "link",
+        "size": "0",
+        "description": "로컬 AI 모음사이트",
+        "created_at": "2026-05-28 12:34:28.876001+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "36",
+        "session_num": "4",
+        "label": "파이썬 생태계 ebook",
+        "filename": "",
+        "url": "https://wikidocs.net/book/14021",
+        "content_type": "link",
+        "size": "0",
+        "description": "파이썬 생태계 ebook",
+        "created_at": "2026-05-28 12:38:05.182035+00",
+        "created_by": "editor@workbench.local"
+      }
+    ]
+  },
+  {
+    "num": 5,
+    "title": "어시스트 코딩 ② 업무 자동화",
+    "page": "session-05-complete.html",
+    "slides": 32,
+    "references": [
+      {
+        "id": "38",
+        "session_num": "5",
+        "label": "02.콘솔개발도구개발",
+        "filename": "02.콘솔개발도구개발.pdf",
+        "url": "assets/refs/68123709a67071fa.pdf",
+        "content_type": "application/pdf",
+        "size": "566083",
+        "description": "",
+        "created_at": "2026-06-17 13:34:30.74079+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "39",
+        "session_num": "5",
+        "label": "01.ollama_llm",
+        "filename": "01.ollama_llm.pdf",
+        "url": "assets/refs/6e26c92dab052aa0.pdf",
+        "content_type": "application/pdf",
+        "size": "546222",
+        "description": "",
+        "created_at": "2026-06-17 13:36:09.955035+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "40",
+        "session_num": "5",
+        "label": "excel_auto_deck",
+        "filename": "excel_auto_deck.html",
+        "url": "assets/refs/0dc4ce03ef7c64e5.html",
+        "content_type": "text/html",
+        "size": "49056",
+        "description": "",
+        "created_at": "2026-06-18 00:53:37.913141+00",
+        "created_by": "editor@workbench.local"
+      }
+    ]
+  },
+  {
+    "num": 6,
+    "title": "AI 에이전트 도구 마스터리",
+    "page": "session-06-complete.html",
+    "slides": 68,
+    "references": [
+      {
+        "id": "9",
+        "session_num": "6",
+        "label": "멀티에이전트, 서브에이전트의 차이",
+        "filename": "멀티에이전트, 서브에이전트의 차이.html",
+        "url": "assets/refs/0b3ac077d183b03c.html",
+        "content_type": "text/html",
+        "size": "54168",
+        "description": "",
+        "created_at": "2026-05-11 14:30:04.437765+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "43",
+        "session_num": "6",
+        "label": "민원 예제 (개인정보 익명화본)",
+        "filename": "민원 예제.xlsx",
+        "url": "assets/refs/22550bb3fbd9c544.xlsx",
+        "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "size": "29792",
+        "description": "",
+        "created_at": "2026-06-24 22:45:00.996197+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "45",
+        "session_num": "6",
+        "label": "oh-my-openagent",
+        "filename": "",
+        "url": "https://github.com/code-yeongyu/oh-my-openagent",
+        "content_type": "link",
+        "size": "0",
+        "description": "",
+        "created_at": "2026-06-24 22:47:00.694598+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "46",
+        "session_num": "6",
+        "label": "딥러닝 기초 이해",
+        "filename": "",
+        "url": "https://www.youtube.com/watch?v=aSyBmlThsf8&t=131s",
+        "content_type": "link",
+        "size": "0",
+        "description": "",
+        "created_at": "2026-06-24 22:47:45.330548+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "47",
+        "session_num": "6",
+        "label": "calculator_tool",
+        "filename": "calculator_tool.ipynb",
+        "url": "assets/refs/c283fbe911c5c371.ipynb",
+        "content_type": "",
+        "size": "11382",
+        "description": "",
+        "created_at": "2026-06-24 22:48:21.543532+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "50",
+        "session_num": "6",
+        "label": "pixel-agents",
+        "filename": "",
+        "url": "https://github.com/pixel-agents-hq/pixel-agents",
+        "content_type": "link",
+        "size": "0",
+        "description": "",
+        "created_at": "2026-06-24 22:49:51.252194+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "51",
+        "session_num": "6",
+        "label": "Latent Collaboration in Multi-Agent Systems(LatentMAS)",
+        "filename": "",
+        "url": "https://arxiv.org/abs/2511.20639",
+        "content_type": "link",
+        "size": "0",
+        "description": "멀티에이전트 관련 논문(아카이브)",
+        "created_at": "2026-06-24 22:57:09.107688+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "52",
+        "session_num": "6",
+        "label": "claude cookbook",
+        "filename": "",
+        "url": "https://github.com/anthropics/claude-cookbooks",
+        "content_type": "link",
+        "size": "0",
+        "description": "클로드의 기술을 기초부터 심화까지",
+        "created_at": "2026-06-25 00:58:26.05205+00",
+        "created_by": "editor@workbench.local"
+      }
+    ]
+  },
+  {
+    "num": 7,
+    "title": "RAG 파이프라인과 웹서비스",
+    "page": "session-07-complete.html",
+    "slides": 70,
+    "references": [
+      {
+        "id": "7",
+        "session_num": "7",
+        "label": "Graph RAG",
+        "filename": "Graph RAG.pdf",
+        "url": "assets/refs/557b74e6761ce31b.pdf",
+        "content_type": "application/pdf",
+        "size": "397758",
+        "description": "",
+        "created_at": "2026-05-11 14:25:30.191003+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "8",
+        "session_num": "7",
+        "label": "Agentic Rag Summary",
+        "filename": "Agentic Rag Summary.pdf",
+        "url": "assets/refs/42a0f42c17ba5ed2.pdf",
+        "content_type": "application/pdf",
+        "size": "441619",
+        "description": "",
+        "created_at": "2026-05-11 14:29:53.187242+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "55",
+        "session_num": "7",
+        "label": "민원 처리에 관한 법률(법률)(제18748호)(20220712)",
+        "filename": "민원 처리에 관한 법률(법률)(제18748호)(20220712).hwpx",
+        "url": "assets/refs/df9229338e390722.hwpx",
+        "content_type": "application/haansofthwpx",
+        "size": "173857",
+        "description": "",
+        "created_at": "2026-06-30 18:10:18.66371+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "56",
+        "session_num": "7",
+        "label": "huggingface.co",
+        "filename": "",
+        "url": "https://huggingface.co/BAAI/bge-m3/tree/main",
+        "content_type": "link",
+        "size": "0",
+        "description": "bge-m3",
+        "created_at": "2026-06-30 18:11:46.46431+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "57",
+        "session_num": "7",
+        "label": "olmOCR",
+        "filename": "olmOCR.ipynb",
+        "url": "assets/refs/d127849c2e43127a.ipynb",
+        "content_type": "",
+        "size": "7596",
+        "description": "",
+        "created_at": "2026-06-30 18:38:26.081009+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "58",
+        "session_num": "7",
+        "label": "계층형청킹_실습",
+        "filename": "계층형청킹_실습.ipynb",
+        "url": "assets/refs/63b9d2a3e74b445a.ipynb",
+        "content_type": "",
+        "size": "18335",
+        "description": "",
+        "created_at": "2026-07-01 17:07:39.479336+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "59",
+        "session_num": "7",
+        "label": "그래프RAG_실습_1",
+        "filename": "그래프RAG_실습_1.ipynb",
+        "url": "assets/refs/3ab0a8fe6004c280.ipynb",
+        "content_type": "",
+        "size": "34186",
+        "description": "",
+        "created_at": "2026-07-01 19:30:51.790791+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "60",
+        "session_num": "7",
+        "label": "Semantic_chunking_test",
+        "filename": "Semantic_chunking_test.ipynb",
+        "url": "assets/refs/e1e45f8d0d9d4f57.ipynb",
+        "content_type": "",
+        "size": "6448",
+        "description": "",
+        "created_at": "2026-07-02 00:48:55.206468+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "61",
+        "session_num": "7",
+        "label": "민원_처리에_관한_법률",
+        "filename": "민원_처리에_관한_법률.md",
+        "url": "assets/refs/66e9bd29e0234929.md",
+        "content_type": "text/markdown",
+        "size": "42587",
+        "description": "",
+        "created_at": "2026-07-02 00:59:21.933319+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "62",
+        "session_num": "7",
+        "label": "레이트청킹",
+        "filename": "레이트청킹.ipynb",
+        "url": "assets/refs/ac45e20909343acd.ipynb",
+        "content_type": "",
+        "size": "14312",
+        "description": "",
+        "created_at": "2026-07-02 01:24:55.3972+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "63",
+        "session_num": "7",
+        "label": "카파시_llm-wiki",
+        "filename": "llm-wiki.md",
+        "url": "assets/refs/e2dfa0a19f830fda.md",
+        "content_type": "text/markdown",
+        "size": "11985",
+        "description": "",
+        "created_at": "2026-07-02 01:46:15.215694+00",
+        "created_by": "editor@workbench.local"
+      }
+    ]
+  },
+  {
+    "num": 8,
+    "title": "API · MCP · 아키텍처 캔버스",
+    "page": "session-08-complete.html",
+    "slides": 33,
+    "references": [
+      {
+        "id": "64",
+        "session_num": "8",
+        "label": "wikidocs.net 하네스 엔지니어링",
+        "filename": "",
+        "url": "https://wikidocs.net/340857",
+        "content_type": "link",
+        "size": "0",
+        "description": "",
+        "created_at": "2026-07-08 19:49:16.220631+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "65",
+        "session_num": "8",
+        "label": "www.npmjs.com",
+        "filename": "",
+        "url": "https://www.npmjs.com/",
+        "content_type": "link",
+        "size": "0",
+        "description": "",
+        "created_at": "2026-07-08 19:49:35.045662+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "66",
+        "session_num": "8",
+        "label": "실습파일_심장질환여부",
+        "filename": "실습파일_심장질환여부.csv",
+        "url": "assets/refs/b7cd35f6052dd26d.csv",
+        "content_type": "text/csv",
+        "size": "29638090",
+        "description": "",
+        "created_at": "2026-07-08 19:50:25.608425+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "67",
+        "session_num": "8",
+        "label": "Kakao 황민호 하네스",
+        "filename": "",
+        "url": "https://github.com/revfactory",
+        "content_type": "link",
+        "size": "0",
+        "description": "",
+        "created_at": "2026-07-09 01:06:34.625294+00",
+        "created_by": "editor@workbench.local"
+      },
+      {
+        "id": "69",
+        "session_num": "8",
+        "label": "출장비_사용현황_샘플데이터",
+        "filename": "출장비_사용현황_샘플데이터.xlsx",
+        "url": "assets/refs/df858d4c631165ee.xlsx",
+        "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "size": "33037",
+        "description": "",
+        "created_at": "2026-07-09 02:23:39.623341+00",
+        "created_by": "editor@workbench.local"
+      }
+    ]
+  }
+]

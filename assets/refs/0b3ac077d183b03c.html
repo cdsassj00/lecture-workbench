@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>서브에이전트 vs 멀티에이전트 완전 가이드</title>
+<style>
+  :root {
+    --bg:#ffffff; --bg2:#f7f6f3; --bg3:#eeecea;
+    --text:#1a1a18; --text2:#5a5a55; --text3:#909088;
+    --border:rgba(0,0,0,0.09); --border2:rgba(0,0,0,0.18);
+    --accent:#c86a20; --accent2:#1a5e88;
+    --nav-h:52px; --sidebar-w:268px;
+    --code-bg:#f2f1ec;
+    --teal-bg:#e2f3ee; --teal-fg:#0d6e52; --teal-border:#1d9e75;
+    --blue-bg:#e4eef7; --blue-fg:#1a4e78; --blue-border:#1a6a9e;
+    --amber-bg:#fdf3e2; --amber-fg:#7a4e10; --amber-border:#c8862a;
+    --red-bg:#fdecea;  --red-fg:#7a2020;  --red-border:#c84040;
+    --green-bg:#eaf3e0;--green-fg:#2a6018; --green-border:#4a9028;
+    --purple-bg:#eeeafd;--purple-fg:#3a2a9a;--purple-border:#7060d0;
+  }
+  [data-theme="dark"] {
+    --bg:#1c1c1a; --bg2:#242422; --bg3:#2c2c29;
+    --text:#e8e6de; --text2:#a8a69e; --text3:#686860;
+    --border:rgba(255,255,255,0.09); --border2:rgba(255,255,255,0.18);
+    --code-bg:#272724;
+    --teal-bg:#0c2820; --teal-fg:#5ecfab; --teal-border:#1d7055;
+    --blue-bg:#0c1e2e; --blue-fg:#7ab8e8; --blue-border:#1a4a7a;
+    --amber-bg:#2a1c08; --amber-fg:#e8b565; --amber-border:#8a5a18;
+    --red-bg:#280d0d;  --red-fg:#e88080;  --red-border:#8a3030;
+    --green-bg:#0e1e08;--green-fg:#90d060; --green-border:#2a5018;
+    --purple-bg:#16103a;--purple-fg:#a090f0;--purple-border:#504090;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Pretendard','Noto Sans KR',system-ui,sans-serif;font-size:15px;line-height:1.8;background:var(--bg);color:var(--text);transition:background .2s,color .2s}
+
+  #nav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);background:var(--bg);border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 18px}
+  #nav-toggle{background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;padding:4px 6px;border-radius:4px;line-height:1}
+  #nav-toggle:hover{background:var(--bg3)}
+  #nav-title{font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap}
+  #nav-tabs{margin-left:auto;display:flex;align-items:center;font-size:13px}
+  #nav-tabs a{padding:5px 12px;text-decoration:none;color:var(--text2);border-radius:6px;white-space:nowrap;transition:.15s}
+  #nav-tabs a:hover{background:var(--bg3);color:var(--text)}
+  #nav-tabs a.active{color:var(--accent);font-weight:600;background:var(--amber-bg)}
+  #nav-tabs .sep{color:var(--text3);font-size:11px}
+  #dark-btn{background:none;border:none;cursor:pointer;color:var(--text2);font-size:16px;padding:4px 8px;border-radius:4px}
+  #dark-btn:hover{background:var(--bg3)}
+
+  #layout{display:flex;margin-top:var(--nav-h);min-height:calc(100vh - var(--nav-h))}
+
+  #sidebar{width:var(--sidebar-w);flex-shrink:0;position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow-y:auto;padding:20px 0 48px;border-right:.5px solid var(--border);background:var(--bg);transition:transform .25s,width .25s}
+  #sidebar.hidden{transform:translateX(-100%);width:0;overflow:hidden;padding:0}
+  .toc-group-title{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);padding:14px 18px 4px;display:block}
+  #sidebar ul{list-style:none}
+  #sidebar ul li a{display:block;padding:4px 18px;font-size:13px;color:var(--text2);text-decoration:none;border-left:2px solid transparent;transition:.1s}
+  #sidebar ul li a:hover{color:var(--text);background:var(--bg2)}
+  #sidebar ul li a.active{color:var(--accent);border-left-color:var(--accent);background:var(--amber-bg);font-weight:500}
+  #sidebar ul.sub li a{padding-left:30px;font-size:12px}
+  #sidebar::-webkit-scrollbar{width:3px}
+  #sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+  #content{flex:1;min-width:0;padding:48px 64px 100px 52px;max-width:900px}
+  @media(max-width:900px){#content{padding:28px 20px 60px}#nav-tabs{display:none}}
+
+  #content h1{font-size:27px;font-weight:800;line-height:1.3;margin-bottom:10px}
+  #content .lead{font-size:15.5px;color:var(--text2);margin-bottom:36px;line-height:1.7}
+  #content h2{font-size:19px;font-weight:700;margin:52px 0 16px;padding-bottom:9px;border-bottom:1.5px solid var(--border);scroll-margin-top:calc(var(--nav-h) + 16px)}
+  #content h3{font-size:15.5px;font-weight:700;margin:30px 0 10px;scroll-margin-top:calc(var(--nav-h) + 16px)}
+  #content h4{font-size:14px;font-weight:700;margin:22px 0 8px;color:var(--text2)}
+  #content p{margin-bottom:14px}
+  #content hr{border:none;border-top:.5px solid var(--border);margin:44px 0}
+  #content ul,#content ol{padding-left:22px;margin-bottom:14px}
+  #content li{margin-bottom:5px}
+  #content strong{font-weight:700}
+
+  #content code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:12.5px;background:var(--code-bg);padding:1px 5px;border-radius:4px;color:var(--accent)}
+  #content pre{background:var(--code-bg);border:.5px solid var(--border);border-radius:8px;padding:18px 22px;overflow-x:auto;margin:16px 0;font-family:'JetBrains Mono','Fira Code',monospace;font-size:13px;line-height:1.65;color:var(--text)}
+  #content pre code{background:none;padding:0;color:inherit;font-size:inherit}
+  .cm{color:var(--text3)} .kw{color:var(--accent)} .st{color:var(--teal-fg)}
+
+  .box{border-radius:8px;padding:14px 18px;margin:16px 0;font-size:14px;line-height:1.75;border-left:3px solid}
+  .box-amber{background:var(--amber-bg);color:var(--amber-fg);border-color:var(--amber-border)}
+  .box-blue{background:var(--blue-bg);color:var(--blue-fg);border-color:var(--blue-border)}
+  .box-teal{background:var(--teal-bg);color:var(--teal-fg);border-color:var(--teal-border)}
+  .box-red{background:var(--red-bg);color:var(--red-fg);border-color:var(--red-border)}
+  .box-green{background:var(--green-bg);color:var(--green-fg);border-color:var(--green-border)}
+  .box-purple{background:var(--purple-bg);color:var(--purple-fg);border-color:var(--purple-border)}
+  .box strong{font-weight:700}
+
+  .tbl-wrap{overflow-x:auto;margin:16px 0}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  table th{text-align:left;padding:10px 14px;background:var(--bg3);border-bottom:1.5px solid var(--border2);font-weight:700;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+  table td{padding:11px 14px;border-bottom:.5px solid var(--border);vertical-align:top;line-height:1.65}
+  table tr:last-child td{border-bottom:none}
+  table tr:hover td{background:var(--bg2)}
+  .hl{background:var(--amber-bg)!important}
+
+  .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;vertical-align:middle}
+  .b-amber{background:var(--amber-bg);color:var(--amber-fg)}
+  .b-teal{background:var(--teal-bg);color:var(--teal-fg)}
+  .b-blue{background:var(--blue-bg);color:var(--blue-fg)}
+  .b-purple{background:var(--purple-bg);color:var(--purple-fg)}
+  .b-green{background:var(--green-bg);color:var(--green-fg)}
+  .b-red{background:var(--red-bg);color:var(--red-fg)}
+
+  .diagram{background:var(--bg2);border:.5px solid var(--border);border-radius:10px;padding:28px 20px 20px;margin:18px 0}
+  .d-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:20px}
+  .d-node{border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;text-align:center;border:1.5px solid}
+  .d-orch{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber-fg)}
+  .d-sub{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue-fg)}
+  .d-peer{background:var(--teal-bg);border-color:var(--teal-border);color:var(--teal-fg)}
+  .d-neutral{background:var(--bg);border-color:var(--border2);color:var(--text2)}
+  .d-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;align-items:center}
+  .d-col{display:flex;flex-direction:column;align-items:center;gap:0}
+  .d-av{width:2px;height:22px;background:var(--border2);margin:2px auto}
+  .d-ah{font-size:16px;color:var(--text3);line-height:1}
+  .d-cap{font-size:12px;color:var(--text3);text-align:center;margin-top:14px}
+  .d-dashed{border:1.5px dashed var(--border2);border-radius:10px;padding:14px 18px}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+  @media(max-width:600px){.two-col{grid-template-columns:1fr}}
+  .col-card{background:var(--bg2);border:.5px solid var(--border);border-radius:10px;padding:20px}
+  .col-card h4{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:.5px solid var(--border)}
+  .col-card ul{list-style:none;padding:0;font-size:13.5px;color:var(--text2)}
+  .col-card ul li{padding:5px 0;border-bottom:.5px solid var(--border)}
+  .col-card ul li:last-child{border-bottom:none}
+
+  .steps{counter-reset:step;list-style:none;padding:0;margin:16px 0}
+  .steps li{counter-increment:step;display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}
+  .steps li::before{content:counter(step);min-width:28px;height:28px;background:var(--accent);color:#fff;font-weight:700;font-size:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+  .step-title{font-weight:700;font-size:14px;margin-bottom:4px}
+  .step-desc{font-size:13.5px;color:var(--text2)}
+
+  .qa{margin:12px 0}
+  .qa-q{font-weight:700;font-size:14px;padding:12px 16px;background:var(--bg3);border-radius:6px 6px 0 0}
+  .qa-a{font-size:14px;padding:12px 16px;background:var(--bg2);border:.5px solid var(--border);border-top:none;border-radius:0 0 6px 6px;color:var(--text2);line-height:1.75}
+
+  .slabel{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;background:var(--bg3);color:var(--text3);padding:2px 8px;border-radius:4px;margin-bottom:6px}
+  .footer{color:var(--text3);font-size:12.5px;margin-top:60px;padding-top:20px;border-top:.5px solid var(--border)}
+
+  @media(max-width:768px){
+    #sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;z-index:90;box-shadow:4px 0 24px rgba(0,0,0,.15)}
+    #sidebar.hidden{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <button id="nav-toggle" onclick="toggleSidebar()">☰</button>
+  <span id="nav-title">에이전트 아키텍처 완전 가이드</span>
+  <div id="nav-tabs">
+    <a href="#intro" class="active">개념 이해</a>
+    <span class="sep"> · </span>
+    <a href="#sec-sub">서브에이전트</a>
+    <span class="sep"> · </span>
+    <a href="#sec-multi">멀티에이전트</a>
+    <span class="sep"> · </span>
+    <a href="#sec-diff">비교·선택</a>
+    <span class="sep"> · </span>
+    <a href="#sec-real">실전 예시</a>
+  </div>
+  <button id="dark-btn" onclick="toggleDark()">◐</button>
+</nav>
+
+<div id="layout">
+<aside id="sidebar">
+  <div class="toc-group">
+    <span class="toc-group-title">기초 이해</span>
+    <ul>
+      <li><a href="#intro">1. 에이전트가 뭔가요?</a></li>
+      <li><a href="#why-multi">2. 왜 여러 개를 쓰나요?</a></li>
+    </ul>
+  </div>
+  <div class="toc-group">
+    <span class="toc-group-title">서브에이전트</span>
+    <ul>
+      <li><a href="#sec-sub">3. 서브에이전트란?</a></li>
+      <ul class="sub">
+        <li><a href="#sub-concept">개념 쉽게 이해</a></li>
+        <li><a href="#sub-structure">구조와 흐름</a></li>
+        <li><a href="#sub-orch">오케스트레이터 역할</a></li>
+        <li><a href="#sub-benefit">장점과 한계</a></li>
+        <li><a href="#sub-example">Claude Code 예시</a></li>
+        <li><a href="#sub-flow">실제 동작 흐름</a></li>
+      </ul>
+    </ul>
+  </div>
+  <div class="toc-group">
+    <span class="toc-group-title">멀티에이전트</span>
+    <ul>
+      <li><a href="#sec-multi">4. 멀티에이전트란?</a></li>
+      <ul class="sub">
+        <li><a href="#multi-concept">개념 쉽게 이해</a></li>
+        <li><a href="#multi-types">4가지 유형</a></li>
+        <li><a href="#multi-hier">① 계층형</a></li>
+        <li><a href="#multi-peer">② 수평형</a></li>
+        <li><a href="#multi-pipe">③ 파이프라인형</a></li>
+        <li><a href="#multi-compete">④ 경쟁형</a></li>
+        <li><a href="#multi-benefit">장점과 한계</a></li>
+      </ul>
+    </ul>
+  </div>
+  <div class="toc-group">
+    <span class="toc-group-title">비교 · 실전</span>
+    <ul>
+      <li><a href="#sec-diff">5. 핵심 차이점</a></li>
+      <li><a href="#sec-when">6. 언제 뭘 써야 해?</a></li>
+      <li><a href="#sec-real">7. 실전 시나리오</a></li>
+      <li><a href="#sec-combo">8. 함께 쓰기</a></li>
+      <li><a href="#sec-faq">9. 자주 묻는 질문</a></li>
+      <li><a href="#sec-summary">핵심 요약</a></li>
+    </ul>
+  </div>
+</aside>
+
+<main id="content">
+
+<span class="slabel">에이전트 아키텍처</span>
+<h1>서브에이전트 vs 멀티에이전트<br>— 코딩 몰라도 이해하는 완전 가이드</h1>
+<p class="lead">
+  AI 에이전트를 여러 개 쓰는 방법에 대해 "서브에이전트"와 "멀티에이전트"라는 말을 자주 듣게 됩니다.
+  둘 다 "에이전트를 여러 개 쓰는 것" 같아 보이지만, 구조·목적·활용법이 다릅니다.
+  기초 개념부터 실제 사례까지, 차근차근 설명합니다.
+</p>
+
+<hr>
+
+<!-- ─────── 1 ─────── -->
+<h2 id="intro">1. 에이전트(Agent)가 뭔가요?</h2>
+
+<p>먼저 "에이전트"가 뭔지부터 정리해야 합니다. AI 에이전트는 <strong>단순히 질문에 답하는 것을 넘어, 스스로 판단하고 행동하는 AI</strong>입니다.</p>
+
+<div class="two-col">
+  <div class="col-card">
+    <h4>❌ 일반 AI (챗봇)</h4>
+    <ul>
+      <li>질문 → 답변 (그것으로 끝)</li>
+      <li>파일을 직접 수정하지 못함</li>
+      <li>인터넷 검색 못함</li>
+      <li>터미널 명령 실행 못함</li>
+      <li>한 번 대화로 끝남</li>
+    </ul>
+  </div>
+  <div class="col-card">
+    <h4>✅ AI 에이전트</h4>
+    <ul>
+      <li>목표를 받으면 스스로 계획 수립</li>
+      <li>파일 읽기·수정·생성 직접 수행</li>
+      <li>인터넷 검색, API 호출 가능</li>
+      <li>터미널 명령 실행 가능</li>
+      <li>목표 달성까지 반복적으로 수행</li>
+    </ul>
+  </div>
+</div>
+
+<div class="box box-amber">
+  <strong>비유:</strong> 일반 AI는 "질문에 답하는 백과사전"이고, AI 에이전트는 "업무를 직접 처리하는 직원"입니다.
+  "보고서 써줘" 라고 하면 백과사전은 쓰는 법을 알려주지만,
+  에이전트는 직접 자료를 찾아서 보고서를 완성해 줍니다.
+</div>
+
+<hr>
+
+<!-- ─────── 2 ─────── -->
+<h2 id="why-multi">2. 왜 에이전트를 여러 개 쓰나요?</h2>
+
+<p>에이전트 하나로는 한계가 있습니다.</p>
+
+<div class="tbl-wrap"><table>
+  <thead><tr><th>한계</th><th>설명</th><th>실제 문제 상황</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>컨텍스트 창 한계</strong></td>
+      <td>한 번에 볼 수 있는 텍스트 양이 제한됨</td>
+      <td>파일 수천 개짜리 코드베이스 전체를 한 번에 분석 불가</td>
+    </tr>
+    <tr>
+      <td><strong>전문성 한계</strong></td>
+      <td>하나의 에이전트가 모든 분야를 다 잘하기 어려움</td>
+      <td>코딩·보안·문서화를 동시에 완벽하게 처리하기 어려움</td>
+    </tr>
+    <tr>
+      <td><strong>병렬 처리 불가</strong></td>
+      <td>에이전트 하나는 한 번에 하나씩만 처리</td>
+      <td>100개 파일을 순서대로 분석하면 시간이 너무 오래 걸림</td>
+    </tr>
+    <tr>
+      <td><strong>자기 검증 한계</strong></td>
+      <td>스스로 만든 것의 오류를 잘 못 잡음</td>
+      <td>자신이 생성한 코드의 버그나 논리 오류를 놓칠 수 있음</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<p>이 한계를 극복하기 위해 에이전트를 여러 개 쓰는 방식이 등장했습니다. 그게 바로 <strong>서브에이전트</strong>와 <strong>멀티에이전트</strong> 시스템입니다.</p>
+
+<div class="box box-blue">
+  <strong>핵심 관계 정리 (먼저 알고 시작):</strong><br><br>
+  <strong>멀티에이전트 시스템</strong> = "여러 에이전트가 함께 동작하는 <em>모든</em> 시스템"의 총칭<br>
+  <strong>서브에이전트 구조</strong> = 멀티에이전트 시스템 중 "오케스트레이터 + 하위 에이전트" 계층형 구조<br><br>
+  즉, <strong>서브에이전트는 멀티에이전트의 한 종류</strong>입니다.<br>
+  "강아지는 동물이다" 처럼, "서브에이전트 구조는 멀티에이전트 시스템이다"라고 볼 수 있습니다.
+</div>
+
+<hr>
+
+<!-- ─────── 3 ─────── -->
+<h2 id="sec-sub">3. 서브에이전트(Subagent)란?</h2>
+
+<h3 id="sub-concept">쉽게 이해하기</h3>
+
+<p>서브에이전트는 <strong>"팀장(오케스트레이터)이 팀원(서브에이전트)들에게 업무를 나눠서 시키는 구조"</strong>입니다.</p>
+
+<div class="box box-amber">
+  <strong>🏢 회사 조직 비유:</strong><br><br>
+  <strong>오케스트레이터</strong> = 팀장. "이번 프로젝트를 완성해야 해"라는 큰 목표를 받음.<br>
+  → 팀장은 혼자 다 하지 않고, 전문 팀원들에게 나눠서 맡깁니다:<br><br>
+  &nbsp;&nbsp;• <strong>서브에이전트 A (코드 리뷰어)</strong>: "너는 코드 품질 검토해"<br>
+  &nbsp;&nbsp;• <strong>서브에이전트 B (보안 검사자)</strong>: "너는 보안 취약점 찾아"<br>
+  &nbsp;&nbsp;• <strong>서브에이전트 C (문서 작성자)</strong>: "너는 변경사항 문서화해"<br><br>
+  팀장은 각 팀원의 결과를 모아서 최종 보고서를 작성합니다.<br>
+  팀원들은 서로 직접 대화하지 않고, 팀장을 통해서만 소통합니다.
+</div>
+
+<h3 id="sub-structure">구조와 흐름</h3>
+
+<div class="diagram">
+  <div class="d-title">서브에이전트 구조 (계층형 · 위임형)</div>
+  <div class="d-col">
+    <div class="d-node d-orch" style="min-width:220px">
+      🎯 오케스트레이터 (메인 에이전트)<br>
+      <span style="font-size:11px;font-weight:400">전체 목표 수신 → 작업 분배 → 결과 통합</span>
+    </div>
+    <div style="display:flex;gap:60px;margin:4px 0">
+      <div class="d-av"></div><div class="d-av"></div><div class="d-av"></div>
+    </div>
+    <div class="d-row">
+      <div class="d-node d-sub" style="min-width:130px">
+        🔍 서브에이전트 A<br><span style="font-size:11px;font-weight:400">코드 리뷰 전문</span>
+      </div>
+      <div class="d-node d-sub" style="min-width:130px">
+        🛡️ 서브에이전트 B<br><span style="font-size:11px;font-weight:400">보안 검사 전문</span>
+      </div>
+      <div class="d-node d-sub" style="min-width:130px">
+        📝 서브에이전트 C<br><span style="font-size:11px;font-weight:400">문서 작성 전문</span>
+      </div>
+    </div>
+  </div>
+  <div class="d-cap">
+    화살표 방향: 오케스트레이터 → 서브에이전트 (위에서 아래로 단방향)<br>
+    서브에이전트끼리는 직접 소통하지 않습니다.
+  </div>
+</div>
+
+<p>서브에이전트 구조의 핵심 특징 3가지:</p>
+
+<ol class="steps">
+  <li>
+    <div>
+      <div class="step-title">반드시 오케스트레이터(지휘자)가 있다</div>
+      <div class="step-desc">모든 작업은 오케스트레이터가 받아서 분배합니다. 서브에이전트끼리 직접 대화하거나 독립적으로 행동하지 않습니다. 오케스트레이터가 전체 흐름을 통제합니다.</div>
+    </div>
+  </li>
+  <li>
+    <div>
+      <div class="step-title">각 서브에이전트는 전문 역할이 고정된다</div>
+      <div class="step-desc">코드 리뷰어는 코드 리뷰만, 테스트 작성자는 테스트만 합니다. 역할이 명확하게 분리되어 있기 때문에 더 전문적인 결과를 만들 수 있습니다.</div>
+    </div>
+  </li>
+  <li>
+    <div>
+      <div class="step-title">병렬 실행이 가능하다</div>
+      <div class="step-desc">A, B, C가 동시에 각자 일을 할 수 있습니다. 오케스트레이터는 모두 완료되면 결과를 합칩니다. 순서대로 하는 것보다 훨씬 빠릅니다.</div>
+    </div>
+  </li>
+</ol>
+
+<h3 id="sub-orch">오케스트레이터(Orchestrator)가 하는 일</h3>
+
+<p>오케스트레이터는 단순히 "시키는" 역할이 아닙니다. 꽤 많은 일을 합니다.</p>
+
+<div class="tbl-wrap"><table>
+  <thead><tr><th>역할</th><th>설명</th><th>예시</th></tr></thead>
+  <tbody>
+    <tr><td><strong>목표 해석</strong></td><td>사용자의 큰 요청을 분석</td><td>"전체 코드베이스 리팩토링" 요청을 받음</td></tr>
+    <tr><td><strong>작업 분해</strong></td><td>큰 일을 서브 태스크로 쪼갬</td><td>리뷰 / 테스트 / 문서화 / 최적화로 나눔</td></tr>
+    <tr><td><strong>에이전트 선택</strong></td><td>각 태스크에 맞는 서브에이전트 결정</td><td>"이건 보안 전문 에이전트한테 맡겨야 해"</td></tr>
+    <tr><td><strong>결과 수집</strong></td><td>모든 서브에이전트 결과를 취합</td><td>리뷰 결과 + 보안 보고서 + 문서 통합</td></tr>
+    <tr><td><strong>충돌 해결</strong></td><td>서브에이전트 간 결과 충돌 조율</td><td>"A는 이걸 삭제하라는데 B는 유지하라네"</td></tr>
+    <tr><td><strong>최종 전달</strong></td><td>통합된 결과를 사용자에게 반환</td><td>최종 PR 리뷰 리포트 작성</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="sub-benefit">장점과 한계</h3>
+
+<div class="two-col">
+  <div class="col-card">
+    <h4>✅ 서브에이전트의 장점</h4>
+    <ul>
+      <li><strong>메인 컨텍스트 보호</strong><br><span style="font-size:12px;color:var(--text3)">서브에이전트가 파일 1000개를 뒤져도 메인 대화에 영향 없음</span></li>
+      <li><strong>병렬 처리</strong><br><span style="font-size:12px;color:var(--text3)">A, B, C가 동시에 작업 → 3배 빠름</span></li>
+      <li><strong>전문화</strong><br><span style="font-size:12px;color:var(--text3)">각자 자기 분야만 깊이 파고듦</span></li>
+      <li><strong>재사용성</strong><br><span style="font-size:12px;color:var(--text3)">코드 리뷰어를 다른 프로젝트에도 사용</span></li>
+      <li><strong>예측 가능성</strong><br><span style="font-size:12px;color:var(--text3)">오케스트레이터가 전체 흐름을 통제하므로 예측 가능</span></li>
+    </ul>
+  </div>
+  <div class="col-card">
+    <h4>⚠️ 서브에이전트의 한계</h4>
+    <ul>
+      <li><strong>오케스트레이터 병목</strong><br><span style="font-size:12px;color:var(--text3)">오케스트레이터가 잘못 판단하면 전체 실패</span></li>
+      <li><strong>서브에이전트 간 소통 없음</strong><br><span style="font-size:12px;color:var(--text3)">A가 B의 결과를 모름. 오케스트레이터만 앎</span></li>
+      <li><strong>유연성 부족</strong><br><span style="font-size:12px;color:var(--text3)">역할이 고정되어 있어 예상 밖 상황에 약함</span></li>
+      <li><strong>단일 장애점</strong><br><span style="font-size:12px;color:var(--text3)">오케스트레이터가 실패하면 전체 시스템 멈춤</span></li>
+    </ul>
+  </div>
+</div>
+
+<h3 id="sub-example">Claude Code 서브에이전트 실제 예시</h3>
+
+<p>Claude Code에서 서브에이전트는 <code>.claude/agents/</code> 폴더에 마크다운 파일로 정의합니다. 이름, 역할 설명, 사용 가능한 도구, 모델을 지정합니다.</p>
+
+<pre><code><span class="cm"># .claude/agents/code-reviewer.md</span>
+---
+name: code-reviewer
+description: <span class="st">코드 리뷰. 스타일, 보안, 성능 문제 체크. 심각도 분류.</span>
+tools: Read, Grep, Glob
+model: claude-sonnet-4-6
+---
+
+당신은 코드 리뷰 전문 에이전트입니다.
+다음 기준으로 리뷰하세요:
+  1. 보안 취약점 (SQL 인젝션, XSS, 노출된 키 등)
+  2. 성능 문제 (N+1 쿼리, 불필요한 루프 등)
+  3. 코드 스타일 (네이밍, 함수 길이, 중복 코드)
+
+결과를 심각도 상/중/하로 분류해서 보여주세요.</code></pre>
+
+<pre><code><span class="cm"># .claude/agents/test-writer.md</span>
+---
+name: test-writer
+description: <span class="st">테스트 코드 작성. 단위 테스트 + 엣지케이스 포함.</span>
+tools: Read, Write, Bash(npm test:*)
+model: claude-sonnet-4-6
+---
+
+당신은 테스트 작성 전문가입니다.
+- 단위 테스트는 Vitest로 작성
+- 엣지케이스 반드시 포함
+- 테스트 실행까지 확인</code></pre>
+
+<div class="box box-teal">
+  <strong>실제 사용법:</strong><br>
+  사용자: "이 PR 코드 리뷰해줘"<br>
+  → 오케스트레이터(Claude)가 판단: "이건 code-reviewer 서브에이전트 쓸 상황이군"<br>
+  → <code>code-reviewer</code> 자동 호출 — 전용 컨텍스트에서 독립적으로 작업<br>
+  → 리뷰 결과만 오케스트레이터에게 반환 (메인 대화 오염 없음)
+</div>
+
+<h3 id="sub-flow">실제 동작 흐름 — 단계별</h3>
+
+<pre><code><span class="cm">== 사용자 요청 ==</span>
+사용자: "이번 커밋의 코드를 리뷰하고 테스트도 보강해줘"
+
+<span class="cm">== Step 1: 오케스트레이터가 작업 분해 ==</span>
+오케스트레이터 판단:
+  - 코드 변경사항 파악    → 내가 직접 처리
+  - 코드 품질 리뷰         → <span class="kw">code-reviewer</span> 에게 위임
+  - 부족한 테스트 보강     → <span class="kw">test-writer</span> 에게 위임
+  - 결과 통합 및 보고      → 내가 직접 처리
+
+<span class="cm">== Step 2: 병렬 실행 ==</span>
+[code-reviewer 실행 중...]       [test-writer 실행 중...]
+  src/auth.ts 분석 중...           기존 테스트 파악 중...
+  보안 취약점 2개 발견             누락 케이스 3개 발견
+  심각도 분류 완료                 테스트 코드 작성 완료
+  → 결과 반환                      → 결과 반환
+
+<span class="cm">== Step 3: 오케스트레이터가 결과 통합 ==</span>
+"리뷰 결과: 보안 문제 2건 (중요도 상), 스타일 5건..."
+"테스트 추가: auth.test.ts 에 3개 케이스 추가됨"
+→ 최종 통합 리포트를 사용자에게 전달</code></pre>
+
+<hr>
+
+<!-- ─────── 4 ─────── -->
+<h2 id="sec-multi">4. 멀티에이전트(Multi-agent)란?</h2>
+
+<h3 id="multi-concept">쉽게 이해하기</h3>
+
+<p>
+  멀티에이전트 시스템은 <strong>"여러 AI 에이전트가 함께 동작하는 모든 시스템"</strong>을 가리키는 포괄적인 용어입니다.
+  서브에이전트 구조도 멀티에이전트의 한 형태지만,
+  에이전트들이 <em>수평적으로 협력</em>하거나, <em>순서대로 결과를 넘기거나</em>, <em>서로 경쟁</em>하는 구조도 모두 멀티에이전트입니다.
+</p>
+
+<div class="box box-amber">
+  <strong>🏥 병원 진료 비유:</strong><br><br>
+  어떤 환자가 복잡한 병을 앓고 있습니다. 한 명의 의사로는 부족합니다.<br><br>
+  <strong>서브에이전트 방식 (계층형):</strong><br>
+  주치의(오케스트레이터)가 "내과는 네가, 외과는 네가, 영상의학은 네가 담당해"라고 지시.
+  각 전문의는 주치의의 지시에 따라 독립적으로 검사 후 주치의에게 결과 보고.<br><br>
+  <strong>멀티에이전트 방식 (수평형):</strong><br>
+  내과·외과·영상의학과 의사들이 <em>함께 회의실에 모여</em> 서로 의견을 나누고,
+  어떤 진단이 맞는지 토론해서 결론 도출. 누가 지휘자가 아님.<br><br>
+  → 둘 다 "여러 전문가가 협력하는" 것이지만, <strong>지시 구조의 위치가 다릅니다.</strong>
+</div>
+
+<h3 id="multi-types">멀티에이전트의 4가지 대표 유형</h3>
+
+<p>멀티에이전트 시스템은 에이전트들이 어떻게 연결되는지에 따라 크게 4가지로 나뉩니다.</p>
+
+<h3 id="multi-hier">① 계층형 (= 서브에이전트 구조)</h3>
+
+<div class="diagram">
+  <div class="d-title">계층형 멀티에이전트 = 서브에이전트 구조</div>
+  <div class="d-col">
+    <div class="d-node d-orch" style="min-width:180px">오케스트레이터</div>
+    <div style="display:flex;gap:50px"><div class="d-av"></div><div class="d-av"></div><div class="d-av"></div></div>
+    <div class="d-row">
+      <div class="d-node d-sub">에이전트 A</div>
+      <div class="d-node d-sub">에이전트 B</div>
+      <div class="d-node d-sub">에이전트 C</div>
+    </div>
+  </div>
+  <div class="d-cap">지시는 위에서 아래로. 서브에이전트끼리 직접 소통 없음.</div>
+</div>
+
+<div class="box box-blue">
+  <strong>특징:</strong> 오케스트레이터가 모든 것을 통제. 예측 가능하고 디버깅 쉬움.<br>
+  <strong>쓸 때:</strong> 큰 작업을 전문화된 팀원들에게 나눠 맡길 때<br>
+  <strong>예시:</strong> Claude Code 서브에이전트, PR 리뷰 자동화 시스템
+</div>
+
+<h3 id="multi-peer">② 수평형 (피어-투-피어, 협력형)</h3>
+
+<div class="diagram">
+  <div class="d-title">수평형 멀티에이전트 — 에이전트들이 대등하게 협력</div>
+  <div class="d-row" style="align-items:center">
+    <div class="d-node d-peer">에이전트 A<br><span style="font-size:11px;font-weight:400">분석 담당</span></div>
+    <div class="d-ah">⇄</div>
+    <div class="d-node d-peer">에이전트 B<br><span style="font-size:11px;font-weight:400">비판 담당</span></div>
+    <div class="d-ah">⇄</div>
+    <div class="d-node d-peer">에이전트 C<br><span style="font-size:11px;font-weight:400">종합 담당</span></div>
+  </div>
+  <div class="d-cap">누구도 지휘자가 아님. 서로 대화하고 의견 교환. 양방향 소통.</div>
+</div>
+
+<div class="box box-teal">
+  <strong>특징:</strong> 에이전트들이 서로의 출력을 보고 피드백. 상호 검증으로 오류 감소.<br>
+  <strong>쓸 때:</strong> 한 에이전트가 틀릴 수 있어서 여러 관점으로 검증이 필요할 때<br>
+  <strong>예시:</strong> AI 논문 리뷰 시스템, 법률 문서 검토, 사실 검증 에이전트 네트워크
+</div>
+
+<h3 id="multi-pipe">③ 파이프라인형 (순차 연결)</h3>
+
+<div class="diagram">
+  <div class="d-title">파이프라인형 멀티에이전트 — 순서대로 결과를 다음 에이전트에게 넘김</div>
+  <div class="d-row" style="align-items:center">
+    <div class="d-node d-sub">에이전트 A<br><span style="font-size:11px;font-weight:400">데이터 수집</span></div>
+    <div style="font-size:20px;color:var(--text3)">→</div>
+    <div class="d-node d-sub">에이전트 B<br><span style="font-size:11px;font-weight:400">분석·처리</span></div>
+    <div style="font-size:20px;color:var(--text3)">→</div>
+    <div class="d-node d-sub">에이전트 C<br><span style="font-size:11px;font-weight:400">보고서 작성</span></div>
+  </div>
+  <div class="d-cap">A의 출력이 B의 입력. B의 출력이 C의 입력. 컨베이어 벨트처럼 순서대로.</div>
+</div>
+
+<div class="box box-purple">
+  <strong>특징:</strong> 각 에이전트가 이전 단계 결과를 받아서 처리. 단계별 변환에 최적.<br>
+  <strong>쓸 때:</strong> 데이터 수집 → 분석 → 요약처럼 단계가 명확할 때<br>
+  <strong>예시:</strong> 뉴스 수집 → 번역 → 요약 → 발송 파이프라인, ETL 자동화
+</div>
+
+<h3 id="multi-compete">④ 경쟁형 (독립 실행 후 최선 선택)</h3>
+
+<div class="diagram">
+  <div class="d-title">경쟁형 멀티에이전트 — 각자 독립적으로 풀고 최선 선택</div>
+  <div class="d-col">
+    <div class="d-node d-neutral" style="min-width:180px">같은 문제 입력</div>
+    <div style="display:flex;gap:50px"><div class="d-av"></div><div class="d-av"></div><div class="d-av"></div></div>
+    <div class="d-row">
+      <div class="d-node d-sub">에이전트 A<br><span style="font-size:11px;font-weight:400">풀이 방법 1</span></div>
+      <div class="d-node d-sub">에이전트 B<br><span style="font-size:11px;font-weight:400">풀이 방법 2</span></div>
+      <div class="d-node d-sub">에이전트 C<br><span style="font-size:11px;font-weight:400">풀이 방법 3</span></div>
+    </div>
+    <div style="display:flex;gap:50px"><div class="d-av"></div><div class="d-av"></div><div class="d-av"></div></div>
+    <div class="d-node d-orch" style="min-width:180px">✅ 최선 결과 선택</div>
+  </div>
+  <div class="d-cap">서로 독립적으로 같은 문제를 풀고, 가장 좋은 결과를 채택.</div>
+</div>
+
+<div class="box box-green">
+  <strong>특징:</strong> 다양성으로 강건성 확보. 한 에이전트가 실패해도 다른 게 성공할 수 있음.<br>
+  <strong>쓸 때:</strong> 정답이 하나가 아니거나, 최선을 골라야 할 때<br>
+  <strong>예시:</strong> AlphaCode (여러 코드 생성 후 테스트 통과한 것 선택), AI 채점 시스템
+</div>
+
+<h3 id="multi-benefit">멀티에이전트 전체 장점과 한계</h3>
+
+<div class="two-col">
+  <div class="col-card">
+    <h4>✅ 멀티에이전트의 장점</h4>
+    <ul>
+      <li><strong>확장성</strong>: 에이전트를 추가해서 능력 확장</li>
+      <li><strong>상호 검증</strong>: 여러 에이전트가 서로 오류 잡음</li>
+      <li><strong>다양한 구조</strong>: 문제에 맞게 구조 선택 가능</li>
+      <li><strong>복잡한 문제 해결</strong>: 하나로 못 풀 때 강력</li>
+      <li><strong>장애 내성</strong>: 하나 실패해도 다른 것이 커버</li>
+    </ul>
+  </div>
+  <div class="col-card">
+    <h4>⚠️ 멀티에이전트의 한계</h4>
+    <ul>
+      <li><strong>비용 증가</strong>: 에이전트 수만큼 API 비용 증가</li>
+      <li><strong>조율 복잡성</strong>: 에이전트 간 통신 관리 어려움</li>
+      <li><strong>디버깅 어려움</strong>: 어느 에이전트가 틀렸는지 파악 힘듦</li>
+      <li><strong>지연 증가</strong>: 에이전트 간 통신으로 속도 저하</li>
+      <li><strong>충돌 해결 필요</strong>: 에이전트들이 서로 다른 답 낼 때</li>
+    </ul>
+  </div>
+</div>
+
+<hr>
+
+<!-- ─────── 5 ─────── -->
+<h2 id="sec-diff">5. 핵심 차이점 — 완전 비교표</h2>
+
+<div class="tbl-wrap"><table>
+  <thead><tr><th>비교 항목</th><th>서브에이전트</th><th>멀티에이전트 (수평형 기준)</th></tr></thead>
+  <tbody>
+    <tr class="hl">
+      <td><strong>포함 관계</strong></td>
+      <td>멀티에이전트의 한 종류 (부분집합)</td>
+      <td>상위 개념. 서브에이전트를 포함함</td>
+    </tr>
+    <tr>
+      <td><strong>구조 형태</strong></td>
+      <td>트리형 — 1개 오케스트레이터 + N개 하위 에이전트</td>
+      <td>네트워크형 — 에이전트들이 서로 연결</td>
+    </tr>
+    <tr>
+      <td><strong>지휘 방식</strong></td>
+      <td>중앙집중 — 오케스트레이터가 모든 것 결정</td>
+      <td>분산 — 에이전트들이 스스로 판단·협의</td>
+    </tr>
+    <tr>
+      <td><strong>통신 방향</strong></td>
+      <td>위 → 아래 (단방향)</td>
+      <td>양방향, 다방향 (모든 에이전트 간 가능)</td>
+    </tr>
+    <tr>
+      <td><strong>에이전트 자율성</strong></td>
+      <td>낮음 — 지시받은 것만 수행</td>
+      <td>높음 — 스스로 판단하고 행동</td>
+    </tr>
+    <tr>
+      <td><strong>역할 유연성</strong></td>
+      <td>고정 — "코드 리뷰어"는 항상 코드 리뷰만</td>
+      <td>유동 — 상황에 따라 역할 변화 가능</td>
+    </tr>
+    <tr>
+      <td><strong>예측 가능성</strong></td>
+      <td>높음 — 오케스트레이터가 흐름 통제</td>
+      <td>낮음 — 에이전트 간 상호작용 예측 어려움</td>
+    </tr>
+    <tr>
+      <td><strong>구현 난이도</strong></td>
+      <td>상대적으로 쉬움</td>
+      <td>복잡도 높음 (통신 프로토콜 설계 필요)</td>
+    </tr>
+    <tr>
+      <td><strong>주요 강점</strong></td>
+      <td>전문화, 병렬 처리, 컨텍스트 보호</td>
+      <td>상호 검증, 집단 지성, 복잡 문제 해결</td>
+    </tr>
+    <tr>
+      <td><strong>주요 약점</strong></td>
+      <td>오케스트레이터 단일 장애점</td>
+      <td>비용 증가, 디버깅 어려움</td>
+    </tr>
+    <tr>
+      <td><strong>비유</strong></td>
+      <td>팀장이 팀원에게 업무 분배</td>
+      <td>여러 전문가가 회의에서 협력</td>
+    </tr>
+    <tr>
+      <td><strong>대표 사례</strong></td>
+      <td>Claude Code 서브에이전트</td>
+      <td>AI 논문 리뷰, 팩트체크 시스템</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<hr>
+
+<!-- ─────── 6 ─────── -->
+<h2 id="sec-when">6. 언제 무엇을 써야 해?</h2>
+
+<h3>서브에이전트가 적합한 상황</h3>
+
+<div class="tbl-wrap"><table>
+  <thead><tr><th>상황</th><th>이유</th><th>예시</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>큰 작업을 역할 분리해서 처리하고 싶을 때</td>
+      <td>오케스트레이터가 분해하고 위임하기 좋음</td>
+      <td>코드 리뷰 + 테스트 + 문서화 동시에</td>
+    </tr>
+    <tr>
+      <td>메인 대화 오염 없이 세부 작업을 처리할 때</td>
+      <td>서브에이전트는 별도 컨텍스트 사용</td>
+      <td>1000개 파일 검색, 메인엔 결과만 반환</td>
+    </tr>
+    <tr>
+      <td>같은 에이전트를 여러 프로젝트에서 재사용</td>
+      <td>역할이 고정되어 있어 재사용하기 좋음</td>
+      <td>코드 리뷰어를 모든 프로젝트에 적용</td>
+    </tr>
+    <tr>
+      <td>병렬 처리로 속도를 높이고 싶을 때</td>
+      <td>여러 서브에이전트가 동시에 작업 가능</td>
+      <td>10개 파일을 10개 에이전트가 동시 분석</td>
+    </tr>
+    <tr>
+      <td>흐름을 정확히 제어하고 싶을 때</td>
+      <td>오케스트레이터가 모든 것을 통제</td>
+      <td>단계별 승인이 필요한 업무 프로세스</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<h3>수평형 멀티에이전트가 적합한 상황</h3>
+
+<div class="tbl-wrap"><table>
+  <thead><tr><th>상황</th><th>이유</th><th>예시</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>한 에이전트의 판단을 검증해야 할 때</td>
+      <td>다른 에이전트가 오류를 잡아줄 수 있음</td>
+      <td>의료 진단, 법률 해석, 재무 분석</td>
+    </tr>
+    <tr>
+      <td>여러 관점이 필요한 복잡한 결정</td>
+      <td>각자 다른 시각으로 기여</td>
+      <td>전략 수립, 리스크 평가</td>
+    </tr>
+    <tr>
+      <td>정답이 불명확하고 토론이 필요할 때</td>
+      <td>에이전트들이 서로 반론하며 발전</td>
+      <td>새로운 아이디어 검토, 창작물 평가</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<h3>파이프라인형이 적합한 상황</h3>
+
+<div class="box box-purple">
+  데이터가 단계별로 <strong>변환</strong>되어야 할 때 씁니다.<br>
+  원본 데이터 → 전처리 → 분석 → 시각화 → 보고서처럼 입력과 출력이 명확한 단계가 이어질 때 최적입니다.<br><br>
+  <strong>핵심 판단 질문:</strong> "이전 단계의 결과물이 다음 단계의 원료가 되는가?" → 파이프라인형
+</div>
+
+<hr>
+
+<!-- ─────── 7 ─────── -->
+<h2 id="sec-real">7. 실전 시나리오로 이해하기</h2>
+
+<h3>시나리오 A — 소프트웨어 개발팀의 PR 리뷰</h3>
+
+<p>새로운 결제 기능을 개발했고, PR을 올리기 전에 검토가 필요합니다. 어떤 방식이 더 어울릴까요?</p>
+
+<div class="two-col">
+  <div class="col-card" style="border-color:var(--amber-border)">
+    <h4>🎯 서브에이전트 방식 선택</h4>
+    <ul style="font-size:13px">
+      <li>오케스트레이터: PR 분석 후 작업 분배</li>
+      <li>코드 리뷰어: 코드 품질 체크 (병렬)</li>
+      <li>보안 에이전트: 결제 로직 보안 검토 (병렬)</li>
+      <li>테스트 에이전트: 테스트 커버리지 확인 (병렬)</li>
+      <li>오케스트레이터: 결과 통합 → 최종 리포트</li>
+    </ul>
+    <div style="margin-top:10px;font-size:12px;color:var(--text3)">✅ 각 분야 전문화, 병렬 처리로 빠름</div>
+  </div>
+  <div class="col-card" style="border-color:var(--teal-border)">
+    <h4>🤝 수평형은 언제?</h4>
+    <ul style="font-size:13px">
+      <li>"이 결제 방식 자체가 맞나?" 같은 질문</li>
+      <li>아키텍처 트레이드오프 결정</li>
+      <li>정답이 없는 설계 방향 선택</li>
+      <li>에이전트들이 서로 의견 교환</li>
+      <li>합의된 최종 방향 도출</li>
+    </ul>
+    <div style="margin-top:10px;font-size:12px;color:var(--text3)">✅ 복잡한 결정, 다양한 관점 필요할 때</div>
+  </div>
+</div>
+
+<div class="box box-amber">
+  <strong>결론:</strong> PR 검토처럼 <em>각 항목을 독립적으로 체크할 수 있는 작업</em>은 서브에이전트가 빠르고 효율적입니다.
+  반면 "이 아키텍처 방향이 맞나?"처럼 <em>정답이 없고 토론이 필요한 결정</em>은 수평형 멀티에이전트가 더 적합합니다.
+</div>
+
+<h3>시나리오 B — 리서치 보고서 자동 생성</h3>
+
+<pre><code><span class="cm">== 파이프라인형 멀티에이전트 예시 ==</span>
+
+사용자: "AI 반도체 시장 동향 보고서 만들어줘"
+
+<span class="kw">에이전트 A (수집):</span>
+  → 최신 뉴스, 논문, 시장조사 자료 크롤링
+  → 원본 데이터 100개 수집
+  → 결과물: raw_data.json
+
+<span class="kw">에이전트 B (분석):</span>  ← A의 raw_data.json 을 입력으로 받음
+  → 핵심 트렌드 5가지 추출
+  → 수치 데이터 정리
+  → 결과물: analysis.json
+
+<span class="kw">에이전트 C (작성):</span>  ← B의 analysis.json 을 입력으로 받음
+  → 보고서 형식으로 문서화
+  → 그래프 및 표 포함
+  → 결과물: report.pdf</code></pre>
+
+<div class="box box-blue">
+  파이프라인형은 <strong>각 에이전트가 이전 단계의 출력을 입력으로 받는</strong> 구조입니다.
+  서브에이전트와 비슷해 보이지만, 오케스트레이터가 통제하는 게 아니라
+  에이전트들이 <em>순서대로 자동 연결</em>된다는 점이 다릅니다.
+</div>
+
+<h3>시나리오 C — AI 논술 채점 시스템</h3>
+
+<pre><code><span class="cm">== 경쟁형 멀티에이전트 예시 ==</span>
+
+문제: "이 학생의 서술형 답안을 100점 만점으로 채점하라"
+
+<span class="kw">에이전트 A</span> (독립적으로 채점): 62점 — 논리 구조가 약함
+<span class="kw">에이전트 B</span> (독립적으로 채점): 70점 — 창의성은 있으나 근거 부족
+<span class="kw">에이전트 C</span> (독립적으로 채점): 65점 — 전반적으로 평균 수준
+
+→ 평균: 65.7점
+→ 각 에이전트 근거를 비교해서 최종 점수 결정
+→ 최종: 66점 (근거 포함 상세 피드백)</code></pre>
+
+<div class="box box-green">
+  경쟁형은 <strong>한 에이전트의 판단만 믿기 어려울 때</strong> 씁니다.
+  여러 에이전트가 독립적으로 같은 문제를 풀고, 결과를 비교해서 신뢰성을 높입니다.
+  의료 진단, 법률 해석, 심사 평가 등 중요한 판단에 유용합니다.
+</div>
+
+<hr>
+
+<!-- ─────── 8 ─────── -->
+<h2 id="sec-combo">8. 함께 쓰기 — 실제 고급 시스템</h2>
+
+<p>
+  실제 복잡한 AI 시스템에서는 서브에이전트와 멀티에이전트를 <strong>혼합</strong>합니다.
+  오케스트레이터가 서브에이전트들을 호출하고, 그 서브에이전트들이 내부에서 멀티에이전트 방식으로 협력하는 구조입니다.
+</p>
+
+<div class="diagram">
+  <div class="d-title">혼합형 — 계층형 + 수평 협력 조합</div>
+  <div class="d-col">
+    <div class="d-node d-orch" style="min-width:220px">🎯 오케스트레이터<br><span style="font-size:11px;font-weight:400">전체 목표 조율 · 결과 통합</span></div>
+    <div class="d-av" style="height:30px"></div>
+    <div class="d-dashed">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);text-align:center;margin-bottom:12px">서브에이전트 그룹 (내부에서 상호 협력)</div>
+      <div class="d-row">
+        <div class="d-node d-sub" style="font-size:12px;padding:8px 12px">분석 에이전트</div>
+        <div class="d-ah" style="font-size:14px">⇄</div>
+        <div class="d-node d-sub" style="font-size:12px;padding:8px 12px">비판 에이전트</div>
+        <div class="d-ah" style="font-size:14px">⇄</div>
+        <div class="d-node d-sub" style="font-size:12px;padding:8px 12px">검증 에이전트</div>
+      </div>
+    </div>
+  </div>
+  <div class="d-cap">오케스트레이터는 전체를 통제하지만, 서브에이전트들끼리는 수평적으로 협력</div>
+</div>
+
+<pre><code><span class="cm">== 혼합형 실전 예시: 복잡한 아키텍처 설계 ==</span>
+
+사용자: "우리 서비스를 마이크로서비스로 전환하는 계획 세워줘"
+
+<span class="kw">오케스트레이터:</span>
+  "이건 혼자 처리하기엔 복잡해. 설계 팀 만들자."
+
+  <span class="cm">→ 서브에이전트 그룹 실행 (내부에서 멀티에이전트 협력)</span>
+  설계A: "이렇게 서비스를 8개로 분리하자" (초안 제안)
+  비판B: "결제와 재고가 같은 DB면 데이터 정합성 문제 생겨" (반론)
+  설계A: "그럼 Saga 패턴 적용하면 어때?" (수정안)
+  검증C: "마이그레이션 비용과 기간은 얼마나 될까?" (검증)
+  비판B: "6개월은 너무 위험해. 단계적 전환 방식은?" (재반론)
+  설계A + 검증C: "Strangler Fig 패턴으로 단계별 전환 동의" (합의)
+
+<span class="kw">오케스트레이터:</span>
+  "그룹 토론 완료. 결론: Strangler Fig 패턴 12개월 전환 계획"
+  → 사용자에게 최종 계획서 전달</code></pre>
+
+<hr>
+
+<!-- ─────── 9 ─────── -->
+<h2 id="sec-faq">9. 자주 묻는 질문 (FAQ)</h2>
+
+<div class="qa">
+  <div class="qa-q">Q. 서브에이전트랑 멀티에이전트가 같은 말 아닌가요?</div>
+  <div class="qa-a">
+    다릅니다. 멀티에이전트는 "여러 에이전트가 함께 쓰이는 모든 시스템"을 가리키는 넓은 개념입니다.
+    서브에이전트는 그 중 "오케스트레이터가 하위 에이전트에게 위임하는 <em>계층형 구조</em>"를 가리킵니다.
+    관계를 정리하면: <strong>서브에이전트 ⊂ 멀티에이전트</strong>.<br><br>
+    즉, 모든 서브에이전트 시스템은 멀티에이전트 시스템이지만,
+    모든 멀티에이전트 시스템이 서브에이전트 구조인 건 아닙니다.
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-q">Q. 그냥 에이전트 하나로 하면 안 되나요?</div>
+  <div class="qa-a">
+    작은 작업은 하나로 충분합니다. 하지만 큰 코드베이스 전체를 분석하거나,
+    여러 전문 분야를 동시에 처리하거나, 상호 검증이 필요한 경우에는 에이전트 하나로는
+    컨텍스트 한계나 전문성 한계에 부딪힙니다. 그럴 때 여러 에이전트를 씁니다.
+    반대로, 단순한 작업에 복잡한 멀티에이전트 시스템을 쓰는 건 과도한 비용과 복잡성만 초래합니다.
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-q">Q. 에이전트가 많을수록 항상 좋은 건가요?</div>
+  <div class="qa-a">
+    아닙니다. 에이전트 수가 늘수록 API 비용이 증가하고, 조율이 복잡해지며, 디버깅이 어려워집니다.
+    단순한 작업에 복잡한 멀티에이전트 시스템을 쓰는 건 오히려 역효과입니다.
+    <strong>"최소한의 에이전트로 최대한의 효과"</strong>가 실제 시스템 설계의 원칙입니다.
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-q">Q. Claude Code에서 멀티에이전트는 어떻게 구현하나요?</div>
+  <div class="qa-a">
+    Claude Code는 기본적으로 서브에이전트 구조를 지원합니다 (<code>.claude/agents/</code> 폴더에 에이전트 정의).
+    수평형 멀티에이전트는 MCP(Model Context Protocol)를 통해 외부 에이전트 시스템과 연결하거나,
+    오케스트레이터가 여러 에이전트를 순차적으로 호출하고 결과를 다시 다음 에이전트에게 넘기는 방식으로 구현할 수 있습니다.
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-q">Q. A2A(Agent-to-Agent) 프로토콜과는 어떤 관계인가요?</div>
+  <div class="qa-a">
+    A2A는 Google이 제안한 에이전트 간 통신 표준입니다.
+    이 프로토콜을 쓰면 서로 다른 AI 에이전트들이 표준화된 방식으로 소통할 수 있습니다.
+    수평형 멀티에이전트를 실제로 구현할 때 A2A를 <em>통신 레이어</em>로 사용합니다.
+    즉, A2A는 멀티에이전트 시스템을 실제로 연결하는 "통신 인프라"입니다.
+    MCP가 "에이전트와 외부 도구를 연결"한다면, A2A는 "에이전트와 에이전트를 연결"합니다.
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-q">Q. 오케스트레이터도 AI 에이전트인가요?</div>
+  <div class="qa-a">
+    네. 오케스트레이터도 AI 에이전트입니다. Claude Code에서는 Claude 자체가 오케스트레이터 역할을 합니다.
+    사용자의 요청을 받아서 어느 서브에이전트를 호출할지 판단하고, 결과를 통합하는 일 자체가 AI 에이전트의 역할입니다.
+    즉, 오케스트레이터는 "서브에이전트들을 관리하는 상위 AI 에이전트"입니다.
+  </div>
+</div>
+
+<hr>
+
+<!-- ─────── 요약 ─────── -->
+<h2 id="sec-summary">핵심 요약</h2>
+
+<div class="tbl-wrap"><table>
+  <thead><tr><th>개념</th><th>한 줄 정의</th><th>구조</th><th>강점</th><th>비유</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="badge b-amber">서브에이전트</span></td>
+      <td>오케스트레이터가 하위 에이전트에게 일을 위임</td>
+      <td>계층형 (트리)</td>
+      <td>전문화, 병렬, 컨텍스트 보호</td>
+      <td>팀장 → 팀원</td>
+    </tr>
+    <tr>
+      <td><span class="badge b-teal">멀티에이전트 (수평)</span></td>
+      <td>에이전트들이 대등하게 협력·검증</td>
+      <td>수평형 (피어)</td>
+      <td>상호 검증, 다양한 관점</td>
+      <td>전문가 회의</td>
+    </tr>
+    <tr>
+      <td><span class="badge b-blue">멀티에이전트 (파이프)</span></td>
+      <td>에이전트들이 순서대로 결과를 넘김</td>
+      <td>파이프라인형</td>
+      <td>단계별 변환, 명확한 흐름</td>
+      <td>컨베이어 벨트</td>
+    </tr>
+    <tr>
+      <td><span class="badge b-green">멀티에이전트 (경쟁)</span></td>
+      <td>독립적으로 풀고 최선 선택</td>
+      <td>병렬 독립형</td>
+      <td>강건성, 신뢰성</td>
+      <td>여러 의사 소견</td>
+    </tr>
+    <tr class="hl">
+      <td><span class="badge b-purple">포함 관계</span></td>
+      <td>서브에이전트 ⊂ 멀티에이전트</td>
+      <td>멀티에이전트가 상위 개념</td>
+      <td>—</td>
+      <td>강아지 ⊂ 동물</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<div class="box box-teal">
+  <strong>한 줄 결론:</strong><br>
+  서브에이전트 = <em>오케스트레이터 + 하위 에이전트의 계층형 위임 구조</em><br>
+  멀티에이전트 = <em>여러 에이전트가 함께 동작하는 모든 시스템</em> (서브에이전트 포함)
+</div>
+
+<div class="box box-amber">
+  <strong>실전 선택 기준:</strong><br>
+  작업 분업·병렬 처리가 필요하다 → <strong>서브에이전트</strong><br>
+  여러 관점으로 검증이 필요하다 → <strong>수평형 멀티에이전트</strong><br>
+  데이터를 단계별로 변환해야 한다 → <strong>파이프라인형 멀티에이전트</strong><br>
+  최선의 답을 골라야 한다 → <strong>경쟁형 멀티에이전트</strong><br>
+  복잡한 큰 시스템 → <strong>혼합형 (위 방식들을 조합)</strong>
+</div>
+
+<div class="footer">
+  작성일: 2026-05-11 &nbsp;·&nbsp; 에이전트 아키텍처 완전 가이드 &nbsp;·&nbsp;
+  코딩 AI 교육 과정 참고 자료
+</div>
+
+</main>
+</div>
+
+<script>
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('hidden')}
+function toggleDark(){
+  const h=document.documentElement;
+  const d=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',d?'':'dark');
+  localStorage.setItem('theme',d?'':'dark');
+}
+if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark');
+const heads=document.querySelectorAll('#content h2,#content h3');
+const links=document.querySelectorAll('#sidebar a');
+function updateToc(){
+  let cur='';
+  heads.forEach(h=>{if(h.getBoundingClientRect().top<=72)cur=h.id});
+  links.forEach(a=>{
+    a.classList.remove('active');
+    if(a.getAttribute('href')==='#'+cur)a.classList.add('active');
+  });
+}
+window.addEventListener('scroll',updateToc,{passive:true});
+updateToc();
+links.forEach(l=>{
+  l.addEventListener('click',e=>{
+    const h=l.getAttribute('href');
+    if(h&&h.startsWith('#')){
+      e.preventDefault();
+      const el=document.querySelector(h);
+      if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+      if(window.innerWidth<768)document.getElementById('sidebar').classList.add('hidden');
+    }
+  });
+});
+</script>
+</body>
+</html>
